@@ -1,6 +1,8 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import BoopButton from "./components/audiohander"
+//import Navbar from "./components/navbar"
 
 function App() {
   return (
@@ -18,6 +20,11 @@ function App() {
         >
           Learn React
         </a>
+        {/* <Navbar/> */}
+          {/* <Routes>
+            <Route path="/" element={<Home />} />
+          </Routes> */}
+        <BoopButton></BoopButton>
       </header>
     </div>
   );
