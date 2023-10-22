@@ -3,6 +3,8 @@ import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import logo from './assets/doof.png';
 import './App.css';
+import BoopButton from "./components/audiohander"
+//import Navbar from "./components/navbar"
 
 function App() {
   return (
