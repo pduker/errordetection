@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import logo from './assets/doof.png';
@@ -11,6 +11,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 //import Navbar from "./components/navbar"
 
 function App() {
+  const [correctAnswers, setCorrectAnswers] = useState<Array<String>>();
   return (
     <Router>
       <div className="App">
@@ -36,7 +37,7 @@ function App() {
         
           <main>
             <Routes>
-              <Route path="/exercises" element={<ExercisesPage />} />
+              <Route path="/exercises" element={<ExercisesPage correctAnswers={correctAnswers} setCorrectAnswers={setCorrectAnswers}></ExercisesPage>} />
             </Routes>
 
             <Routes>
