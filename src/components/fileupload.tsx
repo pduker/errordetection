@@ -4,7 +4,6 @@ import $ from 'jquery';
 import { vertaal } from 'xml2abc';
 
 export default function FileUpload (): JSX.Element{
-    <script src="xml2abc.js"></script>
     //state declarations, can be used to access file in the future
     const [file, setFile] = useState<File>();
     const [msgContent, setMsgContent] = useState<string>("Nothing selected.");
