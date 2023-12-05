@@ -1,13 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-type FileInfo = {
-  name: string;
-  size: number;
-  type: string;
-  originalFile: File;
-};
 
-export default function AudioHandler({ files }: { files: FileInfo[] }): JSX.Element {
+export default function AudioHandler({ files }: { files: File[] }): JSX.Element {
   //state declarations, can be used to access file in the future
   const [msgContent, setMsgContent] = useState<string>("");
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -15,7 +9,7 @@ export default function AudioHandler({ files }: { files: FileInfo[] }): JSX.Elem
   //sets the audio that is uploaded
   useEffect(() => {
     if (files.length > 0) {
-      const objectURL = URL.createObjectURL(files[0].originalFile);
+      const objectURL = URL.createObjectURL(files[files.length-1]);
       if (audioRef.current) {
         audioRef.current.src = objectURL;
       }
