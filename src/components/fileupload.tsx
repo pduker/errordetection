@@ -46,9 +46,9 @@ export default function FileUpload ({
       }
         setFile(files[0]);
         
-        setFiles([...files, selectedFiles[0]]);
+        setFiles([...files, selectedFiles[selectedFiles.length-1]]);
         //checks for .musicxml and .mp3 files, otherwise returns error msg (can be easily changed)
-        if (files[0].name.endsWith(".musicxml")) {
+        if (selectedFiles[selectedFiles.length-1].name.endsWith(".musicxml")) {
             setMsgContent("xml file selected.");
             const fileReader = new FileReader();
             fileReader.onload = () => {
@@ -57,7 +57,7 @@ export default function FileUpload ({
                 abcTranslate(fileContent);
             }
             console.log("now reading");
-            fileReader.readAsText(files[0]);
+            fileReader.readAsText(selectedFiles[selectedFiles.length-1]);
           } else if (selectedFiles[0].name.endsWith(".mp3")) {
             setMsgContent("mp3 file selected.");
           } else {

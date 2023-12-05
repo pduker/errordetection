@@ -9,7 +9,7 @@ export default function AudioHandler({ files }: { files: File[] }): JSX.Element 
   //sets the audio that is uploaded
   useEffect(() => {
     if (files.length > 0) {
-      const objectURL = URL.createObjectURL(files[0]);
+      const objectURL = URL.createObjectURL(files[files.length-1]);
       if (audioRef.current) {
         audioRef.current.src = objectURL;
       }
