@@ -1,25 +1,16 @@
-image: node:latest
-
-stages:
-  - build
-  - run
-
-# Job's name
-first-job:
-  # Define stage
-  stage: build
-  # What to run on the job.
+# The Docker image that will be used to build your app
+image: node:16-alpine
+# Functions that should be executed before the build script is run
+pages:
   script:
     - npm install
+    - npm run build
+    - cp -r build/* public/
   artifacts:
     paths:
-      - node_modules
-
-second-job:
-  stage: run
-  script:
-    - npm run start
-    - node test.js
-  artifacts:
-    paths:
-      - node_modules/
+      - public
+      # The folder that contains the files to be exposed at the Page URL
+  rules:
+    # This ensures that only pushes to the default branch will trigger
+    # a pages deploy
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH

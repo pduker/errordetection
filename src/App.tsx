@@ -16,6 +16,7 @@ import ExerciseData from './interfaces/exerciseData';
 function App() {
   const [correctAnswers, setCorrectAnswers] = useState<Array<String>>();
   const [exerciseData, setExerciseData] = useState<ExerciseData>();
+  const [files, setFiles] = useState<File[]>([]);
   return (
     <Router>
       <div className="App">
@@ -41,11 +42,11 @@ function App() {
         
           <main>
             <Routes>
-              <Route path="/exercises" element={<ExercisesPage setExerciseData={setExerciseData} exerciseData={exerciseData} ></ExercisesPage>} />
+              <Route path="/exercises" element={<ExercisesPage setExerciseData={setExerciseData} exerciseData={exerciseData} files={files} setFiles={setFiles}></ExercisesPage>} />
             </Routes>
 
             <Routes>
-              <Route path="/exercise-management" element={<ExerciseManagementPage setExerciseData={setExerciseData} />} />
+              <Route path="/exercise-management" element={<ExerciseManagementPage setExerciseData={setExerciseData} files={files} setFiles = {setFiles}/>} />
             </Routes>
 
             <Routes>

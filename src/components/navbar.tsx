@@ -1,5 +1,6 @@
 import React from 'react';
 import {Outlet,Link} from 'react-router-dom';
+//import { Button } from "react-bootstrap";
 
 export function Navbar(){
 
@@ -10,9 +11,10 @@ export function Navbar(){
                 <nav >
                    
                     <Link to="/home">Onboarding Hero</Link>
-                </nav>
+                </nav>      
 
                 <Outlet />
             </>
+            
         );
 }

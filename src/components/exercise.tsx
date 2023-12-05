@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import  abcjs from 'abcjs';
-import { FileUpload } from './fileupload';
+import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
+import AudioHandler from './audiohandler';
 
 
 export function Exercise({ 
     setExerciseData,
     teacherMode,
-    exerciseData
+    exerciseData,
+    files,
+    setFiles
 }: { 
     exerciseData: ExerciseData | undefined;
     setExerciseData: ((newData: ExerciseData) => void);
     teacherMode: boolean;
+    files:File[];
+    setFiles:((newFile: File[]) => void);
 }) {
     var abc,ans,feed: string;
     abc = "";
@@ -66,7 +71,7 @@ export function Exercise({
         <div>
             {teacherMode==true?
             <span>
-                <FileUpload setAbcFile={setAbcFile}></FileUpload>
+                <FileUpload setFiles={setFiles} files={files} setAbcFile={setAbcFile}></FileUpload>
                 <button onClick={loadScore}>Load Score</button>
                 <div id ="target"></div>
                 <div className="clicked-info"></div>
@@ -84,6 +89,7 @@ export function Exercise({
             <button onClick={loadScore}>Load Score</button>
             <div id ="target"></div>
             <div className="clicked-info"></div>
+            <AudioHandler files={files}></AudioHandler>
             <div>Analysis: {ana}</div>
             <button onClick={selectAnswer}>Check Answer</button>
             {selectedAnswer !== undefined ? (

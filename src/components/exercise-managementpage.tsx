@@ -1,17 +1,21 @@
 import ExerciseData from '../interfaces/exerciseData';
 import { Exercise } from './exercise';
-import { FileUpload } from './fileupload';
+
 
 export function ExerciseManagementPage({
-    setExerciseData
+    setExerciseData,
+    files,
+    setFiles
 }:{
-    setExerciseData: ((newData: ExerciseData) => void)
+    files: File[];
+    setExerciseData: ((newData: ExerciseData) => void);
+    setFiles: ((newFiles: File[]) => void);
 }) {
     return (
         <div>
             <h2>Welcome to the Exercise Management Page!</h2>
             {/*Component for uploading .musicxml files and .mp3 files, found in fileupload.tsx*/}
-            <Exercise teacherMode={true} setExerciseData={setExerciseData} exerciseData={undefined}></Exercise>
+            <Exercise teacherMode={true} setExerciseData={setExerciseData} exerciseData={undefined} files={files} setFiles ={setFiles}></Exercise>
         </div>
     );
 }
