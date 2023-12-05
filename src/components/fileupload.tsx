@@ -58,7 +58,7 @@ export default function FileUpload ({
             }
             console.log("now reading");
             fileReader.readAsText(selectedFiles[selectedFiles.length-1]);
-          } else if (selectedFiles[0].name.endsWith(".mp3")) {
+          } else if (selectedFiles[selectedFiles.length-1].name.endsWith(".mp3")) {
             setMsgContent("mp3 file selected.");
           } else {
             setMsgContent("Invalid file! Please select either a .musicxml or .mp3 file.");
