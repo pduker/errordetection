@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import logo from './assets/doof.png';
@@ -8,9 +8,15 @@ import { HelpPage } from './components/helppage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { Interface } from 'readline';
+import ExerciseData from './interfaces/exerciseData';
+
 //import Navbar from "./components/navbar"
 
 function App() {
+  const [correctAnswers, setCorrectAnswers] = useState<Array<String>>();
+  const [exerciseData, setExerciseData] = useState<ExerciseData>();
+  const [files, setFiles] = useState<File[]>([]);
   return (
     <Router>
       <div className="App">
@@ -36,11 +42,11 @@ function App() {
         
           <main>
             <Routes>
-              <Route path="/exercises" element={<ExercisesPage />} />
+              <Route path="/exercises" element={<ExercisesPage setExerciseData={setExerciseData} exerciseData={exerciseData} files={files} setFiles={setFiles}></ExercisesPage>} />
             </Routes>
 
             <Routes>
-              <Route path="/exercise-management" element={<ExerciseManagementPage />} />
+              <Route path="/exercise-management" element={<ExerciseManagementPage setExerciseData={setExerciseData} files={files} setFiles = {setFiles}/>} />
             </Routes>
 
             <Routes>
