@@ -3,6 +3,7 @@ import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
 import AudioHandler from './audiohandler';
+import { unstable_renderSubtreeIntoContainer } from 'react-dom';
 
 
 export function Exercise({ 
@@ -19,7 +20,7 @@ export function Exercise({
     setFiles:((newFile: File[]) => void);
 }) {
     var abc,ans,feed, color: string;
-    var selNotes: any[] = [];
+    var selNotesCopy: any[];
     abc = "";
     ans = "";
     feed = "";
@@ -29,7 +30,10 @@ export function Exercise({
             feed = exerciseData.feedback;
     }
     const [output, setOutput] = useState<string>();
+    const [selNotes,setSelNotes] =useState<any[]>([]);
+
     const [selectedAnswer, setSelectedAnswer] = useState<string>();
+    const [selectedAnswers, setSelectedAnswers] = useState<any[]>();
     const [correctAnswer, setCorrectAnswer] = useState<string>(ans);
     const [itemList, setItemList] = useState<JSX.Element[]>();
     
@@ -60,7 +64,10 @@ export function Exercise({
         
         var selTim = note.abselem.elemset[0].getAttribute("selectedTimes");
         if (clicked) selTim++;
-        if (selTim >= 4) selTim = 0;
+        if (selTim >= 4) {
+            selTim = 0;
+            selNotesCopy.splice(selNotesCopy.indexOf(note),1);
+        }
         if (klass === undefined)
             klass = "abcjs-note_selected";
         if (selTim <= 0) {
@@ -77,6 +84,7 @@ export function Exercise({
         }
         if (clicked) note.abselem.elemset[0].setAttribute("selectedTimes", selTim);
         setClass(note.abselem.elemset, klass, "", color);
+        
     };
 
     const clickListener = function (abcelem:any, tuneNumber: number, classes:string, analysis:abcjs.ClickListenerAnalysis, drag:abcjs.ClickListenerDrag){
@@ -91,6 +99,7 @@ export function Exercise({
         if(!selNotes.includes(note)) {
             selNotes[selNotes.length] = note;
         }
+        selNotesCopy = [...selNotes];
         for (var i=0; i<selNotes.length; i++) {
             if(selNotes[i] === note) {
                 highlight(selNotes[i], undefined, true);
@@ -98,8 +107,10 @@ export function Exercise({
                 highlight(selNotes[i], undefined, false);
             }
         }
+        setSelNotes([...selNotesCopy]);
         var test = document.querySelector(".clicked-info");
         if(test !== null) {test.innerHTML = "<div class='label'>Clicked info:</div>" + op;}
+        console.log(selNotesCopy);
     }
     
     const loadScore = function() {
@@ -116,11 +127,17 @@ export function Exercise({
         
     }
     const save = function(){
-        if(abcFile !== undefined && selectedAnswer !== undefined){
+        if(abcFile !== undefined && selectedAnswer !== undefined ){
             let data = new ExerciseData(abcFile, selectedAnswer, "");
             setExerciseData(data);
         }
-            
+        //console.log(selNotesCopy);    
+    }
+    const multiAnswer = function(){
+        //console.log(selNotes)
+        setSelectedAnswers(selNotes);
+        
+        
     }
 
     const selectAnswer = function() {
@@ -143,11 +160,16 @@ export function Exercise({
                 <div id ="target"></div>
                 <div className="clicked-info"></div>
                 <div>Analysis: {ana}</div>
-                <button onClick={selectAnswer}>Select Answer</button>
+                <button onClick={multiAnswer}>Select Answer</button>
                 <div>Currently selected answer:</div>
+                
+                {selectedAnswers !== undefined ?
                 <ul>
-                    <li>{selectedAnswer}</li>
-                </ul>
+                <li>{selectedAnswers[selectedAnswers.length-1].abselem.elemset[0].getAttribute("data-index")}</li>
+                </ul>:
+                <div></div>
+                }
+                
                 <button onClick={save}>Save</button>
                 
                 {/* <textarea id="abc"></textarea>
@@ -161,7 +183,7 @@ export function Exercise({
             <div className="clicked-info"></div>
             <AudioHandler files={files}></AudioHandler>
             <div>Analysis: {ana}</div>
-            <button onClick={selectAnswer}>Check Answer</button>
+            <button onClick={multiAnswer}>Check Answer</button>
             {selectedAnswer !== undefined ? (
                 selectedAnswer === correctAnswer ? 
                     <div>Correct!</div>
