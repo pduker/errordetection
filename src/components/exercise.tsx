@@ -3,7 +3,6 @@ import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
 import AudioHandler from './audiohandler';
-import { unstable_renderSubtreeIntoContainer } from 'react-dom';
 
 
 export function Exercise({ 
@@ -60,13 +59,14 @@ export function Exercise({
         }
     };
 
-    const highlight = function (note: any, klass: any, clicked: boolean) {
-        
+    const highlight = function (note: any, klass: any, clicked: boolean): number {
+        var retval = 0;
         var selTim = note.abselem.elemset[0].getAttribute("selectedTimes");
         if (clicked) selTim++;
         if (selTim >= 4) {
             selTim = 0;
-            selNotesCopy.splice(selNotesCopy.indexOf(note),1);
+            selNotes.splice(selNotes.indexOf(note),1);
+            retval = 1;
         }
         if (klass === undefined)
             klass = "abcjs-note_selected";
@@ -84,6 +84,7 @@ export function Exercise({
         }
         if (clicked) note.abselem.elemset[0].setAttribute("selectedTimes", selTim);
         setClass(note.abselem.elemset, klass, "", color);
+        return retval;
         
     };
 
@@ -96,21 +97,20 @@ export function Exercise({
         if(!(note.abselem.elemset[0].getAttribute("selectedTimes"))) {
             note.abselem.elemset[0].setAttribute("selectedTimes", 0)
         }
+        selNotesCopy = [...selNotes];
         if(!selNotes.includes(note)) {
             selNotes[selNotes.length] = note;
         }
-        selNotesCopy = [...selNotes];
         for (var i=0; i<selNotes.length; i++) {
             if(selNotes[i] === note) {
-                highlight(selNotes[i], undefined, true);
+                if(highlight(selNotes[i], undefined, true) === 1) i--;
             } else {
-                highlight(selNotes[i], undefined, false);
+                if(highlight(selNotes[i], undefined, false) === 1) i--;
             }
         }
-        setSelNotes([...selNotesCopy]);
+        setSelNotes([...selNotes]);
         var test = document.querySelector(".clicked-info");
         if(test !== null) {test.innerHTML = "<div class='label'>Clicked info:</div>" + op;}
-        console.log(selNotesCopy);
     }
     
     const loadScore = function() {
@@ -165,7 +165,11 @@ export function Exercise({
                 
                 {selectedAnswers !== undefined ?
                 <ul>
-                <li>{selectedAnswers[selectedAnswers.length-1].abselem.elemset[0].getAttribute("data-index")}</li>
+                    {selectedAnswers.map(function(answer) {
+                        return (
+                            <li key={answer.abselem.elemset[0].getAttribute("data-index")}>{answer.abselem.elemset[0].getAttribute("data-index")}</li>
+                        )
+                    })}
                 </ul>:
                 <div></div>
                 }

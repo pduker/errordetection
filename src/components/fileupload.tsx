@@ -19,7 +19,6 @@ export default function FileUpload ({
     const abcTranslate = function (fileContent: string) {
       var domparser = new DOMParser();
       var xmldata = domparser.parseFromString(fileContent, 'application/xml');
-      console.log("file is parsed");
       var options = { u:0, b:0, n:0,
       c:0, v:0, d:0,  
       m:0, x:0, t:0,  
@@ -27,13 +26,12 @@ export default function FileUpload ({
       stm:0,          
       p:'f', s:0 };
       var result = vertaal(xmldata, options);
-      console.log("vertaal called");
       var abcText = result[0];
       var errorText = result[1];
       if (setAbcFile != null) {
           setAbcFile(abcText);
-          console.log("file? " + abcText + "<- should be here");
-          console.log("error text: " + errorText);
+          //console.log("file? " + abcText + "<- should be here");
+          //console.log("error text: " + errorText);
       }
   }
 
@@ -53,10 +51,8 @@ export default function FileUpload ({
             const fileReader = new FileReader();
             fileReader.onload = () => {
                 const fileContent = fileReader.result as string;
-                console.log("file is now string");
                 abcTranslate(fileContent);
             }
-            console.log("now reading");
             fileReader.readAsText(selectedFiles[selectedFiles.length-1]);
           } else if (selectedFiles[selectedFiles.length-1].name.endsWith(".mp3")) {
             setMsgContent("mp3 file selected.");
