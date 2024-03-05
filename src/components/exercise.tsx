@@ -89,7 +89,7 @@ export function Exercise({
     const clickListener = function (abcelem:any, tuneNumber: number, classes:string, analysis:abcjs.ClickListenerAnalysis, drag:abcjs.ClickListenerDrag){
         var op = JSON.stringify(drag.index);
         setOutput(op);
-        setAna(JSON.stringify(drag.index));
+        //setAna(JSON.stringify(drag.index));
         var note = abcelem;
         var noteElems = note.abselem.elemset[0];
         //selected notes handling
@@ -108,8 +108,8 @@ export function Exercise({
         }
         var test = document.querySelector(".clicked-info");
         if(test !== null) {test.innerHTML = "<div class='label'>Clicked info:</div>" + op;}
-        /* var staffCt = (Number(noteElems.getAttribute("staffPos"))) + 1, measureCt = (Number(noteElems.getAttribute("measurePos")) + 1);
-        console.log("Note is on staff " + staffCt + " and measure " + measureCt); */
+        var staffCt = (Number(noteElems.getAttribute("staffPos"))) + 1, measureCt = (Number(noteElems.getAttribute("measurePos")) + 1);
+        setAna("Note is on staff " + staffCt + " and measure " + measureCt);
     }
     
     const loadScore = function() {
@@ -120,7 +120,8 @@ export function Exercise({
         
         // adds staff # and measure # to each note when the score is first loaded
         var staffArray = visualObjs[0].lines[0].staff;
-        for (let i = 0, j = 0, staff = 0, measure = 0; i < staffArray[0].voices[0].length + staffArray[1].voices[0].length + staffArray[2].voices[0].length - 3; i++, j++) {
+        
+        for (let j = 0, staff = 0, measure = 0; staff < staffArray.length; j++) {
             if(!(staffArray[staff].voices[0][j].abselem.elemset[0].getAttribute("staffPos"))) staffArray[staff].voices[0][j].abselem.elemset[0].setAttribute("staffPos", staff);
             if(!(staffArray[staff].voices[0][j].abselem.elemset[0].getAttribute("measurePos"))) staffArray[staff].voices[0][j].abselem.elemset[0].setAttribute("measurePos", measure);
             if(staffArray[staff].voices[0][j].el_type === "bar") measure++;
