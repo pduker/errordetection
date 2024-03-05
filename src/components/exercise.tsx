@@ -18,22 +18,22 @@ export function Exercise({
     files:File[];
     setFiles:((newFile: File[]) => void);
 }) {
-    var abc,ans,feed, color: string;
-    var selNotesCopy: any[];
+    var abc,feed, color: string;
+    var ans;
     abc = "";
-    ans = "";
+    ans = [];
     feed = "";
-    if(exerciseData !== undefined && exerciseData.score !== undefined && exerciseData.correctAnswer !== undefined && exerciseData.feedback !== undefined){
+    if(exerciseData !== undefined && exerciseData.score !== undefined && exerciseData.correctAnswers !== undefined && exerciseData.feedback !== undefined){
             abc = exerciseData.score;
-            ans = exerciseData.correctAnswer;
+            ans = exerciseData.correctAnswers;
             feed = exerciseData.feedback;
     }
     const [output, setOutput] = useState<string>();
     const [selNotes,setSelNotes] =useState<any[]>([]);
 
-    const [selectedAnswer, setSelectedAnswer] = useState<string>();
-    const [selectedAnswers, setSelectedAnswers] = useState<any[]>();
-    const [correctAnswer, setCorrectAnswer] = useState<string>(ans);
+    const [selAnswers, setSelAnswers] = useState<any[]>([]);
+    const [correctAnswers, setCorrectAnswers] = useState<{}>({});
+    //const [correctAnswers, setCorrectAnswers] = useState<string>(ans);
     const [itemList, setItemList] = useState<JSX.Element[]>();
     
     const [abcFile, setAbcFile] = useState<string>(abc);
@@ -92,23 +92,40 @@ export function Exercise({
     
         var op = JSON.stringify(drag.index);
         setOutput(op);
-        setAna(JSON.stringify(drag.index));
+       
         var note = abcelem;
-        if(!(note.abselem.elemset[0].getAttribute("selectedTimes"))) {
-            note.abselem.elemset[0].setAttribute("selectedTimes", 0)
+        if(!(note.abselem.elemset[0].getAttribute("selectedTimes")) && !(note.abselem.elemset[0].getAttribute("index"))) {
+            note.abselem.elemset[0].setAttribute("selectedTimes", 0);
+            note.abselem.elemset[0].setAttribute("index",op);
         }
-        selNotesCopy = [...selNotes];
-        if(!selNotes.includes(note)) {
-            selNotes[selNotes.length] = note;
-        }
-        for (var i=0; i<selNotes.length; i++) {
-            if(selNotes[i] === note) {
-                if(highlight(selNotes[i], undefined, true) === 1) i--;
-            } else {
-                if(highlight(selNotes[i], undefined, false) === 1) i--;
+        
+        if(teacherMode){
+            if(!selNotes.includes(note)) {
+                selNotes[selNotes.length] = note;
             }
+            for (var i=0; i<selNotes.length; i++) {
+                if(selNotes[i] === note) {
+                    if(highlight(selNotes[i], undefined, true) === 1) i--;
+                } else {
+                    if(highlight(selNotes[i], undefined, false) === 1) i--;
+                }
+            }
+            setSelNotes([...selNotes]);
         }
-        setSelNotes([...selNotes]);
+        else{
+            if(!selAnswers.includes(note)) {
+                selAnswers[selAnswers.length] = note;
+            }
+            for (var i=0; i<selAnswers.length; i++) {
+                if(selAnswers[i] === note) {
+                    if(highlight(selAnswers[i], undefined, true) === 1) i--;
+                } else {
+                    if(highlight(selAnswers[i], undefined, false) === 1) i--;
+                }
+            }
+            setSelAnswers([...selAnswers]);
+        }
+        setAna(JSON.stringify(drag.index) +',' + note.abselem.elemset[0].getAttribute("selectedTimes"));
         var test = document.querySelector(".clicked-info");
         if(test !== null) {test.innerHTML = "<div class='label'>Clicked info:</div>" + op;}
     }
@@ -127,26 +144,28 @@ export function Exercise({
         
     }
     const save = function(){
-        if(abcFile !== undefined && selectedAnswer !== undefined ){
-            let data = new ExerciseData(abcFile, selectedAnswer, "");
+        if(abcFile !== undefined && correctAnswers !== undefined ){
+            let data = new ExerciseData(abcFile, correctAnswers, "");
+            console.log(correctAnswers);
             setExerciseData(data);
         }
         //console.log(selNotesCopy);    
     }
     const multiAnswer = function(){
-        //console.log(selNotes)
-        setSelectedAnswers(selNotes);
         
-        
-    }
-
-    const selectAnswer = function() {
-        if(output !== undefined && selectedAnswer !== output) {
-            const newSelected = (output);
-            setSelectedAnswer(newSelected);
-        }else{
-            setSelectedAnswer('');
+        const dict:{[idk:number]: {}} = {};
+        for(let i = 0;i < selNotes.length;i++){
+            const dict2:{[label:string]: number} ={
+                "staffPos":selNotes[i].abselem.elemset[0].getAttribute("staffPos"),
+                "measurePos":selNotes[i].abselem.elemset[0].getAttribute("measurePos"),
+                "selectedTimes":selNotes[i].abselem.elemset[0].getAttribute("selectedTimes")
+            }
         }
+        setCorrectAnswers(dict);  
+    }
+    const log = function(){
+        console.log(selAnswers);
+        console.log(correctAnswers);
     }
 
     return (
@@ -161,18 +180,18 @@ export function Exercise({
                 <div className="clicked-info"></div>
                 <div>Analysis: {ana}</div>
                 <button onClick={multiAnswer}>Select Answer</button>
-                <div>Currently selected answer:</div>
+                {/* <div>Currently selected answer:</div> */}
                 
-                {selectedAnswers !== undefined ?
+                {/* {correctAnswers !== undefined ?
                 <ul>
-                    {selectedAnswers.map(function(answer) {
+                    {correctAnswers.map(function(answer) {
                         return (
                             <li key={answer.abselem.elemset[0].getAttribute("data-index")}>{answer.abselem.elemset[0].getAttribute("data-index")}</li>
                         )
                     })}
                 </ul>:
                 <div></div>
-                }
+                } */}
                 
                 <button onClick={save}>Save</button>
                 
@@ -187,9 +206,9 @@ export function Exercise({
             <div className="clicked-info"></div>
             <AudioHandler files={files}></AudioHandler>
             <div>Analysis: {ana}</div>
-            <button onClick={multiAnswer}>Check Answer</button>
-            {selectedAnswer !== undefined ? (
-                selectedAnswer === correctAnswer ? 
+            <button onClick={log}>Check Answer</button>
+            {selAnswers.length >=1 ? (
+                selAnswers.every((element, index) => element === correctAnswers.idk) ? 
                     <div>Correct!</div>
                     :
                     <div>Incorrect </div>) : 
