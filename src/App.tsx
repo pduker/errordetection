@@ -26,8 +26,8 @@ function App() {
               <img
                 alt=""
                 src={logo}
-                width="75"
-                height="75"
+                width="90"
+                height="90"
                 className="d-inline-block align-top"
               />
             </Navbar.Brand>

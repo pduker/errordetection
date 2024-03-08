@@ -5,7 +5,7 @@
 
 .App-header {
   background-color: #efefef;
-  min-height: 5vh;
+  min-height: 15vh;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
