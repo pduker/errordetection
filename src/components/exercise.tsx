@@ -176,7 +176,6 @@ export function Exercise({
         if(abcFile !== undefined && abcFile !== "" && correctAnswers !== undefined ){
             let data = new ExerciseData(abcFile, correctAnswers, "");
             setExerciseData(data);
-            console.log(data);
         }  
     }
     const multiAnswer = function(){
@@ -214,12 +213,19 @@ export function Exercise({
         return ret;
     }
 
+    const debug = function() {
+        console.log("loaded? " + loaded);
+        console.log("exercise data? V");
+        console.log(exerciseData);
+    }
+
     return (
         <div>
+            <button onClick={debug}>bebug bubbon</button>
             {teacherMode===true?
             <span>
                 <FileUpload setFiles={setFiles} files={files} setAbcFile={setAbcFile}></FileUpload>
-                {(abcFile !== undefined && abcFile !== "" && !loaded) || (exerciseData !== undefined) ? <button onClick={loadScore}>Load Score</button> : <div/>}
+                {(exerciseData !== undefined) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
                 <div id ="target"></div>
                 {/* <div className="clicked-info"></div> */}
                 {selNotes.length >= 1 ? <div>Analysis: {ana}</div> : <div/>}
@@ -248,21 +254,25 @@ export function Exercise({
             </span>
             :
             <span>
-            <button onClick={loadScore}>Load Score</button>
+            {(abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <div/>}
             <div id ="target"></div>
             {/* <div className="clicked-info"></div> */}
-            <AudioHandler files={files}></AudioHandler>
+            {files.some((element) => element.name.endsWith(".mp3")) ? <AudioHandler files={files}></AudioHandler> : <></>}
             {selAnswers.length >= 1 ? <div>Analysis: {ana}</div> : <div/>}
-            <button onClick={log}>Check Answer</button>
-            {selAnswers.length >= 1 ? (
-                selAnswers.length === Object.keys(correctAnswers).length ? (
-                    selAnswers.every(everyFunc) ? 
-                        <div>Correct!</div>
-                        :
-                        <div>Incorrect </div>) : 
-                    <div>Incorrect</div>) :
-                <div>Select an Answer</div>
-            }
+            {(abcFile !== undefined && abcFile !== "" && loaded) ? 
+                <div>
+                    <button onClick={log}>Check Answer</button>
+                    {selAnswers.length >= 1 ? (
+                        selAnswers.length === Object.keys(correctAnswers).length ? (
+                            selAnswers.every(everyFunc) ? 
+                                <div>Correct!</div>
+                                :
+                                <div>Incorrect </div>) : 
+                            <div>Incorrect</div>) :
+                        <div>Select an Answer</div>
+                    }
+                </div>
+                : <div/>}
             </span>
             }
             
