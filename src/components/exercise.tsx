@@ -4,6 +4,7 @@ import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
 import AudioHandler from './audiohandler';
 import { Button } from 'react-bootstrap';
+import { load } from 'mime';
 
 
 export function Exercise({ 
@@ -225,7 +226,7 @@ export function Exercise({
             {teacherMode===true?
             <span>
                 <FileUpload setFiles={setFiles} files={files} setAbcFile={setAbcFile}></FileUpload>
-                {(exerciseData !== undefined) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
+                {(exerciseData !== undefined && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
                 <div id ="target"></div>
                 {/* <div className="clicked-info"></div> */}
                 {selNotes.length >= 1 ? <div>Analysis: {ana}</div> : <div/>}

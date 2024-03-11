@@ -46,7 +46,7 @@ function App() {
             </Routes>
 
             <Routes>
-              <Route path="/exercise-management" element={<ExerciseManagementPage setExerciseData={setExerciseData} files={files} setFiles = {setFiles}/>} />
+              <Route path="/exercise-management" element={<ExerciseManagementPage setExerciseData={setExerciseData} exerciseData={exerciseData} files={files} setFiles = {setFiles}/>} />
             </Routes>
 
             <Routes>

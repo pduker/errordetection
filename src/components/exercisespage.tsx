@@ -19,7 +19,6 @@ export function ExercisesPage({
         <div>
             <h2>Welcome to the Exercises Page!</h2>
             <Exercise teacherMode ={false} setExerciseData={setExerciseData} exerciseData={exerciseData} files ={files} setFiles={setFiles}></Exercise>
-
         </div>
 
     );
