@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import  abcjs from 'abcjs';
+import  abcjs, { Editor } from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
 import AudioHandler from './audiohandler';
@@ -7,27 +7,33 @@ import { Button } from 'react-bootstrap';
 import { load } from 'mime';
 
 
-export function Exercise({ 
-    setExerciseData,
+export function Exercise({
+    exIndex, 
     teacherMode,
-    exerciseData,
     files,
-    setFiles
+    setFiles,
+    setAllExData,
+    allExData
 }: { 
-    exerciseData: ExerciseData | undefined;
-    setExerciseData: ((newData: ExerciseData) => void);
+    exIndex: number;
+    
+    
     teacherMode: boolean;
     files:File[];
     setFiles:((newFile: File[]) => void);
+    allExData: ExerciseData[];
+    setAllExData: ((newData: ExerciseData[]) => void);
 }) {
     var abc = "", feed = "", color: string;
     var ans = {};
     var visualObjs: any;
-
+    var exerciseData = allExData[exIndex];
     if(exerciseData !== undefined) {
+       
         if(exerciseData.score !== undefined) abc = exerciseData.score;
         if(exerciseData.correctAnswers !== undefined) ans = exerciseData.correctAnswers;
         if(exerciseData.feedback !== undefined) feed = exerciseData.feedback;
+        
     }
 
     const [updated, setUpdated] = useState<boolean>(false);
@@ -143,7 +149,7 @@ export function Exercise({
     const loadScore = function() {
         // sample file: "X:1\nZ:Copyright ©\n%%scale 0.83\n%%pagewidth 21.59cm\n%%leftmargin 1.49cm\n%%rightmargin 1.49cm\n%%score [ 1 2 ] 3\nL:1/4\nQ:1/4=60\nM:4/4\nI:linebreak $\nK:Amin\nV:1 treble nm=Flute snm=Fl.\nV:2 treble transpose=-9 nm=Alto Saxophone snm=Alto Sax.\nV:3 bass nm=Violoncello snm= Vc.\nV:1\nc2 G3/2 _B/ | _A/_B/ c _d f | _e _d c2 |] %3\nV:2\n[K:F#min] =c d c3/2 e/ | =f f/e/ d2 | =f e f2 |] %3\nV:3\n_A,,2 _E,,2 | F,,2 _D,,2 | _E,,2 _A,,2 |] %3"
         var abcString = abcFile;
-        var el = document.getElementById("target");
+        var el = document.getElementById("target" + exIndex);
         if(el !== null && abcString !== undefined){
             visualObjs = abcjs.renderAbc(el,abcString,{ clickListener: clickListener, selectTypes: ["note"]});
         
@@ -175,8 +181,9 @@ export function Exercise({
 
     const save = function(){
         if(abcFile !== undefined && abcFile !== "" && correctAnswers !== undefined ){
-            let data = new ExerciseData(abcFile, correctAnswers, "");
-            setExerciseData(data);
+            let data = new ExerciseData(abcFile, correctAnswers, "",exIndex);
+            //setExerciseData(data);
+            setAllExData([...allExData,data]);
         }  
     }
     const multiAnswer = function(){
@@ -222,12 +229,12 @@ export function Exercise({
 
     return (
         <div>
-            <button onClick={debug}>bebug bubbon</button>
+            {/* <button onClick={debug}>bebug bubbon</button> */}
             {teacherMode===true?
             <span>
                 <FileUpload setFiles={setFiles} files={files} setAbcFile={setAbcFile}></FileUpload>
                 {(exerciseData !== undefined && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
-                <div id ="target"></div>
+                <div id ={"target" + exIndex}></div>
                 {/* <div className="clicked-info"></div> */}
                 {selNotes.length >= 1 ? <div>Analysis: {ana}</div> : <div/>}
                 {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined) ? <div> 
@@ -256,7 +263,7 @@ export function Exercise({
             :
             <span>
             {(abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <div/>}
-            <div id ="target"></div>
+            <div id ={"target" + exIndex}></div>
             {/* <div className="clicked-info"></div> */}
             {files.some((element) => element.name.endsWith(".mp3")) ? <AudioHandler files={files}></AudioHandler> : <></>}
             {selAnswers.length >= 1 ? <div>Analysis: {ana}</div> : <div/>}

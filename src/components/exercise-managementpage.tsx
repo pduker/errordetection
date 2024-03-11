@@ -3,21 +3,23 @@ import { Exercise } from './exercise';
 
 
 export function ExerciseManagementPage({
-    setExerciseData,
-    exerciseData,
+    
     files,
-    setFiles
+    setFiles,
+    allExData,
+    setAllExData
 }:{
     files: File[];
-    setExerciseData: ((newData: ExerciseData) => void);
     setFiles: ((newFiles: File[]) => void);
-    exerciseData: ExerciseData | undefined;
+    allExData: ExerciseData[];
+    setAllExData: ((newData: ExerciseData[]) => void);
 }) {
     return (
         <div>
             <h2>Welcome to the Exercise Management Page!</h2>
             {/*Component for uploading .musicxml files and .mp3 files, found in fileupload.tsx*/}
-            <Exercise teacherMode={true} setExerciseData={setExerciseData} exerciseData={exerciseData} files={files} setFiles ={setFiles}></Exercise>
+            <Exercise teacherMode={true} allExData = {allExData} setAllExData = {setAllExData}files={files} setFiles ={setFiles} exIndex={0}></Exercise>
+            <Exercise teacherMode={true} allExData = {allExData} setAllExData = {setAllExData} files={files} setFiles ={setFiles} exIndex={1}></Exercise>
         </div>
     );
 }
