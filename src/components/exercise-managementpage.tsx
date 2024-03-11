@@ -1,3 +1,4 @@
+import { Button } from 'react-bootstrap';
 import ExerciseData from '../interfaces/exerciseData';
 import { Exercise } from './exercise';
 
@@ -11,15 +12,28 @@ export function ExerciseManagementPage({
 }:{
     files: File[];
     setFiles: ((newFiles: File[]) => void);
-    allExData: ExerciseData[];
-    setAllExData: ((newData: ExerciseData[]) => void);
+    allExData: (ExerciseData | undefined)[];
+    setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
 }) {
+    const createExercise = function () {
+        setAllExData([...allExData, new ExerciseData("", {}, "", allExData.length, true)]);
+    }
+
     return (
-        <div>
+        <div style={{margin: "10px"}}>
             <h2>Welcome to the Exercise Management Page!</h2>
-            {/*Component for uploading .musicxml files and .mp3 files, found in fileupload.tsx*/}
-            <Exercise teacherMode={true} allExData = {allExData} setAllExData = {setAllExData}files={files} setFiles ={setFiles} exIndex={0}></Exercise>
-            <Exercise teacherMode={true} allExData = {allExData} setAllExData = {setAllExData} files={files} setFiles ={setFiles} exIndex={1}></Exercise>
+            {allExData.map(function(exercise) {
+                if (exercise !== undefined)
+                return (
+                    <Exercise teacherMode={true} allExData={allExData} setAllExData={setAllExData} files={files} setFiles={setFiles} exIndex={exercise.exIndex}></Exercise>
+                )
+                else return (
+                    <Exercise teacherMode={true} allExData={allExData} setAllExData={setAllExData} files={files} setFiles={setFiles} exIndex={allExData.length}></Exercise>
+                )
+            })}
+            <Button onClick={createExercise}>+ New Exercise</Button>
+            {/* <Exercise teacherMode={true} allExData = {allExData} setAllExData = {setAllExData}files={files} setFiles ={setFiles} exIndex={0}></Exercise>
+            <Exercise teacherMode={true} allExData = {allExData} setAllExData = {setAllExData} files={files} setFiles ={setFiles} exIndex={1}></Exercise> */}
         </div>
     );
 }

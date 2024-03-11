@@ -4,7 +4,7 @@
 }
 
 .App-header {
-  background-color: #efefef;
+  /*background-color: #efefef;*/
   min-height: 15vh;
   display: flex;
   flex-direction: row;
@@ -17,6 +17,7 @@
 .Home-bar {
   padding-left: 1vw;
   padding-top: 1vh;
+  background-color: #efefef;
 }
 
 .Home-nav {

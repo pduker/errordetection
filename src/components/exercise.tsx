@@ -16,18 +16,20 @@ export function Exercise({
     allExData
 }: { 
     exIndex: number;
-    
-    
     teacherMode: boolean;
     files:File[];
     setFiles:((newFile: File[]) => void);
-    allExData: ExerciseData[];
-    setAllExData: ((newData: ExerciseData[]) => void);
+    allExData: (ExerciseData | undefined)[];
+    setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
 }) {
+    //for score styling
+    const score = {margin: "auto", backgroundColor: "white", borderRadius: "2px"};
+
     var abc = "", feed = "", color: string;
     var ans = {};
     var visualObjs: any;
     var exerciseData = allExData[exIndex];
+    var exInd = exIndex;
     if(exerciseData !== undefined) {
        
         if(exerciseData.score !== undefined) abc = exerciseData.score;
@@ -180,10 +182,13 @@ export function Exercise({
     }
 
     const save = function(){
-        if(abcFile !== undefined && abcFile !== "" && correctAnswers !== undefined ){
-            let data = new ExerciseData(abcFile, correctAnswers, "",exIndex);
-            //setExerciseData(data);
-            setAllExData([...allExData,data]);
+        if(abcFile !== undefined && abcFile !== "" && correctAnswers !== undefined) {
+            let data = new ExerciseData(abcFile, correctAnswers, "", exInd, false);
+            if(!allExData[exInd]) setAllExData([...allExData,data]);
+            else {
+                allExData[exInd] = data;
+                setAllExData(allExData);
+            }
         }  
     }
     const multiAnswer = function(){
@@ -228,16 +233,17 @@ export function Exercise({
     }
 
     return (
-        <div>
+        <div style = {{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
             {/* <button onClick={debug}>bebug bubbon</button> */}
+            <h3>Exercise {exIndex}</h3>
             {teacherMode===true?
             <span>
                 <FileUpload setFiles={setFiles} files={files} setAbcFile={setAbcFile}></FileUpload>
-                {(exerciseData !== undefined && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
-                <div id ={"target" + exIndex}></div>
+                {(exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
+                <div id ={"target" + exIndex} style={score}/*style = {{margin: "auto", backgroundColor: "white", borderRadius: "2px"}}*/></div>
                 {/* <div className="clicked-info"></div> */}
                 {selNotes.length >= 1 ? <div>Analysis: {ana}</div> : <div/>}
-                {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined) ? <div> 
+                {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? <div> 
                     <button onClick={multiAnswer}>Update Answers</button>
                     {updated ? <div>Answers updated.</div> : <div/>}
                     <Button variant='danger' onClick={reload}>Reset Answers</Button>
@@ -263,7 +269,7 @@ export function Exercise({
             :
             <span>
             {(abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <div/>}
-            <div id ={"target" + exIndex}></div>
+            <div id ={"target" + exIndex} style={score}></div>
             {/* <div className="clicked-info"></div> */}
             {files.some((element) => element.name.endsWith(".mp3")) ? <AudioHandler files={files}></AudioHandler> : <></>}
             {selAnswers.length >= 1 ? <div>Analysis: {ana}</div> : <div/>}

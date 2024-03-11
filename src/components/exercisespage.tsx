@@ -11,16 +11,22 @@ export function ExercisesPage({
 }:{
     files:File[];
     setFiles: ((newFiles: File[]) => void);
-    allExData: ExerciseData[];
-    setAllExData: ((newData: ExerciseData[]) => void);
+    allExData: (ExerciseData | undefined)[];
+    setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
 }){
 
     return (
-        <div>
+        <div className="ex-page">
             <h2>Welcome to the Exercises Page!</h2>
-            <Exercise teacherMode ={false} allExData = {allExData} setAllExData = {setAllExData}files ={files} setFiles={setFiles} exIndex={0}></Exercise>
+            {allExData.map(function(exercise) {
+                if (exercise !== undefined)
+                return (
+                    <Exercise teacherMode={false} allExData={allExData} setAllExData={setAllExData} files={files} setFiles={setFiles} exIndex={exercise.exIndex}></Exercise>
+                )
+            })}
+            {/* <Exercise teacherMode ={false} allExData = {allExData} setAllExData = {setAllExData}files ={files} setFiles={setFiles} exIndex={0}></Exercise>
 
-            <Exercise teacherMode ={false} allExData = {allExData} setAllExData = {setAllExData} files ={files} setFiles={setFiles} exIndex={1}></Exercise>
+            <Exercise teacherMode ={false} allExData = {allExData} setAllExData = {setAllExData} files ={files} setFiles={setFiles} exIndex={1}></Exercise> */}
         </div>
 
     );
