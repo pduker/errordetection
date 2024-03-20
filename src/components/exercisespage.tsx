@@ -1,5 +1,3 @@
-import React, { useState } from 'react';
-import  abcjs from 'abcjs';
 import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
 
@@ -16,13 +14,14 @@ export function ExercisesPage({
 }){
 
     return (
-        <div className="ex-page">
+        <div style={{margin: "10px"}}>
             <h2>Welcome to the Exercises Page!</h2>
             {allExData.map(function(exercise) {
                 if (exercise !== undefined)
                 return (
-                    <Exercise teacherMode={false} allExData={allExData} setAllExData={setAllExData} files={files} setFiles={setFiles} exIndex={exercise.exIndex}></Exercise>
+                    <Exercise key={exercise.exIndex} teacherMode={false} allExData={allExData} setAllExData={setAllExData} files={files} setFiles={setFiles} exIndex={exercise.exIndex}></Exercise>
                 )
+                else return <></>;
             })}
             {/* <Exercise teacherMode ={false} allExData = {allExData} setAllExData = {setAllExData}files ={files} setFiles={setFiles} exIndex={0}></Exercise>
 

@@ -16,7 +16,7 @@ export function ExerciseManagementPage({
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
 }) {
     const createExercise = function () {
-        setAllExData([...allExData, new ExerciseData("", {}, "", allExData.length, true)]);
+        setAllExData([...allExData, new ExerciseData("", [], "", allExData.length, true)]);
     }
 
     return (
@@ -25,10 +25,10 @@ export function ExerciseManagementPage({
             {allExData.map(function(exercise) {
                 if (exercise !== undefined)
                 return (
-                    <Exercise teacherMode={true} allExData={allExData} setAllExData={setAllExData} files={files} setFiles={setFiles} exIndex={exercise.exIndex}></Exercise>
+                    <Exercise key={exercise.exIndex} teacherMode={true} allExData={allExData} setAllExData={setAllExData} files={files} setFiles={setFiles} exIndex={exercise.exIndex}></Exercise>
                 )
                 else return (
-                    <Exercise teacherMode={true} allExData={allExData} setAllExData={setAllExData} files={files} setFiles={setFiles} exIndex={allExData.length}></Exercise>
+                    <Exercise key={allExData.length} teacherMode={true} allExData={allExData} setAllExData={setAllExData} files={files} setFiles={setFiles} exIndex={allExData.length}></Exercise>
                 )
             })}
             <Button onClick={createExercise}>+ New Exercise</Button>

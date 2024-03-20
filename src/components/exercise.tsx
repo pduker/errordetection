@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import  abcjs, { Editor } from 'abcjs';
+import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
 import AudioHandler from './audiohandler';
 import { Button } from 'react-bootstrap';
-import { load } from 'mime';
 
 
 export function Exercise({
@@ -23,10 +22,10 @@ export function Exercise({
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
 }) {
     //for score styling
-    const score = {margin: "auto", backgroundColor: "white", borderRadius: "2px"};
+    const score = {display: "inline-block", margin: "auto", backgroundColor: "white", borderRadius: "2px"};
 
     var abc = "", feed = "", color: string;
-    var ans = {};
+    var ans: any[] = [];
     var visualObjs: any;
     var exerciseData = allExData[exIndex];
     var exInd = exIndex;
@@ -40,12 +39,14 @@ export function Exercise({
 
     const [updated, setUpdated] = useState<boolean>(false);
     const [loaded, setLoaded] = useState<boolean>(false);
+    const [checking, setChecking] = useState<boolean>(false);
     const [ana, setAna] = useState<string>(); 
+    const [customFeedback, setCustomFeedback] = useState<string[]>([]);
+    const [lastClicked, setLastClicked] = useState<any>();
 
     const [selNotes,setSelNotes] = useState<any[]>([]);
     const [selAnswers, setSelAnswers] = useState<any[]>([]);
-    const [correctAnswers, setCorrectAnswers] = useState<{[index: number]: {[label: string]: number}}>(ans);
-    //const [correctAnswers, setCorrectAnswers] = useState<string>(ans);
+    const [correctAnswers, setCorrectAnswers] = useState<{[label: string]: (number | string)}[]>(ans);
     
     const [abcFile, setAbcFile] = useState<string>(abc);
     
@@ -132,11 +133,11 @@ export function Exercise({
             if(!selAnswers.includes(note)) {
                 selAnswers[selAnswers.length] = note;
             }
-            for (var i=0; i<selAnswers.length; i++) {
-                if(selAnswers[i] === note) {
-                    if(highlight(selAnswers[i], undefined, true) === 1) i--;
+            for (var j=0; j<selAnswers.length; j++) {
+                if(selAnswers[j] === note) {
+                    if(highlight(selAnswers[j], undefined, true) === 1) j--;
                 } else {
-                    if(highlight(selAnswers[i], undefined, false) === 1) i--;
+                    if(highlight(selAnswers[j], undefined, false) === 1) j--;
                 }
             }
             setSelAnswers([...selAnswers]);
@@ -145,7 +146,12 @@ export function Exercise({
         if(test !== null) {test.innerHTML = "<div class='label'>Clicked info:</div>" + op;} */
         var staffCt = (Number(noteElems.getAttribute("staffPos"))) + 1, measureCt = (Number(noteElems.getAttribute("measurePos")) + 1);
         setAna("Note is on staff " + staffCt + " and measure " + measureCt);
+        console.log(note);
+        setLastClicked(note);
+        var txt = document.getElementById("note-feedback");
+        if (txt !== null && "value" in txt) txt.value = noteElems.getAttribute("feedback");
         setUpdated(false);
+        setChecking(false);
     }
     
     const loadScore = function() {
@@ -155,12 +161,14 @@ export function Exercise({
         if(el !== null && abcString !== undefined){
             visualObjs = abcjs.renderAbc(el,abcString,{ clickListener: clickListener, selectTypes: ["note"]});
         
-            // adds staff # and measure # to each note when the score is first loaded
+            // adds staff #, measure #, and empty feedback to each note when the score is first loaded
             var staffArray = visualObjs[0].lines[0].staff;
             
             for (let j = 0, staff = 0, measure = 0; staff < staffArray.length; j++) {
-                if(!(staffArray[staff].voices[0][j].abselem.elemset[0].getAttribute("staffPos"))) staffArray[staff].voices[0][j].abselem.elemset[0].setAttribute("staffPos", staff);
-                if(!(staffArray[staff].voices[0][j].abselem.elemset[0].getAttribute("measurePos"))) staffArray[staff].voices[0][j].abselem.elemset[0].setAttribute("measurePos", measure);
+                var noteElems = staffArray[staff].voices[0][j].abselem.elemset[0];
+                if(!(noteElems.getAttribute("staffPos"))) noteElems.setAttribute("staffPos", staff);
+                if(!(noteElems.getAttribute("measurePos"))) noteElems.setAttribute("measurePos", measure);
+                if(!(noteElems.getAttribute("feedback"))) noteElems.setAttribute("feedback", "");
                 if(staffArray[staff].voices[0][j].el_type === "bar") measure++;
                 if(j + 1 == staffArray[staff].voices[0].length) {
                     staff++;
@@ -174,15 +182,22 @@ export function Exercise({
         }
     }
 
+    //runs when reset answers button is pushed on mng view: essentially reloads score/resets answers
     const reload = function() {
         setSelNotes([]);
-        setCorrectAnswers({});
+        setCorrectAnswers([]);
         setUpdated(false);
         setLoaded(true);
     }
 
+    //runs when save button is pushed on mng view: overwrites exercise data at current index with updated choices
     const save = function(){
-        if(abcFile !== undefined && abcFile !== "" && correctAnswers !== undefined) {
+        if(abcFile !== undefined && abcFile !== "" && correctAnswers.length > 0) {
+            setCorrectAnswers(correctAnswers.sort((i1, i2) => {
+                if ((i1.index as number) > (i2.index as number)) return 1;
+                if ((i1.index as number) < (i2.index as number)) return -1;
+                return 0;
+            }));
             let data = new ExerciseData(abcFile, correctAnswers, "", exInd, false);
             if(!allExData[exInd]) setAllExData([...allExData,data]);
             else {
@@ -191,56 +206,105 @@ export function Exercise({
             }
         }  
     }
+
+    //runs when update answers button is pushed on mng view: creates nested dictionaries with necessary selected answer info
     const multiAnswer = function(){
         
-        const dict: {[index: number]: {[label: string]: number}} = {};
+        const dict: {[label: string]: number}[] = [];
         for(let i = 0;i < selNotes.length;i++){
             var noteElems = selNotes[i].abselem.elemset[0];
             const dict2:{[label: string]: number} ={
+                "index": noteElems.getAttribute("index"),
                 "staffPos": noteElems.getAttribute("staffPos"),
                 "measurePos": noteElems.getAttribute("measurePos"),
-                "selectedTimes": noteElems.getAttribute("selectedTimes")
+                "selectedTimes": noteElems.getAttribute("selectedTimes"),
+                "feedback": noteElems.getAttribute("feedback")
             }
-            dict[noteElems.getAttribute("index")] = dict2;
+            dict[i] = dict2;
         }
         setCorrectAnswers(dict);
         setUpdated(true);
     }
+
+    //runs when check answers button is pushed on ex view: logs selected and correct answers for debug and toggles feedback to appear
     const log = function(){
         console.log(selAnswers);
         console.log(correctAnswers);
+        setCustomFeedback([]);
+        setChecking(true);
     }
 
+    //runs when save note feedback button is pushed on mng view: saves individual note feedback into the selected note
+    const saveFeedback = function(e: React.ChangeEvent<HTMLTextAreaElement>) {
+        var feedBox = document.getElementById("note-feedback");
+        if(feedBox !== null && "value" in feedBox) {
+            var str = feedBox.value as string;
+            lastClicked.abselem.elemset[0].setAttribute("feedback", str);
+        }
+    }
+
+    //function for comparing selected answers to correct answers
     const everyFunc = function(element: any, index: number, array: any[]): boolean {
         var ret: boolean = true;
-        for (let it = 0; it < array.length && ret; it++) {
-            var elems = element.abselem.elemset[0];
-            var elemId = elems.getAttribute("index");
-            if (correctAnswers[elemId] === undefined) ret = false;
-            else if (
-                elems.getAttribute("staffPos") !== correctAnswers[elemId]["staffPos"] ||
-                elems.getAttribute("measurePos") !== correctAnswers[elemId]["measurePos"] ||
-                elems.getAttribute("selectedTimes") !== correctAnswers[elemId]["selectedTimes"]
-            ) ret = false;
+        var feedback: string[] = [];
+        if(array.length !== correctAnswers.length) {
+            ret = false;
+            var plural = " are ";
+            if (correctAnswers.length === 1) plural = " is ";
+            feedback = ([...feedback, 
+                "You selected " + selAnswers.length + " answer(s). There" + plural + correctAnswers.length + " correct answer(s)."]);
         }
+        array.sort((i1, i2) => {
+            if ((i1.abselem.elemset[0].getAttribute("index") as number) > (i2.abselem.elemset[0].getAttribute("index") as number)) return 1;
+            if ((i1.abselem.elemset[0].getAttribute("index") as number) < (i2.abselem.elemset[0].getAttribute("index") as number)) return -1;
+            return 0;
+        })
+        
+        var elems = element.abselem.elemset[0];
+        if (correctAnswers[index] === undefined || elems.getAttribute("index") !== correctAnswers[index]["index"]) {
+            ret = false;
+            feedback = ([...feedback, 
+                "Wrong answer selected on measure " + (Number(elems.getAttribute("measurePos"))+1) + " of staff " + (Number(elems.getAttribute("staffPos"))+1) + "."]);
+        }
+        else if (
+            (elems.getAttribute("staffPos") !== correctAnswers[index]["staffPos"]) ||
+            (elems.getAttribute("measurePos") !== correctAnswers[index]["measurePos"]) ||
+            (elems.getAttribute("selectedTimes") !== correctAnswers[index]["selectedTimes"]) 
+        ) {
+            ret = false;
+        }
+        
+        if (!ret) 
+            for(let q=0; q<correctAnswers.length; q++) {
+                feedback = ([...feedback, "Look in measure " + (Number(correctAnswers[q]["measurePos"])+1) + " of staff " + (Number(correctAnswers[q]["measurePos"])+1) + ": " + correctAnswers[q]["feedback"] as string]);
+            }
+        else feedback = ["Correct!"];
+        setCustomFeedback([...feedback]);
+        setChecking(false);
         return ret;
     }
 
-    const debug = function() {
+    //function used with bebug bubbon for testing
+    /* const debug = function() {
         console.log("loaded? " + loaded);
         console.log("exercise data? V");
         console.log(exerciseData);
-    }
+    } */
 
     return (
         <div style = {{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
             {/* <button onClick={debug}>bebug bubbon</button> */}
-            <h3>Exercise {exIndex}</h3>
+            <h3>Exercise {exIndex+1}</h3>
             {teacherMode===true?
             <span>
                 <FileUpload setFiles={setFiles} files={files} setAbcFile={setAbcFile}></FileUpload>
                 {(exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
-                <div id ={"target" + exIndex} style={score}/*style = {{margin: "auto", backgroundColor: "white", borderRadius: "2px"}}*/></div>
+                <div id={"target" + exIndex} style={score}></div>
+                {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? 
+                <div style={{display: "inline-block", marginLeft:"1vw"}}>
+                    <textarea id="note-feedback" placeholder={"Note feedback..."} onChange={saveFeedback}></textarea>
+                </div>:
+                <></>}
                 {/* <div className="clicked-info"></div> */}
                 {selNotes.length >= 1 ? <div>Analysis: {ana}</div> : <div/>}
                 {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? <div> 
@@ -250,41 +314,28 @@ export function Exercise({
                     <div/>
                     <button onClick={save}>Save</button>
                 </div> : <div/>}
-                {/* <div>Currently selected answer:</div>
-
-                {correctAnswers !== undefined ?
-                <ul>
-                    {correctAnswers.map(function(answer) {
-                        return (
-                            <li key={answer.abselem.elemset[0].getAttribute("data-index")}>{answer.abselem.elemset[0].getAttribute("data-index")}</li>
-                        )
-                    })}
-                </ul>:
-                <div></div>
-                } */}
-                
-                
-                
             </span>
             :
             <span>
             {(abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <div/>}
-            <div id ={"target" + exIndex} style={score}></div>
+            <div id={"target" + exIndex} style={score}></div>
             {/* <div className="clicked-info"></div> */}
             {files.some((element) => element.name.endsWith(".mp3")) ? <AudioHandler files={files}></AudioHandler> : <></>}
-            {selAnswers.length >= 1 ? <div>Analysis: {ana}</div> : <div/>}
+            {/* selAnswers.length >= 1 ? <div>Analysis: {ana}</div> : <div/> */}
             {(abcFile !== undefined && abcFile !== "" && loaded) ? 
                 <div>
                     <button onClick={log}>Check Answer</button>
-                    {selAnswers.length >= 1 ? (
-                        selAnswers.length === Object.keys(correctAnswers).length ? (
-                            selAnswers.every(everyFunc) ? 
-                                <div>Correct!</div>
-                                :
-                                <div>Incorrect </div>) : 
-                            <div>Incorrect</div>) :
-                        <div>Select an Answer</div>
+                    {checking ? (
+                        selAnswers.length > 0 ? (
+                            selAnswers.every(everyFunc) ? (
+                                <></>
+                            ) : <></>
+                        ) : <></>
+                    ) : <></>
                     }
+                    <div>Next step(s): {customFeedback.map(function(feedback) {
+                        return <li key={feedback}>{feedback}</li>
+                    })}</div>
                 </div>
                 : <div/>}
             </span>
