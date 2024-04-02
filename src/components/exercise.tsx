@@ -4,6 +4,7 @@ import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
 import AudioHandler from './audiohandler';
 import { Button } from 'react-bootstrap';
+import { string } from 'yargs';
 
 
 export function Exercise({
@@ -22,18 +23,24 @@ export function Exercise({
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
 }) {
     //for score styling
-    const score = {display: "inline-block", margin: "auto", backgroundColor: "white", borderRadius: "2px"};
+    const score = {display: "inline-block", margin: "auto", backgroundColor: "white", borderRadius: "2px", width: "400px"};
 
     var abc = "", feed = "", color: string;
     var ans: any[] = [];
     var visualObjs: any;
     var exerciseData = allExData[exIndex];
     var exInd = exIndex;
+    var title = "";
+    var tags: string[] = [];
+    var difficulty = 0;
     if(exerciseData !== undefined) {
        
         if(exerciseData.score !== undefined) abc = exerciseData.score;
         if(exerciseData.correctAnswers !== undefined) ans = exerciseData.correctAnswers;
         if(exerciseData.feedback !== undefined) feed = exerciseData.feedback;
+        if(exerciseData.title !== undefined) title = exerciseData.title;
+        if(exerciseData.tags !== undefined) tags = exerciseData.tags;
+        if(exerciseData.difficulty !== undefined) difficulty = exerciseData.difficulty;
         
     }
 
@@ -43,7 +50,7 @@ export function Exercise({
     const [ana, setAna] = useState<string>(); 
     const [customFeedback, setCustomFeedback] = useState<string[]>([]);
     const [lastClicked, setLastClicked] = useState<any>();
-
+    const [customTitle, setCustomTitle] = useState<string>(title);
     const [selNotes,setSelNotes] = useState<any[]>([]);
     const [selAnswers, setSelAnswers] = useState<any[]>([]);
     const [correctAnswers, setCorrectAnswers] = useState<{[label: string]: (number | string)}[]>(ans);
@@ -159,7 +166,7 @@ export function Exercise({
         var abcString = abcFile;
         var el = document.getElementById("target" + exIndex);
         if(el !== null && abcString !== undefined){
-            visualObjs = abcjs.renderAbc(el,abcString,{ clickListener: clickListener, selectTypes: ["note"]});
+            visualObjs = abcjs.renderAbc(el,abcString,{ clickListener: clickListener, selectTypes: ["note"],lineThickness: 0.4, responsive: "resize"});
         
             // adds staff #, measure #, and empty feedback to each note when the score is first loaded
             var staffArray = visualObjs[0].lines[0].staff;
@@ -198,7 +205,7 @@ export function Exercise({
                 if ((i1.index as number) < (i2.index as number)) return -1;
                 return 0;
             }));
-            let data = new ExerciseData(abcFile, correctAnswers, "", exInd, false);
+            let data = new ExerciseData(abcFile, correctAnswers, "", exInd, false,customTitle,difficulty,tags);
             if(!allExData[exInd]) setAllExData([...allExData,data]);
             else {
                 allExData[exInd] = data;
@@ -242,6 +249,13 @@ export function Exercise({
             lastClicked.abselem.elemset[0].setAttribute("feedback", str);
         }
     }
+    const saveTitle = function(e: React.ChangeEvent<HTMLTextAreaElement>) {
+        var titleBox = document.getElementById("title");
+        if(titleBox !== null && "value" in titleBox) {
+            var str = titleBox.value as string;
+            setCustomTitle(str);
+        }
+    }
 
     //function for comparing selected answers to correct answers
     const everyFunc = function(element: any, index: number, array: any[]): boolean {
@@ -283,7 +297,6 @@ export function Exercise({
         setChecking(false);
         return ret;
     }
-
     //function used with bebug bubbon for testing
     /* const debug = function() {
         console.log("loaded? " + loaded);
@@ -294,12 +307,31 @@ export function Exercise({
     return (
         <div style = {{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
             {/* <button onClick={debug}>bebug bubbon</button> */}
-            <h3>Exercise {exIndex+1}</h3>
+            <textarea id="title"onChange={(saveTitle)}>{title}</textarea>
             {teacherMode===true?
             <span>
+                <form id="difficulty">
+                    Difficulty:
+                    <br></br>
+                    <input type="radio" name="difficulty" value="1"/>1
+                    <input type="radio" name="difficulty" value="2"/>2
+                    <input type="radio" name="difficulty" value="3"/>3
+                </form>
+                <form id= "tags">
+                    Tags:
+                    <br></br>
+                    <input type="checkbox" name="tags" value="Pitch"/>Pitch
+                    <input type="checkbox" name="tags" value="Intonation"/>Intonation
+                    <input type="checkbox" name="tags" value="Rhythm"/>Rhythm
+
+                </form>
+                
                 <FileUpload setFiles={setFiles} files={files} setAbcFile={setAbcFile}></FileUpload>
                 {(exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
-                <div id={"target" + exIndex} style={score}></div>
+                <div style = {{width:"70%"}}>
+                    <div id={"target" + exIndex} style={score}></div>
+                </div>
+                
                 {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? 
                 <div style={{display: "inline-block", marginLeft:"1vw"}}>
                     <textarea id="note-feedback" placeholder={"Note feedback..."} onChange={saveFeedback}></textarea>
