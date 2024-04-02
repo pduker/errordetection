@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { HTMLInputTypeAttribute, useState } from 'react';
 import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
@@ -31,7 +31,7 @@ export function Exercise({
     var exerciseData = allExData[exIndex];
     var exInd = exIndex;
     var title = "";
-    var tags: string[] = [];
+    var tagsV: string[] = [];
     var difficulty = 0;
     if(exerciseData !== undefined) {
        
@@ -39,7 +39,7 @@ export function Exercise({
         if(exerciseData.correctAnswers !== undefined) ans = exerciseData.correctAnswers;
         if(exerciseData.feedback !== undefined) feed = exerciseData.feedback;
         if(exerciseData.title !== undefined) title = exerciseData.title;
-        if(exerciseData.tags !== undefined) tags = exerciseData.tags;
+        if(exerciseData.tags !== undefined) tagsV = exerciseData.tags;
         if(exerciseData.difficulty !== undefined) difficulty = exerciseData.difficulty;
         
     }
@@ -47,10 +47,14 @@ export function Exercise({
     const [updated, setUpdated] = useState<boolean>(false);
     const [loaded, setLoaded] = useState<boolean>(false);
     const [checking, setChecking] = useState<boolean>(false);
+    const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [ana, setAna] = useState<string>(); 
+    const [customTitle, setCustomTitle] = useState<string>(title);
+    const [diff, setDiff] = useState<number>(difficulty);
+    const [tags, setTags] = useState<string[]>(tagsV);
     const [customFeedback, setCustomFeedback] = useState<string[]>([]);
     const [lastClicked, setLastClicked] = useState<any>();
-    const [customTitle, setCustomTitle] = useState<string>(title);
+
     const [selNotes,setSelNotes] = useState<any[]>([]);
     const [selAnswers, setSelAnswers] = useState<any[]>([]);
     const [correctAnswers, setCorrectAnswers] = useState<{[label: string]: (number | string)}[]>(ans);
@@ -205,7 +209,7 @@ export function Exercise({
                 if ((i1.index as number) < (i2.index as number)) return -1;
                 return 0;
             }));
-            let data = new ExerciseData(abcFile, correctAnswers, "", exInd, false,customTitle,difficulty,tags);
+            let data = new ExerciseData(abcFile, correctAnswers, "", exInd, false,customTitle,diff,tags);
             if(!allExData[exInd]) setAllExData([...allExData,data]);
             else {
                 allExData[exInd] = data;
@@ -249,11 +253,30 @@ export function Exercise({
             lastClicked.abselem.elemset[0].setAttribute("feedback", str);
         }
     }
-    const saveTitle = function(e: React.ChangeEvent<HTMLTextAreaElement>) {
+
+    //saveFeedback, but with the exercise title
+    const saveTitle = function() {
         var titleBox = document.getElementById("title");
         if(titleBox !== null && "value" in titleBox) {
             var str = titleBox.value as string;
             setCustomTitle(str);
+            setEditingTitle(!editingTitle);
+        }
+    }
+
+    //onClick function for difficulty change
+    const diffChange = function (e: React.ChangeEvent<HTMLInputElement>) {
+        setDiff(Number(e.target.value));
+    }
+
+    //onClick function for tags change
+    const tagsChange = function (e: React.ChangeEvent<HTMLInputElement>) {
+        let val = e.target.value;
+        if(tags.includes(val)) {
+            tags.splice(tags.indexOf(val), 1);
+            setTags([...tags]);
+        } else {
+            setTags([...tags, val]);
         }
     }
 
@@ -307,22 +330,29 @@ export function Exercise({
     return (
         <div style = {{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
             {/* <button onClick={debug}>bebug bubbon</button> */}
-            <textarea id="title"onChange={(saveTitle)}>{title}</textarea>
-            {teacherMode===true?
+            {editingTitle && teacherMode ? 
+                <span>
+                    <textarea id="title">{customTitle}</textarea> 
+                    <button onClick={saveTitle}>Save Title</button>
+                </span>
+                : 
+                <h3 onClick={()=>setEditingTitle(!editingTitle)}>{customTitle}</h3>
+            }
+            {teacherMode ?
             <span>
                 <form id="difficulty">
                     Difficulty:
                     <br></br>
-                    <input type="radio" name="difficulty" value="1"/>1
-                    <input type="radio" name="difficulty" value="2"/>2
-                    <input type="radio" name="difficulty" value="3"/>3
+                    <input type="radio" name="difficulty" value="1" checked={diff===1} onChange={diffChange}/>1
+                    <input type="radio" name="difficulty" value="2" checked={diff===2} onChange={diffChange}/>2
+                    <input type="radio" name="difficulty" value="3" checked={diff===3} onChange={diffChange}/>3
                 </form>
                 <form id= "tags">
                     Tags:
                     <br></br>
-                    <input type="checkbox" name="tags" value="Pitch"/>Pitch
-                    <input type="checkbox" name="tags" value="Intonation"/>Intonation
-                    <input type="checkbox" name="tags" value="Rhythm"/>Rhythm
+                    <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange}/>Pitch
+                    <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange}/>Intonation
+                    <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm
 
                 </form>
                 
@@ -349,26 +379,30 @@ export function Exercise({
             </span>
             :
             <span>
-            {(abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <div/>}
-            <div id={"target" + exIndex} style={score}></div>
-            {/* <div className="clicked-info"></div> */}
-            {files.some((element) => element.name.endsWith(".mp3")) ? <AudioHandler files={files}></AudioHandler> : <></>}
-            {/* selAnswers.length >= 1 ? <div>Analysis: {ana}</div> : <div/> */}
-            {(abcFile !== undefined && abcFile !== "" && loaded) ? 
-                <div>
-                    <button onClick={log}>Check Answer</button>
-                    {checking ? (
-                        selAnswers.length > 0 ? (
-                            selAnswers.every(everyFunc) ? (
-                                <></>
+                <div style={{marginLeft: "2px", marginRight: "2px"}}>Difficulty: {diff}</div>
+                <div style={{marginLeft: "2px", marginRight: "2px"}}>Tags: {tags.join(", ")}</div>
+                {(abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <div/>}
+                <div style = {{width:"70%"}}>
+                    <div id={"target" + exIndex} style={score}></div>
+                </div>
+                {/* <div className="clicked-info"></div> */}
+                {files.some((element) => element.name.endsWith(".mp3")) ? <AudioHandler files={files}></AudioHandler> : <></>}
+                {/* selAnswers.length >= 1 ? <div>Analysis: {ana}</div> : <div/> */}
+                {(abcFile !== undefined && abcFile !== "" && loaded) ? 
+                    <div>
+                        <button onClick={log}>Check Answer</button>
+                        {checking ? (
+                            selAnswers.length > 0 ? (
+                                selAnswers.every(everyFunc) ? (
+                                    <></>
+                                ) : <></>
                             ) : <></>
                         ) : <></>
-                    ) : <></>
-                    }
-                    <div>Next step(s): {customFeedback.map(function(feedback) {
-                        return <li key={feedback}>{feedback}</li>
-                    })}</div>
-                </div>
+                        }
+                        <div>Next step(s): {customFeedback.map(function(feedback) {
+                            return <li key={feedback}>{feedback}</li>
+                        })}</div>
+                    </div>
                 : <div/>}
             </span>
             }
