@@ -25,8 +25,7 @@
 }
 
 a {
-  color: #006400;
-  /* color: #DC582A; Dark Orange 1 */
+  color: #dc582a; /*Dark Orange 1 */
   font-size: calc(10px + 2vmin);
   padding-left: 1vw;
   text-decoration: none;
