@@ -32,7 +32,7 @@ export function Exercise({
     var exInd = exIndex;
     var title = "";
     var tagsV: string[] = [];
-    var difficulty = 0;
+    var difficulty = 1;
     if(exerciseData !== undefined) {
        
         if(exerciseData.score !== undefined) abc = exerciseData.score;
@@ -265,8 +265,9 @@ export function Exercise({
     }
 
     //onClick function for difficulty change
-    const diffChange = function (e: React.ChangeEvent<HTMLInputElement>) {
+    const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setDiff(Number(e.target.value));
+        setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value)+ ", Exercise: " + findNum(tags, Number(e.target.value)));
     }
 
     //onClick function for tags change
@@ -275,9 +276,18 @@ export function Exercise({
         if(tags.includes(val)) {
             tags.splice(tags.indexOf(val), 1);
             setTags([...tags]);
+            setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags],diff));
         } else {
             setTags([...tags, val]);
+            setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags,val],diff));
         }
+        
+    }
+    const findNum = function(tags:string[],difficulty:number):number{
+        
+        const count = allExData.filter((exData:ExerciseData | undefined)=> {if (exData !== undefined){return exData.tags.sort().toString() === tags.sort().toString() && exData.difficulty === difficulty}});
+        return count.length+1;
+
     }
 
     //function for comparing selected answers to correct answers
@@ -340,23 +350,40 @@ export function Exercise({
             }
             {teacherMode ?
             <span>
-                <form id="difficulty">
-                    Difficulty:
-                    <br></br>
-                    <input type="radio" name="difficulty" value="1" checked={diff===1} onChange={diffChange}/>1
-                    <input type="radio" name="difficulty" value="2" checked={diff===2} onChange={diffChange}/>2
-                    <input type="radio" name="difficulty" value="3" checked={diff===3} onChange={diffChange}/>3
-                </form>
                 <form id= "tags">
                     Tags:
                     <br></br>
-                    <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange}/>Pitch
-                    <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange}/>Intonation
                     <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm
-
+                    <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange}/>Intonation
+                    <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange}/>Pitch
+                    
+                    
+                </form>
+                <form id="difficulty">
+                    Difficulty:
+                    <br></br>
+                    <select name="difficulty" onChange={diffChange}>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
                 </form>
                 
-                <FileUpload setFiles={setFiles} files={files} setAbcFile={setAbcFile}></FileUpload>
+                <div id="fileUploads" style={{display:"inline",float:"left"}}>
+                    XML Upload<FileUpload setFiles={setFiles} files={files} setAbcFile={setAbcFile} type="xml"></FileUpload>
+                </div>
+                <div id="mp3Upload" style={{display:"inline"}}>
+                    MP3 Upload<FileUpload setFiles={setFiles} files={files} setAbcFile={setAbcFile} type="mp3"></FileUpload>
+                </div>
+                
+                
                 {(exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
                 <div style = {{width:"70%"}}>
                     <div id={"target" + exIndex} style={score}></div>
@@ -379,8 +406,8 @@ export function Exercise({
             </span>
             :
             <span>
-                <div style={{marginLeft: "2px", marginRight: "2px"}}>Difficulty: {diff}</div>
-                <div style={{marginLeft: "2px", marginRight: "2px"}}>Tags: {tags.join(", ")}</div>
+                {/* <div style={{marginLeft: "2px", marginRight: "2px"}}>Difficulty: {diff}</div>
+                <div style={{marginLeft: "2px", marginRight: "2px"}}>Tags: {tags.join(", ")}</div> */}
                 {(abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <div/>}
                 <div style = {{width:"70%"}}>
                     <div id={"target" + exIndex} style={score}></div>

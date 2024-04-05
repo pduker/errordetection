@@ -16,7 +16,7 @@ export function ExerciseManagementPage({
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
 }) {
     const createExercise = function () {
-        setAllExData([...allExData, new ExerciseData("", [], "", allExData.length, true,"Exercise " + (allExData.length+1),0,[])]);
+        setAllExData([...allExData, new ExerciseData("", [], "", allExData.length, true,"Exercise " + (allExData.length+1),1,[])]);
     }
 
     return (
