@@ -3,20 +3,19 @@ import { vertaal } from 'xml2abc';
 import AudioHandler from './audiohandler';
 
 export default function FileUpload ({
-  setFiles,
+  setFile,
   setAbcFile,
-  files,
+  file,
   type
 }:{
-  files:File[];
-  setFiles: ((newFiles: File[]) => void);
+  file:File | undefined;
+  setFile: ((newFile: File) => void);
   setAbcFile: ((newFile: string) => void) | null;
   type:string;
 }):JSX.Element{
 
     //state declarations, can be used to access file in the future
-    const [file, setFile] = useState<File>();
-    const [msgContent, setMsgContent] = useState<string>("Nothing selected.");
+    const [msgContent, setMsgContent] = useState<string>(); //"Nothing selected."
     
     const abcTranslate = function (fileContent: string) {
       var domparser = new DOMParser();
@@ -41,12 +40,11 @@ export default function FileUpload ({
     const fileChange = function (e: React.ChangeEvent<HTMLInputElement>) {
       const selectedFiles = e.target.files;
       if (!selectedFiles || selectedFiles.length === 0) {
-        setMsgContent("No file selected.");
+        //setMsgContent("No file selected.");
         return;
       }
-        setFile(files[0]);
         
-        setFiles([...files, selectedFiles[selectedFiles.length-1]]);
+        setFile(selectedFiles[selectedFiles.length-1]);
         //checks for .musicxml and .mp3 files, otherwise returns error msg (can be easily changed)
         if(type === "xml"){
           if (selectedFiles[selectedFiles.length-1].name.endsWith(".musicxml")) {
@@ -76,7 +74,7 @@ export default function FileUpload ({
         
         
   // Function to print information about uploaded files
-  const printFileInformation = () => {
+  /* const printFileInformation = () => {
     return files.map((file, index) => (
       <div key={index}>
         <p>Name: {file.name}</p>
@@ -84,7 +82,7 @@ export default function FileUpload ({
         <p>Type: {file.type}</p>
       </div>
     ));
-  };
+  }; */
 
   // Function to show the file information
   // const toggleFileDisplay = () => {
@@ -95,7 +93,7 @@ export default function FileUpload ({
   return (
     <div style={{display:"inline"}}>
       <input style={{display:"inline"}} type="file" onChange={fileChange} />
-      {msgContent === "mp3 file selected." ? <AudioHandler files={files} /> : <p>{msgContent}</p>}
+      {msgContent === "mp3 file selected." && file !== undefined ? <AudioHandler file={file} /> : <p>{msgContent}</p>}
       
       {/* <button onClick={toggleFileDisplay}>
         {showFiles ? "Hide Files" : "Show Files Uploaded"}

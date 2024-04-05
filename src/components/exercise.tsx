@@ -8,15 +8,11 @@ import { Button } from 'react-bootstrap';
 export function Exercise({
     exIndex, 
     teacherMode,
-    files,
-    setFiles,
     setAllExData,
     allExData
 }: { 
     exIndex: number;
     teacherMode: boolean;
-    files:File[];
-    setFiles:((newFile: File[]) => void);
     allExData: (ExerciseData | undefined)[];
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
 }) {
@@ -31,9 +27,12 @@ export function Exercise({
     var title = "";
     var tagsV: string[] = [];
     var difficulty = 1;
+    var mp3: File = new File([], "");
+
     if(exerciseData !== undefined) {
        
         if(exerciseData.score !== undefined) abc = exerciseData.score;
+        if(exerciseData.sound !== undefined) mp3 = exerciseData.sound;
         if(exerciseData.correctAnswers !== undefined) ans = exerciseData.correctAnswers;
         if(exerciseData.feedback !== undefined) feed = exerciseData.feedback;
         if(exerciseData.title !== undefined) title = exerciseData.title;
@@ -56,6 +55,8 @@ export function Exercise({
     const [selNotes,setSelNotes] = useState<any[]>([]);
     const [selAnswers, setSelAnswers] = useState<any[]>([]);
     const [correctAnswers, setCorrectAnswers] = useState<{[label: string]: (number | string)}[]>(ans);
+    const [xmlFile, setXmlFile] = useState<File>();
+    const [mp3File, setMp3File] = useState<File>(mp3);
     
     const [abcFile, setAbcFile] = useState<string>(abc);
     
@@ -197,24 +198,30 @@ export function Exercise({
         setCorrectAnswers([]);
         setUpdated(false);
         setLoaded(true);
+        loadScore();
     }
 
     //runs when save button is pushed on mng view: overwrites exercise data at current index with updated choices
     const save = function(){
-        if(abcFile !== undefined && abcFile !== "" && correctAnswers.length > 0) {
+        var data;
+        if(correctAnswers.length > 0) {
             setCorrectAnswers(correctAnswers.sort((i1, i2) => {
                 if ((i1.index as number) > (i2.index as number)) return 1;
                 if ((i1.index as number) < (i2.index as number)) return -1;
                 return 0;
             }));
-            let data = new ExerciseData(abcFile, correctAnswers, "", exInd, false,customTitle,diff,tags);
+        } 
+        if (abcFile !== undefined && abcFile !== "") {
+            data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false,customTitle,diff,tags);
+        } else {
+            
+        }
             if(!allExData[exInd]) setAllExData([...allExData,data]);
             else {
                 allExData[exInd] = data;
                 setAllExData(allExData);
             }
         }  
-    }
 
     //runs when update answers button is pushed on mng view: creates nested dictionaries with necessary selected answer info
     const multiAnswer = function(){
@@ -375,13 +382,13 @@ export function Exercise({
                 </form>
                 
                 <div id="fileUploads" style={{display:"inline",float:"left"}}>
-                    XML Upload<FileUpload setFiles={setFiles} files={files} setAbcFile={setAbcFile} type="xml"></FileUpload>
+                    XML Upload: <FileUpload setFile={setXmlFile} file={xmlFile} setAbcFile={setAbcFile} type="xml"></FileUpload>
                 </div>
                 <div id="mp3Upload" style={{display:"inline"}}>
-                    MP3 Upload<FileUpload setFiles={setFiles} files={files} setAbcFile={setAbcFile} type="mp3"></FileUpload>
+                    MP3 Upload: <FileUpload setFile={setMp3File} file={mp3File} setAbcFile={setAbcFile} type="mp3"></FileUpload>
                 </div>
                 
-                
+                {mp3 === undefined ? <br></br> : <></>}
                 {(exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
                 <div style = {{width:"70%"}}>
                     <div id={"target" + exIndex} style={score}></div>
@@ -396,11 +403,10 @@ export function Exercise({
                 {selNotes.length >= 1 ? <div>Analysis: {ana}</div> : <div/>}
                 {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? <div> 
                     <button onClick={multiAnswer}>Update Answers</button>
-                    {updated ? <div>Answers updated.</div> : <div/>}
                     <Button variant='danger' onClick={reload}>Reset Answers</Button>
-                    <div/>
-                    <button onClick={save}>Save</button>
+                    {updated ? <div>Answers updated.</div> : <></>}
                 </div> : <div/>}
+                {updated || (mp3File.name !== "") ? <button onClick={save}>Save</button> : <></>}
             </span>
             :
             <span>
@@ -411,7 +417,7 @@ export function Exercise({
                     <div id={"target" + exIndex} style={score}></div>
                 </div>
                 {/* <div className="clicked-info"></div> */}
-                {files.some((element) => element.name.endsWith(".mp3")) ? <AudioHandler files={files}></AudioHandler> : <></>}
+                {mp3 !== undefined ? <AudioHandler file={mp3}></AudioHandler> : <></>}
                 {/* selAnswers.length >= 1 ? <div>Analysis: {ana}</div> : <div/> */}
                 {(abcFile !== undefined && abcFile !== "" && loaded) ? 
                     <div>

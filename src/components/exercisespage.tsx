@@ -2,13 +2,9 @@ import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
 
 export function ExercisesPage({
-    files,
-    setFiles,
     allExData,
     setAllExData
 }:{
-    files:File[];
-    setFiles: ((newFiles: File[]) => void);
     allExData: (ExerciseData | undefined)[];
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
 }){
@@ -19,7 +15,7 @@ export function ExercisesPage({
             {allExData.map(function(exercise) {
                 if (exercise !== undefined)
                 return (
-                    <Exercise key={exercise.exIndex} teacherMode={false} allExData={allExData} setAllExData={setAllExData} files={files} setFiles={setFiles} exIndex={exercise.exIndex}></Exercise>
+                    <Exercise key={exercise.exIndex} teacherMode={false} allExData={allExData} setAllExData={setAllExData} exIndex={exercise.exIndex}></Exercise>
                 )
                 else return <></>;
             })}
