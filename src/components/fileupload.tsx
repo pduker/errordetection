@@ -95,8 +95,8 @@ export default function FileUpload ({
   return (
     <div style={{display:"inline"}}>
       <input style={{display:"inline"}} type="file" onChange={fileChange} />
-      <p>{msgContent}</p>
-      {msgContent === "mp3 file selected." ? <AudioHandler files={files} /> : <></>}
+      {msgContent === "mp3 file selected." ? <AudioHandler files={files} /> : <p>{msgContent}</p>}
+      
       {/* <button onClick={toggleFileDisplay}>
         {showFiles ? "Hide Files" : "Show Files Uploaded"}
       </button> */}

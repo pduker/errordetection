@@ -25,7 +25,7 @@ export default function AudioHandler({ files }: { files: File[] }): JSX.Element 
   //plays the audio that is uploaded 
   return (
     <div>
-            <audio ref={audioRef} controls onPlay={() => setMsgContent("Playing...")} onPause={() => setMsgContent("Paused")} onEnded={() => setMsgContent("Playback ended.")} onError={() => setMsgContent("Can't play a non .mp3 file.")}>
+            <audio ref={audioRef} controls>
             </audio>
             <p>{msgContent}</p>
         </div>

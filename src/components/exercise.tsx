@@ -1,11 +1,9 @@
-import React, { HTMLInputTypeAttribute, useState } from 'react';
+import React, { useState } from 'react';
 import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
 import AudioHandler from './audiohandler';
 import { Button } from 'react-bootstrap';
-import { string } from 'yargs';
-
 
 export function Exercise({
     exIndex, 
