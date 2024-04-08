@@ -4,6 +4,7 @@ import Nav from 'react-bootstrap/Nav';
 import logo from './assets/doof.png';
 import './App.css';
 //import BoopButton from "./components/audiohander"
+import { HomePage } from './components/homepage';
 import { HelpPage } from './components/helppage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
@@ -24,7 +25,7 @@ function App() {
       <div className="App">
         <header className="App-header">
           <Navbar className="Home-bar" fixed='top'>
-            <Navbar.Brand href="#home">
+            <Navbar.Brand href="/">
               <img
                 alt=""
                 src={logo}
@@ -43,6 +44,10 @@ function App() {
         </header>
         
           <main>
+            <Routes>
+              <Route path="/" element={<HomePage/>}/>
+            </Routes>
+
             <Routes>
               <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} files={files} setFiles={setFiles}></ExercisesPage>} />
             </Routes>
