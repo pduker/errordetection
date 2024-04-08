@@ -139,13 +139,6 @@ export function Exercise({
         var note = abcelem;
         var noteElems = note.abselem.elemset[0];
         //selected notes handling
-        if(!(noteElems.getAttribute("selectedTimes"))) {
-            noteElems.setAttribute("selectedTimes", 0);
-        }
-        if(!(noteElems.getAttribute("index"))) {
-            noteElems.setAttribute("index", op);
-        }
-        
         if(teacherMode){
             if(!selNotes.includes(note)) {
                 selNotes[selNotes.length] = note;
@@ -176,7 +169,7 @@ export function Exercise({
         if(test !== null) {test.innerHTML = "<div class='label'>Clicked info:</div>" + op;} */
         var staffCt = (Number(noteElems.getAttribute("staffPos"))) + 1, measureCt = (Number(noteElems.getAttribute("measurePos")) + 1);
         setAna("Note is on staff " + staffCt + " and measure " + measureCt);
-        console.log(note);
+        console.log(selNotes);//noteElems.getAttribute("index")
         setLastClicked(note);
         var txt = document.getElementById("note-feedback");
         if (txt !== null && "value" in txt) txt.value = noteElems.getAttribute("feedback");
@@ -190,20 +183,39 @@ export function Exercise({
         var el = document.getElementById("target" + exIndex);
         if(el !== null && abcString !== undefined){
             visualObjs = abcjs.renderAbc(el,abcString,{ clickListener: clickListener, selectTypes: ["note"],lineThickness: 0.4, responsive: "resize"});
-        
+            console.log(correctAnswers);
             // adds staff #, measure #, and empty feedback to each note when the score is first loaded
             var staffArray = visualObjs[0].lines[0].staff;
             
-            for (let j = 0, staff = 0, measure = 0; staff < staffArray.length; j++) {
+            for (let i = 0, j = 0, staff = 0, measure = 0; staff < staffArray.length; i++, j++) {
+                var note = staffArray[staff].voices[0][j];
                 var noteElems = staffArray[staff].voices[0][j].abselem.elemset[0];
                 if(!(noteElems.getAttribute("staffPos"))) noteElems.setAttribute("staffPos", staff);
                 if(!(noteElems.getAttribute("measurePos"))) noteElems.setAttribute("measurePos", measure);
                 if(!(noteElems.getAttribute("feedback"))) noteElems.setAttribute("feedback", "");
-                if(staffArray[staff].voices[0][j].el_type === "bar") measure++;
+                if(!(noteElems.getAttribute("index"))) noteElems.setAttribute("index", i);
+                if(!(noteElems.getAttribute("selectedTimes"))) noteElems.setAttribute("selectedTimes", 0);
+                if(staffArray[staff].voices[0][j].el_type === "bar") {measure++; i--;}
                 if(j + 1 == staffArray[staff].voices[0].length) {
                     staff++;
                     j = -1;
                     measure = 0;
+                }
+                if(teacherMode) {
+                    if(correctAnswers[Number(noteElems.getAttribute("index"))] !== undefined && correctAnswers[Number(noteElems.getAttribute("index"))].index === noteElems.getAttribute("index")) {
+                        noteElems.setAttribute("selectedTimes", correctAnswers[Number(noteElems.getAttribute("index"))].selectedTimes);
+                        
+                        if(!selNotes.includes(note)) {
+                            selNotes[selNotes.length] = note;
+                        }
+                        setSelNotes([...selNotes]);
+                        if(!selAnswers.includes(note)) {
+                            selAnswers[selAnswers.length] = note;
+                        }
+                        setSelAnswers([...selAnswers]);
+                        for(let q = 0; q < noteElems.getAttribute("selectedTimes"); q++)
+                            highlight(note, undefined, false);
+                    }
                 }
             }
             setLoaded(true);
@@ -268,6 +280,12 @@ export function Exercise({
             }
             dict[i] = dict2;
         }
+        /* dict.sort((i1, i2) => {
+            if ((i1.index as number) > (i2.index as number)) return 1;
+            if ((i1.index as number) < (i2.index as number)) return -1;
+            return 0;
+        }) */
+        console.log(dict);
         setCorrectAnswers(dict);
         setUpdated(true);
     }
@@ -282,10 +300,11 @@ export function Exercise({
 
     //runs when save note feedback button is pushed on mng view: saves individual note feedback into the selected note
     const saveFeedback = function(e: React.ChangeEvent<HTMLTextAreaElement>) {
-        var feedBox = document.getElementById("note-feedback");
+        var feedBox = document.getElementById("note-feedback-"+exIndex);
         if(feedBox !== null && "value" in feedBox) {
             var str = feedBox.value as string;
             lastClicked.abselem.elemset[0].setAttribute("feedback", str);
+            console.log("Feedback on " + lastClicked.abselem.elemset[0].getAttribute("index") + " changing to " + str);
         }
     }
 
@@ -427,7 +446,7 @@ export function Exercise({
                 
                 {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? 
                 <div style={{display: "inline-block", marginLeft:"1vw"}}>
-                    <textarea id="note-feedback" placeholder={"Note feedback..."} onChange={saveFeedback}></textarea>
+                    <textarea id={"note-feedback-"+exIndex} placeholder={"Note feedback..."} onChange={saveFeedback}></textarea>
                 </div>:
                 <></>}
                 {/* <div className="clicked-info"></div> */}
