@@ -26,12 +26,14 @@ export const firebaseApp = app;
 export function Exercise({
     exIndex, 
     teacherMode,
+    allExData,
     setAllExData,
     ExData
 }: { 
     exIndex: number;
     teacherMode: boolean;
     ExData: ExerciseData;
+    allExData: (ExerciseData | undefined)[]
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
 }) {
     //for score styling
@@ -309,19 +311,19 @@ export function Exercise({
         if(tags.includes(val)) {
             tags.splice(tags.indexOf(val), 1);
             setTags([...tags]);
-            setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: ");// + findNum([...tags],diff));
+            setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: "+ findNum([...tags],diff));// 
         } else {
             setTags([...tags, val]);
-            setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: ");// + findNum([...tags,val],diff));
+            setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags,val],diff));// 
         }
         
     }
-    /*const findNum = function(tags:string[],difficulty:number):number{
+    const findNum = function(tags:string[],difficulty:number):number{
         
-        const count = allExData.filter((exData:ExerciseData | undefined)=> {if (exData !== undefined){return exData.tags.sort().toString() === tags.sort().toString() && exData.difficulty === difficulty}});
+        const count = allExData.filter((exData:ExerciseData | undefined)=> {if (exData !== undefined && exData.tags !== undefined && exData.difficulty !== undefined){return exData.tags.sort().toString() === tags.sort().toString() && exData.difficulty === difficulty}});
         return count.length+1;
 
-    }*/
+    }
 
     //function for comparing selected answers to correct answers
     const everyFunc = function(element: any, index: number, array: any[]): boolean {
@@ -381,6 +383,7 @@ export function Exercise({
                 : 
                 <h3 onClick={()=>setEditingTitle(!editingTitle)}>{customTitle}</h3>
             }
+            <h4>Global Index: {exIndex}</h4>
             {teacherMode ?
             <span>
                 <form id= "tags">
