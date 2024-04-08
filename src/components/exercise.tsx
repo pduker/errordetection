@@ -201,19 +201,21 @@ export function Exercise({
                     j = -1;
                     measure = 0;
                 }
-                if(correctAnswers[Number(noteElems.getAttribute("index"))] !== undefined && correctAnswers[Number(noteElems.getAttribute("index"))].index === noteElems.getAttribute("index")) {
-                    noteElems.setAttribute("selectedTimes", correctAnswers[Number(noteElems.getAttribute("index"))].selectedTimes);
-                    
-                    if(!selNotes.includes(note)) {
-                        selNotes[selNotes.length] = note;
+                if(teacherMode) {
+                    if(correctAnswers[Number(noteElems.getAttribute("index"))] !== undefined && correctAnswers[Number(noteElems.getAttribute("index"))].index === noteElems.getAttribute("index")) {
+                        noteElems.setAttribute("selectedTimes", correctAnswers[Number(noteElems.getAttribute("index"))].selectedTimes);
+                        
+                        if(!selNotes.includes(note)) {
+                            selNotes[selNotes.length] = note;
+                        }
+                        setSelNotes([...selNotes]);
+                        if(!selAnswers.includes(note)) {
+                            selAnswers[selAnswers.length] = note;
+                        }
+                        setSelAnswers([...selAnswers]);
+                        for(let q = 0; q < noteElems.getAttribute("selectedTimes"); q++)
+                            highlight(note, undefined, false);
                     }
-                    setSelNotes([...selNotes]);
-                    if(!selAnswers.includes(note)) {
-                        selAnswers[selAnswers.length] = note;
-                    }
-                    setSelAnswers([...selAnswers]);
-                    for(let q = 0; q < noteElems.getAttribute("selectedTimes"); q++)
-                        highlight(note, undefined, false);
                 }
             }
             setLoaded(true);
