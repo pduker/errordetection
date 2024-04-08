@@ -19,8 +19,9 @@ function App() {
   var globalIndex = allExData.length;
   return (
     <Router>
-      <div className="App">
-        <header className="App-header">
+      <div >
+        <header className="App-header" >
+          
           <Navbar className="Home-bar" fixed='top'>
             <Navbar.Brand href="/">
               <img
@@ -33,15 +34,16 @@ function App() {
             </Navbar.Brand>
             <Navbar.Brand>Error Detectinator!</Navbar.Brand>
             <Nav className='Home-nav' justify>
-            <Link to="/exercises">Exercises</Link>
-            <Link to="/exercise-management">Exercise Management</Link>
-            <Link to="/help">Help</Link>
+            <Link to="/exercises" className='btn'>Exercises</Link>
+            <Link to="/exercise-management" className='btn'>Exercise Management</Link>
+            <Link to="/help" className='btn'>Help</Link>
             </Nav>
           </Navbar>
+          
         </header>
         
-          <main>
-            <Routes>
+          <body>
+          <Routes>
               <Route path="/" element={<HomePage/>}/>
             </Routes>
 
@@ -56,7 +58,7 @@ function App() {
             <Routes>
               <Route path="/help" element={<HelpPage />} />
             </Routes>
-          </main>
+          </body>
 
       </div>
     </Router>
