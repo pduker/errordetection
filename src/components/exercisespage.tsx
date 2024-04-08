@@ -42,7 +42,7 @@ export function ExercisesPage({
                 if (exercise !== undefined)
                 return (
                     <div>
-                        <Exercise key={exercise.exIndex} teacherMode={false} allExData={allExData} setAllExData={setAllExData} exIndex={exercise.exIndex}></Exercise>
+                        <Exercise key={exercise.exIndex} teacherMode={false} ExData={exercise} setAllExData={setAllExData} exIndex={exercise.exIndex}></Exercise>
                     </div>
                 )
                 else return <></>;

@@ -27,11 +27,11 @@ export function Exercise({
     exIndex, 
     teacherMode,
     setAllExData,
-    allExData
+    ExData
 }: { 
     exIndex: number;
     teacherMode: boolean;
-    allExData: (ExerciseData | undefined)[];
+    ExData: ExerciseData;
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
 }) {
     //for score styling
@@ -40,7 +40,7 @@ export function Exercise({
     var abc = "", feed = "", color: string;
     var ans: any[] = [];
     var visualObjs: any;
-    var exerciseData = allExData[exIndex];
+    var exerciseData = ExData;
     var exInd = exIndex;
     var title = "";
     var tagsV: string[] = [];
@@ -244,11 +244,11 @@ export function Exercise({
         await push(scoresRef, data); // Use push to add new data without overwriting existing data
         console.log('Score saved successfully!');
         console.log(data);
-            if(!allExData[exInd]) setAllExData([...allExData,data]);
+            /*if(!ExData) setAllExData([...ExData,data]);
             else {
-                allExData[exInd] = data;
+                ExData = data;
                 setAllExData(allExData);
-            }
+            }*/
         }  
 
     //runs when update answers button is pushed on mng view: creates nested dictionaries with necessary selected answer info
@@ -300,7 +300,7 @@ export function Exercise({
     //onClick function for difficulty change
     const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setDiff(Number(e.target.value));
-        setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value)+ ", Exercise: " + findNum(tags, Number(e.target.value)));
+        setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value)+ ", Exercise: ");// + findNum(tags, Number(e.target.value)));
     }
 
     //onClick function for tags change
@@ -309,19 +309,19 @@ export function Exercise({
         if(tags.includes(val)) {
             tags.splice(tags.indexOf(val), 1);
             setTags([...tags]);
-            setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags],diff));
+            setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: ");// + findNum([...tags],diff));
         } else {
             setTags([...tags, val]);
-            setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags,val],diff));
+            setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: ");// + findNum([...tags,val],diff));
         }
         
     }
-    const findNum = function(tags:string[],difficulty:number):number{
+    /*const findNum = function(tags:string[],difficulty:number):number{
         
         const count = allExData.filter((exData:ExerciseData | undefined)=> {if (exData !== undefined){return exData.tags.sort().toString() === tags.sort().toString() && exData.difficulty === difficulty}});
         return count.length+1;
 
-    }
+    }*/
 
     //function for comparing selected answers to correct answers
     const everyFunc = function(element: any, index: number, array: any[]): boolean {

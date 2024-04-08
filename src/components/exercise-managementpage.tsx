@@ -21,10 +21,10 @@ export function ExerciseManagementPage({
             {allExData.map(function(exercise) {
                 if (exercise !== undefined)
                 return (
-                    <Exercise key={exercise.exIndex} teacherMode={true} allExData={allExData} setAllExData={setAllExData} exIndex={exercise.exIndex}></Exercise>
+                    <Exercise key={exercise.exIndex} teacherMode={true} ExData={exercise} setAllExData={setAllExData} exIndex={exercise.exIndex}></Exercise>
                 )
-                else return (
-                    <Exercise key={allExData.length} teacherMode={true} allExData={allExData} setAllExData={setAllExData} exIndex={allExData.length}></Exercise>
+                else return (<div/>
+                    //<Exercise key={allExData.length} teacherMode={true} ExData={exercise} setAllExData={setAllExData} exIndex={allExData.length}></Exercise>
                 )
             })}
             <Button onClick={createExercise}>+ New Exercise</Button>
