@@ -1,52 +1,80 @@
 import React, { useState } from 'react';
+import { ref, push, onValue, DataSnapshot } from 'firebase/database';
 import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
 import AudioHandler from './audiohandler';
+import { getDatabase } from 'firebase/database';
 import { Button } from 'react-bootstrap';
+import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, UploadTaskSnapshot, StorageReference } from 'firebase/storage';
+import { initializeApp } from 'firebase/app';
 
+const firebaseConfig = {
+    apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
+    authDomain: "errordetectinator.firebaseapp.com",
+    databaseURL: "https://errordetectinator-default-rtdb.firebaseio.com",
+    projectId: "errordetectinator",
+    storageBucket: "errordetectinator.appspot.com",
+    messagingSenderId: "442966541608",
+    appId: "1:442966541608:web:b08d5b8a9ea1d5ba2ffc1d"
+};
+const app = initializeApp(firebaseConfig);
+
+// Export initialized Firebase app
+export const firebaseApp = app; 
 
 export function Exercise({
     exIndex, 
     teacherMode,
-    files,
-    setFiles,
     setAllExData,
-    allExData
+    ExData
 }: { 
     exIndex: number;
     teacherMode: boolean;
-    files:File[];
-    setFiles:((newFile: File[]) => void);
-    allExData: (ExerciseData | undefined)[];
+    ExData: ExerciseData;
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
 }) {
     //for score styling
-    const score = {display: "inline-block", margin: "auto", backgroundColor: "white", borderRadius: "2px"};
+    const score = {display: "inline-block", margin: "auto", backgroundColor: "white", borderRadius: "2px", width: "400px"};
 
     var abc = "", feed = "", color: string;
     var ans: any[] = [];
     var visualObjs: any;
-    var exerciseData = allExData[exIndex];
+    var exerciseData = ExData;
     var exInd = exIndex;
+    var title = "";
+    var tagsV: string[] = [];
+    var difficulty = 1;
+    var mp3: File = new File([], "");
+
     if(exerciseData !== undefined) {
        
         if(exerciseData.score !== undefined) abc = exerciseData.score;
+        if(exerciseData.sound !== undefined) mp3 = exerciseData.sound;
         if(exerciseData.correctAnswers !== undefined) ans = exerciseData.correctAnswers;
         if(exerciseData.feedback !== undefined) feed = exerciseData.feedback;
+        if(exerciseData.title !== undefined) title = exerciseData.title;
+        if(exerciseData.tags !== undefined) tagsV = exerciseData.tags;
+        if(exerciseData.difficulty !== undefined) difficulty = exerciseData.difficulty;
         
     }
 
     const [updated, setUpdated] = useState<boolean>(false);
     const [loaded, setLoaded] = useState<boolean>(false);
     const [checking, setChecking] = useState<boolean>(false);
+    const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [ana, setAna] = useState<string>(); 
+    const [customTitle, setCustomTitle] = useState<string>(title);
+    const [diff, setDiff] = useState<number>(difficulty);
+    const [tags, setTags] = useState<string[]>(tagsV);
     const [customFeedback, setCustomFeedback] = useState<string[]>([]);
     const [lastClicked, setLastClicked] = useState<any>();
 
     const [selNotes,setSelNotes] = useState<any[]>([]);
     const [selAnswers, setSelAnswers] = useState<any[]>([]);
     const [correctAnswers, setCorrectAnswers] = useState<{[label: string]: (number | string)}[]>(ans);
+    const [xmlFile, setXmlFile] = useState<File>();
+    const [mp3File, setMp3File] = useState<File>(mp3);
     
     const [abcFile, setAbcFile] = useState<string>(abc);
     
@@ -159,7 +187,7 @@ export function Exercise({
         var abcString = abcFile;
         var el = document.getElementById("target" + exIndex);
         if(el !== null && abcString !== undefined){
-            visualObjs = abcjs.renderAbc(el,abcString,{ clickListener: clickListener, selectTypes: ["note"]});
+            visualObjs = abcjs.renderAbc(el,abcString,{ clickListener: clickListener, selectTypes: ["note"],lineThickness: 0.4, responsive: "resize"});
         
             // adds staff #, measure #, and empty feedback to each note when the score is first loaded
             var staffArray = visualObjs[0].lines[0].staff;
@@ -188,24 +216,40 @@ export function Exercise({
         setCorrectAnswers([]);
         setUpdated(false);
         setLoaded(true);
+        loadScore();
     }
 
     //runs when save button is pushed on mng view: overwrites exercise data at current index with updated choices
-    const save = function(){
-        if(abcFile !== undefined && abcFile !== "" && correctAnswers.length > 0) {
+    const save = async function(){
+        var data;
+        if(correctAnswers.length > 0) {
             setCorrectAnswers(correctAnswers.sort((i1, i2) => {
                 if ((i1.index as number) > (i2.index as number)) return 1;
                 if ((i1.index as number) < (i2.index as number)) return -1;
                 return 0;
             }));
-            let data = new ExerciseData(abcFile, correctAnswers, "", exInd, false);
-            if(!allExData[exInd]) setAllExData([...allExData,data]);
+        } 
+        if (abcFile !== undefined && abcFile !== "") {
+            data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false,customTitle,diff,tags);
+        } else {
+            
+        }
+        //setExerciseData(data);
+    
+        // Get database reference
+        const database = getDatabase();
+
+        // Save data to database
+        const scoresRef = ref(database, 'scores');
+        await push(scoresRef, data); // Use push to add new data without overwriting existing data
+        console.log('Score saved successfully!');
+        console.log(data);
+            /*if(!ExData) setAllExData([...ExData,data]);
             else {
-                allExData[exInd] = data;
+                ExData = data;
                 setAllExData(allExData);
-            }
+            }*/
         }  
-    }
 
     //runs when update answers button is pushed on mng view: creates nested dictionaries with necessary selected answer info
     const multiAnswer = function(){
@@ -242,6 +286,42 @@ export function Exercise({
             lastClicked.abselem.elemset[0].setAttribute("feedback", str);
         }
     }
+
+    //saveFeedback, but with the exercise title
+    const saveTitle = function() {
+        var titleBox = document.getElementById("title");
+        if(titleBox !== null && "value" in titleBox) {
+            var str = titleBox.value as string;
+            setCustomTitle(str);
+            setEditingTitle(!editingTitle);
+        }
+    }
+
+    //onClick function for difficulty change
+    const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
+        setDiff(Number(e.target.value));
+        setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value)+ ", Exercise: ");// + findNum(tags, Number(e.target.value)));
+    }
+
+    //onClick function for tags change
+    const tagsChange = function (e: React.ChangeEvent<HTMLInputElement>) {
+        let val = e.target.value;
+        if(tags.includes(val)) {
+            tags.splice(tags.indexOf(val), 1);
+            setTags([...tags]);
+            setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: ");// + findNum([...tags],diff));
+        } else {
+            setTags([...tags, val]);
+            setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: ");// + findNum([...tags,val],diff));
+        }
+        
+    }
+    /*const findNum = function(tags:string[],difficulty:number):number{
+        
+        const count = allExData.filter((exData:ExerciseData | undefined)=> {if (exData !== undefined){return exData.tags.sort().toString() === tags.sort().toString() && exData.difficulty === difficulty}});
+        return count.length+1;
+
+    }*/
 
     //function for comparing selected answers to correct answers
     const everyFunc = function(element: any, index: number, array: any[]): boolean {
@@ -283,7 +363,6 @@ export function Exercise({
         setChecking(false);
         return ret;
     }
-
     //function used with bebug bubbon for testing
     /* const debug = function() {
         console.log("loaded? " + loaded);
@@ -294,12 +373,55 @@ export function Exercise({
     return (
         <div style = {{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
             {/* <button onClick={debug}>bebug bubbon</button> */}
-            <h3>Exercise {exIndex+1}</h3>
-            {teacherMode===true?
+            {editingTitle && teacherMode ? 
+                <span>
+                    <textarea id="title">{customTitle}</textarea> 
+                    <button onClick={saveTitle}>Save Title</button>
+                </span>
+                : 
+                <h3 onClick={()=>setEditingTitle(!editingTitle)}>{customTitle}</h3>
+            }
+            {teacherMode ?
             <span>
-                <FileUpload setFiles={setFiles} files={files} setAbcFile={setAbcFile}></FileUpload>
+                <form id= "tags">
+                    Tags:
+                    <br></br>
+                    <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm
+                    <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange}/>Intonation
+                    <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange}/>Pitch
+                    
+                    
+                </form>
+                <form id="difficulty">
+                    Difficulty:
+                    <br></br>
+                    <select name="difficulty" onChange={diffChange}>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                    </select>
+                </form>
+                
+                <div id="fileUploads" style={{display:"inline",float:"left"}}>
+                    XML Upload: <FileUpload setFile={setXmlFile} file={xmlFile} setAbcFile={setAbcFile} type="xml"></FileUpload>
+                </div>
+                <div id="mp3Upload" style={{display:"inline"}}>
+                    MP3 Upload: <FileUpload setFile={setMp3File} file={mp3File} setAbcFile={setAbcFile} type="mp3"></FileUpload>
+                </div>
+                
+                {mp3 === undefined ? <br></br> : <></>}
                 {(exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
-                <div id={"target" + exIndex} style={score}></div>
+                <div style = {{width:"70%"}}>
+                    <div id={"target" + exIndex} style={score}></div>
+                </div>
+                
                 {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? 
                 <div style={{display: "inline-block", marginLeft:"1vw"}}>
                     <textarea id="note-feedback" placeholder={"Note feedback..."} onChange={saveFeedback}></textarea>
@@ -309,34 +431,37 @@ export function Exercise({
                 {selNotes.length >= 1 ? <div>Analysis: {ana}</div> : <div/>}
                 {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? <div> 
                     <button onClick={multiAnswer}>Update Answers</button>
-                    {updated ? <div>Answers updated.</div> : <div/>}
                     <Button variant='danger' onClick={reload}>Reset Answers</Button>
-                    <div/>
-                    <button onClick={save}>Save</button>
+                    {updated ? <div>Answers updated.</div> : <></>}
                 </div> : <div/>}
+                {updated || (mp3File.name !== "") ? <button onClick={save}>Save</button> : <></>}
             </span>
             :
             <span>
-            {(abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <div/>}
-            <div id={"target" + exIndex} style={score}></div>
-            {/* <div className="clicked-info"></div> */}
-            {files.some((element) => element.name.endsWith(".mp3")) ? <AudioHandler files={files}></AudioHandler> : <></>}
-            {/* selAnswers.length >= 1 ? <div>Analysis: {ana}</div> : <div/> */}
-            {(abcFile !== undefined && abcFile !== "" && loaded) ? 
-                <div>
-                    <button onClick={log}>Check Answer</button>
-                    {checking ? (
-                        selAnswers.length > 0 ? (
-                            selAnswers.every(everyFunc) ? (
-                                <></>
+                {/* <div style={{marginLeft: "2px", marginRight: "2px"}}>Difficulty: {diff}</div>
+                <div style={{marginLeft: "2px", marginRight: "2px"}}>Tags: {tags.join(", ")}</div> */}
+                {(abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <div/>}
+                <div style = {{width:"70%"}}>
+                    <div id={"target" + exIndex} style={score}></div>
+                </div>
+                {/* <div className="clicked-info"></div> */}
+                {mp3 !== undefined ? <AudioHandler file={mp3}></AudioHandler> : <></>}
+                {/* selAnswers.length >= 1 ? <div>Analysis: {ana}</div> : <div/> */}
+                {(abcFile !== undefined && abcFile !== "" && loaded) ? 
+                    <div>
+                        <button onClick={log}>Check Answer</button>
+                        {checking ? (
+                            selAnswers.length > 0 ? (
+                                selAnswers.every(everyFunc) ? (
+                                    <></>
+                                ) : <></>
                             ) : <></>
                         ) : <></>
-                    ) : <></>
-                    }
-                    <div>Next step(s): {customFeedback.map(function(feedback) {
-                        return <li key={feedback}>{feedback}</li>
-                    })}</div>
-                </div>
+                        }
+                        <div>Next step(s): {customFeedback.map(function(feedback) {
+                            return <li key={feedback}>{feedback}</li>
+                        })}</div>
+                    </div>
                 : <div/>}
             </span>
             }
