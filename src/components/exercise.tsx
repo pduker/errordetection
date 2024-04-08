@@ -1,9 +1,27 @@
 import React, { useState } from 'react';
+import { ref, push, onValue, DataSnapshot } from 'firebase/database';
 import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
 import AudioHandler from './audiohandler';
+import { getDatabase } from 'firebase/database';
 import { Button } from 'react-bootstrap';
+import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, UploadTaskSnapshot, StorageReference } from 'firebase/storage';
+import { initializeApp } from 'firebase/app';
+
+const firebaseConfig = {
+    apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
+    authDomain: "errordetectinator.firebaseapp.com",
+    databaseURL: "https://errordetectinator-default-rtdb.firebaseio.com",
+    projectId: "errordetectinator",
+    storageBucket: "errordetectinator.appspot.com",
+    messagingSenderId: "442966541608",
+    appId: "1:442966541608:web:b08d5b8a9ea1d5ba2ffc1d"
+};
+const app = initializeApp(firebaseConfig);
+
+// Export initialized Firebase app
+export const firebaseApp = app; 
 
 export function Exercise({
     exIndex, 
@@ -202,7 +220,7 @@ export function Exercise({
     }
 
     //runs when save button is pushed on mng view: overwrites exercise data at current index with updated choices
-    const save = function(){
+    const save = async function(){
         var data;
         if(correctAnswers.length > 0) {
             setCorrectAnswers(correctAnswers.sort((i1, i2) => {
@@ -216,6 +234,16 @@ export function Exercise({
         } else {
             
         }
+        //setExerciseData(data);
+    
+        // Get database reference
+        const database = getDatabase();
+
+        // Save data to database
+        const scoresRef = ref(database, 'scores');
+        await push(scoresRef, data); // Use push to add new data without overwriting existing data
+        console.log('Score saved successfully!');
+        console.log(data);
             if(!allExData[exInd]) setAllExData([...allExData,data]);
             else {
                 allExData[exInd] = data;

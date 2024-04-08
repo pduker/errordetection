@@ -1,6 +1,7 @@
 import { Button } from 'react-bootstrap';
 import ExerciseData from '../interfaces/exerciseData';
 import { Exercise } from './exercise';
+import { Database } from './database';
 
 
 export function ExerciseManagementPage({
