@@ -3,23 +3,23 @@ import { vertaal } from 'xml2abc';
 import AudioHandler from './audiohandler';
 
 export default function FileUpload ({
-  setFiles,
+  setFile,
   setAbcFile,
-  files
+  file,
+  type
 }:{
-  files:File[];
-  setFiles: ((newFiles: File[]) => void);
+  file:File | undefined;
+  setFile: ((newFile: File) => void);
   setAbcFile: ((newFile: string) => void) | null;
+  type:string;
 }):JSX.Element{
 
     //state declarations, can be used to access file in the future
-    const [file, setFile] = useState<File>();
-    const [msgContent, setMsgContent] = useState<string>("Nothing selected.");
+    const [msgContent, setMsgContent] = useState<string>(); //"Nothing selected."
     
     const abcTranslate = function (fileContent: string) {
       var domparser = new DOMParser();
       var xmldata = domparser.parseFromString(fileContent, 'application/xml');
-      console.log("file is parsed");
       var options = { u:0, b:0, n:0,
       c:0, v:0, d:0,  
       m:0, x:0, t:0,  
@@ -27,13 +27,12 @@ export default function FileUpload ({
       stm:0,          
       p:'f', s:0 };
       var result = vertaal(xmldata, options);
-      console.log("vertaal called");
       var abcText = result[0];
       var errorText = result[1];
       if (setAbcFile != null) {
           setAbcFile(abcText);
-          console.log("file? " + abcText + "<- should be here");
-          console.log("error text: " + errorText);
+          //console.log("file? " + abcText + "<- should be here");
+          //console.log("error text: " + errorText);
       }
   }
 
@@ -41,31 +40,41 @@ export default function FileUpload ({
     const fileChange = function (e: React.ChangeEvent<HTMLInputElement>) {
       const selectedFiles = e.target.files;
       if (!selectedFiles || selectedFiles.length === 0) {
-        setMsgContent("No file selected.");
+        //setMsgContent("No file selected.");
         return;
       }
-        setFile(files[0]);
         
-        setFiles([...files, selectedFiles[selectedFiles.length-1]]);
+        setFile(selectedFiles[selectedFiles.length-1]);
         //checks for .musicxml and .mp3 files, otherwise returns error msg (can be easily changed)
-        if (selectedFiles[selectedFiles.length-1].name.endsWith(".musicxml")) {
+        if(type === "xml"){
+          if (selectedFiles[selectedFiles.length-1].name.endsWith(".musicxml")) {
             setMsgContent("xml file selected.");
             const fileReader = new FileReader();
+
             fileReader.onload = () => {
                 const fileContent = fileReader.result as string;
-                console.log("file is now string");
                 abcTranslate(fileContent);
             }
-            console.log("now reading");
-            fileReader.readAsText(selectedFiles[selectedFiles.length-1]);
-          } else if (selectedFiles[selectedFiles.length-1].name.endsWith(".mp3")) {
-            setMsgContent("mp3 file selected.");
-          } else {
-            setMsgContent("Invalid file! Please select either a .musicxml or .mp3 file.");
+          fileReader.readAsText(selectedFiles[selectedFiles.length-1]);
+         }
+          else {
+            setMsgContent("Invalid file! Please select a .musicxml file");
           }
-        };
+        }
+        if(type === "mp3"){ 
+         if (selectedFiles[selectedFiles.length-1].name.endsWith(".mp3")) {
+            setMsgContent("mp3 file selected.");
+          }
+          else {
+            setMsgContent("Invalid file! Please select a .mp3 file");
+          }
+        }
+      };
+          
+        
+        
   // Function to print information about uploaded files
-  const printFileInformation = () => {
+  /* const printFileInformation = () => {
     return files.map((file, index) => (
       <div key={index}>
         <p>Name: {file.name}</p>
@@ -73,7 +82,7 @@ export default function FileUpload ({
         <p>Type: {file.type}</p>
       </div>
     ));
-  };
+  }; */
 
   // Function to show the file information
   // const toggleFileDisplay = () => {
@@ -82,10 +91,10 @@ export default function FileUpload ({
 
   //rendered stuff
   return (
-    <div>
-      <input type="file" onChange={fileChange} />
-      <p>{msgContent}</p>
-      <AudioHandler files={files} />
+    <div style={{display:"inline"}}>
+      <input style={{display:"inline"}} type="file" onChange={fileChange} />
+      {msgContent === "mp3 file selected." && file !== undefined ? <AudioHandler file={file} /> : <p>{msgContent}</p>}
+      
       {/* <button onClick={toggleFileDisplay}>
         {showFiles ? "Hide Files" : "Show Files Uploaded"}
       </button> */}

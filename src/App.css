@@ -4,19 +4,20 @@
 }
 
 .App-header {
-  background-color: #efefef;
-  min-height: 5vh;
+  /*background-color: #efefef;*/
+  min-height: 15vh;
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   font-size: calc(20px + 2vmin);
   font-family: Arial, Helvetica, sans-serif;
-  color: #DC582A; /*Dark Orange 1*/
+  color: #dc582a; /*Dark Orange 1*/
 }
 
 .Home-bar {
   padding-left: 1vw;
   padding-top: 1vh;
+  background-color: #efefef;
 }
 
 .Home-nav {
@@ -24,7 +25,7 @@
 }
 
 a {
-  color: #DC582A; /*Dark Orange 1*/
+  color: #dc582a; /*Dark Orange 1 */
   font-size: calc(10px + 2vmin);
   padding-left: 1vw;
   text-decoration: none;
