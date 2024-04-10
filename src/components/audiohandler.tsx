@@ -8,6 +8,7 @@ export default function AudioHandler({ file }: { file: File }): JSX.Element {
 
   //sets the audio that is uploaded
   useEffect(() => {
+    if (file.name !== undefined)
     if (file.name.endsWith(".mp3")) {
       
       const objectURL = URL.createObjectURL(file);

@@ -4,7 +4,8 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
+      "ES2023.Array"
     ],
     "typeRoots": [
       "node_modules/@types",

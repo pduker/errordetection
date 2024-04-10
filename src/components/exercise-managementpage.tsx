@@ -22,7 +22,8 @@ export function ExerciseManagementPage({
     return (
         <div style={{margin: "10px"}}>
             <h2>Welcome to the Exercise Management Page!</h2>
-            {allExData.map(function(exercise) {
+            <Button onClick={createExercise}>+ New Exercise</Button>
+            {allExData.toReversed().map(function(exercise) {
                 if (exercise !== undefined)
                 return (
                     <Exercise key={exercise.exIndex} teacherMode={true} ExData={exercise} allExData={allExData} setAllExData={setAllExData} exIndex={exercise.exIndex}></Exercise>
@@ -31,7 +32,6 @@ export function ExerciseManagementPage({
                     //<Exercise key={allExData.length} teacherMode={true} ExData={exercise} setAllExData={setAllExData} exIndex={allExData.length}></Exercise>
                 )
             })}
-            <Button onClick={createExercise}>+ New Exercise</Button>
             <br></br>
             <Button onClick={fetch} variant="success">Sync with Database</Button>
             {/* <Exercise teacherMode={true} allExData = {allExData} setAllExData = {setAllExData}files={files} setFiles ={setFiles} exIndex={0}></Exercise>

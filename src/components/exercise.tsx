@@ -171,7 +171,7 @@ export function Exercise({
         setAna("Note is on staff " + staffCt + " and measure " + measureCt);
         console.log(selNotes);//noteElems.getAttribute("index")
         setLastClicked(note);
-        var txt = document.getElementById("note-feedback");
+        var txt = document.getElementById("note-feedback-"+exIndex);
         if (txt !== null && "value" in txt) txt.value = noteElems.getAttribute("feedback");
         setUpdated(false);
         setChecking(false);
@@ -180,6 +180,7 @@ export function Exercise({
     const loadScore = function() {
         // sample file: "X:1\nZ:Copyright ©\n%%scale 0.83\n%%pagewidth 21.59cm\n%%leftmargin 1.49cm\n%%rightmargin 1.49cm\n%%score [ 1 2 ] 3\nL:1/4\nQ:1/4=60\nM:4/4\nI:linebreak $\nK:Amin\nV:1 treble nm=Flute snm=Fl.\nV:2 treble transpose=-9 nm=Alto Saxophone snm=Alto Sax.\nV:3 bass nm=Violoncello snm= Vc.\nV:1\nc2 G3/2 _B/ | _A/_B/ c _d f | _e _d c2 |] %3\nV:2\n[K:F#min] =c d c3/2 e/ | =f f/e/ d2 | =f e f2 |] %3\nV:3\n_A,,2 _E,,2 | F,,2 _D,,2 | _E,,2 _A,,2 |] %3"
         var abcString = abcFile;
+        abcString = abcString.replace("Z:Copyright ©\n", "");
         var el = document.getElementById("target" + exIndex);
         if(el !== null && abcString !== undefined){
             visualObjs = abcjs.renderAbc(el,abcString,{ clickListener: clickListener, selectTypes: ["note"],lineThickness: 0.4, responsive: "resize"});
@@ -195,15 +196,17 @@ export function Exercise({
                 if(!(noteElems.getAttribute("feedback"))) noteElems.setAttribute("feedback", "");
                 if(!(noteElems.getAttribute("index"))) noteElems.setAttribute("index", i);
                 if(!(noteElems.getAttribute("selectedTimes"))) noteElems.setAttribute("selectedTimes", 0);
-                if(staffArray[staff].voices[0][j].el_type === "bar") {measure++; i--;}
+                if(note.el_type === "bar") {measure++; i--;}
                 if(j + 1 == staffArray[staff].voices[0].length) {
                     staff++;
                     j = -1;
                     measure = 0;
                 }
                 if(teacherMode) {
-                    if(correctAnswers[Number(noteElems.getAttribute("index"))] !== undefined && correctAnswers[Number(noteElems.getAttribute("index"))].index === noteElems.getAttribute("index")) {
-                        noteElems.setAttribute("selectedTimes", correctAnswers[Number(noteElems.getAttribute("index"))].selectedTimes);
+                    var ansSearch = correctAnswers.findIndex((answer: {[label: string]: string | number}) => (answer.index === noteElems.getAttribute("index") && note.el_type !== "bar"))
+                    if(ansSearch !== -1) {
+                        noteElems.setAttribute("selectedTimes", correctAnswers[ansSearch].selectedTimes);
+                        noteElems.setAttribute("feedback", correctAnswers[ansSearch].feedback);
                         
                         if(!selNotes.includes(note)) {
                             selNotes[selNotes.length] = note;
@@ -304,7 +307,6 @@ export function Exercise({
         if(feedBox !== null && "value" in feedBox) {
             var str = feedBox.value as string;
             lastClicked.abselem.elemset[0].setAttribute("feedback", str);
-            console.log("Feedback on " + lastClicked.abselem.elemset[0].getAttribute("index") + " changing to " + str);
         }
     }
 
@@ -321,7 +323,7 @@ export function Exercise({
     //onClick function for difficulty change
     const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setDiff(Number(e.target.value));
-        setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value)+ ", Exercise: ");// + findNum(tags, Number(e.target.value)));
+        setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value)+ ", Exercise: " + findNum(tags, Number(e.target.value)));
     }
 
     //onClick function for tags change
@@ -330,10 +332,10 @@ export function Exercise({
         if(tags.includes(val)) {
             tags.splice(tags.indexOf(val), 1);
             setTags([...tags]);
-            setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: "+ findNum([...tags],diff));// 
+            setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: "+ findNum([...tags],diff));
         } else {
             setTags([...tags, val]);
-            setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags,val],diff));// 
+            setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags,val],diff));
         }
         
     }
@@ -402,7 +404,7 @@ export function Exercise({
                 : 
                 <h3 onClick={()=>setEditingTitle(!editingTitle)}>{customTitle}</h3>
             }
-            <h4>Global Index: {exIndex}</h4>
+            {/* <h4>Global Index: {exIndex}</h4> */}
             {teacherMode ?
             <span>
                 <form id= "tags">
