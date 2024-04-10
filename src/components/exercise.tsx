@@ -3,6 +3,7 @@ import { ref, push, onValue, DataSnapshot } from 'firebase/database';
 import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
+import DBData from '../interfaces/DBData';
 import AudioHandler from './audiohandler';
 import { getDatabase } from 'firebase/database';
 import { Button } from 'react-bootstrap';
@@ -255,9 +256,12 @@ export function Exercise({
 
         // Save data to database
         const scoresRef = ref(database, 'scores');
-        await push(scoresRef, data); // Use push to add new data without overwriting existing data
+        const blob = new Blob([mp3File], {type: "audio/mpeg"});
+        const string = await blob.text();
+        var dbdata = new DBData(data, string);
+        await push(scoresRef, dbdata); // Use push to add new data without overwriting existing data
         console.log('Score saved successfully!');
-        console.log(data);
+        console.log(dbdata);
             /*if(!ExData) setAllExData([...ExData,data]);
             else {
                 ExData = data;

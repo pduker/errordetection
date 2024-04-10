@@ -23,6 +23,7 @@ export function ExercisesPage({
         <div style={{margin: "10px"}}>
             <h2>Welcome to the Exercises Page!</h2>
             {allExData.map(function(exercise) {
+                console.log(exercise);
                 if (exercise !== undefined)
                 return (
                     <div>
