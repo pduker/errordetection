@@ -7,8 +7,9 @@ import DBData from '../interfaces/DBData';
 import AudioHandler from './audiohandler';
 import { getDatabase } from 'firebase/database';
 import { Button } from 'react-bootstrap';
-import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, UploadTaskSnapshot, StorageReference } from 'firebase/storage';
+import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, UploadTaskSnapshot, StorageReference, uploadBytes } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
+import { stringify } from 'querystring';
 
 const firebaseConfig = {
     apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
@@ -234,6 +235,8 @@ export function Exercise({
         loadScore();
     }
 
+    
+
     //runs when save button is pushed on mng view: overwrites exercise data at current index with updated choices
     const save = async function(){
         var data;
@@ -253,12 +256,15 @@ export function Exercise({
     
         // Get database reference
         const database = getDatabase();
+        const storage = getStorage();
 
         // Save data to database
         const scoresRef = ref(database, 'scores');
-        const blob = new Blob([mp3File], {type: "audio/mpeg"});
-        const string = await blob.text();
-        var dbdata = new DBData(data, string);
+        const audioref = storageRef(storage, mp3File.name);
+        uploadBytes(audioref, mp3File).then((snapshot) => {
+            console.log('Uploaded a blob or file!');
+          });
+        var dbdata = new DBData(data, mp3File.name);
         await push(scoresRef, dbdata); // Use push to add new data without overwriting existing data
         console.log('Score saved successfully!');
         console.log(dbdata);

@@ -13,6 +13,7 @@ import ExerciseData from './interfaces/exerciseData';
 import DBData from './interfaces/DBData';
 import { getDatabase } from 'firebase/database';
 import { ref, push, onValue, DataSnapshot } from 'firebase/database';
+import { getBlob, getDownloadURL, getStorage, ref as storageRef } from 'firebase/storage';
 
 //import Navbar from "./components/navbar"
 
@@ -35,12 +36,18 @@ function App() {
           });
           // Update state with scores retrieved from the database
           const scoresData2: ExerciseData[] = [];
-          scoresData.forEach(function (value) {
-            const blob = new Blob([value.sound], {type: 'audio/mpeg'});
+          const storage = getStorage();
+          //const audioref = storageRef(storage, "mp3Files");
+          scoresData.forEach(async function (value) {
+            if(value.sound){
+            const blob = await getBlob(storageRef(storage, value.sound));
+            console.log(blob);
+            //let response = await fetch(blob);
+            //let data = await response.blob();
             var file = new File([blob], "audio.mp3", {type: "audio/mpeg"})
             var thing = new ExerciseData(value.score,file,value.correctAnswers,value.feedback,value.exIndex,value.empty,value.title,value.difficulty,value.tags);
             scoresData2.push(thing);
-            console.log(thing);
+            console.log(thing);}
         });
           setAllExData(scoresData2);
           setScoresRetrieved(true); // Set scoresRetrieved to true after retrieving scores
