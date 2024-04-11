@@ -3,11 +3,13 @@ import { ref, push, onValue, DataSnapshot, get, remove } from 'firebase/database
 import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
+import DBData from '../interfaces/DBData';
 import AudioHandler from './audiohandler';
 import { getDatabase } from 'firebase/database';
 import { Button } from 'react-bootstrap';
-import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, UploadTaskSnapshot, StorageReference } from 'firebase/storage';
+import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, UploadTaskSnapshot, StorageReference, uploadBytes } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
+import { stringify } from 'querystring';
 
 const firebaseConfig = {
     apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
@@ -236,6 +238,8 @@ export function Exercise({
         loadScore();
     }
 
+    
+
     //runs when save button is pushed on mng view: overwrites exercise data at current index with updated choices
     const save = async function(){
         var data;
@@ -255,12 +259,18 @@ export function Exercise({
     
         // Get database reference
         const database = getDatabase();
+        const storage = getStorage();
 
         // Save data to database
         const scoresRef = ref(database, 'scores');
-        await push(scoresRef, data); // Use push to add new data without overwriting existing data
+        const audioref = storageRef(storage, mp3File.name);
+        uploadBytes(audioref, mp3File).then((snapshot) => {
+            console.log('Uploaded a blob or file!');
+          });
+        var dbdata = new DBData(data, mp3File.name);
+        await push(scoresRef, dbdata); // Use push to add new data without overwriting existing data
         console.log('Score saved successfully!');
-        console.log(data);
+        console.log(dbdata);
             /*if(!ExData) setAllExData([...ExData,data]);
             else {
                 ExData = data;

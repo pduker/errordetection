@@ -10,8 +10,10 @@ import { ExerciseManagementPage} from './components/exercise-managementpage';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { Interface } from 'readline';
 import ExerciseData from './interfaces/exerciseData';
+import DBData from './interfaces/DBData';
 import { getDatabase } from 'firebase/database';
 import { ref, push, onValue, DataSnapshot } from 'firebase/database';
+import { getBlob, getDownloadURL, getStorage, ref as storageRef } from 'firebase/storage';
 
 //import Navbar from "./components/navbar"
 
@@ -25,7 +27,7 @@ function App() {
         const database = getDatabase();
         const scoresRef = ref(database, 'scores');
         onValue(scoresRef, (snapshot) => {
-          const scoresData: ExerciseData[] = [];
+          const scoresData: DBData[] = [];
           snapshot.forEach((childSnapshot: DataSnapshot) => {
             const score = childSnapshot.val();
             if (score) {
@@ -33,7 +35,21 @@ function App() {
             }
           });
           // Update state with scores retrieved from the database
-          setAllExData(scoresData);
+          const scoresData2: ExerciseData[] = [];
+          const storage = getStorage();
+          //const audioref = storageRef(storage, "mp3Files");
+          scoresData.forEach(async function (value) {
+            if(value.sound){
+            const blob = await getBlob(storageRef(storage, value.sound));
+            console.log(blob);
+            //let response = await fetch(blob);
+            //let data = await response.blob();
+            var file = new File([blob], "audio.mp3", {type: "audio/mpeg"})
+            var thing = new ExerciseData(value.score,file,value.correctAnswers,value.feedback,value.exIndex,value.empty,value.title,value.difficulty,value.tags);
+            scoresData2.push(thing);
+            console.log(thing);}
+        });
+          setAllExData(scoresData2);
           setScoresRetrieved(true); // Set scoresRetrieved to true after retrieving scores
         });
       } catch (error) {
@@ -41,6 +57,7 @@ function App() {
         // Add additional error handling if necessary
       }
     }
+    console.log(allExData);
   };
   return (
     <Router>
