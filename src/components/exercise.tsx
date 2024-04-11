@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ref, push, onValue, DataSnapshot } from 'firebase/database';
+import { ref, push, onValue, DataSnapshot, get, remove } from 'firebase/database';
 import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
@@ -393,6 +393,59 @@ export function Exercise({
         console.log(exerciseData);
     } */
 
+    const arrayEquals = (a: any[], b: any[]): boolean => {
+        if (a.length !== b.length) return false;
+    
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) return false;
+        }
+    
+        return true;
+    };
+
+    //deleting the exercise from database and website
+    const handleExerciseDelete = async (exIndex: number, tags: string[]) => {
+        try {
+            //get database reference
+            const database = getDatabase();
+    
+            //find the exercise based on matching exIndex and tags
+            const exerciseRef = ref(database, 'scores');
+            const snapshot = await get(exerciseRef);
+            if (snapshot.exists()) {
+                const exercises = snapshot.val();
+    
+                //iterate through each exercise
+                for (const key in exercises) {
+                    if (exercises.hasOwnProperty(key)) {
+                        const exercise = exercises[key];
+    
+                        //check if exercise match both exIndex and tags
+                        if (exercise.exIndex === exIndex && arrayEquals(exercise.tags, tags)) {
+                            // removing exercise from the database
+                            const exerciseDataRef = ref(database, `scores/${key}`);
+                            await remove(exerciseDataRef);
+                            console.log('Exercise deleted successfully!');
+                            
+                        //removing exercise from the page
+                        const updatedExercises = allExData.filter((exercise: any) => {
+                            return exercise.exIndex !== exIndex || !exercise.tags.every((tag: string) => tags.includes(tag));
+                        });
+                        setAllExData(updatedExercises);
+    
+                        return;
+                        }
+                    }
+                }
+    
+                //if no matching exercise is found
+                console.log('Exercise with exIndex ' + exIndex + ' and tags ' + tags.join(', ') + ' not found!');
+            }
+        } catch (error) {
+            console.error('Error deleting exercise:', error);
+        }
+    };
+
     return (
         <div style = {{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
             {/* <button onClick={debug}>bebug bubbon</button> */}
@@ -456,6 +509,7 @@ export function Exercise({
                 {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? <div> 
                     <button onClick={multiAnswer}>Update Answers</button>
                     <Button variant='danger' onClick={reload}>Reset Answers</Button>
+                    <Button onClick={() => handleExerciseDelete(exIndex, tags)} variant="danger">Delete</Button>
                     {updated ? <div>Answers updated.</div> : <></>}
                 </div> : <div/>}
                 {updated || (mp3File.name !== "") ? <button onClick={save}>Save</button> : <></>}
