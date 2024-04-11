@@ -18,15 +18,22 @@ export function ExercisesPage({
     useEffect(() => {
         fetch();
     })
-    
-    return (
+
+      return (
         <div style={{margin: "10px"}}>
             <h2>Welcome to the Exercises Page!</h2>
             {allExData.map(function(exercise) {
                 if (exercise !== undefined)
                 return (
                     <div>
-                        <Exercise key={exercise.exIndex} teacherMode={false} ExData={exercise} allExData={allExData} setAllExData={setAllExData} exIndex={exercise.exIndex}></Exercise>
+                        <Exercise
+                            teacherMode={false}
+                            ExData={exercise}
+                            allExData={allExData}
+                            setAllExData={setAllExData}
+                            exIndex={exercise.exIndex}
+                            
+                        />
                     </div>
                 )
                 else return <></>;
