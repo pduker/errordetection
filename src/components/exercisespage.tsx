@@ -16,7 +16,7 @@ export function ExercisesPage({
     useEffect(() => {
         //fetch();
         if(exList.length === 0) {
-            if(tags.length === 0) setExList(allExData.sort(exSortFunc));
+            if(tags.length === 0 && (diff === undefined || diff === "All")) setExList(allExData.sort(exSortFunc));
         }
     })
 
@@ -31,7 +31,10 @@ export function ExercisesPage({
         else if (tempTags.length === 0) method = "diff";
         switch (method) {
             case "diff": // no tags selected
-                list = allExData.filter(function(exercise) {if (exercise !== undefined) return tempDiff === String(exercise.difficulty)}).sort(exSortFunc)
+                list = allExData.filter(function(exercise) {
+                    if (exercise !== undefined) 
+                        return tempDiff === String(exercise.difficulty)})
+                        .sort(exSortFunc);
                 setExList(list);
                 break;
             case "tags": // no diff / "All" selected
@@ -222,6 +225,7 @@ export function ExercisesPage({
                         )}
                     else return <></>;
                 })}
+                {exList.length === 0 ? <div>No exercises with those criteria found!</div> : <></>}
             </div>
             <div style={{float:'right',width:'70%'}}>
                 {selExercise !== undefined ? <div>

@@ -23,7 +23,7 @@ export function HelpPage({
     return (
         <div>
             <h2>Welcome to the Help Page!</h2>
-            <input type="password" id="mng-pwd" placeholder="Enter admin password..."></input>
+            <input id="mng-pwd" placeholder="Enter admin password..."></input>
             <button onClick={checkAuth}>Submit</button>
             {error ? <div style={{color: "red"}}>Incorrect password.</div> : <></>}
         </div>

@@ -186,7 +186,7 @@ export function Exercise({
         var el = document.getElementById("target" + exIndex);
         if(el !== null && abcString !== undefined){
             visualObjs = abcjs.renderAbc(el,abcString,{ clickListener: clickListener, selectTypes: ["note"],lineThickness: 0.4, responsive: "resize"});
-            console.log(correctAnswers);
+            // console.log(correctAnswers);
             // adds staff #, measure #, and empty feedback to each note when the score is first loaded
             var staffArray = visualObjs[0].lines[0].staff;
             
@@ -468,7 +468,7 @@ export function Exercise({
                 : 
                 <h3 onClick={()=>setEditingTitle(!editingTitle)}>{customTitle}</h3>
             }
-            {/* <h4>Global Index: {exIndex}</h4> */}
+            {/* <h4>Global Index: {exIndex}</h4> <- use for debugging */}
             {teacherMode ?
             <span>
                 <form id= "tags">
@@ -504,7 +504,7 @@ export function Exercise({
                     MP3 Upload: <FileUpload setFile={setMp3File} file={mp3File} setAbcFile={setAbcFile} type="mp3"></FileUpload>
                 </div>
                 
-                {mp3 === undefined ? <br></br> : <></>}
+                {mp3File.name === "" ? <br></br> : <></>}
                 {(exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
                 <div style = {{width:"70%"}}>
                     <div id={"target" + exIndex} style={score}></div>
