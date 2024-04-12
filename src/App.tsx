@@ -20,6 +20,7 @@ import { getBlob, getDownloadURL, getStorage, ref as storageRef } from 'firebase
 function App() {
   const [allExData,setAllExData] = useState<(ExerciseData | undefined)[]>([]);
   const [scoresRetrieved, setScoresRetrieved] = useState<boolean>(false); // Track whether scores are retrieved
+  const [authorized, setAuthorized] = useState<boolean>(false); // has the user put in the admin pwd on help page?
   const fetchScoresFromDatabase = async () => {
     if(!scoresRetrieved) {
       console.log("Retrieving scores");
@@ -79,7 +80,9 @@ function App() {
             <Navbar.Brand>Error Detectinator!</Navbar.Brand>
             <Nav className='Home-nav' justify>
             <Link to="/exercises">Exercises</Link>
+            {authorized ?
             <Link to="/exercise-management">Exercise Management</Link>
+            : <></>}
             <Link to="/help">Help</Link>
             </Nav>
           </Navbar>
@@ -95,7 +98,7 @@ function App() {
             </Routes>
 
             <Routes>
-              <Route path="/help" element={<HelpPage />} />
+              <Route path="/help" element={<HelpPage setAuthorized={setAuthorized}/>} />
             </Routes>
           </main>
 
