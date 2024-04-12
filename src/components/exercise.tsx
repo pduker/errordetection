@@ -250,11 +250,9 @@ export function Exercise({
                 return 0;
             }));
         } 
-        if (abcFile !== undefined && abcFile !== "") {
+        if (abcFile !== undefined && abcFile !== "" && mp3File.name !== "") {
             data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false,customTitle,diff,tags);
-        } else {
-            
-        }
+        
         //setExerciseData(data);
     
         // Get database reference
@@ -276,6 +274,9 @@ export function Exercise({
                 ExData = data;
                 setAllExData(allExData);
             }*/
+        } else {
+            console.log("Incomplete exercise - not saving to database");
+        }
         }  
 
     //runs when update answers button is pushed on mng view: creates nested dictionaries with necessary selected answer info
@@ -316,7 +317,7 @@ export function Exercise({
         var feedBox = document.getElementById("note-feedback-"+exIndex);
         if(feedBox !== null && "value" in feedBox) {
             var str = feedBox.value as string;
-            lastClicked.abselem.elemset[0].setAttribute("feedback", str);
+            if(lastClicked !== undefined) lastClicked.abselem.elemset[0].setAttribute("feedback", str);
         }
     }
 

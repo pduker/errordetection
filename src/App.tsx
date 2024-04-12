@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import logo from './assets/doof.png';
@@ -59,12 +59,15 @@ function App() {
     }
     console.log(allExData);
   };
+
+  useEffect(()=>{fetchScoresFromDatabase()});
+  
   return (
     <Router>
       <div className="App">
         <header className="App-header">
           <Navbar className="Home-bar" fixed='top'>
-            <Navbar.Brand href="#home">
+            <Navbar.Brand href="/home">
               <img
                 alt=""
                 src={logo}
@@ -84,11 +87,11 @@ function App() {
         
           <main>
             <Routes>
-              <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase}></ExercisesPage>} />
+              <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData}></ExercisesPage>} />
             </Routes>
 
             <Routes>
-              <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase}/>} />
+              <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData}/>} />
             </Routes>
 
             <Routes>

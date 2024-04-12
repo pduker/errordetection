@@ -8,15 +8,13 @@ import { Button } from 'react-bootstrap';
 
 export function ExercisesPage({
     allExData,
-    setAllExData,
-    fetch
+    setAllExData
 }:{
     allExData: (ExerciseData | undefined)[];
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
-    fetch: () => void;
 }){
     useEffect(() => {
-        fetch();
+        //fetch();
         if(exList.length === 0) {
             if(tags.length === 0) setExList(allExData.sort(exSortFunc));
         }
