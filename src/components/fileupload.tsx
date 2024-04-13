@@ -93,7 +93,7 @@ export default function FileUpload ({
   return (
     <div style={{display:"inline"}}>
       <input style={{display:"inline"}} type="file" onChange={fileChange} />
-      {msgContent === "mp3 file selected." && file !== undefined ? <AudioHandler file={file} /> : <p>{msgContent}</p>}
+      {type === "mp3" && file !== undefined && file.name !== "" ? <AudioHandler file={file} /> : <p>{msgContent}</p>}
       
       {/* <button onClick={toggleFileDisplay}>
         {showFiles ? "Hide Files" : "Show Files Uploaded"}

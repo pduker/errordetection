@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { ref, push, onValue, DataSnapshot } from 'firebase/database';
+import { ref, push, onValue, DataSnapshot, get, remove } from 'firebase/database';
 import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
+import DBData from '../interfaces/DBData';
 import AudioHandler from './audiohandler';
 import { getDatabase } from 'firebase/database';
 import { Button } from 'react-bootstrap';
-import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, UploadTaskSnapshot, StorageReference } from 'firebase/storage';
+import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, UploadTaskSnapshot, StorageReference, uploadBytes } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
+import { stringify } from 'querystring';
 
 const firebaseConfig = {
     apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
@@ -171,7 +173,7 @@ export function Exercise({
         setAna("Note is on staff " + staffCt + " and measure " + measureCt);
         console.log(selNotes);//noteElems.getAttribute("index")
         setLastClicked(note);
-        var txt = document.getElementById("note-feedback");
+        var txt = document.getElementById("note-feedback-"+exIndex);
         if (txt !== null && "value" in txt) txt.value = noteElems.getAttribute("feedback");
         setUpdated(false);
         setChecking(false);
@@ -180,10 +182,11 @@ export function Exercise({
     const loadScore = function() {
         // sample file: "X:1\nZ:Copyright ©\n%%scale 0.83\n%%pagewidth 21.59cm\n%%leftmargin 1.49cm\n%%rightmargin 1.49cm\n%%score [ 1 2 ] 3\nL:1/4\nQ:1/4=60\nM:4/4\nI:linebreak $\nK:Amin\nV:1 treble nm=Flute snm=Fl.\nV:2 treble transpose=-9 nm=Alto Saxophone snm=Alto Sax.\nV:3 bass nm=Violoncello snm= Vc.\nV:1\nc2 G3/2 _B/ | _A/_B/ c _d f | _e _d c2 |] %3\nV:2\n[K:F#min] =c d c3/2 e/ | =f f/e/ d2 | =f e f2 |] %3\nV:3\n_A,,2 _E,,2 | F,,2 _D,,2 | _E,,2 _A,,2 |] %3"
         var abcString = abcFile;
+        abcString = abcString.replace("Z:Copyright ©\n", "");
         var el = document.getElementById("target" + exIndex);
         if(el !== null && abcString !== undefined){
             visualObjs = abcjs.renderAbc(el,abcString,{ clickListener: clickListener, selectTypes: ["note"],lineThickness: 0.4, responsive: "resize"});
-            console.log(correctAnswers);
+            // console.log(correctAnswers);
             // adds staff #, measure #, and empty feedback to each note when the score is first loaded
             var staffArray = visualObjs[0].lines[0].staff;
             
@@ -195,15 +198,17 @@ export function Exercise({
                 if(!(noteElems.getAttribute("feedback"))) noteElems.setAttribute("feedback", "");
                 if(!(noteElems.getAttribute("index"))) noteElems.setAttribute("index", i);
                 if(!(noteElems.getAttribute("selectedTimes"))) noteElems.setAttribute("selectedTimes", 0);
-                if(staffArray[staff].voices[0][j].el_type === "bar") {measure++; i--;}
+                if(note.el_type === "bar") {measure++; i--;}
                 if(j + 1 == staffArray[staff].voices[0].length) {
                     staff++;
                     j = -1;
                     measure = 0;
                 }
                 if(teacherMode) {
-                    if(correctAnswers[Number(noteElems.getAttribute("index"))] !== undefined && correctAnswers[Number(noteElems.getAttribute("index"))].index === noteElems.getAttribute("index")) {
-                        noteElems.setAttribute("selectedTimes", correctAnswers[Number(noteElems.getAttribute("index"))].selectedTimes);
+                    var ansSearch = correctAnswers.findIndex((answer: {[label: string]: string | number}) => (answer.index === noteElems.getAttribute("index") && note.el_type !== "bar"))
+                    if(ansSearch !== -1) {
+                        noteElems.setAttribute("selectedTimes", correctAnswers[ansSearch].selectedTimes);
+                        noteElems.setAttribute("feedback", correctAnswers[ansSearch].feedback);
                         
                         if(!selNotes.includes(note)) {
                             selNotes[selNotes.length] = note;
@@ -233,6 +238,8 @@ export function Exercise({
         loadScore();
     }
 
+    
+
     //runs when save button is pushed on mng view: overwrites exercise data at current index with updated choices
     const save = async function(){
         var data;
@@ -243,26 +250,33 @@ export function Exercise({
                 return 0;
             }));
         } 
-        if (abcFile !== undefined && abcFile !== "") {
+        if (abcFile !== undefined && abcFile !== "" && mp3File.name !== "") {
             data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false,customTitle,diff,tags);
-        } else {
-            
-        }
+        
         //setExerciseData(data);
     
         // Get database reference
         const database = getDatabase();
+        const storage = getStorage();
 
         // Save data to database
         const scoresRef = ref(database, 'scores');
-        await push(scoresRef, data); // Use push to add new data without overwriting existing data
+        const audioref = storageRef(storage, mp3File.name);
+        uploadBytes(audioref, mp3File).then((snapshot) => {
+            console.log('Uploaded a blob or file!');
+          });
+        var dbdata = new DBData(data, mp3File.name);
+        await push(scoresRef, dbdata); // Use push to add new data without overwriting existing data
         console.log('Score saved successfully!');
-        console.log(data);
+        console.log(dbdata);
             /*if(!ExData) setAllExData([...ExData,data]);
             else {
                 ExData = data;
                 setAllExData(allExData);
             }*/
+        } else {
+            console.log("Incomplete exercise - not saving to database");
+        }
         }  
 
     //runs when update answers button is pushed on mng view: creates nested dictionaries with necessary selected answer info
@@ -303,8 +317,7 @@ export function Exercise({
         var feedBox = document.getElementById("note-feedback-"+exIndex);
         if(feedBox !== null && "value" in feedBox) {
             var str = feedBox.value as string;
-            lastClicked.abselem.elemset[0].setAttribute("feedback", str);
-            console.log("Feedback on " + lastClicked.abselem.elemset[0].getAttribute("index") + " changing to " + str);
+            if(lastClicked !== undefined) lastClicked.abselem.elemset[0].setAttribute("feedback", str);
         }
     }
 
@@ -321,7 +334,7 @@ export function Exercise({
     //onClick function for difficulty change
     const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setDiff(Number(e.target.value));
-        setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value)+ ", Exercise: ");// + findNum(tags, Number(e.target.value)));
+        setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value)+ ", Exercise: " + findNum(tags, Number(e.target.value)));
     }
 
     //onClick function for tags change
@@ -330,10 +343,10 @@ export function Exercise({
         if(tags.includes(val)) {
             tags.splice(tags.indexOf(val), 1);
             setTags([...tags]);
-            setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: "+ findNum([...tags],diff));// 
+            setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: "+ findNum([...tags],diff));
         } else {
             setTags([...tags, val]);
-            setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags,val],diff));// 
+            setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags,val],diff));
         }
         
     }
@@ -391,6 +404,59 @@ export function Exercise({
         console.log(exerciseData);
     } */
 
+    const arrayEquals = (a: any[], b: any[]): boolean => {
+        if (a.length !== b.length) return false;
+    
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) return false;
+        }
+    
+        return true;
+    };
+
+    //deleting the exercise from database and website
+    const handleExerciseDelete = async (exIndex: number, tags: string[]) => {
+        try {
+            //get database reference
+            const database = getDatabase();
+    
+            //find the exercise based on matching exIndex and tags
+            const exerciseRef = ref(database, 'scores');
+            const snapshot = await get(exerciseRef);
+            if (snapshot.exists()) {
+                const exercises = snapshot.val();
+    
+                //iterate through each exercise
+                for (const key in exercises) {
+                    if (exercises.hasOwnProperty(key)) {
+                        const exercise = exercises[key];
+    
+                        //check if exercise match both exIndex and tags
+                        if (exercise.exIndex === exIndex && arrayEquals(exercise.tags, tags)) {
+                            // removing exercise from the database
+                            const exerciseDataRef = ref(database, `scores/${key}`);
+                            await remove(exerciseDataRef);
+                            console.log('Exercise deleted successfully!');
+                            
+                        //removing exercise from the page
+                        const updatedExercises = allExData.filter((exercise: any) => {
+                            return exercise.exIndex !== exIndex || !exercise.tags.every((tag: string) => tags.includes(tag));
+                        });
+                        setAllExData(updatedExercises);
+    
+                        return;
+                        }
+                    }
+                }
+    
+                //if no matching exercise is found
+                console.log('Exercise with exIndex ' + exIndex + ' and tags ' + tags.join(', ') + ' not found!');
+            }
+        } catch (error) {
+            console.error('Error deleting exercise:', error);
+        }
+    };
+
     return (
         <div style = {{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
             {/* <button onClick={debug}>bebug bubbon</button> */}
@@ -402,7 +468,7 @@ export function Exercise({
                 : 
                 <h3 onClick={()=>setEditingTitle(!editingTitle)}>{customTitle}</h3>
             }
-            <h4>Global Index: {exIndex}</h4>
+            {/* <h4>Global Index: {exIndex}</h4> <- use for debugging */}
             {teacherMode ?
             <span>
                 <form id= "tags">
@@ -438,7 +504,7 @@ export function Exercise({
                     MP3 Upload: <FileUpload setFile={setMp3File} file={mp3File} setAbcFile={setAbcFile} type="mp3"></FileUpload>
                 </div>
                 
-                {mp3 === undefined ? <br></br> : <></>}
+                {mp3File.name === "" ? <br></br> : <></>}
                 {(exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
                 <div style = {{width:"70%"}}>
                     <div id={"target" + exIndex} style={score}></div>
@@ -454,6 +520,7 @@ export function Exercise({
                 {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? <div> 
                     <button onClick={multiAnswer}>Update Answers</button>
                     <Button variant='danger' onClick={reload}>Reset Answers</Button>
+                    <Button onClick={() => handleExerciseDelete(exIndex, tags)} variant="danger">Delete</Button>
                     {updated ? <div>Answers updated.</div> : <></>}
                 </div> : <div/>}
                 {updated || (mp3File.name !== "") ? <button onClick={save}>Save</button> : <></>}
