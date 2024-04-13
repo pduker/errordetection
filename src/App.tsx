@@ -4,6 +4,7 @@ import Nav from 'react-bootstrap/Nav';
 import logo from './assets/doof.png';
 import './App.css';
 //import BoopButton from "./components/audiohander"
+import { HomePage } from './components/homepage';
 import { HelpPage } from './components/helppage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
@@ -65,8 +66,9 @@ function App() {
   
   return (
     <Router>
-      <div className="App">
-        <header className="App-header">
+      <div >
+        <header className="App-header" >
+          
           <Navbar className="Home-bar" fixed='top'>
             <Navbar.Brand href="/home">
               <img
@@ -86,9 +88,14 @@ function App() {
             <Link to="/help">Help</Link>
             </Nav>
           </Navbar>
+          
         </header>
         
-          <main>
+          <body>
+          <Routes>
+              <Route path="/" element={<HomePage/>}/>
+            </Routes>
+
             <Routes>
               <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData}></ExercisesPage>} />
             </Routes>
@@ -100,7 +107,7 @@ function App() {
             <Routes>
               <Route path="/help" element={<HelpPage setAuthorized={setAuthorized}/>} />
             </Routes>
-          </main>
+          </body>
 
       </div>
     </Router>
