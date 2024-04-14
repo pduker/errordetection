@@ -70,7 +70,7 @@ function App() {
         <header className="App-header" >
           
           <Navbar className="Home-bar" fixed='top'>
-            <Navbar.Brand href="/home">
+            <Navbar.Brand href="/">
               <img
                 alt=""
                 src={logo}
