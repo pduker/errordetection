@@ -21,17 +21,7 @@ export function HomePage() {
         <div className="container ">
           <div><h1>Home Page</h1></div>
           <div className="work-list">
-          <div className="work" onClick={intLink}>
-              <img src={musicnote} alt="note"/>
-              <div className="layer">
-              <h3>Jump to Intonation Exercises</h3>
-              {/* 
-                <p>
-                  To Intonation exercises
-                </p> */}
-              
-              </div>
-            </div>
+
             <div className="work" onClick={pitchLink}>
               <img alt="" src={musicnote} />
               <div className="layer">
@@ -52,6 +42,19 @@ export function HomePage() {
               
               </div>
             </div>
+
+            <div className="work" onClick={intLink}>
+              <img src={musicnote} alt="note"/>
+              <div className="layer">
+              <h3>Jump to Intonation Exercises</h3>
+              {/* 
+                <p>
+                  To Intonation exercises
+                </p> */}
+              
+              </div>
+            </div>
+            
             <Link id="intLink" to="/exercises/intonation" hidden={true}></Link>
             <Link id="pitchLink" to="/exercises/pitch" hidden={true}></Link>
             <Link id="rhyLink" to="/exercises/rhythm" hidden={true}></Link>
