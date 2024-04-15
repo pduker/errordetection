@@ -31,7 +31,7 @@ export default function FileUpload ({
       var errorText = result[1];
       if (setAbcFile != null) {
           setAbcFile(abcText);
-          //console.log("file? " + abcText + "<- should be here");
+          console.log("file? " + abcText + "<- should be here");
           //console.log("error text: " + errorText);
       }
   }

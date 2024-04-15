@@ -85,6 +85,7 @@ export function Exercise({
 
     useEffect(() => {
         if ((exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded)) loadScore();
+        else console.log("nothing is happening");
     })
     
     //yoinked/edited from abcjs! probably don't need all of it for highlighting but oh well
