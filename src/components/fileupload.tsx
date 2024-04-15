@@ -33,7 +33,7 @@ export default function FileUpload ({
       if (setAbcFile != null) {
           setAbcFile(abcText);
           console.log("file? " + abcText + "<- should be here");
-          //console.log("error text: " + errorText);
+          console.log("error text: " + errorText);
       }
   }
 
