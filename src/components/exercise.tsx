@@ -187,12 +187,15 @@ export function Exercise({
     const loadScore = function() {
         // sample file: "X:1\nZ:Copyright ©\n%%scale 0.83\n%%pagewidth 21.59cm\n%%leftmargin 1.49cm\n%%rightmargin 1.49cm\n%%score [ 1 2 ] 3\nL:1/4\nQ:1/4=60\nM:4/4\nI:linebreak $\nK:Amin\nV:1 treble nm=Flute snm=Fl.\nV:2 treble transpose=-9 nm=Alto Saxophone snm=Alto Sax.\nV:3 bass nm=Violoncello snm= Vc.\nV:1\nc2 G3/2 _B/ | _A/_B/ c _d f | _e _d c2 |] %3\nV:2\n[K:F#min] =c d c3/2 e/ | =f f/e/ d2 | =f e f2 |] %3\nV:3\n_A,,2 _E,,2 | F,,2 _D,,2 | _E,,2 _A,,2 |] %3"
         var abcString = abcFile;
+        console.log(abcFile);
         abcString = abcString.replace("Z:Copyright ©\n", "");
         var el = document.getElementById("target" + exIndex);
         if(el !== null && abcString !== undefined){
+            console.log("going to render");
             visualObjs = abcjs.renderAbc(el,abcString,{ clickListener: clickListener, selectTypes: ["note"],lineThickness: 0.4, responsive: "resize"});
             // console.log(correctAnswers);
             // adds staff #, measure #, and empty feedback to each note when the score is first loaded
+            console.log("render has occurred");
             var staffArray = visualObjs[0].lines[0].staff;
             
             for (let i = 0, j = 0, staff = 0, measure = 0; staff < staffArray.length; i++, j++) {
@@ -229,6 +232,7 @@ export function Exercise({
                 }
             }
             setLoaded(true);
+            console.log("exercise good to go");
         } else {
             console.log("abcString is undefined");
         }
