@@ -139,7 +139,7 @@ nav ul li a:hover::after {
 }
 
 .header-text h1 {
-  fornt-size: 60px;
+  font-size: 60px;
   margin-top: 20px;
 }
 .header-text h1 span {
@@ -270,6 +270,7 @@ nav ul li a:hover::after {
   border-radius: 15px;
   position: relative;
   overflow: hidden;
+  cursor: pointer;
 }
 .work img {
   width: 100%;
@@ -295,8 +296,7 @@ nav ul li a:hover::after {
   font-size: 14px;
   transition: height 0.5s;
 }
-.layer p {
-}
+
 .layer h3 {
   font-weight: 700;
   margin-bottom: 20px;
@@ -324,12 +324,12 @@ nav ul li a:hover::after {
   /* border-style: dashed; */
   margin: 10px auto;
   width: fit-content;
-  border: 3px solid #dc582a;
-  padding: 14px 30px;
+  /* border: 3px solid #dc582a; */
+  padding: 8px 16px;
   border-radius: 6px;
   text-decoration: none;
   justify-content: center;
-  color: #dc582a;
+  color: #ffffff;
   transition: background 0.5s;
 }
 
@@ -342,7 +342,7 @@ nav ul li a:hover::after {
 
 .btn:hover {
   background: #ff9900; /*lighter orange*/
-  border: 3px solid #dc582a;
+  /* border: 3px solid #dc582a; */
 }
 
 /* --------------contact-------------- */
@@ -366,7 +366,7 @@ nav ul li a:hover::after {
 .contact-right form {
   width: 100%;
 }
-form input,
+/* form input, */
 form textarea {
   width: 100%;
   border: 0;
@@ -379,9 +379,9 @@ form textarea {
   border-radius: 6px;
 }
 form .btn2 {
-  padding: 14px 60px;
+  padding: 10px 10px;
   font-size: 18px;
-  margin-top: 20px;
+  margin-top: 8px;
   cursor: pointer;
 }
 .social-icons {
@@ -431,7 +431,7 @@ nav .fas {
   }
 
   .header-text h1 {
-    fornt-size: 30px;
+    font-size: 30px;
     margin-top: 20px;
   }
   .header-text h1 span {
