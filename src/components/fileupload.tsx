@@ -53,7 +53,7 @@ export default function FileUpload ({
 
             fileReader.onload = () => {
                 const fileContent = fileReader.result as string;
-                abcTranslate(fileContent);
+                abcTranslate(fileContent); //logs somewhere
             }
           fileReader.readAsText(selectedFiles[selectedFiles.length-1]);
          }
