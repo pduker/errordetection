@@ -15,6 +15,7 @@ export function ExerciseManagementPage({
     const createExercise = function () {
         var last = allExData[allExData.sort(indexSort).length-1];
         if(last !== undefined) setAllExData([...allExData, new ExerciseData("", undefined, [], "", (last.exIndex) + 1, true,"Exercise " + (allExData.length+1),1,[])]);
+        else setAllExData([...allExData, new ExerciseData("", undefined, [], "", 0, true,"Exercise " + (allExData.length+1),1,[])]);
     }
 
     const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
