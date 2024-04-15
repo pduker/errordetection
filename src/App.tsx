@@ -51,7 +51,7 @@ function App() {
             scoresData2.push(thing);
             console.log(thing);}
         });
-          setAllExData(scoresData2);
+          setTimeout(function(){setAllExData(scoresData2)}, 350*scoresData.length);
           setScoresRetrieved(true); // Set scoresRetrieved to true after retrieving scores
         });
       } catch (error) {
@@ -70,7 +70,7 @@ function App() {
         <header className="App-header" >
           
           <Navbar className="Home-bar" fixed='top'>
-            <Navbar.Brand href="/home">
+            <Navbar.Brand href="/">
               <img
                 alt=""
                 src={logo}
@@ -97,7 +97,19 @@ function App() {
             </Routes>
 
             <Routes>
-              <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData}></ExercisesPage>} />
+              <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]}></ExercisesPage>} />
+            </Routes>
+
+            <Routes>
+              <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]}></ExercisesPage>} />
+            </Routes>
+
+            <Routes>
+              <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]}></ExercisesPage>} />
+            </Routes>
+
+            <Routes>
+              <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]}></ExercisesPage>} />
             </Routes>
 
             <Routes>
@@ -105,7 +117,7 @@ function App() {
             </Routes>
 
             <Routes>
-              <Route path="/help" element={<HelpPage setAuthorized={setAuthorized}/>} />
+              <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>} />
             </Routes>
           </body>
 
@@ -116,3 +128,5 @@ function App() {
 }
 
 export default App;
+
+
