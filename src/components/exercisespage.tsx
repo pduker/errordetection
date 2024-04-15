@@ -1,22 +1,21 @@
 import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
-import { getDatabase } from 'firebase/database';
-import { ref, push, onValue, DataSnapshot } from 'firebase/database';
-import React, { useState, useEffect, MouseEvent, MouseEventHandler } from 'react';
-import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, UploadTaskSnapshot, StorageReference } from 'firebase/storage';
-import { Button } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
 
 export function ExercisesPage({
     allExData,
-    setAllExData
+    setAllExData,
+    defaultTags
 }:{
     allExData: (ExerciseData | undefined)[];
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
+    defaultTags: string[];
 }){
     useEffect(() => {
         //fetch();
         if(exList.length === 0) {
             if(tags.length === 0 && (diff === undefined || diff === "All")) setExList(allExData.sort(exSortFunc));
+            else if(tags.length > 0) sortExercises(tags);
         }
     })
 
@@ -96,7 +95,7 @@ export function ExercisesPage({
     }
 
     const [diff, setDiff] = useState<string>();
-    const [tags, setTags] = useState<string[]>([]);
+    const [tags, setTags] = useState<string[]>(defaultTags);
     const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
     const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
 
@@ -153,8 +152,8 @@ export function ExercisesPage({
         var exPos = exList.indexOf(selExercise);
         if(exPos !== -1) {
             setSelExercise(exList[exPos-1]);
-            if (exPos > 1) {
-                var btn = document.getElementById("next-btn");
+            if (exPos-1 > 0) {
+                var btn = document.getElementById("back-btn");
                 if (btn !== null && "disabled" in btn) btn.disabled = false;
             }
             else {
@@ -165,40 +164,51 @@ export function ExercisesPage({
             setSelExercise(exList[0]);
             var btn = document.getElementById("back-btn");
             if (btn !== null && "disabled" in btn) btn.disabled = true;
-            if (exList.length < 2) {
-                var nBtn = document.getElementById("next-btn");
-                if (nBtn !== null && "disabled" in nBtn) nBtn.disabled = true;
-            }
+        }
+        if (exList.length < 2) {
+            var nBtn = document.getElementById("next-btn");
+            if (nBtn !== null && "disabled" in nBtn) nBtn.disabled = true;
+        } else {
+            var nBtn = document.getElementById("next-btn");
+            if (nBtn !== null && "disabled" in nBtn) nBtn.disabled = false;
         }
     }
 
     const nextEx = function () {
         var exPos = exList.indexOf(selExercise);
         setSelExercise(exList[exPos+1]);
-        if (exPos < (exList.length - 2)) {
-            var btn = document.getElementById("back-btn");
-            if (btn !== null && "disabled" in btn && exPos !== -1) btn.disabled = false;
+        if (exPos+1 >= (exList.length - 1)) {
+            var btn = document.getElementById("next-btn");
+            if (btn !== null && "disabled" in btn && exPos !== -1) btn.disabled = true;
         }
         else {
             var btn = document.getElementById("next-btn");
-            if (btn !== null && "disabled" in btn) btn.disabled = true;
+            if (btn !== null && "disabled" in btn) btn.disabled = false;
+        }
+        if (exList.length < 2 || exPos === -1) {
+            var bBtn = document.getElementById("back-btn");
+            if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = true;
+        } else {
+            var bBtn = document.getElementById("back-btn");
+            if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = false;
         }
     }
 
     return (
         <div style={{margin: "10px"}}>
             <h2>Welcome to the Exercises Page!</h2>
+            <h5 style={{fontStyle: "italic"}}>Sort by tags and difficulty, then click an exercise to get started.</h5>
             <div style={{float:'left'}}>
                 <span>
                     <form id= "tags">
-                        Tags:
+                        <div style={{fontSize:"16px", display:"inline"}}>Tags:</div>
                         <br></br>
                         <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange}/>Intonation
                         <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange}/>Pitch
                         <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm
                     </form>
                     <form id="difficulty">
-                        Difficulty:
+                        <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>
                         <br></br>
                         <select name="difficulty" onChange={diffChange}>
                             <option value="All">All</option>
@@ -219,8 +229,10 @@ export function ExercisesPage({
                 {exList.map(function(exercise){
                     if(exercise !== undefined) {
                         return (
-                        <div key = {exercise.title} id = {exercise.title} onClick={exChange}>
-                            {exercise.title}
+                        <div style={{margin: "8px", padding: "6px", cursor: "pointer", backgroundColor: "#fcfcd2", borderRadius: "2px"}}>
+                            <div key = {exercise.title} id = {exercise.title} onClick={exChange}>
+                                {exercise.title}
+                            </div>
                         </div>
                         )}
                     else return <></>;
@@ -232,8 +244,10 @@ export function ExercisesPage({
                     <Exercise key={selExercise.exIndex} teacherMode={false} ExData={selExercise} allExData={allExData} setAllExData={setAllExData} exIndex={selExercise.exIndex}/>
                     
                 </div> : <></>}
-                <button id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
-                <button id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
+            <div style={{display:"flex", justifyContent: "center"}}>
+                <button style={{width: "5%"}}id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
+                <button style={{width: "5%"}} id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
+            </div>
                 
             </div>
             

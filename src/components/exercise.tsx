@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ref, push, onValue, DataSnapshot, get, remove } from 'firebase/database';
 import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
@@ -10,6 +10,7 @@ import { Button } from 'react-bootstrap';
 import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, UploadTaskSnapshot, StorageReference, uploadBytes } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
 import { stringify } from 'querystring';
+import noteKey from "../assets/note-color-key.png"
 
 const firebaseConfig = {
     apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
@@ -81,6 +82,10 @@ export function Exercise({
     const [mp3File, setMp3File] = useState<File>(mp3);
     
     const [abcFile, setAbcFile] = useState<string>(abc);
+
+    useEffect(() => {
+        if ((exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded)) loadScore();
+    })
     
     //yoinked/edited from abcjs! probably don't need all of it for highlighting but oh well
     const setClass = function (elemset: any, addClass: any, removeClass: any, color: any) {
@@ -170,7 +175,7 @@ export function Exercise({
         /* var test = document.querySelector(".clicked-info");
         if(test !== null) {test.innerHTML = "<div class='label'>Clicked info:</div>" + op;} */
         var staffCt = (Number(noteElems.getAttribute("staffPos"))) + 1, measureCt = (Number(noteElems.getAttribute("measurePos")) + 1);
-        setAna("Note is on staff " + staffCt + " and measure " + measureCt);
+        setAna("Staff " + staffCt + ", measure " + measureCt);
         console.log(selNotes);//noteElems.getAttribute("index")
         setLastClicked(note);
         var txt = document.getElementById("note-feedback-"+exIndex);
@@ -432,11 +437,21 @@ export function Exercise({
                         const exercise = exercises[key];
     
                         //check if exercise match both exIndex and tags
-                        if (exercise.exIndex === exIndex && arrayEquals(exercise.tags, tags)) {
+                        if (exercise.exIndex === exIndex) {
+                            if (exercise.tags !== undefined) {
+                                if(arrayEquals(exercise.tags, tags)) {
+                                    const exerciseDataRef = ref(database, `scores/${key}`);
+                                    await remove(exerciseDataRef);
+                                    console.log('Exercise deleted successfully!');
+                                } else {
+                                    console.log("Something went wrong while deleting...");
+                                }
+                            } else {
                             // removing exercise from the database
-                            const exerciseDataRef = ref(database, `scores/${key}`);
-                            await remove(exerciseDataRef);
-                            console.log('Exercise deleted successfully!');
+                                const exerciseDataRef = ref(database, `scores/${key}`);
+                                await remove(exerciseDataRef);
+                                console.log('Exercise deleted successfully!');
+                            }
                             
                         //removing exercise from the page
                         const updatedExercises = allExData.filter((exercise: any) => {
@@ -506,35 +521,52 @@ export function Exercise({
                 
                 {mp3File.name === "" ? <br></br> : <></>}
                 {(exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
-                <div style = {{width:"70%"}}>
+                <div style = {{display: "inline-block", width:"75%"}}>
                     <div id={"target" + exIndex} style={score}></div>
+                    
                 </div>
+                <img
+                    alt="note-color-key"
+                    src={noteKey}
+                    width="20%"
+                    height="7%"
+                    style={{display:"inline", marginLeft:"1vw"}}
+                />
+                
                 
                 {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? 
-                <div style={{display: "inline-block", marginLeft:"1vw"}}>
+                <div style={{display: "inline-block", marginLeft:"1vw", marginTop: "1vh"}}>
                     <textarea id={"note-feedback-"+exIndex} placeholder={"Note feedback..."} onChange={saveFeedback}></textarea>
                 </div>:
                 <></>}
                 {/* <div className="clicked-info"></div> */}
-                {selNotes.length >= 1 ? <div>Analysis: {ana}</div> : <div/>}
+                {lastClicked !== undefined && Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) % 4 !== 0 ? <div>Note Info: {ana}</div> : <div/>}
                 {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? <div> 
-                    <button onClick={multiAnswer}>Update Answers</button>
+                    <Button onClick={multiAnswer}>Update Answers</Button>
                     <Button variant='danger' onClick={reload}>Reset Answers</Button>
                     <Button onClick={() => handleExerciseDelete(exIndex, tags)} variant="danger">Delete</Button>
                     {updated ? <div>Answers updated.</div> : <></>}
                 </div> : <div/>}
-                {updated || (mp3File.name !== "") ? <button onClick={save}>Save</button> : <></>}
+                {updated ? <Button variant='success' onClick={save}>Save</Button> : <></>}
             </span>
             :
             <span>
                 {/* <div style={{marginLeft: "2px", marginRight: "2px"}}>Difficulty: {diff}</div>
                 <div style={{marginLeft: "2px", marginRight: "2px"}}>Tags: {tags.join(", ")}</div> */}
-                {(abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <div/>}
-                <div style = {{width:"70%"}}>
+                {/* (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <div/> */}
+                <div style = {{width:"75%", display: "inline-flex"}}>
                     <div id={"target" + exIndex} style={score}></div>
                 </div>
+                <img
+                    alt="note-color-key"
+                    src={noteKey}
+                    width="20%"
+                    height="7%"
+                    style={{display:"inline-flex", marginLeft: "1vw", marginTop: "-30vh"}}
+                />
                 {/* <div className="clicked-info"></div> */}
                 {mp3 !== undefined ? <AudioHandler file={mp3}></AudioHandler> : <></>}
+                
                 {/* selAnswers.length >= 1 ? <div>Analysis: {ana}</div> : <div/> */}
                 {(abcFile !== undefined && abcFile !== "" && loaded) ? 
                     <div>
@@ -548,7 +580,7 @@ export function Exercise({
                         ) : <></>
                         }
                         <div>Next step(s): {customFeedback.map(function(feedback) {
-                            return <li key={feedback}>{feedback}</li>
+                            return <li style={{marginLeft: "12px"}}key={feedback}>{feedback}</li>
                         })}</div>
                     </div>
                 : <div/>}
