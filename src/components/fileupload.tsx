@@ -26,6 +26,7 @@ export default function FileUpload ({
       v1:0, noped:0,  
       stm:0,          
       p:'f', s:0 };
+      console.log(xmldata);
       var result = vertaal(xmldata, options);
       var abcText = result[0];
       var errorText = result[1];
