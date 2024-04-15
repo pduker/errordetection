@@ -27,7 +27,7 @@
     "typescript": "^4.9.5",
     "use-sound": "^4.0.1",
     "web-vitals": "^2.1.4",
-    "xml2abc": "https://wim.vree.org/js/xml2abc.tgz"
+    "xml2abc": "https://github.com/Joyboy97/errordetector/blob/main/src/assets/xml2abc.zip"
   },
   "scripts": {
     "start": "react-scripts start",
