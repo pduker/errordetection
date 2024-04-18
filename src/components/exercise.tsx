@@ -48,8 +48,9 @@ export function Exercise({
     var exerciseData = ExData;
     var exInd = exIndex;
     var title = "";
-    var tagsV: string[] = [];
+    var tagsInit: string[] = [];
     var difficulty = 1;
+    var voicesInit = 1;
     var mp3: File = new File([], "");
 
     if(exerciseData !== undefined) {
@@ -59,8 +60,9 @@ export function Exercise({
         if(exerciseData.correctAnswers !== undefined) ans = exerciseData.correctAnswers;
         if(exerciseData.feedback !== undefined) feed = exerciseData.feedback;
         if(exerciseData.title !== undefined) title = exerciseData.title;
-        if(exerciseData.tags !== undefined) tagsV = exerciseData.tags;
+        if(exerciseData.tags !== undefined) tagsInit = exerciseData.tags;
         if(exerciseData.difficulty !== undefined) difficulty = exerciseData.difficulty;
+        if(exerciseData.voices !== undefined) voicesInit = exerciseData.voices;
         
     }
 
@@ -71,7 +73,8 @@ export function Exercise({
     const [ana, setAna] = useState<string>(); 
     const [customTitle, setCustomTitle] = useState<string>(title);
     const [diff, setDiff] = useState<number>(difficulty);
-    const [tags, setTags] = useState<string[]>(tagsV);
+    const [tags, setTags] = useState<string[]>(tagsInit);
+    const [voices, setVoices] = useState<number>(voicesInit);
     const [customFeedback, setCustomFeedback] = useState<string[]>([]);
     const [lastClicked, setLastClicked] = useState<any>();
 
@@ -261,7 +264,7 @@ export function Exercise({
             }));
         } 
         if (abcFile !== undefined && abcFile !== "" && mp3File.name !== "") {
-            data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false,customTitle,diff,tags);
+            data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false, customTitle, diff, voices,tags);
         
         //setExerciseData(data);
     
@@ -358,8 +361,15 @@ export function Exercise({
             setTags([...tags, val]);
             setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags,val],diff));
         }
-        
     }
+
+    //onClick function for voices change
+    const voiceChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
+        setVoices(Number(e.target.value));
+        setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value)+ ", Exercise: " + findNum(tags, Number(e.target.value)));
+    }
+
+    //function used in above onClicks to find the number of exercises with certain tags, difficulties, voices
     const findNum = function(tags:string[],difficulty:number):number{
         
         const count = allExData.filter((exData:ExerciseData | undefined)=> {if (exData !== undefined && exData.tags !== undefined && exData.difficulty !== undefined){return exData.tags.sort().toString() === tags.sort().toString() && exData.difficulty === difficulty}});
@@ -491,31 +501,60 @@ export function Exercise({
             {/* <h4>Global Index: {exIndex}</h4> <- use for debugging */}
             {teacherMode ?
             <span>
-                <form id= "tags">
-                    Tags:
-                    <br></br>
-                    <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm
-                    <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange}/>Intonation
-                    <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange}/>Pitch
-                    
-                    
-                </form>
-                <form id="difficulty">
-                    Difficulty:
-                    <br></br>
-                    <select name="difficulty" onChange={diffChange}>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
-                        <option value="10">10</option>
-                    </select>
-                </form>
+                
+                <div id="forms" style={{display: "inline-flex", padding: "4px"}}>
+                    <form id= "tags">
+                        Tags
+                        <br></br>
+                        {/* <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm */}
+                        <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{margin: "4px"}}/>Pitch
+                        <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Intonation
+                    </form>
+                    <form id="voiceCt">
+                        Voices
+                        <br></br>
+                        <select name="voices" onChange={voiceChange}>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            {/* <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option> */}
+                        </select>
+                    </form>
+                    <form id="difficulty">
+                        Difficulty
+                        <br></br>
+                        <select name="difficulty" onChange={diffChange}>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                            {/* <option value="6">6</option>
+                            <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option> */}
+                        </select>
+                    </form>
+                    <form id="tags2">
+                        <div style={{display: "inline-block", marginRight: "15px"}}>
+                            Drone<br/>
+                            <input type="checkbox" name="tags2" value="Drone" checked={tags.includes("Drone")} onChange={tagsChange} style={{margin: "4px"}}/>
+                        </div>
+
+                        <div style={{display: "inline-block"}}>
+                            Ensemble parts<br/>
+                            <input type="checkbox" name="tags2" value="Ensemble" checked={tags.includes("Ensemble")} onChange={tagsChange} style={{marginLeft: "12px"}}/>
+                        </div>
+                    </form>
+                </div>
+                <div/>
                 
                 <div id="fileUploads" style={{display:"inline",float:"left"}}>
                     XML Upload: <FileUpload setFile={setXmlFile} file={xmlFile} setAbcFile={setAbcFile} type="xml"></FileUpload>

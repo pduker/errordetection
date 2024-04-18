@@ -14,8 +14,8 @@ export function ExerciseManagementPage({
 }) {
     const createExercise = function () {
         var last = allExData[allExData.sort(indexSort).length-1];
-        if(last !== undefined) setAllExData([...allExData, new ExerciseData("", undefined, [], "", (last.exIndex) + 1, true,"Exercise " + (allExData.length+1),1,[])]);
-        else setAllExData([...allExData, new ExerciseData("", undefined, [], "", 0, true,"Exercise " + (allExData.length+1),1,[])]);
+        if(last !== undefined) setAllExData([...allExData, new ExerciseData("", undefined, [], "", (last.exIndex) + 1, true,"Exercise " + (allExData.length+1),1,1,[])]);
+        else setAllExData([...allExData, new ExerciseData("", undefined, [], "", 0, true,"Exercise " + (allExData.length+1),1,1,[])]);
     }
 
     const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
@@ -25,29 +25,16 @@ export function ExerciseManagementPage({
                 else if(e2.title.startsWith("Exercise ")) return -1;
                 var e1Sorted = e1.tags.sort().length;
                 var e2Sorted = e2.tags.sort().length;
-                var ex = [e1Sorted, e2Sorted];
-                switch (ex.toString()) {
-                    case "1,1":
-                    case "2,2":
-                    case "3,3": 
-                        break;
-                    case "1,2":
-                    case "1,3":
-                    case "2,3":
-                        return -1;
-                    case "2,1":
-                    case "3,1":
-                    case "3,2":
-                        return 1;
-                    default: 
-                        break;
-                }
-                if (e1.title > e2.title) return 1;
-                else if (e1.title < e2.title) return -1;
+                if (e1Sorted > e2Sorted) return 1;
+                else if (e1Sorted < e2Sorted) return -1;
                 else {
-                    if(e1.difficulty > e2.difficulty) return 1;
-                    else if(e1.difficulty < e2.difficulty) return -1;
-                    else return 0;
+                    if (e1.title > e2.title) return 1;
+                    else if (e1.title < e2.title) return -1;
+                    else {
+                        if(e1.difficulty > e2.difficulty) return 1;
+                        else if(e1.difficulty < e2.difficulty) return -1;
+                        else return 0;
+                    }
                 }
             } catch {
                 if(e1.title > e2.title) return 1;

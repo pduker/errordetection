@@ -47,7 +47,7 @@ function App() {
             //let response = await fetch(blob);
             //let data = await response.blob();
             var file = new File([blob], value.sound, {type: "audio/mpeg"})
-            var thing = new ExerciseData(value.score,file,value.correctAnswers,value.feedback,value.exIndex,value.empty,value.title,value.difficulty,value.tags);
+            var thing = new ExerciseData(value.score,file,value.correctAnswers,value.feedback,value.exIndex,value.empty,value.title,value.difficulty,value.voices,value.tags);
             scoresData2.push(thing);
             console.log(thing);}
         });
@@ -108,9 +108,9 @@ function App() {
               <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]}></ExercisesPage>} />
             </Routes>
 
-            <Routes>
+            {/* <Routes>
               <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]}></ExercisesPage>} />
-            </Routes>
+            </Routes> */}
 
             <Routes>
               <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData}/>} />

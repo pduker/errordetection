@@ -9,6 +9,7 @@ class DBData {
     empty: boolean
     title: string
     difficulty: number
+    voices: number
     tags: string[]
     constructor(data:ExerciseData | undefined,sound:string){
         if(data !== undefined){
@@ -20,6 +21,7 @@ class DBData {
             this.empty = data.empty;
             this.title = data.title;
             this.difficulty = data.difficulty;
+            this.voices = data.voices;
             this.tags = data.tags;
         }
         else{
@@ -31,6 +33,7 @@ class DBData {
             this.empty = true;
             this.title = "";
             this.difficulty = -1;
+            this.voices = -1;
             this.tags = [""];
         }
     }

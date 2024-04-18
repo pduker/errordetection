@@ -28,7 +28,7 @@ export function HelpPage({
             <h2>Welcome to the Help Page!</h2>
             <div style={{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
             This site is meant to help you practice your error detection skills.<br/>
-            On the Exercises page, you’ll find a list the exercises currently uploaded to the site. <br/>
+            On the Exercises page, you’ll find a list of the exercises currently uploaded to the site. <br/>
             You can use the different filters to sort and find appropriately challenging exercises for you (e.g. if you are new to this, consider starting with: intonation + 1 voice + level 1 + drone). <br/>
             Clicking on the “drone” checkbox will find exercises that have a drone on tonic. <br/>
             Clicking on the “ensemble parts” checkbox will have multiple voices/instruments performing the same part (e.g., 3 different clarinets playing the top line, one of which will perform the error(s)). <br/>
