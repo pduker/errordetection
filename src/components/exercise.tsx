@@ -533,7 +533,7 @@ export function Exercise({
                 <img
                     alt="note-color-key"
                     src={noteKey}
-                    width="20%"
+                    width="14%"
                     height="7%"
                     style={{display:"inline", marginLeft:"1vw"}}
                 />
@@ -565,7 +565,7 @@ export function Exercise({
                 <img
                     alt="note-color-key"
                     src={noteKey}
-                    width="20%"
+                    width="14%"
                     height="7%"
                     style={{display:"inline-flex", marginLeft: "1vw", marginTop: "-30vh"}}
                 />

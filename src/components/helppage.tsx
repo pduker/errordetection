@@ -26,24 +26,28 @@ export function HelpPage({
     return (
         <div>
             <h2>Welcome to the Help Page!</h2>
-            <div style={{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>This site is meant to help students practice their music reading and listening capabilities.<br/>
-                On the Exercises page, you'll find a list of all the exercises currently uploaded to the site.<br/>
-                You can use the "tags" and "difficulty" fields to sort and find the right exercise.<br/>
-                After finding the right one, simply click the exercise to open it!<br/>
-                A piece of score and an audio player will show up. The score will always be correct.<br/>
-                Your job is to click the notes on the score where you think an error is present in the sound. <br/>
-                Click a note multiple times to change which type of error you believe is present.<br/>
-                A key will be present on each exercise to remind you which color corresponds to which error.<br/>
-                This key is also included here: <br/>
+            <div style={{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
+            This site is meant to help you practice your error detection skills.<br/>
+            On the Exercises page, you’ll find a list the exercises currently uploaded to the site. <br/>
+            You can use the different filters to sort and find appropriately challenging exercises for you (e.g. if you are new to this, consider starting with: intonation + 1 voice + level 1 + drone). <br/>
+            Clicking on the “drone” checkbox will find exercises that have a drone on tonic. <br/>
+            Clicking on the “ensemble parts” checkbox will have multiple voices/instruments performing the same part (e.g., 3 different clarinets playing the top line, one of which will perform the error(s)). <br/>
+            After finding some exercises, simply click the exercise to open it! <br/>
+            A short excerpt of a score and an audio player will show up. Assume that the score will always be correct. <br/>
+            The Audio file will play a short intro (2 bars long) to let you entrain to the key, tempo, and meter (you can move the cursor to skip past this if you don’t need it). <br/>
+            Your job is to click on the notes where you hear something different from what is in the score. <br/>
+            Click a note multiple times to change which type of error you hear. <br/>
+            A key will be present on each exercise to remind you which color corresponds to which kind of error.<br/>
+            This key is also included here: <br/>
                 <div>
                     <img
                     alt="note-color-key"
                     src={noteKey}
-                    width="300"
-                    height="112"
+                    width="250"
+                    height="125"
                     />
                 </div>
-                After selecting all errors, click "Check Answers" to receive feedback.<br/>
+            After selecting all errors, click "Check Answers" to receive feedback on how you did.<br/>
             </div>
             <div style={{margin: "6px"}}>
                 <input id="mng-pwd" placeholder="Enter admin password..."></input>

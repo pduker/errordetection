@@ -61,7 +61,7 @@ export function HomePage() {
           </div>
           <br></br>
           <h3>About</h3>
-          <div>This website is a music reading and listening practice tool! 
+          <div>This website is an error detection practice tool! 
             Choose a category of exercises above to get started, or visit the Help page to learn more.</div>
        
       </div>
