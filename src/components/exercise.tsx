@@ -11,6 +11,8 @@ import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, Up
 import { initializeApp } from 'firebase/app';
 import { stringify } from 'querystring';
 import noteKey from "../assets/note-color-key.png"
+import { IndexKind } from 'typescript';
+import { randomBytes, randomInt } from 'crypto';
 
 const firebaseConfig = {
     apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
@@ -193,6 +195,7 @@ export function Exercise({
         var abcString = abcFile;
         console.log(abcFile);
         abcString = abcString.replace("Z:Copyright ©\n", "");
+        abcString = abcString.replace("T:Title\n", "");
         var el = document.getElementById("target" + exIndex);
         if(el !== null && abcString !== undefined){
             console.log("going to render");
@@ -318,12 +321,72 @@ export function Exercise({
     }
 
     //runs when check answers button is pushed on ex view: logs selected and correct answers for debug and toggles feedback to appear
-    const log = function(){
+    /* const log = function(){
         console.log(selAnswers);
         console.log(correctAnswers);
         setCustomFeedback([]);
         setChecking(true);
+    } */
+    const checkAnswers = function(){
+        var tmpSelected = [...selAnswers];
+        var tmpCorrect = [...correctAnswers];
+        var feedback: string[] = [];
+
+        /* if(tmpSelected.length !== tmpCorrect.length) {
+            var plural = " are ";
+            if (correctAnswers.length === 1) plural = " is ";
+            feedback = ([...feedback, 
+                "You selected " + selAnswers.length + " answer(s). There" + plural + correctAnswers.length + " correct answer(s)."]);
+        } */
+        tmpSelected.sort((i1, i2) => {
+            if ((i1.abselem.elemset[0].getAttribute("index") as number) > (i2.abselem.elemset[0].getAttribute("index") as number)) return 1;
+            if ((i1.abselem.elemset[0].getAttribute("index") as number) < (i2.abselem.elemset[0].getAttribute("index") as number)) return -1;
+            return 0;
+        })
+        for(var i=0,j=0;i<correctAnswers.length && j<selAnswers.length && tmpCorrect[i] !== undefined;){
+            if(tmpSelected[j].abselem.elemset[0].getAttribute("index") === tmpCorrect[i]["index"]){
+                tmpCorrect = tmpCorrect.filter(function(ans){return ans["index"] !== tmpCorrect[i]["index"]});
+                j++;
+            }else if(tmpSelected[j].abselem.elemset[0].getAttribute("index") > tmpCorrect[i]["index"]){
+                i++;
+            }
+            else if(tmpSelected[j].abselem.elemset[0].getAttribute("index") < tmpCorrect[i]["index"]){
+                j++;
+            }
+
+        }
+        if(tmpCorrect.length === 0 && tmpSelected.length === correctAnswers.length){
+            feedback = ["Great job identifying the errors in this passage!"];
+
+        }else if(tmpSelected.length !== correctAnswers.length){
+            var plural = " are ";
+            if (correctAnswers.length === 1) plural = " is ";
+            feedback = (["You selected " + selAnswers.length + " answer(s). There" + plural + correctAnswers.length + " correct answer(s)."]);
+
+        }else if(tmpCorrect.length === correctAnswers.length){
+            feedback = ["Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:"];
+            for(var i = 0;i < tmpCorrect.length;i++){
+                feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                /* feedback = [...feedback, String(tmpCorrect[i]["index"])]; */
+                if(tmpCorrect[i]["feedback"] !== ""){
+                    var add = feedback.pop();
+                    feedback = [...feedback, add + ": " + tmpCorrect[i]["feedback"] as string];
+                } 
+            }
+        }else if(tmpCorrect.length < correctAnswers.length){
+            feedback = ["Good work – you’ve found some of the errors, but here are some specific places to look at and listen to more closely:"];
+            for(var i = 0;i < tmpCorrect.length;i++){
+                /* feedback = [...feedback, String(tmpCorrect[i]["index"])]; */
+                feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                if(tmpCorrect[i]["feedback"] !== ""){
+                    var add = feedback.pop();
+                    feedback = [...feedback, add + ": " + tmpCorrect[i]["feedback"] as string];
+                } 
+            }
+        }
+        setCustomFeedback([...feedback]);
     }
+
 
     //runs when save note feedback button is pushed on mng view: saves individual note feedback into the selected note
     const saveFeedback = function(e: React.ChangeEvent<HTMLTextAreaElement>) {
@@ -366,7 +429,6 @@ export function Exercise({
     //onClick function for voices change
     const voiceChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setVoices(Number(e.target.value));
-        setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value)+ ", Exercise: " + findNum(tags, Number(e.target.value)));
     }
 
     //function used in above onClicks to find the number of exercises with certain tags, difficulties, voices
@@ -614,17 +676,17 @@ export function Exercise({
                 {/* selAnswers.length >= 1 ? <div>Analysis: {ana}</div> : <div/> */}
                 {(abcFile !== undefined && abcFile !== "" && loaded) ? 
                     <div>
-                        <button onClick={log}>Check Answer</button>
-                        {checking ? (
+                        <button onClick={checkAnswers}>Check Answer</button>
+                        {/* {checking ? (
                             selAnswers.length > 0 ? (
                                 selAnswers.every(everyFunc) ? (
                                     <></>
                                 ) : <></>
                             ) : <></>
                         ) : <></>
-                        }
+                        } */}
                         <div>Next step(s): {customFeedback.map(function(feedback) {
-                            return <li style={{marginLeft: "12px"}}key={feedback}>{feedback}</li>
+                            return <li style={{marginLeft: "12px"}}key={Math.random()}>{feedback}</li>
                         })}</div>
                     </div>
                 : <div/>}
