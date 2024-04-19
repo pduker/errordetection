@@ -1,6 +1,7 @@
 import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
 import React, { useState, useEffect } from 'react';
+import { Button } from 'react-bootstrap';
 
 export function ExercisesPage({
     allExData,
@@ -15,11 +16,21 @@ export function ExercisesPage({
         //fetch();
         if(exList.length === 0) {
             if(tags.length === 0 && diff === "All" && voices === 0) setExList(allExData.sort(exSortFunc));
-            else if(tags.length > 0) sortExercises(tags);
+            else if(tags.length > 0 && diff === "All" && voices === 0 && !upd) {
+                sortExercises(tags);
+                setUpd(true);
+            }
         }
     })
 
-    const sortExercises = function (input: string | string[]) {
+    const [diff, setDiff] = useState<string>("All");
+    const [voices, setVoices] = useState<number>(0);
+    const [tags, setTags] = useState<string[]>(defaultTags);
+    const [upd, setUpd] = useState<boolean>(false);
+    const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
+    const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
+
+    const sortExercises = function (input: string | string[] | number) {
         var tempTags = tags, tempDiff = diff, tempVoices = voices;
         if (typeof(input) === "object") tempTags = input;
         else if (typeof(input) === "string") tempDiff = input;
@@ -33,46 +44,62 @@ export function ExercisesPage({
         else if (tempVoices === 0) method = "diffTags";
         else if (tempTags.length === 0) method = "diffVoices";
         else if (tempDiff === "All") method = "tagsVoices";
+        //console.log(method);
         switch (method) {
             case "diff": // only diff selected
                 list = allExData.filter(function(exercise) {
                     if (exercise !== undefined) 
-                        return tempDiff === String(exercise.difficulty)})
+                        return tempDiff === String(exercise.difficulty) 
+                    else return false;})
                         .sort(exSortFunc);
+                    
                 setExList(list);
                 break;
             case "tags": // only tags selected
                 list = allExData.filter(function(exercise) {
                     if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
-                        return (tempTags.sort().toString() === exercise.tags.sort().toString())}})
+                        return (tempTags.sort().toString() === exercise.tags.sort().toString())}
+                    else return false;})
                         .sort(exSortFunc);
                 setExList(list);
                 break;
             case "voices": // only voices selected
-            list = allExData.filter(function(exercise) {
-                if (exercise !== undefined) 
-                    return tempVoices === exercise.voices})
-                    .sort(exSortFunc);
-            setExList(list);
-            break;
+                list = allExData.filter(function(exercise) {
+                    if (exercise !== undefined) 
+                        return tempVoices === exercise.voices
+                    else return false;})
+                        .sort(exSortFunc);
+                setExList(list);
+                break;
             case "diffTags": // diff and tags selected (no voices)
                 list = allExData.filter(function(exercise) {
                     if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
-                        return (tempTags.sort().toString() === exercise.tags.sort().toString()) && tempDiff === String(exercise.difficulty)}})
+                        return (tempTags.sort().toString() === exercise.tags.sort().toString()) && tempDiff === String(exercise.difficulty)}
+                    else return false;})
                         .sort(exSortFunc)
                 setExList(list);
                 break;
             case "diffVoices": // diff and voices selected (no tags)
                 list = allExData.filter(function(exercise) {
                     if (exercise !== undefined) 
-                        return (tempDiff === String(exercise.difficulty) && tempVoices === exercise.voices)})
+                        return (tempDiff === String(exercise.difficulty) && tempVoices === exercise.voices)
+                    else return false;})
                         .sort(exSortFunc);
                 setExList(list);
                 break;
             case "tagsVoices": // tags and voices selected (no diff)
                 list = allExData.filter(function(exercise) {
                     if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
-                        return (tempTags.sort().toString() === exercise.tags.sort().toString()) && tempVoices === exercise.voices}})
+                        return (tempTags.sort().toString() === exercise.tags.sort().toString()) && tempVoices === exercise.voices}
+                    else return false;})
+                        .sort(exSortFunc);
+                setExList(list);
+                break;
+            case "all": // all sorting options selected
+                list = allExData.filter(function(exercise) {
+                    if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
+                        return (tempTags.sort().toString() === exercise.tags.sort().toString()) && tempDiff === String(exercise.difficulty) && tempVoices === exercise.voices}
+                    else return false;})
                         .sort(exSortFunc);
                 setExList(list);
                 break;
@@ -109,14 +136,8 @@ export function ExercisesPage({
         } else return 0;
     }
 
-    const [diff, setDiff] = useState<string>("All");
-    const [voices, setVoices] = useState<number>(0);
-    const [tags, setTags] = useState<string[]>(defaultTags);
-    const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
-    const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
-
     const exChange = function (e:React.MouseEvent<HTMLSpanElement>){
-        var ex = allExData.find((exercise: ExerciseData | undefined) => {if (exercise !== undefined && exercise.title === (e.target as Element).id){return exercise}})
+        var ex = allExData.find((exercise: ExerciseData | undefined) => {if (exercise !== undefined && exercise.title === (e.target as Element).id){return exercise} else {return undefined}})
         var nBtn = document.getElementById("next-btn");
         var bBtn = document.getElementById("back-btn");
         if(exList.indexOf(ex) === (exList.length - 1)) {
@@ -146,6 +167,7 @@ export function ExercisesPage({
         setSelExercise(ex);
     }
 
+    //onClick function for diff change
     const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setDiff((e.target.value));
         sortExercises(e.target.value);
@@ -167,60 +189,68 @@ export function ExercisesPage({
     //onClick function for voices change
     const voiceChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setVoices(Number(e.target.value));
-        sortExercises(e.target.value);
+        sortExercises(Number(e.target.value));
     }
 
+    //onClick function for when Back button is pushed under exercise
     const prevEx = function () {
         var exPos = exList.indexOf(selExercise);
+        var bBtn = document.getElementById("back-btn");
+        var nBtn = document.getElementById("next-btn");
         if(exPos !== -1) {
             setSelExercise(exList[exPos-1]);
             if (exPos-1 > 0) {
-                var btn = document.getElementById("back-btn");
-                if (btn !== null && "disabled" in btn) btn.disabled = false;
+                if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = false;
             }
             else {
-                var btn = document.getElementById("back-btn");
-                if (btn !== null && "disabled" in btn) btn.disabled = true;
+                if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = true;
             }
         } else {
             setSelExercise(exList[0]);
-            var btn = document.getElementById("back-btn");
-            if (btn !== null && "disabled" in btn) btn.disabled = true;
+            if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = true;
         }
         if (exList.length < 2) {
-            var nBtn = document.getElementById("next-btn");
             if (nBtn !== null && "disabled" in nBtn) nBtn.disabled = true;
         } else {
-            var nBtn = document.getElementById("next-btn");
             if (nBtn !== null && "disabled" in nBtn) nBtn.disabled = false;
         }
     }
 
+    //onClick function for when Next button is pushed under exercise
     const nextEx = function () {
+        var bBtn = document.getElementById("back-btn");
+        var nBtn = document.getElementById("next-btn");
         var exPos = exList.indexOf(selExercise);
         setSelExercise(exList[exPos+1]);
         if (exPos+1 >= (exList.length - 1)) {
-            var btn = document.getElementById("next-btn");
-            if (btn !== null && "disabled" in btn && exPos !== -1) btn.disabled = true;
+            if (nBtn !== null && "disabled" in nBtn && exPos !== -1) nBtn.disabled = true;
         }
         else {
-            var btn = document.getElementById("next-btn");
-            if (btn !== null && "disabled" in btn) btn.disabled = false;
+            if (nBtn !== null && "disabled" in nBtn) nBtn.disabled = false;
         }
         if (exList.length < 2 || exPos === -1) {
-            var bBtn = document.getElementById("back-btn");
             if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = true;
         } else {
-            var bBtn = document.getElementById("back-btn");
             if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = false;
         }
+    }
+
+    //onClick to reset all exercise sort fields
+    const resetSort = function () {
+        setTags([]);
+        setDiff("All");
+        var diffBox = document.getElementsByName("difficulty")[0] as HTMLSelectElement;
+        if (diffBox !== null) diffBox.options[0].selected = true;
+        setVoices(0);
+        var voiceBox = document.getElementsByName("voices")[0] as HTMLSelectElement;
+        if (voiceBox !== null) voiceBox.options[0].selected = true;
     }
 
     return (
         <div style={{margin: "10px"}}>
             <h2>Welcome to the Exercises Page!</h2>
             <h5 style={{fontStyle: "italic"}}>Sort by tags, difficulty, and voices, then click an exercise to get started.</h5>
-            <div style={{float:'left'}}>
+            <div style={{float:'left', width: "30%"}}>
                 <span>
                     <form id= "tags">
                         <div style={{fontSize:"16px", display:"inline"}}>Tags:</div>
@@ -231,49 +261,50 @@ export function ExercisesPage({
                         <input type="checkbox" name="tags" value="Ensemble" checked={tags.includes("Ensemble")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Ensemble
                         {/* <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm */}
                     </form>
-                    <form id="difficulty">
-                        <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>
-                        <br></br>
-                        <select name="difficulty" onChange={diffChange}>
-                            <option value="All">All</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            {/* <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option> */}
-                        </select>
-                    </form>
-                    <form id="voiceCt">
-                        Voices
-                        <br></br>
-                        <select name="voices" onChange={voiceChange}>
-                            <option value={0}>Any</option>
-                            <option value={1}>1</option>
-                            <option value={2}>2</option>
-                            <option value={3}>3</option>
-                            <option value={4}>4</option>
-                            <option value={5}>5</option>
-                            {/* <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option> */}
-                        </select>
-                    </form>
+                    <div id="dropdowns" style={{display: "inline-flex", padding: "4px"}}>
+                        <form id="difficulty">
+                            <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>
+                            <br></br>
+                            <select name="difficulty" onChange={diffChange}>
+                                <option value="All">All</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                {/* <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option> */}
+                            </select>
+                        </form>
+                        <form id="voiceCt">
+                            Voices
+                            <br></br>
+                            <select name="voices" onChange={voiceChange}>
+                                <option value={0}>Any</option>
+                                <option value={1}>1</option>
+                                <option value={2}>2</option>
+                                <option value={3}>3</option>
+                                <option value={4}>4</option>
+                                <option value={5}>5</option>
+                                {/* <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option> */}
+                            </select>
+                        </form>
+                        <Button variant="danger" onClick={resetSort} style={{marginLeft: "10px"}}>Reset Sort</Button>
+                    </div>
                 </span>
                 
                 {exList.map(function(exercise){
                     if(exercise !== undefined) {
                         return (
-                        <div style={{margin: "8px", padding: "6px", cursor: "pointer", backgroundColor: "#fcfcd2", borderRadius: "2px"}}>
-                            <div key = {exercise.title} id = {exercise.title} onClick={exChange}>
-                                {exercise.title}
-                            </div>
+                        <div key = {exercise.title} id = {exercise.title} onClick={exChange} style={{margin: "8px", padding: "6px", cursor: "pointer", backgroundColor: "#fcfcd2", borderRadius: "2px"}}>
+                            {exercise.title}
                         </div>
                         )}
                     else return <></>;
@@ -282,7 +313,7 @@ export function ExercisesPage({
             </div>
             <div style={{float:'right',width:'70%'}}>
                 {selExercise !== undefined ? <div>
-                    <Exercise key={selExercise.exIndex} teacherMode={false} ExData={selExercise} allExData={allExData} setAllExData={setAllExData} exIndex={selExercise.exIndex}/>
+                    <Exercise key={selExercise.exIndex} teacherMode={false} ExData={selExercise} allExData={allExData} setAllExData={setAllExData} exIndex={selExercise.exIndex} setNewExercise={undefined}/>
                     
                 </div> : <></>}
             <div style={{display:"flex", justifyContent: "center"}}>

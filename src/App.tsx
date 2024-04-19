@@ -43,13 +43,14 @@ function App() {
           scoresData.forEach(async function (value) {
             if(value.sound){
             const blob = await getBlob(storageRef(storage, value.sound));
-            console.log(blob);
+            //console.log(blob);
             //let response = await fetch(blob);
             //let data = await response.blob();
             var file = new File([blob], value.sound, {type: "audio/mpeg"})
             var thing = new ExerciseData(value.score,file,value.correctAnswers,value.feedback,value.exIndex,value.empty,value.title,value.difficulty,value.voices,value.tags);
             scoresData2.push(thing);
-            console.log(thing);}
+            //console.log(thing);
+            }
         });
           setTimeout(function(){setAllExData(scoresData2)}, 350*scoresData.length);
           setScoresRetrieved(true); // Set scoresRetrieved to true after retrieving scores
@@ -66,7 +67,7 @@ function App() {
   
   return (
     <Router>
-      <div >
+      <div>
         <header className="App-header" >
           
           <Navbar className="Home-bar" fixed='top'>
@@ -74,8 +75,8 @@ function App() {
               <img
                 alt=""
                 src={logo}
-                width="90"
-                height="90"
+                width="100"
+                height="100"
                 className="d-inline-block align-top"
               />
             </Navbar.Brand>
@@ -91,7 +92,6 @@ function App() {
           
         </header>
         
-          <body>
           <Routes>
               <Route path="/" element={<HomePage/>}/>
             </Routes>
@@ -119,7 +119,6 @@ function App() {
             <Routes>
               <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>} />
             </Routes>
-          </body>
 
       </div>
     </Router>

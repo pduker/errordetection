@@ -26,14 +26,14 @@ export default function FileUpload ({
       v1:0, noped:0,  
       stm:0,          
       p:'f', s:0 };
-      console.log(xmldata);
+      //console.log(xmldata);
       var result = vertaal(xmldata, options);
       var abcText = result[0];
       var errorText = result[1];
       if (setAbcFile != null) {
           setAbcFile(abcText);
-          console.log("file? " + abcText + "<- should be here");
-          console.log("error text: " + errorText);
+          /* console.log("file? " + abcText + "<- should be here");
+          console.log("error text: " + errorText); */
       }
   }
 
@@ -54,7 +54,7 @@ export default function FileUpload ({
 
             fileReader.onload = () => {
                 const fileContent = fileReader.result as string;
-                console.log(fileContent)
+                //console.log(fileContent);
                 abcTranslate(fileContent); //logs somewhere
             }
           fileReader.readAsText(selectedFiles[selectedFiles.length-1]);

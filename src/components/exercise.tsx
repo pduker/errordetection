@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ref, push, onValue, DataSnapshot, get, remove } from 'firebase/database';
+import { ref, push, get, remove } from 'firebase/database';
 import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
@@ -7,12 +7,9 @@ import DBData from '../interfaces/DBData';
 import AudioHandler from './audiohandler';
 import { getDatabase } from 'firebase/database';
 import { Button } from 'react-bootstrap';
-import { getStorage, ref as storageRef, uploadBytesResumable, getDownloadURL, UploadTaskSnapshot, StorageReference, uploadBytes } from 'firebase/storage';
+import { getStorage, ref as storageRef, uploadBytes } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
-import { stringify } from 'querystring';
 import noteKey from "../assets/note-color-key.png"
-import { IndexKind } from 'typescript';
-import { randomBytes, randomInt } from 'crypto';
 
 const firebaseConfig = {
     apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
@@ -31,15 +28,17 @@ export const firebaseApp = app;
 export function Exercise({
     exIndex, 
     teacherMode,
+    ExData,
     allExData,
     setAllExData,
-    ExData
+    setNewExercise
 }: { 
     exIndex: number;
     teacherMode: boolean;
     ExData: ExerciseData;
     allExData: (ExerciseData | undefined)[]
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
+    setNewExercise: ((newEx: (ExerciseData | undefined)) => void) | undefined;
 }) {
     //for score styling
     const score = {display: "inline-block", margin: "auto", backgroundColor: "white", borderRadius: "2px", width: "400px"};
@@ -68,9 +67,8 @@ export function Exercise({
         
     }
 
-    const [updated, setUpdated] = useState<boolean>(false);
     const [loaded, setLoaded] = useState<boolean>(false);
-    const [checking, setChecking] = useState<boolean>(false);
+    //const [checking, setChecking] = useState<boolean>(false);
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [ana, setAna] = useState<string>(); 
     const [customTitle, setCustomTitle] = useState<string>(title);
@@ -85,12 +83,13 @@ export function Exercise({
     const [correctAnswers, setCorrectAnswers] = useState<{[label: string]: (number | string)}[]>(ans);
     const [xmlFile, setXmlFile] = useState<File>();
     const [mp3File, setMp3File] = useState<File>(mp3);
-    
     const [abcFile, setAbcFile] = useState<string>(abc);
 
     useEffect(() => {
         if ((exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded)) loadScore();
-        else console.log("nothing is happening");
+        if (selNotes.length > correctAnswers.length) multiAnswer();
+
+        //else console.log("nothing is happening");
     })
     
     //yoinked/edited from abcjs! probably don't need all of it for highlighting but oh well
@@ -117,9 +116,9 @@ export function Exercise({
     //yoinked/edited from abcjs! changed behavior so it works how we want it to B)
     const highlight = function (note: any, klass: any, clicked: boolean): number {
         var retval = 0;
-        var selTim = note.abselem.elemset[0].getAttribute("selectedTimes");
+        var selTim = Number(note.abselem.elemset[0].getAttribute("selectedTimes"));
         if (clicked) selTim++;
-        if (selTim >= 4) {
+        if (selTim >= 3) {
             selTim = 0;
             selNotes.splice(selNotes.indexOf(note),1);
             selAnswers.splice(selAnswers.indexOf(note),1)
@@ -130,13 +129,13 @@ export function Exercise({
         if (selTim <= 0) {
             color = "#000000";
         }
-        if (selTim == 1) {
+        if (selTim === 1) {
             color = "#ff6100"; //was red - ff0000, now orange - ff6100
         }
-        if (selTim == 2) {
+        /* if (selTim == 2) {
             color = "#dc267f"; //was blue - 00ff00, now magenta - dc267f
-        }
-        if (selTim == 3) {
+        } */
+        if (selTim === 2) {
             color = "#648fff"; //was green - 0000ff, now blue - 648fff
         }
         if (clicked) note.abselem.elemset[0].setAttribute("selectedTimes", selTim);
@@ -182,27 +181,26 @@ export function Exercise({
         if(test !== null) {test.innerHTML = "<div class='label'>Clicked info:</div>" + op;} */
         var staffCt = (Number(noteElems.getAttribute("staffPos"))) + 1, measureCt = (Number(noteElems.getAttribute("measurePos")) + 1);
         setAna("Staff " + staffCt + ", measure " + measureCt);
-        console.log(selNotes);//noteElems.getAttribute("index")
+        //console.log(selNotes);//noteElems.getAttribute("index")
         setLastClicked(note);
         var txt = document.getElementById("note-feedback-"+exIndex);
         if (txt !== null && "value" in txt) txt.value = noteElems.getAttribute("feedback");
-        setUpdated(false);
-        setChecking(false);
+        //setChecking(false);
     }
     
     const loadScore = function() {
         // sample file: "X:1\nZ:Copyright ©\n%%scale 0.83\n%%pagewidth 21.59cm\n%%leftmargin 1.49cm\n%%rightmargin 1.49cm\n%%score [ 1 2 ] 3\nL:1/4\nQ:1/4=60\nM:4/4\nI:linebreak $\nK:Amin\nV:1 treble nm=Flute snm=Fl.\nV:2 treble transpose=-9 nm=Alto Saxophone snm=Alto Sax.\nV:3 bass nm=Violoncello snm= Vc.\nV:1\nc2 G3/2 _B/ | _A/_B/ c _d f | _e _d c2 |] %3\nV:2\n[K:F#min] =c d c3/2 e/ | =f f/e/ d2 | =f e f2 |] %3\nV:3\n_A,,2 _E,,2 | F,,2 _D,,2 | _E,,2 _A,,2 |] %3"
         var abcString = abcFile;
-        console.log(abcFile);
+        //console.log(abcFile);
         abcString = abcString.replace("Z:Copyright ©\n", "");
         abcString = abcString.replace("T:Title\n", "");
         var el = document.getElementById("target" + exIndex);
         if(el !== null && abcString !== undefined){
-            console.log("going to render");
+            //console.log("going to render");
             visualObjs = abcjs.renderAbc(el,abcString,{ clickListener: clickListener, selectTypes: ["note"],lineThickness: 0.4, responsive: "resize"});
             // console.log(correctAnswers);
             // adds staff #, measure #, and empty feedback to each note when the score is first loaded
-            console.log("render has occurred");
+            //console.log("render has occurred");
             var staffArray = visualObjs[0].lines[0].staff;
             
             for (let i = 0, j = 0, staff = 0, measure = 0; staff < staffArray.length; i++, j++) {
@@ -214,7 +212,7 @@ export function Exercise({
                 if(!(noteElems.getAttribute("index"))) noteElems.setAttribute("index", i);
                 if(!(noteElems.getAttribute("selectedTimes"))) noteElems.setAttribute("selectedTimes", 0);
                 if(note.el_type === "bar") {measure++; i--;}
-                if(j + 1 == staffArray[staff].voices[0].length) {
+                if(j + 1 === staffArray[staff].voices[0].length) {
                     staff++;
                     j = -1;
                     measure = 0;
@@ -239,7 +237,7 @@ export function Exercise({
                 }
             }
             setLoaded(true);
-            console.log("exercise good to go");
+            //console.log("exercise good to go");
         } else {
             console.log("abcString is undefined");
         }
@@ -247,13 +245,22 @@ export function Exercise({
 
     //runs when reset answers button is pushed on mng view: essentially reloads score/resets answers
     const reload = function() {
+        // see exReload for explanation of this jank
+        for(let i=0; i<selNotes.length;) selNotes.pop();
         setSelNotes([]);
+        // ditto
+        for(let i=0; i<correctAnswers.length;) correctAnswers.pop();
         setCorrectAnswers([]);
-        setUpdated(false);
-        setLoaded(true);
         loadScore();
     }
 
+    //same as above, but on exercises page
+    const exReload = function() {
+        // workaround because state is jank: empties selAnswers via popping before... setting it to an empty list (thanks react)
+        for(let i=0; i<selAnswers.length;) selAnswers.pop();
+        setSelAnswers([]);
+        loadScore();
+    }
     
 
     //runs when save button is pushed on mng view: overwrites exercise data at current index with updated choices
@@ -266,7 +273,7 @@ export function Exercise({
                 return 0;
             }));
         } 
-        if (abcFile !== undefined && abcFile !== "" && mp3File.name !== "") {
+        if (abcFile !== undefined && abcFile !== "" && mp3File.name !== "" && correctAnswers.length > 0) {
             data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false, customTitle, diff, voices,tags);
         
         //setExerciseData(data);
@@ -283,8 +290,10 @@ export function Exercise({
           });
         var dbdata = new DBData(data, mp3File.name);
         await push(scoresRef, dbdata); // Use push to add new data without overwriting existing data
-        console.log('Score saved successfully!');
-        console.log(dbdata);
+        //console.log('Score saved successfully!');
+        //console.log(dbdata);
+        alert("Score has been uploaded!");
+        if(setNewExercise !== undefined) setNewExercise(undefined);
             /*if(!ExData) setAllExData([...ExData,data]);
             else {
                 ExData = data;
@@ -292,6 +301,10 @@ export function Exercise({
             }*/
         } else {
             console.log("Incomplete exercise - not saving to database");
+            alert("\Something went wrong - make sure you: \n \
+            -uploaded both a musicxml AND an mp3 file\n \
+            -marked any applicable tags, voice #, and difficulty\n \
+            -selected at least one correct answer")
         }
         }  
 
@@ -315,9 +328,8 @@ export function Exercise({
             if ((i1.index as number) < (i2.index as number)) return -1;
             return 0;
         }) */
-        console.log(dict);
+        //console.log(dict);
         setCorrectAnswers(dict);
-        setUpdated(true);
     }
 
     //runs when check answers button is pushed on ex view: logs selected and correct answers for debug and toggles feedback to appear
@@ -332,6 +344,8 @@ export function Exercise({
         var tmpCorrect = [...correctAnswers];
         var feedback: string[] = [];
 
+        //console.log(tmpSelected);
+
         /* if(tmpSelected.length !== tmpCorrect.length) {
             var plural = " are ";
             if (correctAnswers.length === 1) plural = " is ";
@@ -344,13 +358,15 @@ export function Exercise({
             return 0;
         })
         for(var i=0,j=0;i<correctAnswers.length && j<selAnswers.length && tmpCorrect[i] !== undefined;){
-            if(tmpSelected[j].abselem.elemset[0].getAttribute("index") === tmpCorrect[i]["index"]){
-                tmpCorrect = tmpCorrect.filter(function(ans){return ans["index"] !== tmpCorrect[i]["index"]});
+            let noteElems = tmpSelected[j].abselem.elemset[0];
+            if(noteElems.getAttribute("index") === tmpCorrect[i]["index"]){
+                if((noteElems.getAttribute("selectedTimes")) === tmpCorrect[i]["selectedTimes"])
+                    tmpCorrect = tmpCorrect.filter(function(ans){return ans["index"] !== tmpCorrect[i]["index"]});
                 j++;
-            }else if(tmpSelected[j].abselem.elemset[0].getAttribute("index") > tmpCorrect[i]["index"]){
+            }else if(noteElems.getAttribute("index") > tmpCorrect[i]["index"]){
                 i++;
             }
-            else if(tmpSelected[j].abselem.elemset[0].getAttribute("index") < tmpCorrect[i]["index"]){
+            else if(noteElems.getAttribute("index") < tmpCorrect[i]["index"]){
                 j++;
             }
 
@@ -365,21 +381,21 @@ export function Exercise({
 
         }else if(tmpCorrect.length === correctAnswers.length){
             feedback = ["Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:"];
-            for(var i = 0;i < tmpCorrect.length;i++){
+            for(let i = 0;i < tmpCorrect.length;i++){
                 feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
                 /* feedback = [...feedback, String(tmpCorrect[i]["index"])]; */
                 if(tmpCorrect[i]["feedback"] !== ""){
-                    var add = feedback.pop();
+                    let add = feedback.pop();
                     feedback = [...feedback, add + ": " + tmpCorrect[i]["feedback"] as string];
                 } 
             }
         }else if(tmpCorrect.length < correctAnswers.length){
             feedback = ["Good work – you’ve found some of the errors, but here are some specific places to look at and listen to more closely:"];
-            for(var i = 0;i < tmpCorrect.length;i++){
+            for(let i = 0;i < tmpCorrect.length;i++){
                 /* feedback = [...feedback, String(tmpCorrect[i]["index"])]; */
                 feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
                 if(tmpCorrect[i]["feedback"] !== ""){
-                    var add = feedback.pop();
+                    let add = feedback.pop();
                     feedback = [...feedback, add + ": " + tmpCorrect[i]["feedback"] as string];
                 } 
             }
@@ -393,7 +409,10 @@ export function Exercise({
         var feedBox = document.getElementById("note-feedback-"+exIndex);
         if(feedBox !== null && "value" in feedBox) {
             var str = feedBox.value as string;
-            if(lastClicked !== undefined) lastClicked.abselem.elemset[0].setAttribute("feedback", str);
+            if(lastClicked !== undefined) {
+                lastClicked.abselem.elemset[0].setAttribute("feedback", str);
+                multiAnswer();
+            }
         }
     }
 
@@ -434,13 +453,13 @@ export function Exercise({
     //function used in above onClicks to find the number of exercises with certain tags, difficulties, voices
     const findNum = function(tags:string[],difficulty:number):number{
         
-        const count = allExData.filter((exData:ExerciseData | undefined)=> {if (exData !== undefined && exData.tags !== undefined && exData.difficulty !== undefined){return exData.tags.sort().toString() === tags.sort().toString() && exData.difficulty === difficulty}});
+        const count = allExData.filter((exData:ExerciseData | undefined)=> {if (exData !== undefined && exData.tags !== undefined && exData.difficulty !== undefined){return exData.tags.sort().toString() === tags.sort().toString() && exData.difficulty === difficulty} else {return false}});
         return count.length+1;
 
     }
 
-    //function for comparing selected answers to correct answers
-    const everyFunc = function(element: any, index: number, array: any[]): boolean {
+    //function for comparing selected answers to correct answers - DEPRECATED, see checkAnswers function instead
+    /* const everyFunc = function(element: any, index: number, array: any[]): boolean {
         var ret: boolean = true;
         var feedback: string[] = [];
         if(array.length !== correctAnswers.length) {
@@ -478,7 +497,7 @@ export function Exercise({
         setCustomFeedback([...feedback]);
         setChecking(false);
         return ret;
-    }
+    } */
     //function used with bebug bubbon for testing
     /* const debug = function() {
         console.log("loaded? " + loaded);
@@ -520,6 +539,7 @@ export function Exercise({
                                     const exerciseDataRef = ref(database, `scores/${key}`);
                                     await remove(exerciseDataRef);
                                     console.log('Exercise deleted successfully!');
+                                    alert("Exercise deleted successfully.")
                                 } else {
                                     console.log("Something went wrong while deleting...");
                                 }
@@ -528,14 +548,14 @@ export function Exercise({
                                 const exerciseDataRef = ref(database, `scores/${key}`);
                                 await remove(exerciseDataRef);
                                 console.log('Exercise deleted successfully!');
+                                alert("Exercise deleted successfully.")
                             }
                             
-                        //removing exercise from the page
+                        //removing exercise from the page - needs fixing, exMan now uses an exList based on allExData
                         const updatedExercises = allExData.filter((exercise: any) => {
-                            return exercise.exIndex !== exIndex || !exercise.tags.every((tag: string) => tags.includes(tag));
+                            return exercise.exIndex !== exIndex/*  || !exercise.tags.every((tag: string) => tags.includes(tag)) */;
                         });
                         setAllExData(updatedExercises);
-    
                         return;
                         }
                     }
@@ -563,7 +583,6 @@ export function Exercise({
             {/* <h4>Global Index: {exIndex}</h4> <- use for debugging */}
             {teacherMode ?
             <span>
-                
                 <div id="forms" style={{display: "inline-flex", padding: "4px"}}>
                     <form id= "tags">
                         Tags
@@ -643,23 +662,16 @@ export function Exercise({
                 {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? 
                 <div style={{display: "inline-block", marginLeft:"1vw", marginTop: "1vh"}}>
                     <textarea id={"note-feedback-"+exIndex} placeholder={"Note feedback..."} onChange={saveFeedback}></textarea>
+                    <Button variant='danger' onClick={reload} style={{marginLeft: "1vw", float:"right"}}>Reset Answers</Button>
                 </div>:
                 <></>}
                 {/* <div className="clicked-info"></div> */}
-                {lastClicked !== undefined && Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) % 4 !== 0 ? <div>Note Info: {ana}</div> : <div/>}
-                {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? <div> 
-                    <Button onClick={multiAnswer}>Update Answers</Button>
-                    <Button variant='danger' onClick={reload}>Reset Answers</Button>
-                    <Button onClick={() => handleExerciseDelete(exIndex, tags)} variant="danger">Delete</Button>
-                    {updated ? <div>Answers updated.</div> : <></>}
-                </div> : <div/>}
-                {updated ? <Button variant='success' onClick={save}>Save</Button> : <></>}
+                {lastClicked !== undefined && Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) % 3 !== 0 ? <div style={{marginLeft: "1vw"}}>Note Info: {ana}</div> : <div/>}
+                <br/>
+                <Button variant='success' onClick={save}>Save Exercise</Button><Button onClick={() => handleExerciseDelete(exIndex, tags)} variant="danger">Delete Exercise</Button>
             </span>
             :
             <span>
-                {/* <div style={{marginLeft: "2px", marginRight: "2px"}}>Difficulty: {diff}</div>
-                <div style={{marginLeft: "2px", marginRight: "2px"}}>Tags: {tags.join(", ")}</div> */}
-                {/* (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <div/> */}
                 <div style = {{width:"75%", display: "inline-flex"}}>
                     <div id={"target" + exIndex} style={score}></div>
                 </div>
@@ -670,23 +682,17 @@ export function Exercise({
                     height="7%"
                     style={{display:"inline-flex", marginLeft: "1vw", marginTop: "-30vh"}}
                 />
-                {/* <div className="clicked-info"></div> */}
-                {mp3 !== undefined ? <AudioHandler file={mp3}></AudioHandler> : <></>}
+                <div style={{display: "inline-flex", marginTop: "-2vh"}}>
+                    {mp3 !== undefined ? <div style={{marginTop: "2vh"}}><AudioHandler file={mp3}></AudioHandler></div> : <></>}
+                    <Button variant='danger' onClick={exReload} style={{position: "relative", marginLeft: "1vw", marginBottom: "2vh"}}>Reset Answers</Button>
+                </div>
                 
-                {/* selAnswers.length >= 1 ? <div>Analysis: {ana}</div> : <div/> */}
                 {(abcFile !== undefined && abcFile !== "" && loaded) ? 
                     <div>
                         <button onClick={checkAnswers}>Check Answer</button>
-                        {/* {checking ? (
-                            selAnswers.length > 0 ? (
-                                selAnswers.every(everyFunc) ? (
-                                    <></>
-                                ) : <></>
-                            ) : <></>
-                        ) : <></>
-                        } */}
                         <div>Next step(s): {customFeedback.map(function(feedback) {
-                            return <li style={{marginLeft: "12px"}}key={Math.random()}>{feedback}</li>
+                            // this key generation is COOKED but we don't need to access it and they all gotta be different sooooooo
+                            return <li style={{marginLeft: "12px"}} key={Math.random()}>{feedback}</li>
                         })}</div>
                     </div>
                 : <div/>}
