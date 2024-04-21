@@ -308,6 +308,9 @@ export function Exercise({
         }
         }  
 
+
+    
+
     //runs when update answers button is pushed on mng view: creates nested dictionaries with necessary selected answer info
     const multiAnswer = function(){
         
@@ -505,70 +508,40 @@ export function Exercise({
         console.log(exerciseData);
     } */
 
-    const arrayEquals = (a: any[], b: any[]): boolean => {
-        if (a.length !== b.length) return false;
-    
-        for (let i = 0; i < a.length; i++) {
-            if (a[i] !== b[i]) return false;
-        }
-    
-        return true;
-    };
-
-    //deleting the exercise from database and website
-    const handleExerciseDelete = async (exIndex: number, tags: string[]) => {
+    const handleExerciseDelete = async (exIndex: number) => {
         try {
-            //get database reference
             const database = getDatabase();
-    
-            //find the exercise based on matching exIndex and tags
             const exerciseRef = ref(database, 'scores');
             const snapshot = await get(exerciseRef);
+    
             if (snapshot.exists()) {
                 const exercises = snapshot.val();
     
-                //iterate through each exercise
                 for (const key in exercises) {
                     if (exercises.hasOwnProperty(key)) {
                         const exercise = exercises[key];
     
-                        //check if exercise match both exIndex and tags
                         if (exercise.exIndex === exIndex) {
-                            if (exercise.tags !== undefined) {
-                                if(arrayEquals(exercise.tags, tags)) {
-                                    const exerciseDataRef = ref(database, `scores/${key}`);
-                                    await remove(exerciseDataRef);
-                                    console.log('Exercise deleted successfully!');
-                                    alert("Exercise deleted successfully.")
-                                } else {
-                                    console.log("Something went wrong while deleting...");
-                                }
-                            } else {
-                            // removing exercise from the database
-                                const exerciseDataRef = ref(database, `scores/${key}`);
-                                await remove(exerciseDataRef);
-                                console.log('Exercise deleted successfully!');
-                                alert("Exercise deleted successfully.")
-                            }
-                            
-                        //removing exercise from the page - needs fixing, exMan now uses an exList based on allExData
-                        const updatedExercises = allExData.filter((exercise: any) => {
-                            return exercise.exIndex !== exIndex/*  || !exercise.tags.every((tag: string) => tags.includes(tag)) */;
-                        });
-                        setAllExData(updatedExercises);
-                        return;
+                            const exerciseDataRef = ref(database, `scores/${key}`);
+                            await remove(exerciseDataRef);
+                            console.log('Exercise deleted successfully!');
+                            alert("Exercise deleted successfully.");
+    
+                            // Update UI by filtering out the deleted exercise
+                            const updatedExercises = allExData.filter(ex => ex?.exIndex !== exIndex);
+                            setAllExData(updatedExercises);
+                            return;
                         }
                     }
                 }
-    
-                //if no matching exercise is found
-                console.log('Exercise with exIndex ' + exIndex + ' and tags ' + tags.join(', ') + ' not found!');
+                console.log('Exercise with exIndex ' + exIndex + ' not found!');
             }
         } catch (error) {
             console.error('Error deleting exercise:', error);
         }
     };
-
+    
+    
     return (
         <div style = {{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
             {/* <button onClick={debug}>bebug bubbon</button> */}
@@ -668,7 +641,7 @@ export function Exercise({
                 {/* <div className="clicked-info"></div> */}
                 {lastClicked !== undefined && Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) % 3 !== 0 ? <div style={{marginLeft: "1vw"}}>Note Info: {ana}</div> : <div/>}
                 <br/>
-                <Button variant='success' onClick={save}>Save Exercise</Button><Button onClick={() => handleExerciseDelete(exIndex, tags)} variant="danger">Delete Exercise</Button>
+                <Button variant='success' onClick={save}>Save Exercise</Button><Button onClick={() => handleExerciseDelete(exIndex)} variant="danger">Delete Exercise</Button>
             </span>
             :
             <span>
