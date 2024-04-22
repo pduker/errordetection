@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ref, push, get, remove } from 'firebase/database';
+import { ref, push, get, remove, child, set } from 'firebase/database';
 import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
@@ -265,6 +265,7 @@ export function Exercise({
 
     //runs when save button is pushed on mng view: overwrites exercise data at current index with updated choices
     const save = async function(){
+        try{
         var data;
         if(correctAnswers.length > 0) {
             setCorrectAnswers(correctAnswers.sort((i1, i2) => {
@@ -285,14 +286,23 @@ export function Exercise({
         // Save data to database
         const scoresRef = ref(database, 'scores');
         const audioref = storageRef(storage, mp3File.name);
-        uploadBytes(audioref, mp3File).then((snapshot) => {
-            console.log('Uploaded a blob or file!');
-          });
-        var dbdata = new DBData(data, mp3File.name);
-        await push(scoresRef, dbdata); // Use push to add new data without overwriting existing data
-        //console.log('Score saved successfully!');
-        //console.log(dbdata);
-        alert("Score has been uploaded!");
+
+        await uploadBytes(audioref, mp3File);
+        const dbDataRef = child(scoresRef, exInd.toString()); 
+
+        // Check if the exercise already exists
+        const snapshot = await get(dbDataRef);
+        if (snapshot.exists()) {
+            await set(dbDataRef, new DBData(data, mp3File.name));
+            console.log('Exercise data was updated!');
+            alert("exercise data was updated!");
+        } else {
+            console.log('Exercise with exIndex does not exist, adding it');
+            await set(dbDataRef, new DBData(data, mp3File.name));
+            console.log('New exercise added!');
+            alert("new exercise added!");
+        }
+
         if(setNewExercise !== undefined) setNewExercise(undefined);
             /*if(!ExData) setAllExData([...ExData,data]);
             else {
@@ -306,10 +316,13 @@ export function Exercise({
             -marked any applicable tags, voice #, and difficulty\n \
             -selected at least one correct answer")
         }
+        
+        }catch (error) {
+        console.error('Error', error);
+        alert("error when saving the exercise.");
+        }
+
         }  
-
-
-    
 
     //runs when update answers button is pushed on mng view: creates nested dictionaries with necessary selected answer info
     const multiAnswer = function(){
@@ -508,40 +521,41 @@ export function Exercise({
         console.log(exerciseData);
     } */
 
+    //deleting the exercise from database and website
     const handleExerciseDelete = async (exIndex: number) => {
         try {
+            //get database reference
             const database = getDatabase();
-            const exerciseRef = ref(database, 'scores');
+            
+            //find the exercise based on matching exIndex 
+            const exerciseRef = ref(database, `scores/${exIndex}`);
             const snapshot = await get(exerciseRef);
-    
             if (snapshot.exists()) {
-                const exercises = snapshot.val();
+                await remove(exerciseRef);
+                console.log('exercise deleted from the database!');
     
-                for (const key in exercises) {
-                    if (exercises.hasOwnProperty(key)) {
-                        const exercise = exercises[key];
+                //removing exercise from the page, need to reload page to see changes on website
+                const updatedExercises = allExData.filter((exercise) => {
+                    return exercise && exercise.exIndex !== exIndex;
+                });
+                setAllExData(updatedExercises);
+                alert("exercise deleted!");
     
-                        if (exercise.exIndex === exIndex) {
-                            const exerciseDataRef = ref(database, `scores/${key}`);
-                            await remove(exerciseDataRef);
-                            console.log('Exercise deleted successfully!');
-                            alert("Exercise deleted successfully.");
-    
-                            // Update UI by filtering out the deleted exercise
-                            const updatedExercises = allExData.filter(ex => ex?.exIndex !== exIndex);
-                            setAllExData(updatedExercises);
-                            return;
-                        }
-                    }
-                }
+                // reload the page
+                window.location.reload();
+
+            } else {
+                //if no matching exercise is found
                 console.log('Exercise with exIndex ' + exIndex + ' not found!');
+                alert('exercise not found.');
             }
         } catch (error) {
             console.error('Error deleting exercise:', error);
+            alert('error deleting exercise.');
         }
     };
-    
-    
+     
+
     return (
         <div style = {{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
             {/* <button onClick={debug}>bebug bubbon</button> */}

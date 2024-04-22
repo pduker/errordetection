@@ -11,20 +11,19 @@ export function ExerciseManagementPage({
     allExData: (ExerciseData | undefined)[];
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
 }) {
-    const [mode, setMode] = useState<boolean>(false);
-    const [newExercise, setNewExercise] = useState<ExerciseData | undefined>(undefined);
-    const [diff, setDiff] = useState<string>("All");
-    const [voices, setVoices] = useState<number>(0);
-    const [tags, setTags] = useState<string[]>([]);
-    const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]); // Moved exList declaration here
-
     useEffect(() => {
         if(exList.length === 0) {
             if(tags.length === 0 && diff === "All" && voices === 0) setExList(allExData.sort(exSortFunc));
         }
         if(exList.length > allExData.length) setExList(allExData.sort(exSortFunc));
-    }, [allExData, exList]); // Add exList as a dependency to the useEffect hook
+    });
 
+    const [mode, setMode] = useState<boolean>(false);
+    const [newExercise, setNewExercise] = useState<ExerciseData |  undefined>(undefined);
+    const [diff, setDiff] = useState<string>("All");
+    const [voices, setVoices] = useState<number>(0);
+    const [tags, setTags] = useState<string[]>([]);
+    const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
 
     const modeChange = function () {
         setMode(!mode);
