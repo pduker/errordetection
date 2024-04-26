@@ -373,11 +373,16 @@ export function Exercise({
             if ((i1.abselem.elemset[0].getAttribute("index") as number) < (i2.abselem.elemset[0].getAttribute("index") as number)) return -1;
             return 0;
         })
+        let closeList: Number[] = [];
         for(var i=0,j=0;i<correctAnswers.length && j<selAnswers.length && tmpCorrect[i] !== undefined;){
             let noteElems = tmpSelected[j].abselem.elemset[0];
             if(noteElems.getAttribute("index") === tmpCorrect[i]["index"]){
                 if((noteElems.getAttribute("selectedTimes")) === tmpCorrect[i]["selectedTimes"])
                     tmpCorrect = tmpCorrect.filter(function(ans){return ans["index"] !== tmpCorrect[i]["index"]});
+                else {
+                    closeList.push(Number(tmpCorrect[i]["index"]));
+                    
+                }
                 j++;
             }else if(noteElems.getAttribute("index") > tmpCorrect[i]["index"]){
                 i++;
@@ -399,20 +404,24 @@ export function Exercise({
             feedback = ["Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:"];
             for(let i = 0;i < tmpCorrect.length;i++){
                 feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
-                /* feedback = [...feedback, String(tmpCorrect[i]["index"])]; */
-                if(tmpCorrect[i]["feedback"] !== ""){
+                let addtlFeedback = tmpCorrect[i]["feedback"];
+                if(closeList.includes(Number(tmpCorrect[i]["index"])) && !tmpCorrect[i]["feedback"].toString().startsWith("You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). "))
+                        addtlFeedback = "You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). " + tmpCorrect[i]["feedback"];
+                if(addtlFeedback !== ""){
                     let add = feedback.pop();
-                    feedback = [...feedback, add + ": " + tmpCorrect[i]["feedback"] as string];
+                    feedback = [...feedback, add + ". Additional feedback: " + addtlFeedback];
                 } 
             }
         }else if(tmpCorrect.length < correctAnswers.length){
             feedback = ["Good work – you’ve found some of the errors, but here are some specific places to look at and listen to more closely:"];
             for(let i = 0;i < tmpCorrect.length;i++){
-                /* feedback = [...feedback, String(tmpCorrect[i]["index"])]; */
                 feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
-                if(tmpCorrect[i]["feedback"] !== ""){
+                let addtlFeedback = tmpCorrect[i]["feedback"];
+                if(closeList.includes(Number(tmpCorrect[i]["index"])) && !tmpCorrect[i]["feedback"].toString().startsWith("You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). "))
+                        addtlFeedback = "You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). " + tmpCorrect[i]["feedback"];
+                if(addtlFeedback !== ""){
                     let add = feedback.pop();
-                    feedback = [...feedback, add + ": " + tmpCorrect[i]["feedback"] as string];
+                    feedback = [...feedback, add + ". Additional feedback: " + addtlFeedback];
                 } 
             }
         }
