@@ -53,6 +53,7 @@ export function Exercise({
     var difficulty = 1;
     var voicesInit = 1;
     var mp3: File = new File([], "");
+    var typesInit = "None";
 
     if(exerciseData !== undefined) {
        
@@ -64,6 +65,7 @@ export function Exercise({
         if(exerciseData.tags !== undefined) tagsInit = exerciseData.tags;
         if(exerciseData.difficulty !== undefined) difficulty = exerciseData.difficulty;
         if(exerciseData.voices !== undefined) voicesInit = exerciseData.voices;
+        if(exerciseData.types !== undefined) typesInit = exerciseData.types;
         
     }
 
@@ -75,6 +77,7 @@ export function Exercise({
     const [diff, setDiff] = useState<number>(difficulty);
     const [tags, setTags] = useState<string[]>(tagsInit);
     const [voices, setVoices] = useState<number>(voicesInit);
+    const [types, setTypes] = useState<string>(typesInit);
     const [customFeedback, setCustomFeedback] = useState<string[]>([]);
     const [lastClicked, setLastClicked] = useState<any>();
 
@@ -275,7 +278,7 @@ export function Exercise({
             }));
         } 
         if (abcFile !== undefined && abcFile !== "" && mp3File.name !== "" && correctAnswers.length > 0) {
-            data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false, customTitle, diff, voices,tags);
+            data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false, customTitle, diff, voices,tags,types);
         
         //setExerciseData(data);
     
@@ -454,7 +457,13 @@ export function Exercise({
     //onClick function for difficulty change
     const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setDiff(Number(e.target.value));
-        setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value)+ ", Exercise: " + findNum(tags, Number(e.target.value)));
+        if(types === "None"){
+            setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value) + ", Exercise: " + findNum(tags, Number(e.target.value)));
+        }else if (types === "Both"){
+            setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + Number(e.target.value) + ", Exercise: " + findNum(tags, Number(e.target.value)));
+        }else
+        setCustomTitle(tags.sort().join(" & ") + ": " + types + " - Level " + Number(e.target.value) + ", Exercise: " + findNum(tags, Number(e.target.value)));
+        
     }
 
     //onClick function for tags change
@@ -463,10 +472,20 @@ export function Exercise({
         if(tags.includes(val)) {
             tags.splice(tags.indexOf(val), 1);
             setTags([...tags]);
-            setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: "+ findNum([...tags],diff));
+            if(types === "None"){
+                setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags],diff));
+            }else if (types === "Both"){
+                setCustomTitle([...tags].sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + findNum([...tags], diff));
+            }else
+            setCustomTitle([...tags].sort().join(" & ") + ": " + types + " - Level " + diff + ", Exercise: "+ findNum([...tags],diff));
         } else {
             setTags([...tags, val]);
-            setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags,val],diff));
+            if(types === "None"){
+                setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags,val], diff));
+            }else if (types === "Both"){
+                setCustomTitle([...tags,val].sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + findNum([...tags,val], diff));
+            }else
+            setCustomTitle([...tags,val].sort().join(" & ") + ": " + types + " - Level " + diff + ", Exercise: " + findNum([...tags,val],diff));
         }
     }
 
@@ -481,6 +500,14 @@ export function Exercise({
         const count = allExData.filter((exData:ExerciseData | undefined)=> {if (exData !== undefined && exData.tags !== undefined && exData.difficulty !== undefined){return exData.tags.sort().toString() === tags.sort().toString() && exData.difficulty === difficulty} else {return false}});
         return count.length+1;
 
+    }
+    const typesChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
+        setTypes(e.target.value);
+        if(e.target.value === "None"){
+            setCustomTitle(tags.sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum(tags, diff));
+        }else if (e.target.value === "Both"){
+            setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + findNum(tags, diff));
+        }else setCustomTitle(tags.sort().join(" & ") + ": " + (e.target.value) + " - Level " + diff + ", Exercise: " + findNum(tags, diff));
     }
 
     //function for comparing selected answers to correct answers - DEPRECATED, see checkAnswers function instead
@@ -581,14 +608,14 @@ export function Exercise({
             <span>
                 <div id="forms" style={{display: "inline-flex", padding: "4px"}}>
                     <form id= "tags">
-                        Tags
+                        Tags:
                         <br></br>
                         {/* <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm */}
                         <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{margin: "4px"}}/>Pitch
                         <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Intonation
                     </form>
                     <form id="voiceCt">
-                        Voices
+                        Voices:
                         <br></br>
                         <select name="voices" onChange={voiceChange}>
                             <option value="1">1</option>
@@ -604,7 +631,7 @@ export function Exercise({
                         </select>
                     </form>
                     <form id="difficulty">
-                        Difficulty
+                        Difficulty:
                         <br></br>
                         <select name="difficulty" onChange={diffChange}>
                             <option value="1">1</option>
@@ -620,15 +647,14 @@ export function Exercise({
                         </select>
                     </form>
                     <form id="tags2">
-                        <div style={{display: "inline-block", marginRight: "15px"}}>
-                            Drone<br/>
-                            <input type="checkbox" name="tags2" value="Drone" checked={tags.includes("Drone")} onChange={tagsChange} style={{margin: "4px"}}/>
-                        </div>
-
-                        <div style={{display: "inline-block"}}>
-                            Ensemble parts<br/>
-                            <input type="checkbox" name="tags2" value="Ensemble" checked={tags.includes("Ensemble")} onChange={tagsChange} style={{marginLeft: "12px"}}/>
-                        </div>
+                        Textural Factor:
+                        <br></br>
+                        <select name='types' onChange={typesChange}>
+                                <option value="None">None</option>
+                                <option value="Drone">Drone</option>
+                                <option value="Ensemble Parts">Ensemble Parts</option>
+                                <option value="Both">Drone & Ensemble Parts</option>
+                        </select>
                     </form>
                 </div>
                 <div/>
