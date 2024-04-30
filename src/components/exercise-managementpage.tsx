@@ -2,6 +2,7 @@ import { Button } from 'react-bootstrap';
 import ExerciseData from '../interfaces/exerciseData';
 import { Exercise } from './exercise';
 import { useEffect, useState } from 'react';
+import { get, getDatabase, ref, remove } from 'firebase/database';
 
 
 export function ExerciseManagementPage({
@@ -24,6 +25,9 @@ export function ExerciseManagementPage({
     const [voices, setVoices] = useState<number>(0);
     const [tags, setTags] = useState<string[]>([]);
     const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
+
+    const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
+
 
     const modeChange = function () {
         setMode(!mode);
@@ -187,85 +191,147 @@ export function ExerciseManagementPage({
         if (voiceBox !== null) voiceBox.options[0].selected = true;
     }
 
+    // function to handle selection of exercises - for deletion 
+    const handleSelectExercise = (exIndex: number) => {
+        const index = selectedIndexes.indexOf(exIndex);
+        if (index === -1) {
+            // exercise not selected - add it to the selected list
+            setSelectedIndexes([...selectedIndexes, exIndex]);
+        } else {
+            // exercise is selected - remove from the selected list
+            const updatedSelection = [...selectedIndexes];
+            updatedSelection.splice(index, 1);
+            setSelectedIndexes(updatedSelection);
+        }
+    };
+
+    // function to handle deletion of selected exercises
+    const handleMultipleExerciseDelete = async (selectedIndexes: number[]) => {
+        try {
+            const database = getDatabase();
+    
+            // delete exercises from the database
+            await Promise.all(selectedIndexes.map(async (exIndex) => {
+                const exerciseRef = ref(database, `scores/${exIndex}`);
+                const snapshot = await get(exerciseRef);
+                if (snapshot.exists()) {
+                    await remove(exerciseRef);
+                } else {
+                    console.log('exercise' + exIndex + ' not found in the database');
+                }
+            }));
+    
+            // remove exercises from the page
+            const updatedExercises = allExData.filter((exercise) => {
+                return !selectedIndexes.includes(exercise?.exIndex || -1);
+            });
+            setAllExData(updatedExercises);
+            alert("selected exercises deleted!");
+            // reload the page without changing the url 
+            window.location.href = window.location.href;
+        } catch (error) {
+            console.error('error deleting exercises:', error);
+            alert('Error deleting exercises.');
+        }
+    };
+
     return (
-        <div style={{margin: "10px"}}>
-            <h2 style={{display:"inline"}}>Welcome to the Exercise Management Page!</h2>
-            <form id="editMode" style={{display: "inline", float:"right"}}>
+        <div style={{ margin: "10px" }}>
+            <h2 style={{ display: "inline" }}>Welcome to the Exercise Management Page!</h2>
+            <form id="editMode" style={{ display: "inline", float: "right" }}>
                 <div className="form-check form-switch">
-                    <input className="form-check-input" type="checkbox" role="switch" id="switchCheckDefault" checked={mode} onChange={modeChange}/>
+                    <input className="form-check-input" type="checkbox" role="switch" id="switchCheckDefault" checked={mode} onChange={modeChange} />
                 </div>
             </form>
-            <h5 style={{marginTop: "8px", fontStyle: "italic"}}>Use the slider on the right to toggle between adding and editing exercises.</h5>
-            {!mode ? 
+            <h5 style={{ marginTop: "8px", fontStyle: "italic" }}>Use the slider on the right to toggle between adding and editing exercises.</h5>
+            {!mode ?
                 <div>
-                    <span style={{marginLeft: "4px"}}>Sort By:
-                    <form id= "tags">
-                        <div style={{fontSize:"16px", display:"inline"}}>Tags</div>
-                        <br></br>
-                        <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange}style={{margin: "4px"}}/>Pitch
-                        <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Intonation
-                        <input type="checkbox" name="tags" value="Drone" checked={tags.includes("Drone")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Drone
-                        <input type="checkbox" name="tags" value="Ensemble" checked={tags.includes("Ensemble")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Ensemble
-                        {/* <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm */}
-                    </form>
-                    <div id="dropdowns" style={{display: "inline-flex", padding: "4px"}}>
-                        <form id="difficulty">
-                            <div style={{fontSize:"16px", display:"inline"}}>Difficulty</div>
+                    <span style={{ marginLeft: "4px" }}>Sort By:
+                        <form id="tags">
+                            <div style={{ fontSize: "16px", display: "inline" }}>Tags</div>
                             <br></br>
-                            <select name="difficulty" onChange={diffChange}>
-                                <option value="All">All</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                                {/* <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option> */}
-                            </select>
+                            <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{ margin: "4px" }} />Pitch
+                            <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{ marginLeft: "12px" }} /> Intonation
+                            <input type="checkbox" name="tags" value="Drone" checked={tags.includes("Drone")} onChange={tagsChange} style={{ marginLeft: "12px" }} /> Drone
+                            <input type="checkbox" name="tags" value="Ensemble" checked={tags.includes("Ensemble")} onChange={tagsChange} style={{ marginLeft: "12px" }} /> Ensemble
                         </form>
-                        <form id="voiceCt">
-                            Voices
-                            <br></br>
-                            <select name="voices" onChange={voiceChange}>
-                                <option value={0}>Any</option>
-                                <option value={1}>1</option>
-                                <option value={2}>2</option>
-                                <option value={3}>3</option>
-                                <option value={4}>4</option>
-                                <option value={5}>5</option>
-                                {/* <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option> */}
-                            </select>
-                        </form>
-                        <Button variant="danger" onClick={resetSort} style={{marginLeft: "10px"}}>Reset Sort</Button>
-                    </div>
-                </span>
-                    {exList.map(function(exercise) {
-                    if (exercise !== undefined)
-                    return (
-                        <Exercise key={exercise.exIndex} teacherMode={true} ExData={exercise} allExData={allExData} setAllExData={setAllExData} exIndex={exercise.exIndex} setNewExercise={undefined}></Exercise>
-                    )
-                    else return (<div/>
-                        //<Exercise key={allExData.length} teacherMode={true} ExData={exercise} setAllExData={setAllExData} exIndex={allExData.length}></Exercise>
-                    )
+                        <div id="dropdowns" style={{ display: "inline-flex", padding: "4px" }}>
+                            <form id="difficulty">
+                                <div style={{ fontSize: "16px", display: "inline" }}>Difficulty</div>
+                                <br></br>
+                                <select name="difficulty" onChange={diffChange}>
+                                    <option value="All">All</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                            </form>
+                            <form id="voiceCt">
+                                Voices
+                                <br></br>
+                                <select name="voices" onChange={voiceChange}>
+                                    <option value={0}>Any</option>
+                                    <option value={1}>1</option>
+                                    <option value={2}>2</option>
+                                    <option value={3}>3</option>
+                                    <option value={4}>4</option>
+                                    <option value={5}>5</option>
+                                </select>
+                            </form>
+                            <Button variant="danger" onClick={resetSort} style={{ marginLeft: "10px" }}>Reset Sort</Button>
+                            {!mode && (
+                                <Button
+                                variant="danger" 
+                                onClick={() => handleMultipleExerciseDelete(selectedIndexes)} 
+                                style={{ marginTop: "10px" }}
+                                >Delete Selected Exercises
+                                </Button>
+                            )}
+                        </div>
+                    </span>
+                    {/* Map through exList to render Exercise components */}
+                    {exList.map((exercise) => {
+                        if (exercise !== undefined)
+                            return (
+                                <Exercise
+                                    key={exercise.exIndex}
+                                    teacherMode={true}
+                                    ExData={exercise}
+                                    allExData={allExData}
+                                    setAllExData={setAllExData}
+                                    exIndex={exercise.exIndex}
+                                    setNewExercise={undefined}
+                                    // Pass a function to handle selection
+                                    handleSelectExercise={handleSelectExercise}
+                                    // Check if this exercise is selected
+                                    isSelected={selectedIndexes.includes(exercise.exIndex)}
+                                />
+                            )
+                        else return (<div key={Math.random()} />);
                     })}
-                </div> 
-                : <div>
-                    <Button style={{color: "white", borderColor: "blue", display: "flex"}} onClick={createExercise}>+ New Exercise</Button>
+                </div>
+                :
+                <div>
+                    <Button style={{ color: "white", borderColor: "blue", display: "flex" }} onClick={createExercise}>+ New Exercise</Button>
                     {newExercise !== undefined ? <div>
-                        <Exercise key={newExercise.exIndex} teacherMode={true} ExData={newExercise} allExData={allExData} setAllExData={setAllExData} exIndex={newExercise.exIndex} setNewExercise={setNewExercise}/>
+                        <Exercise
+                            key={newExercise.exIndex}
+                            teacherMode={true}
+                            ExData={newExercise}
+                            allExData={allExData}
+                            setAllExData={setAllExData}
+                            exIndex={newExercise.exIndex}
+                            setNewExercise={setNewExercise}
+                            handleSelectExercise={() => {}}
+                            isSelected={false}
+                        />
                     </div> : <></>}
                 </div>}
-            
-            
-            <br></br>
-            {/* <Button onClick={fetch} variant="success">Sync with Database</Button> */}
+                     
+
         </div>
     );
+    
 }

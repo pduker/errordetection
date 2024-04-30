@@ -31,7 +31,9 @@ export function Exercise({
     ExData,
     allExData,
     setAllExData,
-    setNewExercise
+    setNewExercise,
+    handleSelectExercise, 
+    isSelected 
 }: { 
     exIndex: number;
     teacherMode: boolean;
@@ -39,6 +41,8 @@ export function Exercise({
     allExData: (ExerciseData | undefined)[]
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
     setNewExercise: ((newEx: (ExerciseData | undefined)) => void) | undefined;
+    handleSelectExercise: (exIndex: number) => void; 
+    isSelected: boolean; 
 }) {
     //for score styling
     const score = {display: "inline-block", margin: "auto", backgroundColor: "white", borderRadius: "2px", width: "400px"};
@@ -53,6 +57,7 @@ export function Exercise({
     var difficulty = 1;
     var voicesInit = 1;
     var mp3: File = new File([], "");
+    var typesInit = "None";
 
     if(exerciseData !== undefined) {
        
@@ -64,6 +69,7 @@ export function Exercise({
         if(exerciseData.tags !== undefined) tagsInit = exerciseData.tags;
         if(exerciseData.difficulty !== undefined) difficulty = exerciseData.difficulty;
         if(exerciseData.voices !== undefined) voicesInit = exerciseData.voices;
+        if(exerciseData.types !== undefined) typesInit = exerciseData.types;
         
     }
 
@@ -75,6 +81,7 @@ export function Exercise({
     const [diff, setDiff] = useState<number>(difficulty);
     const [tags, setTags] = useState<string[]>(tagsInit);
     const [voices, setVoices] = useState<number>(voicesInit);
+    const [types, setTypes] = useState<string>(typesInit);
     const [customFeedback, setCustomFeedback] = useState<string[]>([]);
     const [lastClicked, setLastClicked] = useState<any>();
 
@@ -84,6 +91,8 @@ export function Exercise({
     const [xmlFile, setXmlFile] = useState<File>();
     const [mp3File, setMp3File] = useState<File>(mp3);
     const [abcFile, setAbcFile] = useState<string>(abc);
+
+    //const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
 
     useEffect(() => {
         if ((exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded)) loadScore();
@@ -275,7 +284,7 @@ export function Exercise({
             }));
         } 
         if (abcFile !== undefined && abcFile !== "" && mp3File.name !== "" && correctAnswers.length > 0) {
-            data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false, customTitle, diff, voices,tags);
+            data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false, customTitle, diff, voices,tags,types);
         
         //setExerciseData(data);
     
@@ -373,11 +382,16 @@ export function Exercise({
             if ((i1.abselem.elemset[0].getAttribute("index") as number) < (i2.abselem.elemset[0].getAttribute("index") as number)) return -1;
             return 0;
         })
+        let closeList: Number[] = [];
         for(var i=0,j=0;i<correctAnswers.length && j<selAnswers.length && tmpCorrect[i] !== undefined;){
             let noteElems = tmpSelected[j].abselem.elemset[0];
             if(noteElems.getAttribute("index") === tmpCorrect[i]["index"]){
                 if((noteElems.getAttribute("selectedTimes")) === tmpCorrect[i]["selectedTimes"])
                     tmpCorrect = tmpCorrect.filter(function(ans){return ans["index"] !== tmpCorrect[i]["index"]});
+                else {
+                    closeList.push(Number(tmpCorrect[i]["index"]));
+                    
+                }
                 j++;
             }else if(noteElems.getAttribute("index") > tmpCorrect[i]["index"]){
                 i++;
@@ -399,20 +413,24 @@ export function Exercise({
             feedback = ["Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:"];
             for(let i = 0;i < tmpCorrect.length;i++){
                 feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
-                /* feedback = [...feedback, String(tmpCorrect[i]["index"])]; */
-                if(tmpCorrect[i]["feedback"] !== ""){
+                let addtlFeedback = tmpCorrect[i]["feedback"];
+                if(closeList.includes(Number(tmpCorrect[i]["index"])) && !tmpCorrect[i]["feedback"].toString().startsWith("You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). "))
+                        addtlFeedback = "You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). " + tmpCorrect[i]["feedback"];
+                if(addtlFeedback !== ""){
                     let add = feedback.pop();
-                    feedback = [...feedback, add + ": " + tmpCorrect[i]["feedback"] as string];
+                    feedback = [...feedback, add + ". Additional feedback: " + addtlFeedback];
                 } 
             }
         }else if(tmpCorrect.length < correctAnswers.length){
             feedback = ["Good work – you’ve found some of the errors, but here are some specific places to look at and listen to more closely:"];
             for(let i = 0;i < tmpCorrect.length;i++){
-                /* feedback = [...feedback, String(tmpCorrect[i]["index"])]; */
                 feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
-                if(tmpCorrect[i]["feedback"] !== ""){
+                let addtlFeedback = tmpCorrect[i]["feedback"];
+                if(closeList.includes(Number(tmpCorrect[i]["index"])) && !tmpCorrect[i]["feedback"].toString().startsWith("You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). "))
+                        addtlFeedback = "You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). " + tmpCorrect[i]["feedback"];
+                if(addtlFeedback !== ""){
                     let add = feedback.pop();
-                    feedback = [...feedback, add + ": " + tmpCorrect[i]["feedback"] as string];
+                    feedback = [...feedback, add + ". Additional feedback: " + addtlFeedback];
                 } 
             }
         }
@@ -445,7 +463,13 @@ export function Exercise({
     //onClick function for difficulty change
     const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setDiff(Number(e.target.value));
-        setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value)+ ", Exercise: " + findNum(tags, Number(e.target.value)));
+        if(types === "None"){
+            setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value) + ", Exercise: " + findNum(tags, Number(e.target.value)));
+        }else if (types === "Both"){
+            setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + Number(e.target.value) + ", Exercise: " + findNum(tags, Number(e.target.value)));
+        }else
+        setCustomTitle(tags.sort().join(" & ") + ": " + types + " - Level " + Number(e.target.value) + ", Exercise: " + findNum(tags, Number(e.target.value)));
+        
     }
 
     //onClick function for tags change
@@ -454,10 +478,20 @@ export function Exercise({
         if(tags.includes(val)) {
             tags.splice(tags.indexOf(val), 1);
             setTags([...tags]);
-            setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: "+ findNum([...tags],diff));
+            if(types === "None"){
+                setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags],diff));
+            }else if (types === "Both"){
+                setCustomTitle([...tags].sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + findNum([...tags], diff));
+            }else
+            setCustomTitle([...tags].sort().join(" & ") + ": " + types + " - Level " + diff + ", Exercise: "+ findNum([...tags],diff));
         } else {
             setTags([...tags, val]);
-            setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags,val],diff));
+            if(types === "None"){
+                setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags,val], diff));
+            }else if (types === "Both"){
+                setCustomTitle([...tags,val].sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + findNum([...tags,val], diff));
+            }else
+            setCustomTitle([...tags,val].sort().join(" & ") + ": " + types + " - Level " + diff + ", Exercise: " + findNum([...tags,val],diff));
         }
     }
 
@@ -472,6 +506,14 @@ export function Exercise({
         const count = allExData.filter((exData:ExerciseData | undefined)=> {if (exData !== undefined && exData.tags !== undefined && exData.difficulty !== undefined){return exData.tags.sort().toString() === tags.sort().toString() && exData.difficulty === difficulty} else {return false}});
         return count.length+1;
 
+    }
+    const typesChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
+        setTypes(e.target.value);
+        if(e.target.value === "None"){
+            setCustomTitle(tags.sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum(tags, diff));
+        }else if (e.target.value === "Both"){
+            setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + findNum(tags, diff));
+        }else setCustomTitle(tags.sort().join(" & ") + ": " + (e.target.value) + " - Level " + diff + ", Exercise: " + findNum(tags, diff));
     }
 
     //function for comparing selected answers to correct answers - DEPRECATED, see checkAnswers function instead
@@ -541,12 +583,12 @@ export function Exercise({
                 setAllExData(updatedExercises);
                 alert("exercise deleted!");
     
-                // reload the page
-                window.location.reload();
+                // reload the page without changing the url 
+                window.location.href = window.location.href;
 
             } else {
                 //if no matching exercise is found
-                console.log('Exercise with exIndex ' + exIndex + ' not found!');
+                console.log('exercise with' + exIndex + ' not found!');
                 alert('exercise not found.');
             }
         } catch (error) {
@@ -554,6 +596,8 @@ export function Exercise({
             alert('error deleting exercise.');
         }
     };
+
+   
      
 
     return (
@@ -572,14 +616,14 @@ export function Exercise({
             <span>
                 <div id="forms" style={{display: "inline-flex", padding: "4px"}}>
                     <form id= "tags">
-                        Tags
+                        Tags:
                         <br></br>
                         {/* <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm */}
                         <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{margin: "4px"}}/>Pitch
                         <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Intonation
                     </form>
                     <form id="voiceCt">
-                        Voices
+                        Voices:
                         <br></br>
                         <select name="voices" onChange={voiceChange}>
                             <option value="1">1</option>
@@ -595,7 +639,7 @@ export function Exercise({
                         </select>
                     </form>
                     <form id="difficulty">
-                        Difficulty
+                        Difficulty:
                         <br></br>
                         <select name="difficulty" onChange={diffChange}>
                             <option value="1">1</option>
@@ -611,15 +655,14 @@ export function Exercise({
                         </select>
                     </form>
                     <form id="tags2">
-                        <div style={{display: "inline-block", marginRight: "15px"}}>
-                            Drone<br/>
-                            <input type="checkbox" name="tags2" value="Drone" checked={tags.includes("Drone")} onChange={tagsChange} style={{margin: "4px"}}/>
-                        </div>
-
-                        <div style={{display: "inline-block"}}>
-                            Ensemble parts<br/>
-                            <input type="checkbox" name="tags2" value="Ensemble" checked={tags.includes("Ensemble")} onChange={tagsChange} style={{marginLeft: "12px"}}/>
-                        </div>
+                        Textural Factor:
+                        <br></br>
+                        <select name='types' onChange={typesChange}>
+                                <option value="None">None</option>
+                                <option value="Drone">Drone</option>
+                                <option value="Ensemble Parts">Ensemble Parts</option>
+                                <option value="Both">Drone & Ensemble Parts</option>
+                        </select>
                     </form>
                 </div>
                 <div/>
@@ -655,7 +698,9 @@ export function Exercise({
                 {/* <div className="clicked-info"></div> */}
                 {lastClicked !== undefined && Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) % 3 !== 0 ? <div style={{marginLeft: "1vw"}}>Note Info: {ana}</div> : <div/>}
                 <br/>
-                <Button variant='success' onClick={save}>Save Exercise</Button><Button onClick={() => handleExerciseDelete(exIndex)} variant="danger">Delete Exercise</Button>
+                <Button variant='success' onClick={save}>Save Exercise</Button>
+                <Button onClick={() => handleExerciseDelete(exIndex)} variant="danger">Delete Exercise</Button>
+
             </span>
             :
             <span>
@@ -685,6 +730,14 @@ export function Exercise({
                 : <div/>}
             </span>
             }
+
+        <div>
+        <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => handleSelectExercise(exIndex)}
+        /> Select to Delete (Multiple Deletion)
+    </div>
             
         </div>
 
