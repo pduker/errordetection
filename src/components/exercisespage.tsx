@@ -15,8 +15,8 @@ export function ExercisesPage({
     useEffect(() => {
         //fetch();
         if(exList.length === 0) {
-            if(tags.length === 0 && diff === "All" && voices === 0) setExList(allExData.sort(exSortFunc));
-            else if(tags.length > 0 && diff === "All" && voices === 0 && !upd) {
+            if(tags.length === 0 && diff === "All" && voices === 0 && types === "None") setExList(allExData.sort(exSortFunc));
+            else if(tags.length > 0 && diff === "All" && voices === 0 && types === "None" && !upd) {
                 sortExercises(tags);
                 setUpd(true);
             }
@@ -24,6 +24,7 @@ export function ExercisesPage({
     })
 
     const [diff, setDiff] = useState<string>("All");
+    const [types, setTypes] = useState<string>("None");
     const [voices, setVoices] = useState<number>(0);
     const [tags, setTags] = useState<string[]>(defaultTags);
     const [upd, setUpd] = useState<boolean>(false);
@@ -31,19 +32,32 @@ export function ExercisesPage({
     const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
 
     const sortExercises = function (input: string | string[] | number) {
-        var tempTags = tags, tempDiff = diff, tempVoices = voices;
+        var tempTags = tags, tempDiff = diff, tempVoices = voices, tempTypes = types;
         if (typeof(input) === "object") tempTags = input;
-        else if (typeof(input) === "string") tempDiff = input;
+        else if (typeof(input) === "string"){
+            if( input === "None" || input === "Drone" || input === "Ensemble Parts" || input === "Both")
+                tempTypes = input;
+            else tempDiff = input; 
+        } 
         else if (typeof(input) === "number") tempVoices = input;
         var list: (ExerciseData | undefined)[] = [];
         var method = "all";
-        if (tempTags.length === 0 && tempDiff === "All" && tempVoices === 0) method = "";
-        else if (tempDiff === "All" && tempVoices === 0) method = "tags";
-        else if (tempTags.length === 0 && tempVoices === 0) method = "diff";
-        else if (tempTags.length === 0 && tempDiff === "All") method = "voices";
-        else if (tempVoices === 0) method = "diffTags";
-        else if (tempTags.length === 0) method = "diffVoices";
-        else if (tempDiff === "All") method = "tagsVoices";
+        if (tempTags.length === 0 && tempDiff === "All" && tempVoices === 0 && tempTypes === "None") method = "";
+        else if (tempDiff === "All" && tempVoices === 0 && tempTypes === "None") method = "tags";
+        else if (tempTags.length === 0 && tempVoices === 0 && tempTypes === "None") method = "diff";
+        else if (tempTags.length === 0 && tempDiff === "All" && tempTypes === "None") method = "voices";
+        else if (tempVoices === 0 && tempTypes === "None") method = "diffTags";
+        else if (tempTags.length === 0 && tempTypes === "None") method = "diffVoices";
+        else if (tempDiff === "All" && tempTypes === "None") method = "tagsVoices";
+        else if (tempDiff === "All" && tempVoices === 0 && tempTags.length === 0) method = "types";
+        else if (tempDiff === "All" && tempVoices === 0) method = "tagsTypes";
+        else if (tempTags.length === 0 && tempVoices === 0) method = "diffTypes";
+        else if (tempTags.length === 0 && tempDiff === "All") method = "voicesTypes";
+        else if (tempVoices === 0) method = "diffTagsTypes";
+        else if (tempTags.length === 0 ) method = "diffVoicesTypes";
+        else if (tempDiff === "All") method = "tagsVoicesTypes";
+        else if (tempTypes === "None") method = "diffTagsVoices";
+        
         //console.log(method);
         switch (method) {
             case "diff": // only diff selected
@@ -58,7 +72,8 @@ export function ExercisesPage({
             case "tags": // only tags selected
                 list = allExData.filter(function(exercise) {
                     if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
-                        return (tempTags.sort().toString() === exercise.tags.sort().toString())}
+                        return tempTags.every((element) => exercise.tags.includes(element))
+                    }
                     else return false;})
                         .sort(exSortFunc);
                 setExList(list);
@@ -74,7 +89,7 @@ export function ExercisesPage({
             case "diffTags": // diff and tags selected (no voices)
                 list = allExData.filter(function(exercise) {
                     if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
-                        return (tempTags.sort().toString() === exercise.tags.sort().toString()) && tempDiff === String(exercise.difficulty)}
+                        return (tempTags.every((element) => exercise.tags.includes(element)) && tempDiff === String(exercise.difficulty))}
                     else return false;})
                         .sort(exSortFunc)
                 setExList(list);
@@ -90,7 +105,71 @@ export function ExercisesPage({
             case "tagsVoices": // tags and voices selected (no diff)
                 list = allExData.filter(function(exercise) {
                     if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
-                        return (tempTags.sort().toString() === exercise.tags.sort().toString()) && tempVoices === exercise.voices}
+                        return (tempTags.every((element) => exercise.tags.includes(element))) && tempVoices === exercise.voices}
+                    else return false;})
+                        .sort(exSortFunc);
+                setExList(list);
+                break;
+            case "diffTagsVoices": // all sorting options selected
+                list = allExData.filter(function(exercise) {
+                    if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
+                        return (tempTags.every((element) => exercise.tags.includes(element))) && tempDiff === String(exercise.difficulty) && tempVoices === exercise.voices}
+                    else return false;})
+                        .sort(exSortFunc);
+                setExList(list);
+                break;
+            case "types":
+                list = allExData.filter(function(exercise) {
+                    if (exercise !== undefined){
+                        return (tempTypes === exercise.types)}
+                    else return false;})
+                        .sort(exSortFunc);
+                setExList(list);
+                break;
+            case "diffTypes": // only diff selected
+            list = allExData.filter(function(exercise) {
+                if (exercise !== undefined) 
+                    return (tempDiff === String(exercise.difficulty) && tempTypes === exercise.types)
+                else return false;})
+                    .sort(exSortFunc);
+            setExList(list);
+            break;
+            case "tagsTypes": // only tags selected
+                list = allExData.filter(function(exercise) {
+                    if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
+                        return (tempTags.every((element) => exercise.tags.includes(element)) && tempTypes === exercise.types)}
+                    else return false;})
+                        .sort(exSortFunc);
+                setExList(list);
+                break;
+            case "voicesTypes": // only voices selected
+                list = allExData.filter(function(exercise) {
+                    if (exercise !== undefined) 
+                        return tempVoices === exercise.voices && tempTypes === exercise.types
+                    else return false;})
+                        .sort(exSortFunc);
+                setExList(list);
+                break;
+            case "diffTagsTypes": // diff and tags selected (no voices)
+                list = allExData.filter(function(exercise) {
+                    if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
+                        return (tempTags.every((element) => exercise.tags.includes(element))) && tempDiff === String(exercise.difficulty) && tempTypes === exercise.types}
+                    else return false;})
+                        .sort(exSortFunc)
+                setExList(list);
+                break;
+            case "diffVoicesTypes": // diff and voices selected (no tags)
+                list = allExData.filter(function(exercise) {
+                    if (exercise !== undefined) 
+                        return (tempDiff === String(exercise.difficulty) && tempVoices === exercise.voices) && tempTypes === exercise.types
+                    else return false;})
+                        .sort(exSortFunc);
+                setExList(list);
+                break;
+            case "tagsVoicesTypes": // tags and voices selected (no diff)
+                list = allExData.filter(function(exercise) {
+                    if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
+                        return (tempTags.every((element) => exercise.tags.includes(element))) && tempVoices === exercise.voices && tempTypes === exercise.types}
                     else return false;})
                         .sort(exSortFunc);
                 setExList(list);
@@ -98,7 +177,7 @@ export function ExercisesPage({
             case "all": // all sorting options selected
                 list = allExData.filter(function(exercise) {
                     if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
-                        return (tempTags.sort().toString() === exercise.tags.sort().toString()) && tempDiff === String(exercise.difficulty) && tempVoices === exercise.voices}
+                        return (tempTags.every((element) => exercise.tags.includes(element))) && tempDiff === String(exercise.difficulty) && tempVoices === exercise.voices && tempTypes === exercise.types}
                     else return false;})
                         .sort(exSortFunc);
                 setExList(list);
@@ -192,6 +271,12 @@ export function ExercisesPage({
         sortExercises(Number(e.target.value));
     }
 
+    const typesChange = function (e: React.ChangeEvent<HTMLSelectElement>){
+        setTypes(e.target.value);
+        sortExercises(e.target.value);
+        
+    }
+
     //onClick function for when Back button is pushed under exercise
     const prevEx = function () {
         var exPos = exList.indexOf(selExercise);
@@ -244,6 +329,9 @@ export function ExercisesPage({
         setVoices(0);
         var voiceBox = document.getElementsByName("voices")[0] as HTMLSelectElement;
         if (voiceBox !== null) voiceBox.options[0].selected = true;
+        setTypes("None");
+        var typesBox = document.getElementsByName("types")[0] as HTMLSelectElement;
+        if(typesBox !== null) typesBox.options[0].selected = true;
     }
 
     return (
@@ -257,8 +345,8 @@ export function ExercisesPage({
                         <br></br>
                         <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange}style={{margin: "4px"}}/>Pitch
                         <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Intonation
-                        <input type="checkbox" name="tags" value="Drone" checked={tags.includes("Drone")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Drone
-                        <input type="checkbox" name="tags" value="Ensemble" checked={tags.includes("Ensemble")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Ensemble
+                        {/* <input type="checkbox" name="tags" value="Drone" checked={tags.includes("Drone")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Drone
+                        <input type="checkbox" name="tags" value="Ensemble" checked={tags.includes("Ensemble")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Ensemble */}
                         {/* <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm */}
                     </form>
                     <div id="dropdowns" style={{display: "inline-flex", padding: "4px"}}>
@@ -280,7 +368,7 @@ export function ExercisesPage({
                             </select>
                         </form>
                         <form id="voiceCt">
-                            Voices
+                            Voices:
                             <br></br>
                             <select name="voices" onChange={voiceChange}>
                                 <option value={0}>Any</option>
@@ -294,6 +382,16 @@ export function ExercisesPage({
                                 <option value="8">8</option>
                                 <option value="9">9</option>
                                 <option value="10">10</option> */}
+                            </select>
+                        </form>
+                        <form id='typesForm'>
+                            Textural Factors:
+                            <br></br>
+                            <select name="types" onChange={typesChange}>
+                                <option value="None">None</option>
+                                <option value="Drone">Drone</option>
+                                <option value="Ensemble Parts">Ensemble Parts</option>
+                                <option value="Both">Drone & Ensemble Parts</option>
                             </select>
                         </form>
                         <Button variant="danger" onClick={resetSort} style={{marginLeft: "10px"}}>Reset Sort</Button>

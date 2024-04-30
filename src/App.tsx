@@ -47,7 +47,7 @@ function App() {
             //let response = await fetch(blob);
             //let data = await response.blob();
             var file = new File([blob], value.sound, {type: "audio/mpeg"})
-            var thing = new ExerciseData(value.score,file,value.correctAnswers,value.feedback,value.exIndex,value.empty,value.title,value.difficulty,value.voices,value.tags);
+            var thing = new ExerciseData(value.score,file,value.correctAnswers,value.feedback,value.exIndex,value.empty,value.title,value.difficulty,value.voices,value.tags,value.types);
             scoresData2.push(thing);
             //console.log(thing);
             }
