@@ -4,7 +4,6 @@ import { Exercise } from './exercise';
 import { useEffect, useState } from 'react';
 import { get, getDatabase, ref, remove } from 'firebase/database';
 
-
 export function ExerciseManagementPage({
     allExData,
     setAllExData
@@ -19,6 +18,8 @@ export function ExerciseManagementPage({
         if(exList.length > allExData.length) setExList(allExData.sort(exSortFunc));
     });
 
+    const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
+
     const [mode, setMode] = useState<boolean>(false);
     const [newExercise, setNewExercise] = useState<ExerciseData |  undefined>(undefined);
     const [diff, setDiff] = useState<string>("All");
@@ -26,10 +27,6 @@ export function ExerciseManagementPage({
     const [voices, setVoices] = useState<number>(0);
     const [tags, setTags] = useState<string[]>([]);
     const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
-
-    const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
-
-
 
     const modeChange = function () {
         setMode(!mode);
@@ -325,7 +322,6 @@ export function ExerciseManagementPage({
         }
     };
 
-
     return (
         <div style={{margin: "10px"}}>
             <h2 style={{display:"inline"}}>Welcome to the Exercise Management Page!</h2>
@@ -401,7 +397,6 @@ export function ExerciseManagementPage({
                                 >Delete Selected Exercises
                                 </Button>
                             )}
-
                     </div>
                 </span>
                 {exList.map((exercise) => {
@@ -424,7 +419,7 @@ export function ExerciseManagementPage({
 
                 </div> 
                 : <div>
-                    <Button style={{ color: "white", borderColor: "blue", display: "flex" }} onClick={createExercise}>+ New Exercise</Button>
+                   <Button style={{ color: "white", borderColor: "blue", display: "flex" }} onClick={createExercise}>+ New Exercise</Button>
                     {newExercise !== undefined ? <div>
                         <Exercise
                             key={newExercise.exIndex}

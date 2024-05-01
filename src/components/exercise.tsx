@@ -43,6 +43,7 @@ export function Exercise({
     setNewExercise: ((newEx: (ExerciseData | undefined)) => void) | undefined;
     handleSelectExercise: (exIndex: number) => void; 
     isSelected: boolean; 
+
 }) {
     //for score styling
     const score = {display: "inline-block", margin: "auto", backgroundColor: "white", borderRadius: "2px", width: "400px"};
@@ -91,8 +92,6 @@ export function Exercise({
     const [xmlFile, setXmlFile] = useState<File>();
     const [mp3File, setMp3File] = useState<File>(mp3);
     const [abcFile, setAbcFile] = useState<string>(abc);
-
-    //const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
 
     useEffect(() => {
         if ((exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded)) loadScore();
@@ -597,8 +596,7 @@ export function Exercise({
         }
     };
 
-   
-     
+    
 
     return (
         <div style = {{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
@@ -698,9 +696,7 @@ export function Exercise({
                 {/* <div className="clicked-info"></div> */}
                 {lastClicked !== undefined && Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) % 3 !== 0 ? <div style={{marginLeft: "1vw"}}>Note Info: {ana}</div> : <div/>}
                 <br/>
-                <Button variant='success' onClick={save}>Save Exercise</Button>
-                <Button onClick={() => handleExerciseDelete(exIndex)} variant="danger">Delete Exercise</Button>
-
+                <Button variant='success' onClick={save}>Save Exercise</Button><Button onClick={() => handleExerciseDelete(exIndex)} variant="danger">Delete Exercise</Button>
             </span>
             :
             <span>
@@ -730,14 +726,14 @@ export function Exercise({
                 : <div/>}
             </span>
             }
+            <div>
+                <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={() => handleSelectExercise(exIndex)}
+                /> Select to Delete (Multiple Deletion)
+            </div>
 
-        <div>
-        <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={() => handleSelectExercise(exIndex)}
-        /> Select to Delete (Multiple Deletion)
-    </div>
             
         </div>
 
