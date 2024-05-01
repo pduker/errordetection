@@ -394,8 +394,8 @@ export function ExercisesPage({
                                 <option value="Both">Drone & Ensemble Parts</option>
                             </select>
                         </form>
-                        <Button variant="danger" onClick={resetSort} style={{marginLeft: "10px"}}>Reset Sort</Button>
                     </div>
+                    <Button variant="danger" onClick={resetSort} style={{marginLeft: "10px"}}>Reset Sort</Button>
                 </span>
                 
                 {exList.map(function(exercise){
@@ -411,7 +411,18 @@ export function ExercisesPage({
             </div>
             <div style={{float:'right',width:'70%'}}>
                 {selExercise !== undefined ? <div>
-                    <Exercise key={selExercise.exIndex} teacherMode={false} ExData={selExercise} allExData={allExData} setAllExData={setAllExData} exIndex={selExercise.exIndex} setNewExercise={undefined}/>
+                    <Exercise 
+                        key={selExercise.exIndex} 
+                        teacherMode={false} 
+                        ExData={selExercise} 
+                        allExData={allExData} 
+                        setAllExData={setAllExData} 
+                        exIndex={selExercise.exIndex} 
+                        setNewExercise={undefined} 
+                        handleSelectExercise={undefined} 
+                        isSelected={undefined}
+                        fetch={undefined}
+                    />
                     
                 </div> : <></>}
             <div style={{display:"flex", justifyContent: "center"}}>

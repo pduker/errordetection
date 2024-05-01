@@ -6,11 +6,12 @@ import { get, getDatabase, ref, remove } from 'firebase/database';
 
 export function ExerciseManagementPage({
     allExData,
-    setAllExData
-    dsadadsadssa
+    setAllExData,
+    fetch
 }:{
     allExData: (ExerciseData | undefined)[];
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
+    fetch: (val: boolean) => void;
 }) {
     useEffect(() => {
         if(exList.length === 0) {
@@ -31,6 +32,11 @@ export function ExerciseManagementPage({
 
     const modeChange = function () {
         setMode(!mode);
+        setDiff("All");
+        setTypes("None");
+        setVoices(0);
+        setTags([]);
+        sortExercises(undefined);
     }
 
     const createExercise = function () {
@@ -39,10 +45,11 @@ export function ExerciseManagementPage({
         if(last !== undefined) newEx = new ExerciseData("", undefined, [], "", (last.exIndex) + 1, true,"Exercise " + (allExData.length+1),1,1,[],"None")
         else newEx = new ExerciseData("", undefined, [], "", 0, true,"Exercise " + (allExData.length+1),1,1,[],"None")
         setAllExData([...allExData, newEx]);
+        setExList([...allExData, newEx]);
         setNewExercise(newEx);
     }
 
-    const sortExercises = function (input: string | string[] | number) {
+    const sortExercises = function (input: string | string[] | number | undefined) {
         var tempTags = tags, tempDiff = diff, tempVoices = voices, tempTypes = types;
         if (typeof(input) === "object") tempTags = input;
         else if (typeof(input) === "string"){
@@ -413,10 +420,12 @@ export function ExerciseManagementPage({
                                     setNewExercise={undefined}
                                     handleSelectExercise={handleSelectExercise}
                                     isSelected={selectedIndexes.includes(exercise.exIndex)}
+                                    fetch={undefined}
                                 />
                             )
                         else return (<div key={Math.random()} />);
                     })}
+                {exList.length === 0 ? <div>No exercises found! Maybe try adding one?</div> : <></>}
 
                 </div> 
                 : <div>
@@ -430,8 +439,9 @@ export function ExerciseManagementPage({
                             setAllExData={setAllExData}
                             exIndex={newExercise.exIndex}
                             setNewExercise={setNewExercise}
-                            handleSelectExercise={() => {}}
-                            isSelected={false}
+                            handleSelectExercise={undefined}
+                            isSelected={undefined}
+                            fetch={fetch}
                         />
 
                     </div> : <></>}

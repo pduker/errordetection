@@ -33,7 +33,8 @@ export function Exercise({
     setAllExData,
     setNewExercise,
     handleSelectExercise, 
-    isSelected 
+    isSelected,
+    fetch
 }: { 
     exIndex: number;
     teacherMode: boolean;
@@ -41,8 +42,9 @@ export function Exercise({
     allExData: (ExerciseData | undefined)[]
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
     setNewExercise: ((newEx: (ExerciseData | undefined)) => void) | undefined;
-    handleSelectExercise: (exIndex: number) => void; 
-    isSelected: boolean; 
+    handleSelectExercise: ((exIndex: number) => void) | undefined; 
+    isSelected: boolean | undefined; 
+    fetch: ((val: boolean) => void) | undefined;
 
 }) {
     //for score styling
@@ -309,9 +311,15 @@ export function Exercise({
             await set(dbDataRef, new DBData(data, mp3File.name));
             console.log('New exercise added!');
             alert("new exercise added!");
+            
         }
 
         if(setNewExercise !== undefined) setNewExercise(undefined);
+        if(fetch !== undefined) {
+            console.log("fetching");
+            fetch(false);
+        }
+
             /*if(!ExData) setAllExData([...ExData,data]);
             else {
                 ExData = data;
@@ -319,7 +327,7 @@ export function Exercise({
             }*/
         } else {
             console.log("Incomplete exercise - not saving to database");
-            alert("\Something went wrong - make sure you: \n \
+            alert("Something went wrong - make sure you: \n \
             -uploaded both a musicxml AND an mp3 file\n \
             -marked any applicable tags, voice #, and difficulty\n \
             -selected at least one correct answer")
@@ -623,7 +631,7 @@ export function Exercise({
                     <form id="voiceCt">
                         Voices:
                         <br></br>
-                        <select name="voices" onChange={voiceChange}>
+                        <select name="voices" defaultValue={voices} onChange={voiceChange}>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -639,7 +647,7 @@ export function Exercise({
                     <form id="difficulty">
                         Difficulty:
                         <br></br>
-                        <select name="difficulty" onChange={diffChange}>
+                        <select name="difficulty" defaultValue={diff} onChange={diffChange}>
                             <option value="1">1</option>
                             <option value="2">2</option>
                             <option value="3">3</option>
@@ -655,7 +663,7 @@ export function Exercise({
                     <form id="tags2">
                         Textural Factor:
                         <br></br>
-                        <select name='types' onChange={typesChange}>
+                        <select name='types' defaultValue={types} onChange={typesChange}>
                                 <option value="None">None</option>
                                 <option value="Drone">Drone</option>
                                 <option value="Ensemble Parts">Ensemble Parts</option>
@@ -726,13 +734,13 @@ export function Exercise({
                 : <div/>}
             </span>
             }
-            <div>
+            {handleSelectExercise !== undefined ? <div>
                 <input
                 type="checkbox"
                 checked={isSelected}
                 onChange={() => handleSelectExercise(exIndex)}
                 /> Select to Delete (Multiple Deletion)
-            </div>
+            </div> : <></>}
 
             
         </div>

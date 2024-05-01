@@ -22,8 +22,8 @@ function App() {
   const [allExData,setAllExData] = useState<(ExerciseData | undefined)[]>([]);
   const [scoresRetrieved, setScoresRetrieved] = useState<boolean>(false); // Track whether scores are retrieved
   const [authorized, setAuthorized] = useState<boolean>(false); // has the user put in the admin pwd on help page?
-  const fetchScoresFromDatabase = async () => {
-    if(!scoresRetrieved) {
+  const fetchScoresFromDatabase = async (scoresRet: boolean) => {
+    if(!scoresRet) {
       console.log("Retrieving scores");
       try {
         const database = getDatabase();
@@ -63,7 +63,7 @@ function App() {
     console.log(allExData);
   };
 
-  useEffect(()=>{fetchScoresFromDatabase()});
+  useEffect(()=>{fetchScoresFromDatabase(scoresRetrieved)});
   
   return (
     <Router>
@@ -113,7 +113,7 @@ function App() {
             </Routes> */}
 
             <Routes>
-              <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData}/>} />
+              <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase}/>} />
             </Routes>
 
             <Routes>
