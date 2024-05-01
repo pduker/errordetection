@@ -7,6 +7,7 @@ import { get, getDatabase, ref, remove } from 'firebase/database';
 export function ExerciseManagementPage({
     allExData,
     setAllExData
+    dsadadsadssa
 }:{
     allExData: (ExerciseData | undefined)[];
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
