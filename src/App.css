@@ -301,6 +301,10 @@ nav ul li a:hover::after {
   font-weight: 700;
   margin-bottom: 20px;
 }
+.layer h2 {
+  font-weight: 750;
+  margin-bottom: 20px;
+}
 .layer a {
   margin-top: 20px;
   color: #1f104f;
@@ -383,6 +387,51 @@ form .btn2 {
   font-size: 18px;
   margin-top: 8px;
   cursor: pointer;
+}
+form {
+  margin: 3px;
+  margin-left: 15px;
+  margin-right: 15px;
+  padding: 3px;
+}
+.form-check-input {
+  background-color: #106cfc;
+  border-color: #106cfc;
+  padding-bottom: 40px;
+  padding-left: 100px;
+  position: relative;
+  width: 40px;
+  height: 20px;
+}
+
+.form-check-input:after {
+  position: absolute;
+  left: 50%;
+  top: 15%;
+  content: "🔧";
+  color: white;
+  font-size: 18px;
+}
+
+.form-check-input:checked {
+  background-color: #14b336;
+  /* border-color: #106cfc; */
+}
+
+.form-check-input:checked:after {
+  left: 20%;
+  content: "➕";
+}
+
+.form-switch .form-check-input {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='white'/%3e%3c/svg%3e");
+}
+
+.form-switch .form-check-input:focus {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='white'/%3e%3c/svg%3e");
+  -moz-box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
 }
 .social-icons {
   margin-top: 30px;

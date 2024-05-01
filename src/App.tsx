@@ -22,8 +22,8 @@ function App() {
   const [allExData,setAllExData] = useState<(ExerciseData | undefined)[]>([]);
   const [scoresRetrieved, setScoresRetrieved] = useState<boolean>(false); // Track whether scores are retrieved
   const [authorized, setAuthorized] = useState<boolean>(false); // has the user put in the admin pwd on help page?
-  const fetchScoresFromDatabase = async () => {
-    if(!scoresRetrieved) {
+  const fetchScoresFromDatabase = async (scoresRet: boolean) => {
+    if(!scoresRet) {
       console.log("Retrieving scores");
       try {
         const database = getDatabase();
@@ -43,13 +43,14 @@ function App() {
           scoresData.forEach(async function (value) {
             if(value.sound){
             const blob = await getBlob(storageRef(storage, value.sound));
-            console.log(blob);
+            //console.log(blob);
             //let response = await fetch(blob);
             //let data = await response.blob();
             var file = new File([blob], value.sound, {type: "audio/mpeg"})
-            var thing = new ExerciseData(value.score,file,value.correctAnswers,value.feedback,value.exIndex,value.empty,value.title,value.difficulty,value.tags);
+            var thing = new ExerciseData(value.score,file,value.correctAnswers,value.feedback,value.exIndex,value.empty,value.title,value.difficulty,value.voices,value.tags,value.types);
             scoresData2.push(thing);
-            console.log(thing);}
+            //console.log(thing);
+            }
         });
           setTimeout(function(){setAllExData(scoresData2)}, 350*scoresData.length);
           setScoresRetrieved(true); // Set scoresRetrieved to true after retrieving scores
@@ -62,11 +63,11 @@ function App() {
     console.log(allExData);
   };
 
-  useEffect(()=>{fetchScoresFromDatabase()});
+  useEffect(()=>{fetchScoresFromDatabase(scoresRetrieved)});
   
   return (
     <Router>
-      <div >
+      <div>
         <header className="App-header" >
           
           <Navbar className="Home-bar" fixed='top'>
@@ -74,8 +75,8 @@ function App() {
               <img
                 alt=""
                 src={logo}
-                width="90"
-                height="90"
+                width="100"
+                height="100"
                 className="d-inline-block align-top"
               />
             </Navbar.Brand>
@@ -91,7 +92,6 @@ function App() {
           
         </header>
         
-          <body>
           <Routes>
               <Route path="/" element={<HomePage/>}/>
             </Routes>
@@ -108,18 +108,17 @@ function App() {
               <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]}></ExercisesPage>} />
             </Routes>
 
-            <Routes>
+            {/* <Routes>
               <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]}></ExercisesPage>} />
-            </Routes>
+            </Routes> */}
 
             <Routes>
-              <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData}/>} />
+              <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase}/>} />
             </Routes>
 
             <Routes>
               <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>} />
             </Routes>
-          </body>
 
       </div>
     </Router>
