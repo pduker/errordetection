@@ -40,8 +40,43 @@ export function ExercisesPage({
         else if (inputType === "types") tempTypes = input as string;
         else if (inputType === "meter") tempMeter = input as string;
         
-        var list: (ExerciseData | undefined)[] = [];
-        var method = "all";
+        var list: (ExerciseData | undefined)[] = [...allExData];
+        if (tempTags.length > 0) {
+            list = list.filter(function(exercise) {
+                if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
+                    return tempTags.every((element) => exercise.tags.includes(element))
+                }
+                else return false;})
+        }
+        if (tempDiff !== "All") {
+            list = list.filter(function(exercise) {
+                if (exercise !== undefined) 
+                    return tempDiff === String(exercise.difficulty) 
+                else return false;})
+        }
+        if (tempVoices !== 0) {
+            list = list.filter(function(exercise) {
+                if (exercise !== undefined) 
+                    return tempVoices === exercise.voices
+                else return false;})
+        }
+        if (tempTypes !== "None") {
+            list = list.filter(function(exercise) {
+                if (exercise !== undefined){
+                    return (tempTypes === exercise.types)}
+                else return false;})
+        }
+        if (tempMeter !== "Anything") {
+            list = list.filter(function(exercise) {
+                if (exercise !== undefined) 
+                    return tempMeter === String(exercise.meter)
+                else return false;})
+        }
+        list = list.sort(exSortFunc);
+        setExList(list);
+        // this huge wall of text was super bulky so i wanted to get rid of it (which is why it's now much shorter above)
+        // feel free to get rid of this assuming the above works perfectly
+        /* var method = "all";
         if (tempTags.length === 0 && tempDiff === "All" && tempVoices === 0 && tempTypes === "None" && tempMeter === "Anything") method = "";
         else if (tempDiff === "All" && tempVoices === 0 && tempTypes === "None" && tempMeter === "Anything") method = "tags";
         else if (tempTags.length === 0 && tempVoices === 0 && tempTypes === "None" && tempMeter === "Anything") method = "diff";
@@ -326,25 +361,35 @@ export function ExercisesPage({
                 list = allExData.sort(exSortFunc);
                 setExList(list);
                 break;
-        }
-    }
+        } */
+    } 
 
     const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
         if (e1 !== undefined && e2 !== undefined) {
             try {
-                if(e1.title.startsWith("Exercise ")) return 1;
+                if(e1.title.startsWith("Exercise ") && e2.title.startsWith("Exercise ")) {
+                    if (e1.title > e2.title) return 1;
+                    else if (e1.title < e2.title) return -1;
+                    else return 0;
+                }
+                else if(e1.title.startsWith("Exercise ")) return 1;
                 else if(e2.title.startsWith("Exercise ")) return -1;
                 var e1Sorted = e1.tags.sort().length;
                 var e2Sorted = e2.tags.sort().length;
                 if (e1Sorted > e2Sorted) return 1;
                 else if (e1Sorted < e2Sorted) return -1;
                 else {
-                    if (e1.title > e2.title) return 1;
-                    else if (e1.title < e2.title) return -1;
+                    if(Number(e1.difficulty) > Number(e2.difficulty)) return 1;
+                    else if(Number(e1.difficulty) < Number(e2.difficulty)) return -1;
                     else {
-                        if(e1.difficulty > e2.difficulty) return 1;
-                        else if(e1.difficulty < e2.difficulty) return -1;
-                        else return 0;
+                        let e1Split = e1.title.split(":"), e2Split = e2.title.split(":");
+                        if(Number(e1Split[e1Split.length-1]) > Number(e2Split[e2Split.length-1])) return 1;
+                        else if(Number(e1Split[e1Split.length-1]) < Number(e2Split[e2Split.length-1])) return -1;
+                        else {
+                            if (e1.title > e2.title) return 1;
+                            else if (e1.title < e2.title) return -1;
+                            else return 0;
+                        }
                     }
                 }
             } catch {
