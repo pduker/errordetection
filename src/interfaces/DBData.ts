@@ -12,6 +12,7 @@ class DBData {
     voices: number
     tags: string[]
     types: string
+    meter: string
     constructor(data:ExerciseData | undefined,sound:string){
         if(data !== undefined){
             this.score = data.score;
@@ -25,6 +26,7 @@ class DBData {
             this.voices = data.voices;
             this.tags = data.tags;
             this.types = data.types;
+            this.meter = data.meter;
         }
         else{
             this.score = "";
@@ -38,6 +40,7 @@ class DBData {
             this.voices = -1;
             this.tags = [""];
             this.types = "None";
+            this.meter = "Anything";
         }
     }
     
