@@ -473,19 +473,19 @@ export function Exercise({
     //onClick function for difficulty change
     const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setDiff(Number(e.target.value));
+        let exNum = findNum(tags,Number(e.target.value),voices,types,meter)
         if(meter === "Anything"){
             if(types === "None"){
-                setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value) + ", Exercise: " + findNum(tags,Number(e.target.value),voices,types,meter));
-            }else if (types === "Both"){
-            setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + Number(e.target.value) + ", Exercise: " + findNum(tags, Number(e.target.value),voices,types,meter));
-            }else setCustomTitle(tags.sort().join(" & ") + ": " + (types) + " - Level " + Number(e.target.value) + ", Exercise: " + findNum(tags, Number(e.target.value),voices,types,meter));
+                setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value) + ", Exercise: " + exNum);
+            } else if (types === "Both"){
+                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + Number(e.target.value) + ", Exercise: " + exNum);
+            } else setCustomTitle(tags.sort().join(" & ") + ": " + (types) + " - Level " + Number(e.target.value) + ", Exercise: " + exNum);
         }else{
             if(types === "None"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + meter + "- Level " + Number(e.target.value) + ", Exercise: " + findNum(tags, Number(e.target.value),voices,types,meter));
-            }else if (types === "Both"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + meter + " - Level " + Number(e.target.value) + ", Exercise: " + findNum(tags, Number(e.target.value),voices,types,meter));
-            }else 
-                setCustomTitle(tags.sort().join(" & ") + ": " + (types) + ": " + meter  + " - Level " + Number(e.target.value) + ", Exercise: " + findNum(tags, Number(e.target.value),voices,types,meter));
+                setCustomTitle(tags.sort().join(" & ") + ": " + meter + " - Level " + Number(e.target.value) + ", Exercise: " + exNum);
+            } else if (types === "Both"){
+                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + meter + " - Level " + Number(e.target.value) + ", Exercise: " + exNum);
+            } else setCustomTitle(tags.sort().join(" & ") + ": " + (types) + ": " + meter  + " - Level " + Number(e.target.value) + ", Exercise: " + exNum);
 
 
         }
@@ -498,37 +498,37 @@ export function Exercise({
         if(tags.includes(val)) {
             tags.splice(tags.indexOf(val), 1);
             setTags([...tags]);
+            let exNum = findNum([...tags], diff,voices,types,meter)
             if(meter === "Anything"){
                 if(types === "None"){
-                    setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags], diff,voices,types,meter));
-                }else if (types === "Both"){
-                setCustomTitle([...tags].sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + findNum([...tags], diff,voices,types,meter));
-                }else setCustomTitle([...tags].sort().join(" & ") + ": " + (types) + " - Level " + diff + ", Exercise: " + findNum([...tags], diff,voices,types,meter));
+                    setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: " + exNum);
+                } else if (types === "Both"){
+                    setCustomTitle([...tags].sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + exNum);
+                } else setCustomTitle([...tags].sort().join(" & ") + ": " + (types) + " - Level " + diff + ", Exercise: " + exNum);
             }else{
                 if(types === "None"){
-                    setCustomTitle([...tags].sort().join(" & ") + ": " + meter + "- Level " + diff + ", Exercise: " + findNum([...tags], diff,voices,types,meter));
-                }else if (types === "Both"){
-                    setCustomTitle([...tags].sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + meter + " - Level " + diff + ", Exercise: " + findNum([...tags], diff,voices,types,meter));
-                }else 
-                    setCustomTitle([...tags].sort().join(" & ") + ": " + (types) + ": " + meter  + " - Level " + diff + ", Exercise: " + findNum([...tags], diff,voices,types,meter));
+                    setCustomTitle([...tags].sort().join(" & ") + ": " + meter + " - Level " + diff + ", Exercise: " + exNum);
+                } else if (types === "Both"){
+                    setCustomTitle([...tags].sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + meter + " - Level " + diff + ", Exercise: " + exNum);
+                } else setCustomTitle([...tags].sort().join(" & ") + ": " + (types) + ": " + meter  + " - Level " + diff + ", Exercise: " + exNum);
     
     
             }
         } else {
             setTags([...tags, val]);
+            let exNum = findNum([...tags,val], diff,voices,types,meter);
             if(meter === "Anything"){
                 if(types === "None"){
-                    setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum([...tags,val], diff,voices,types,meter));
-                }else if (types === "Both"){
-                setCustomTitle([...tags,val].sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + findNum([...tags,val], diff,voices,types,meter));
-                }else setCustomTitle([...tags,val].sort().join(" & ") + ": " + (types) + " - Level " + diff + ", Exercise: " + findNum([...tags,val], diff,voices,types,meter));
+                    setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + exNum);
+                } else if (types === "Both"){
+                    setCustomTitle([...tags,val].sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + exNum);
+                } else setCustomTitle([...tags,val].sort().join(" & ") + ": " + (types) + " - Level " + diff + ", Exercise: " + exNum);
             }else{
                 if(types === "None"){
-                    setCustomTitle([...tags,val].sort().join(" & ") + ": " + meter + "- Level " + diff + ", Exercise: " + findNum([...tags,val], diff,voices,types,meter));
-                }else if (types === "Both"){
-                    setCustomTitle([...tags,val].sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + meter + " - Level " + diff + ", Exercise: " + findNum([...tags,val], diff,voices,types,meter));
-                }else 
-                    setCustomTitle([...tags,val].sort().join(" & ") + ": " + (types) + ": " + meter  + " - Level " + diff + ", Exercise: " + findNum([...tags,val], diff,voices,types,meter));
+                    setCustomTitle([...tags,val].sort().join(" & ") + ": " + meter + "- Level " + diff + ", Exercise: " + exNum);
+                } else if (types === "Both"){
+                    setCustomTitle([...tags,val].sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + meter + " - Level " + diff + ", Exercise: " + exNum);
+                } else setCustomTitle([...tags,val].sort().join(" & ") + ": " + (types) + ": " + meter  + " - Level " + diff + ", Exercise: " + exNum);
     
     
             }
@@ -540,50 +540,57 @@ export function Exercise({
         setVoices(Number(e.target.value));
     }
 
-    //function used in above onClicks to find the number of exercises with certain tags, difficulties, voices
-    const findNum = function(tags:string[],difficulty:number,voices:number,types:string,meter:string):number{
-        
-        const count = allExData.filter((exData:ExerciseData | undefined)=> {if (exData !== undefined && exData.tags !== undefined && exData.difficulty !== undefined){return exData.tags.sort().toString() === tags.sort().toString() && exData.difficulty === difficulty && exData.voices === voices && exData.types === types && exData.meter === meter} else {return false}});
-        return count.length+1;
-
-    }
     const typesChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
         setTypes(e.target.value);
+        let exNum = findNum(tags, diff,voices,e.target.value,meter)
         if(meter === "Anything"){
             if(e.target.value === "None"){
-                setCustomTitle(tags.sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum(tags, diff,voices,e.target.value,meter));
-            }else if (e.target.value === "Both"){
-            setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + findNum(tags, diff,voices,e.target.value,meter));
-            }else setCustomTitle(tags.sort().join(" & ") + ": " + (e.target.value) + " - Level " + diff + ", Exercise: " + findNum(tags, diff,voices,e.target.value,meter));
+                setCustomTitle(tags.sort().join(" & ") + ": Level " + diff + ", Exercise: " + exNum);
+            } else if (e.target.value === "Both"){
+                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + exNum);
+            } else setCustomTitle(tags.sort().join(" & ") + ": " + (e.target.value) + " - Level " + diff + ", Exercise: " + exNum);
         }else{
             if(e.target.value === "None"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + meter + "- Level " + diff + ", Exercise: " + findNum(tags, diff,voices,e.target.value,meter));
-            }else if (e.target.value === "Both"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + meter + " - Level " + diff + ", Exercise: " + findNum(tags, diff,voices,e.target.value,meter));
-            }else 
-                setCustomTitle(tags.sort().join(" & ") + ": " + (e.target.value) + ": " + meter  + " - Level " + diff + ", Exercise: " + findNum(tags, diff,voices,e.target.value,meter));
+                setCustomTitle(tags.sort().join(" & ") + ": " + meter + " - Level " + diff + ", Exercise: " + exNum);
+            } else if (e.target.value === "Both"){
+                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + meter + " - Level " + diff + ", Exercise: " + exNum);
+            } else setCustomTitle(tags.sort().join(" & ") + ": " + (e.target.value) + ": " + meter  + " - Level " + diff + ", Exercise: " + exNum);
 
 
         }
     }
     const meterChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
         setMeter(e.target.value);
+        let exNum = findNum(tags, diff,voices,types,e.target.value)
         if(e.target.value === "Anything"){
             if(types === "None"){
-                setCustomTitle(tags.sort().join(" & ") + ": Level " + diff + ", Exercise: " + findNum(tags, diff,voices,types,e.target.value));
-            }else if (types === "Both"){
-            setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + findNum(tags, diff,voices,types,e.target.value));
-            }else setCustomTitle(tags.sort().join(" & ") + ": " + (types) + " - Level " + diff + ", Exercise: " + findNum(tags, diff,voices,types,e.target.value));
+                setCustomTitle(tags.sort().join(" & ") + ": Level " + diff + ", Exercise: " + exNum);
+            } else if (types === "Both"){
+                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + exNum);
+            } else setCustomTitle(tags.sort().join(" & ") + ": " + (types) + " - Level " + diff + ", Exercise: " + exNum);
         }else{
             if(types === "None"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + e.target.value + "- Level " + diff + ", Exercise: " + findNum(tags, diff,voices,types,e.target.value));
-            }else if (types === "Both"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + e.target.value + " - Level " + diff + ", Exercise: " + findNum(tags, diff,voices,types,e.target.value));
-            }else 
-                setCustomTitle(tags.sort().join(" & ") + ": " + (types) + ": " + e.target.value  + " - Level " + diff + ", Exercise: " + findNum(tags, diff,voices,types,e.target.value));
+                setCustomTitle(tags.sort().join(" & ") + ": " + e.target.value + "- Level " + diff + ", Exercise: " + exNum);
+            } else if (types === "Both"){
+                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + e.target.value + " - Level " + diff + ", Exercise: " + exNum);
+            } else setCustomTitle(tags.sort().join(" & ") + ": " + (types) + ": " + e.target.value  + " - Level " + diff + ", Exercise: " + exNum);
 
 
         }
+    }
+
+    //function used in above onClicks to find the number of exercises with certain tags, difficulties, voices
+    const findNum = function(tags:string[],difficulty:number,voices:number,types:string,meter:string):number{
+        const count = allExData.filter((exData:ExerciseData | undefined) => {
+            if (exData !== undefined && exData.tags !== undefined && exData.difficulty !== undefined){
+                return exData.tags.sort().toString() === tags.sort().toString() && 
+                    exData.difficulty === difficulty && 
+                    exData.voices === voices && 
+                    exData.types === types && 
+                    exData.meter === meter
+                } else {return false}});
+        return count.length+1;
+
     }
 
     //function for comparing selected answers to correct answers - DEPRECATED, see checkAnswers function instead
