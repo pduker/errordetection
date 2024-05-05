@@ -281,7 +281,7 @@ nav ul li a:hover::after {
 .layer {
   width: 100%;
   height: 0;
-  background: linear-gradient(rgba(256, 256, 256, 0.6), #114b96);
+  background: linear-gradient(rgba(256, 256, 256, 0.6), #a1c0dc);
   border-radius: 10px;
   position: absolute;
   left: 0;
