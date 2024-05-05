@@ -50,6 +50,7 @@ export function Exercise({
     //for score styling
     const score = {display: "inline-block", margin: "auto", backgroundColor: "white", borderRadius: "2px", width: "400px"};
 
+    // lots of variable initialization
     var abc = "", feed = "", color: string;
     var ans: any[] = [];
     var visualObjs: any;
@@ -63,6 +64,7 @@ export function Exercise({
     var typesInit = "None";
     var meterInit = "Anything";
 
+    // writing into above variables with info from exerciseData
     if(exerciseData !== undefined) {
        
         if(exerciseData.score !== undefined) abc = exerciseData.score;
@@ -78,34 +80,34 @@ export function Exercise({
         
     }
 
+    // lots of state init
     const [loaded, setLoaded] = useState<boolean>(false);
-    //const [checking, setChecking] = useState<boolean>(false);
     const [editingTitle, setEditingTitle] = useState<boolean>(false);
     const [ana, setAna] = useState<string>(); 
     const [customTitle, setCustomTitle] = useState<string>(title);
+    const [customFeedback, setCustomFeedback] = useState<string[]>([]);
+    const [lastClicked, setLastClicked] = useState<any>();
+
     const [diff, setDiff] = useState<number>(difficulty);
     const [tags, setTags] = useState<string[]>(tagsInit);
     const [voices, setVoices] = useState<number>(voicesInit);
     const [types, setTypes] = useState<string>(typesInit);
     const [meter, setMeter] = useState<string>(meterInit);
-    const [customFeedback, setCustomFeedback] = useState<string[]>([]);
-    const [lastClicked, setLastClicked] = useState<any>();
 
     const [selNotes,setSelNotes] = useState<any[]>([]);
     const [selAnswers, setSelAnswers] = useState<any[]>([]);
     const [correctAnswers, setCorrectAnswers] = useState<{[label: string]: (number | string)}[]>(ans);
+
     const [xmlFile, setXmlFile] = useState<File>();
     const [mp3File, setMp3File] = useState<File>(mp3);
     const [abcFile, setAbcFile] = useState<string>(abc);
 
+    // tries to load score when there's either exerciseData or an abc file to pull from
     useEffect(() => {
         if ((exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded)) loadScore();
-        if (selNotes.length > correctAnswers.length) multiAnswer();
-
-        //else console.log("nothing is happening");
     })
     
-    //yoinked/edited from abcjs! probably don't need all of it for highlighting but oh well
+    // yoinked/edited from abcjs! probably don't need all of it for highlighting but oh well
     const setClass = function (elemset: any, addClass: any, removeClass: any, color: any) {
         if (!elemset)
             return;
@@ -126,7 +128,7 @@ export function Exercise({
         }
     };
 
-    //yoinked/edited from abcjs! changed behavior so it works how we want it to B)
+    // yoinked/edited from abcjs! changed behavior so it works how we want it to B)
     const highlight = function (note: any, klass: any, clicked: boolean): number {
         var retval = 0;
         var selTim = Number(note.abselem.elemset[0].getAttribute("selectedTimes"));
@@ -153,30 +155,32 @@ export function Exercise({
         }
         if (clicked) note.abselem.elemset[0].setAttribute("selectedTimes", selTim);
         setClass(note.abselem.elemset, klass, "", color);
+        //console.log(note);
         return retval;
         
     };
 
-    //handles notes when they are clicked on: selects them and highlights them
+    // handles notes when they are clicked on: selects them and highlights them
     const clickListener = function (abcelem:any, tuneNumber: number, classes:string, analysis:abcjs.ClickListenerAnalysis, drag:abcjs.ClickListenerDrag){
-        var op = JSON.stringify(drag.index);
-        //setOutput(op);
         var note = abcelem;
         var noteElems = note.abselem.elemset[0];
-        //selected notes handling
+        // selected notes handling
         if(teacherMode){
             if(!selNotes.includes(note)) {
-                selNotes[selNotes.length] = note;
+                selNotes.push(note);
             }
             for (var i=0; i<selNotes.length; i++) {
                 if(selNotes[i] === note) {
                     if(highlight(selNotes[i], undefined, true) === 1) i--;
+                    console.log(noteElems.getAttribute("selectedTimes"));
                 } else {
                     if(highlight(selNotes[i], undefined, false) === 1) i--;
                 }
             }
-            setSelNotes([...selNotes]);
+            // this state set doesn't seem to be necessary? leaving in for posterity/just in case it becomes necessary
+            //setSelNotes([...selNotes]);
         }
+        // selected notes handling: non-teacher edition (that means it's called selected ANSWERS now)
         else{
             if(!selAnswers.includes(note)) {
                 selAnswers[selAnswers.length] = note;
@@ -190,67 +194,70 @@ export function Exercise({
             }
             setSelAnswers([...selAnswers]);
         }
-        /* var test = document.querySelector(".clicked-info");
-        if(test !== null) {test.innerHTML = "<div class='label'>Clicked info:</div>" + op;} */
+
+        // gets the position of the note and adds it to Ana (used on mng view to show note info)
         var staffCt = (Number(noteElems.getAttribute("staffPos"))) + 1, measureCt = (Number(noteElems.getAttribute("measurePos")) + 1);
         setAna("Staff " + staffCt + ", measure " + measureCt);
-        //console.log(selNotes);//noteElems.getAttribute("index")
+
+        // lastClicked used to save unique note feedback
         setLastClicked(note);
         var txt = document.getElementById("note-feedback-"+exIndex);
         if (txt !== null && "value" in txt) txt.value = noteElems.getAttribute("feedback");
-        //setChecking(false);
+        if(teacherMode) multiAnswer();
     }
     
+    // function that runs once a valid abc score has been detected: loads the abc, adds note attrs, and highlights correct answers on mng page
     const loadScore = function() {
         // sample file: "X:1\nZ:Copyright ©\n%%scale 0.83\n%%pagewidth 21.59cm\n%%leftmargin 1.49cm\n%%rightmargin 1.49cm\n%%score [ 1 2 ] 3\nL:1/4\nQ:1/4=60\nM:4/4\nI:linebreak $\nK:Amin\nV:1 treble nm=Flute snm=Fl.\nV:2 treble transpose=-9 nm=Alto Saxophone snm=Alto Sax.\nV:3 bass nm=Violoncello snm= Vc.\nV:1\nc2 G3/2 _B/ | _A/_B/ c _d f | _e _d c2 |] %3\nV:2\n[K:F#min] =c d c3/2 e/ | =f f/e/ d2 | =f e f2 |] %3\nV:3\n_A,,2 _E,,2 | F,,2 _D,,2 | _E,,2 _A,,2 |] %3"
         var abcString = abcFile;
-        //console.log(abcFile);
+
+        // removing extra unimportant stuff from abc string
         abcString = abcString.replace("Z:Copyright ©\n", "");
         abcString = abcString.replace("T:Title\n", "");
         var el = document.getElementById("target" + exIndex);
         if(el !== null && abcString !== undefined){
-            //console.log("going to render");
+            // the render itself
             visualObjs = abcjs.renderAbc(el,abcString,{ clickListener: clickListener, selectTypes: ["note"],lineThickness: 0.4, responsive: "resize"});
-            // console.log(correctAnswers);
-            // adds staff #, measure #, and empty feedback to each note when the score is first loaded
-            //console.log("render has occurred");
+            
+            // adds staff #, measure #, index, selectedTimes of 0, and empty feedback to each note when the score is first loaded
             var staffArray = visualObjs[0].lines[0].staff;
             
             for (let i = 0, j = 0, staff = 0, measure = 0; staff < staffArray.length; i++, j++) {
                 var note = staffArray[staff].voices[0][j];
                 var noteElems = staffArray[staff].voices[0][j].abselem.elemset[0];
-                if(!(noteElems.getAttribute("staffPos"))) noteElems.setAttribute("staffPos", staff);
-                if(!(noteElems.getAttribute("measurePos"))) noteElems.setAttribute("measurePos", measure);
-                if(!(noteElems.getAttribute("feedback"))) noteElems.setAttribute("feedback", "");
-                if(!(noteElems.getAttribute("index"))) noteElems.setAttribute("index", i);
-                if(!(noteElems.getAttribute("selectedTimes"))) noteElems.setAttribute("selectedTimes", 0);
                 if(note.el_type === "bar") {measure++; i--;}
+                else {
+                    if(!(noteElems.getAttribute("staffPos"))) noteElems.setAttribute("staffPos", staff);
+                    if(!(noteElems.getAttribute("measurePos"))) noteElems.setAttribute("measurePos", measure);
+                    if(!(noteElems.getAttribute("feedback"))) noteElems.setAttribute("feedback", "");
+                    if(!(noteElems.getAttribute("index"))) noteElems.setAttribute("index", i);
+                    if(!(noteElems.getAttribute("selectedTimes"))) noteElems.setAttribute("selectedTimes", 0);
+                }
                 if(j + 1 === staffArray[staff].voices[0].length) {
                     staff++;
                     j = -1;
                     measure = 0;
                 }
+                // rehighlights correct answers on mng page for ex editing purposes
                 if(teacherMode) {
                     var ansSearch = correctAnswers.findIndex((answer: {[label: string]: string | number}) => (answer.index === noteElems.getAttribute("index") && note.el_type !== "bar"))
                     if(ansSearch !== -1) {
+                        // sets attributes to their proper values
                         noteElems.setAttribute("selectedTimes", correctAnswers[ansSearch].selectedTimes);
                         noteElems.setAttribute("feedback", correctAnswers[ansSearch].feedback);
                         
-                        if(!selNotes.includes(note)) {
-                            selNotes[selNotes.length] = note;
-                        }
-                        setSelNotes([...selNotes]);
-                        if(!selAnswers.includes(note)) {
-                            selAnswers[selAnswers.length] = note;
-                        }
-                        setSelAnswers([...selAnswers]);
+                        // little bit of jank: for some reason this stuff gets run twice? with the second set of notes being the ones we actually want
+                        // so the if part adds the bad values to selNotes (which we may not need to do? who knows, it works for now)
+                        // and the else writes over the bad values with the good ones
+                        if(selNotes.findIndex((val) => val.startChar === note.startChar) === -1) selNotes.push(note);
+                        else selNotes[selNotes.findIndex((val) => val.startChar === note.startChar)] = note;
+
                         for(let q = 0; q < noteElems.getAttribute("selectedTimes"); q++)
                             highlight(note, undefined, false);
                     }
                 }
             }
             setLoaded(true);
-            //console.log("exercise good to go");
         } else {
             console.log("abcString is undefined");
         }
@@ -281,11 +288,11 @@ export function Exercise({
         try{
         var data;
         if(correctAnswers.length > 0) {
-            setCorrectAnswers(correctAnswers.sort((i1, i2) => {
+            correctAnswers.sort((i1, i2) => {
                 if ((i1.index as number) > (i2.index as number)) return 1;
                 if ((i1.index as number) < (i2.index as number)) return -1;
                 return 0;
-            }));
+            });
         } 
         if (abcFile !== undefined && abcFile !== "" && mp3File.name !== "" && correctAnswers.length > 0) {
             data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false, customTitle, diff, voices,tags,types,meter);
@@ -323,11 +330,6 @@ export function Exercise({
             fetch(false);
         }
 
-            /*if(!ExData) setAllExData([...ExData,data]);
-            else {
-                ExData = data;
-                setAllExData(allExData);
-            }*/
         } else {
             console.log("Incomplete exercise - not saving to database");
             alert("Something went wrong - make sure you: \n \
@@ -343,7 +345,7 @@ export function Exercise({
 
         }  
 
-    //runs when update answers button is pushed on mng view: creates nested dictionaries with necessary selected answer info
+    //runs in clickListener on mng view: creates nested dictionaries with necessary selected answer info and sets correctAnswers to be pushed to database
     const multiAnswer = function(){
         
         const dict: {[label: string]: number}[] = [];
@@ -358,12 +360,7 @@ export function Exercise({
             }
             dict[i] = dict2;
         }
-        /* dict.sort((i1, i2) => {
-            if ((i1.index as number) > (i2.index as number)) return 1;
-            if ((i1.index as number) < (i2.index as number)) return -1;
-            return 0;
-        }) */
-        //console.log(dict);
+        
         setCorrectAnswers(dict);
     }
 
@@ -374,65 +371,80 @@ export function Exercise({
         setCustomFeedback([]);
         setChecking(true);
     } */
+
+    //function run when check answers button pressed on ex view: checks selected vs correct answers and displays feedback accordingly
     const checkAnswers = function(){
         var tmpSelected = [...selAnswers];
         var tmpCorrect = [...correctAnswers];
         var feedback: string[] = [];
 
-        //console.log(tmpSelected);
-
-        /* if(tmpSelected.length !== tmpCorrect.length) {
-            var plural = " are ";
-            if (correctAnswers.length === 1) plural = " is ";
-            feedback = ([...feedback, 
-                "You selected " + selAnswers.length + " answer(s). There" + plural + correctAnswers.length + " correct answer(s)."]);
-        } */
+        // sorting copy of selAnswers for comparison against copy of correctAnswers
         tmpSelected.sort((i1, i2) => {
             if ((i1.abselem.elemset[0].getAttribute("index") as number) > (i2.abselem.elemset[0].getAttribute("index") as number)) return 1;
             if ((i1.abselem.elemset[0].getAttribute("index") as number) < (i2.abselem.elemset[0].getAttribute("index") as number)) return -1;
             return 0;
         })
+
+        // holds indexes of answers that were the right note, but wrong error
         let closeList: Number[] = [];
+
+        // loops through corr/sel copies in a unique way to compare answers
         for(var i=0,j=0;i<correctAnswers.length && j<selAnswers.length && tmpCorrect[i] !== undefined;){
             let noteElems = tmpSelected[j].abselem.elemset[0];
+            // note index is right -- but is it the right error?
             if(noteElems.getAttribute("index") === tmpCorrect[i]["index"]){
+                // answer is fully correct: removes note from correct array
                 if((noteElems.getAttribute("selectedTimes")) === tmpCorrect[i]["selectedTimes"])
                     tmpCorrect = tmpCorrect.filter(function(ans){return ans["index"] !== tmpCorrect[i]["index"]});
-                else {
-                    closeList.push(Number(tmpCorrect[i]["index"]));
-                    
-                }
-                j++;
-            }else if(noteElems.getAttribute("index") > tmpCorrect[i]["index"]){
-                i++;
-            }
-            else if(noteElems.getAttribute("index") < tmpCorrect[i]["index"]){
-                j++;
-            }
+                // wrong error type selected: note is added to closeList
+                else closeList.push(Number(tmpCorrect[i]["index"]));
 
+                // either way, if the index is correct, selected copy iterator moved forward
+                j++;
+
+            // note index is larger than the i'th element of correct array: correct iterator moved forward (preserves missed answers for feedback)
+            } else if(noteElems.getAttribute("index") > tmpCorrect[i]["index"]) i++;
+
+            // note index is smaller than the i'th element of correct array: selected iterator moved forward
+            else if(noteElems.getAttribute("index") < tmpCorrect[i]["index"]) j++;
         }
+
+        // no missed answers in correct array and selected array is the same length as the original correct array: all good!
         if(tmpCorrect.length === 0 && tmpSelected.length === correctAnswers.length){
             feedback = ["Great job identifying the errors in this passage!"];
 
-        }else if(tmpSelected.length !== correctAnswers.length){
+        // wrong amount of answers selected: first/only feedback displayed until right amt selected
+        } else if(tmpSelected.length !== correctAnswers.length){
             var plural = " are ";
             if (correctAnswers.length === 1) plural = " is ";
             feedback = (["You selected " + selAnswers.length + " answer(s). There" + plural + correctAnswers.length + " correct answer(s)."]);
 
-        }else if(tmpCorrect.length === correctAnswers.length){
+        // no correct answers selected
+        } else if(tmpCorrect.length === correctAnswers.length){
             feedback = ["Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:"];
+            // iterates through missed answers giving info/note specific feedback (if added on mng page)
             for(let i = 0;i < tmpCorrect.length;i++){
+                // generic note position feedback
                 feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+
+                // specific note feedback added on mng page
                 let addtlFeedback = tmpCorrect[i]["feedback"];
+
+                // additional msg for if wrong error is selected
                 if(closeList.includes(Number(tmpCorrect[i]["index"])) && !tmpCorrect[i]["feedback"].toString().startsWith("You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). "))
                         addtlFeedback = "You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). " + tmpCorrect[i]["feedback"];
+                
+                // adds any feedback to array for display later
                 if(addtlFeedback !== ""){
                     let add = feedback.pop();
                     feedback = [...feedback, add + ". Additional feedback: " + addtlFeedback];
                 } 
             }
+        
+        // one or more correct answers selected 
         }else if(tmpCorrect.length < correctAnswers.length){
             feedback = ["Good work – you’ve found some of the errors, but here are some specific places to look at and listen to more closely:"];
+            // same as above feedback loop
             for(let i = 0;i < tmpCorrect.length;i++){
                 feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
                 let addtlFeedback = tmpCorrect[i]["feedback"];
@@ -444,6 +456,8 @@ export function Exercise({
                 } 
             }
         }
+
+        // sets customFeedback to copy of feedback array, to eventually be mapped into a list on the page
         setCustomFeedback([...feedback]);
     }
 
@@ -470,99 +484,11 @@ export function Exercise({
         }
     }
 
-    //onClick function for difficulty change
-    const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
-        setDiff(Number(e.target.value));
-        let exNum = findNum(tags,Number(e.target.value),voices,types,meter)
+    //helper run in xChange functions to set the custom exercise title based on all the fields
+    const customTitleChange = function (tags: string[], diff: number, voices: number, types: string, meter: string) {
+        let exNum = findNum(tags,diff,voices,types,meter);
+        // lots of special cases for meter/types being certain things, title adjusted accordingly
         if(meter === "Anything"){
-            if(types === "None"){
-                setCustomTitle(tags.sort().join(" & ") + ": Level " + Number(e.target.value) + ", Exercise: " + exNum);
-            } else if (types === "Both"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + Number(e.target.value) + ", Exercise: " + exNum);
-            } else setCustomTitle(tags.sort().join(" & ") + ": " + (types) + " - Level " + Number(e.target.value) + ", Exercise: " + exNum);
-        }else{
-            if(types === "None"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + meter + " - Level " + Number(e.target.value) + ", Exercise: " + exNum);
-            } else if (types === "Both"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + meter + " - Level " + Number(e.target.value) + ", Exercise: " + exNum);
-            } else setCustomTitle(tags.sort().join(" & ") + ": " + (types) + ": " + meter  + " - Level " + Number(e.target.value) + ", Exercise: " + exNum);
-
-
-        }
-        
-    }
-
-    //onClick function for tags change
-    const tagsChange = function (e: React.ChangeEvent<HTMLInputElement>) {
-        let val = e.target.value;
-        if(tags.includes(val)) {
-            tags.splice(tags.indexOf(val), 1);
-            setTags([...tags]);
-            let exNum = findNum([...tags], diff,voices,types,meter)
-            if(meter === "Anything"){
-                if(types === "None"){
-                    setCustomTitle([...tags].sort().join(" & ") + ": Level " + diff + ", Exercise: " + exNum);
-                } else if (types === "Both"){
-                    setCustomTitle([...tags].sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + exNum);
-                } else setCustomTitle([...tags].sort().join(" & ") + ": " + (types) + " - Level " + diff + ", Exercise: " + exNum);
-            }else{
-                if(types === "None"){
-                    setCustomTitle([...tags].sort().join(" & ") + ": " + meter + " - Level " + diff + ", Exercise: " + exNum);
-                } else if (types === "Both"){
-                    setCustomTitle([...tags].sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + meter + " - Level " + diff + ", Exercise: " + exNum);
-                } else setCustomTitle([...tags].sort().join(" & ") + ": " + (types) + ": " + meter  + " - Level " + diff + ", Exercise: " + exNum);
-    
-    
-            }
-        } else {
-            setTags([...tags, val]);
-            let exNum = findNum([...tags,val], diff,voices,types,meter);
-            if(meter === "Anything"){
-                if(types === "None"){
-                    setCustomTitle([...tags,val].sort().join(" & ") + ": Level " + diff + ", Exercise: " + exNum);
-                } else if (types === "Both"){
-                    setCustomTitle([...tags,val].sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + exNum);
-                } else setCustomTitle([...tags,val].sort().join(" & ") + ": " + (types) + " - Level " + diff + ", Exercise: " + exNum);
-            }else{
-                if(types === "None"){
-                    setCustomTitle([...tags,val].sort().join(" & ") + ": " + meter + "- Level " + diff + ", Exercise: " + exNum);
-                } else if (types === "Both"){
-                    setCustomTitle([...tags,val].sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + meter + " - Level " + diff + ", Exercise: " + exNum);
-                } else setCustomTitle([...tags,val].sort().join(" & ") + ": " + (types) + ": " + meter  + " - Level " + diff + ", Exercise: " + exNum);
-    
-    
-            }
-        }
-    }
-
-    //onClick function for voices change
-    const voiceChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
-        setVoices(Number(e.target.value));
-    }
-
-    const typesChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
-        setTypes(e.target.value);
-        let exNum = findNum(tags, diff,voices,e.target.value,meter)
-        if(meter === "Anything"){
-            if(e.target.value === "None"){
-                setCustomTitle(tags.sort().join(" & ") + ": Level " + diff + ", Exercise: " + exNum);
-            } else if (e.target.value === "Both"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + exNum);
-            } else setCustomTitle(tags.sort().join(" & ") + ": " + (e.target.value) + " - Level " + diff + ", Exercise: " + exNum);
-        }else{
-            if(e.target.value === "None"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + meter + " - Level " + diff + ", Exercise: " + exNum);
-            } else if (e.target.value === "Both"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + meter + " - Level " + diff + ", Exercise: " + exNum);
-            } else setCustomTitle(tags.sort().join(" & ") + ": " + (e.target.value) + ": " + meter  + " - Level " + diff + ", Exercise: " + exNum);
-
-
-        }
-    }
-    const meterChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
-        setMeter(e.target.value);
-        let exNum = findNum(tags, diff,voices,types,e.target.value)
-        if(e.target.value === "Anything"){
             if(types === "None"){
                 setCustomTitle(tags.sort().join(" & ") + ": Level " + diff + ", Exercise: " + exNum);
             } else if (types === "Both"){
@@ -570,16 +496,52 @@ export function Exercise({
             } else setCustomTitle(tags.sort().join(" & ") + ": " + (types) + " - Level " + diff + ", Exercise: " + exNum);
         }else{
             if(types === "None"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + e.target.value + "- Level " + diff + ", Exercise: " + exNum);
+                setCustomTitle(tags.sort().join(" & ") + ": " + meter + " - Level " + diff + ", Exercise: " + exNum);
             } else if (types === "Both"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + e.target.value + " - Level " + diff + ", Exercise: " + exNum);
-            } else setCustomTitle(tags.sort().join(" & ") + ": " + (types) + ": " + e.target.value  + " - Level " + diff + ", Exercise: " + exNum);
-
-
+                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + meter + " - Level " + diff + ", Exercise: " + exNum);
+            } else setCustomTitle(tags.sort().join(" & ") + ": " + (types) + ": " + meter  + " - Level " + diff + ", Exercise: " + exNum);
         }
     }
 
-    //function used in above onClicks to find the number of exercises with certain tags, difficulties, voices
+    //onClick function for whenever difficulty is changed
+    const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
+        setDiff(Number(e.target.value));
+        customTitleChange(tags, Number(e.target.value), voices, types, meter);
+    }
+
+    //onClick function for whenever tags are changed
+    const tagsChange = function (e: React.ChangeEvent<HTMLInputElement>) {
+        let val = e.target.value;
+        // case where the tag is already checked and needs to be removed
+        if(tags.includes(val)) {
+            tags.splice(tags.indexOf(val), 1);
+            setTags([...tags]);
+            customTitleChange([...tags], diff, voices, types, meter);
+        // tag is newly checked, needs to be added
+        } else {
+            setTags([...tags, val]);
+            customTitleChange([...tags, val], diff, voices, types, meter);
+        }
+    }
+
+    //onClick function for whenever voices are changed - don't need to change ex title for voices
+    const voiceChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
+        setVoices(Number(e.target.value));
+    }
+
+    //onClick function for whenever types are changed
+    const typesChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
+        setTypes(e.target.value);
+        customTitleChange(tags, diff, voices, e.target.value, meter);
+    }
+
+    //onClick function for when meter is changed
+    const meterChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
+        setMeter(e.target.value);
+        customTitleChange(tags, diff, voices, types, e.target.value);
+    }
+
+    //function used in customTitleChange to find the number of exercises with certain fields for unique exercise naming
     const findNum = function(tags:string[],difficulty:number,voices:number,types:string,meter:string):number{
         const count = allExData.filter((exData:ExerciseData | undefined) => {
             if (exData !== undefined && exData.tags !== undefined && exData.difficulty !== undefined){
@@ -593,51 +555,9 @@ export function Exercise({
 
     }
 
-    //function for comparing selected answers to correct answers - DEPRECATED, see checkAnswers function instead
-    /* const everyFunc = function(element: any, index: number, array: any[]): boolean {
-        var ret: boolean = true;
-        var feedback: string[] = [];
-        if(array.length !== correctAnswers.length) {
-            ret = false;
-            var plural = " are ";
-            if (correctAnswers.length === 1) plural = " is ";
-            feedback = ([...feedback, 
-                "You selected " + selAnswers.length + " answer(s). There" + plural + correctAnswers.length + " correct answer(s)."]);
-        }
-        array.sort((i1, i2) => {
-            if ((i1.abselem.elemset[0].getAttribute("index") as number) > (i2.abselem.elemset[0].getAttribute("index") as number)) return 1;
-            if ((i1.abselem.elemset[0].getAttribute("index") as number) < (i2.abselem.elemset[0].getAttribute("index") as number)) return -1;
-            return 0;
-        })
-        
-        var elems = element.abselem.elemset[0];
-        if (correctAnswers[index] === undefined || elems.getAttribute("index") !== correctAnswers[index]["index"]) {
-            ret = false;
-            feedback = ([...feedback, 
-                "Wrong answer selected on measure " + (Number(elems.getAttribute("measurePos"))+1) + " of staff " + (Number(elems.getAttribute("staffPos"))+1) + "."]);
-        }
-        else if (
-            (elems.getAttribute("staffPos") !== correctAnswers[index]["staffPos"]) ||
-            (elems.getAttribute("measurePos") !== correctAnswers[index]["measurePos"]) ||
-            (elems.getAttribute("selectedTimes") !== correctAnswers[index]["selectedTimes"]) 
-        ) {
-            ret = false;
-        }
-        
-        if (!ret) 
-            for(let q=0; q<correctAnswers.length; q++) {
-                feedback = ([...feedback, "Look in measure " + (Number(correctAnswers[q]["measurePos"])+1) + " of staff " + (Number(correctAnswers[q]["measurePos"])+1) + ": " + correctAnswers[q]["feedback"] as string]);
-            }
-        else feedback = ["Correct!"];
-        setCustomFeedback([...feedback]);
-        setChecking(false);
-        return ret;
-    } */
     //function used with bebug bubbon for testing
     /* const debug = function() {
-        console.log("loaded? " + loaded);
-        console.log("exercise data? V");
-        console.log(exerciseData);
+        console.log(selNotes);
     } */
 
     //deleting the exercise from database and website
@@ -650,6 +570,7 @@ export function Exercise({
             const exerciseRef = ref(database, `scores/${exIndex}`);
             const snapshot = await get(exerciseRef);
             if (snapshot.exists()) {
+                var exTitle = title;
                 await remove(exerciseRef);
                 console.log('exercise deleted from the database!');
     
@@ -658,7 +579,7 @@ export function Exercise({
                     return exercise && exercise.exIndex !== exIndex;
                 });
                 setAllExData(updatedExercises);
-                alert("exercise deleted!");
+                alert("exercise " + exTitle + " deleted!");
     
                 // reload the page without changing the url 
                 window.location.href = window.location.href;
@@ -677,8 +598,10 @@ export function Exercise({
     
 
     return (
+        // big yellow exercise box
         <div style = {{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
-            {/* <button onClick={debug}>bebug bubbon</button> */}
+
+            {/* custom exercise title box */}
             {editingTitle && teacherMode ? 
                 <span>
                     <textarea id="title">{customTitle}</textarea> 
@@ -687,9 +610,11 @@ export function Exercise({
                 : 
                 <h3 onClick={()=>setEditingTitle(!editingTitle)}>{customTitle}</h3>
             }
-            {/* <h4>Global Index: {exIndex}</h4> <- use for debugging */}
+
+            {/* <h4>Global Index: {exIndex}</h4> <- use for debugging in case something goes wrong w indexing*/}
             {teacherMode ?
             <span>
+                {/* all the fields you can apply to an exercise: tags, voices, etc, you can read */}
                 <div id="forms" style={{display: "inline-flex", padding: "4px"}}>
                     <form id= "tags">
                         Tags:
@@ -707,11 +632,6 @@ export function Exercise({
                             <option value="3">3</option>
                             <option value="4">4</option>
                             <option value="5">5</option>
-                            {/* <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option> */}
                         </select>
                     </form>
                     <form id="difficulty">
@@ -723,14 +643,9 @@ export function Exercise({
                             <option value="3">3</option>
                             <option value="4">4</option>
                             <option value="5">5</option>
-                            {/* <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option> */}
                         </select>
                     </form>
-                    <form id="tags3">
+                    <form id="meter">
                         Meter:
                         <br></br>
                         <select name='meter' defaultValue={types} onChange={meterChange}>
@@ -740,8 +655,8 @@ export function Exercise({
                                 
                         </select>
                     </form>
-                    <form id="tags2">
-                        Textural Factor:
+                    <form id="types">
+                        Textural Factors:
                         <br></br>
                         <select name='types' defaultValue={types} onChange={typesChange}>
                                 <option value="None">None</option>
@@ -753,7 +668,8 @@ export function Exercise({
                 </div>
                 <div/>
                 
-                <div id="fileUploads" style={{display:"inline",float:"left"}}>
+                {/* file uploads */}
+                <div id="xmlUpload" style={{display:"inline",float:"left"}}>
                     XML Upload: <FileUpload setFile={setXmlFile} file={xmlFile} setAbcFile={setAbcFile} type="xml"></FileUpload>
                 </div>
                 <div id="mp3Upload" style={{display:"inline"}}>
@@ -761,11 +677,15 @@ export function Exercise({
                 </div>
                 
                 {mp3File.name === "" ? <br></br> : <></>}
+
+                {/* this button shouldn't actually be able to appear, but is a backup in case useEffect doesn't load the score */}
                 {(exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
+
+                {/* div that actually contains the score */}
                 <div style = {{display: "inline-block", width:"75%"}}>
                     <div id={"target" + exIndex} style={score}></div>
-                    
                 </div>
+
                 <img
                     alt="note-color-key"
                     src={noteKey}
@@ -774,23 +694,27 @@ export function Exercise({
                     style={{display:"inline", marginLeft:"1vw"}}
                 />
                 
-                
+                {/* stuff that only shows once an xml has been passed in: individual note feedback, reset answers button */}
                 {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? 
                 <div style={{display: "inline-block", marginLeft:"1vw", marginTop: "1vh"}}>
                     <textarea id={"note-feedback-"+exIndex} placeholder={"Note feedback..."} onChange={saveFeedback}></textarea>
                     <Button variant='danger' onClick={reload} style={{marginLeft: "1vw", float:"right"}}>Reset Answers</Button>
-                </div>:
-                <></>}
-                {/* <div className="clicked-info"></div> */}
+                </div> : <></>}
+
+                {/* note info blurb in case teachers want to see which staff/measure the note is on (and can't/don't want to count i guess) */}
                 {lastClicked !== undefined && Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) % 3 !== 0 ? <div style={{marginLeft: "1vw"}}>Note Info: {ana}</div> : <div/>}
                 <br/>
+                {/* <button onClick={debug}>bebug bubbon</button> */}
                 <Button variant='success' onClick={save}>Save Exercise</Button><Button onClick={() => handleExerciseDelete(exIndex)} variant="danger">Delete Exercise</Button>
             </span>
             :
+            /* student view */
             <span>
+                {/* score div */}
                 <div style = {{width:"75%", display: "inline-flex"}}>
                     <div id={"target" + exIndex} style={score}></div>
                 </div>
+
                 <img
                     alt="note-color-key"
                     src={noteKey}
@@ -798,11 +722,14 @@ export function Exercise({
                     height="7%"
                     style={{display:"inline-flex", marginLeft: "1vw", marginTop: "-30vh"}}
                 />
+
+                {/* container for the audio player and reset button */}
                 <div style={{display: "inline-flex", marginTop: "-2vh"}}>
                     {mp3 !== undefined ? <div style={{marginTop: "2vh"}}><AudioHandler file={mp3}></AudioHandler></div> : <></>}
                     <Button variant='danger' onClick={exReload} style={{position: "relative", marginLeft: "1vw", marginBottom: "2vh"}}>Reset Answers</Button>
                 </div>
                 
+                {/* check button/feedback loaded only when score is present: should always happen based on mng upload parameters but here as a failsafe */}
                 {(abcFile !== undefined && abcFile !== "" && loaded) ? 
                     <div>
                         <button onClick={checkAnswers}>Check Answer</button>
@@ -814,6 +741,8 @@ export function Exercise({
                 : <div/>}
             </span>
             }
+
+            {/* multi-exercise deletion box, only loads on teacher view because of how handle is defined (or "un"defined HAHAHA) */}
             {handleSelectExercise !== undefined ? <div>
                 <input
                 type="checkbox"
