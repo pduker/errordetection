@@ -604,7 +604,7 @@ export function ExerciseManagementPage({
                                 <Button
                                 variant="danger" 
                                 onClick={() => handleMultipleExerciseDelete(selectedIndexes)} 
-                                style={{ marginTop: "10px" }}
+                                style={{ marginLeft: "10px", marginTop: "10px" }}
                                 >Delete Selected Exercises
                                 </Button>
                             )}
