@@ -58,26 +58,28 @@ export function Exercise({
     var exInd = exIndex;
     var title = "";
     var tagsInit: string[] = [];
-    var difficulty = 1;
+    var diffInit = 1;
     var voicesInit = 1;
     var mp3: File = new File([], "");
     var typesInit = "None";
     var meterInit = "Anything";
+    var transposInit = false;
 
     // writing into above variables with info from exerciseData
     if(exerciseData !== undefined) {
-       
+
         if(exerciseData.score !== undefined) abc = exerciseData.score;
         if(exerciseData.sound !== undefined) mp3 = exerciseData.sound;
         if(exerciseData.correctAnswers !== undefined) ans = exerciseData.correctAnswers;
         if(exerciseData.feedback !== undefined) feed = exerciseData.feedback;
         if(exerciseData.title !== undefined) title = exerciseData.title;
         if(exerciseData.tags !== undefined) tagsInit = exerciseData.tags;
-        if(exerciseData.difficulty !== undefined) difficulty = exerciseData.difficulty;
+        if(exerciseData.difficulty !== undefined) diffInit = exerciseData.difficulty;
         if(exerciseData.voices !== undefined) voicesInit = exerciseData.voices;
         if(exerciseData.types !== undefined) typesInit = exerciseData.types;
         if(exerciseData.meter !== undefined) meterInit = exerciseData.meter;
-        
+        if(exerciseData.transpos !== undefined) transposInit = exerciseData.transpos;
+
     }
 
     // lots of state init
@@ -88,11 +90,12 @@ export function Exercise({
     const [customFeedback, setCustomFeedback] = useState<string[]>([]);
     const [lastClicked, setLastClicked] = useState<any>();
 
-    const [diff, setDiff] = useState<number>(difficulty);
+    const [diff, setDiff] = useState<number>(diffInit);
     const [tags, setTags] = useState<string[]>(tagsInit);
     const [voices, setVoices] = useState<number>(voicesInit);
     const [types, setTypes] = useState<string>(typesInit);
     const [meter, setMeter] = useState<string>(meterInit);
+    const [transpos, setTranspos] = useState<boolean>(transposInit);
 
     const [selNotes,setSelNotes] = useState<any[]>([]);
     const [selAnswers, setSelAnswers] = useState<any[]>([]);
@@ -172,7 +175,6 @@ export function Exercise({
             for (var i=0; i<selNotes.length; i++) {
                 if(selNotes[i] === note) {
                     if(highlight(selNotes[i], undefined, true) === 1) i--;
-                    console.log(noteElems.getAttribute("selectedTimes"));
                 } else {
                     if(highlight(selNotes[i], undefined, false) === 1) i--;
                 }
@@ -295,7 +297,7 @@ export function Exercise({
             });
         } 
         if (abcFile !== undefined && abcFile !== "" && mp3File.name !== "" && correctAnswers.length > 0) {
-            data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false, customTitle, diff, voices,tags,types,meter);
+            data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false, customTitle, diff, voices,tags,types,meter, transpos);
         
         //setExerciseData(data);
     
@@ -325,10 +327,7 @@ export function Exercise({
         }
 
         if(setNewExercise !== undefined) setNewExercise(undefined);
-        if(fetch !== undefined) {
-            console.log("fetching");
-            fetch(false);
-        }
+        if(fetch !== undefined) fetch(false);
 
         } else {
             console.log("Incomplete exercise - not saving to database");
@@ -484,9 +483,9 @@ export function Exercise({
         }
     }
 
-    //helper run in xChange functions to set the custom exercise title based on all the fields
-    const customTitleChange = function (tags: string[], diff: number, voices: number, types: string, meter: string) {
-        let exNum = findNum(tags,diff,voices,types,meter);
+    //helper run in fieldChange functions to set the custom exercise title based on all the fields
+    const customTitleChange = function (tags: string[], diff: number, voices: number, types: string, meter: string, transpos: boolean) {
+        let exNum = findNum(tags,diff,voices,types,meter, transpos);
         // lots of special cases for meter/types being certain things, title adjusted accordingly
         if(meter === "Anything"){
             if(types === "None"){
@@ -506,7 +505,7 @@ export function Exercise({
     //onClick function for whenever difficulty is changed
     const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setDiff(Number(e.target.value));
-        customTitleChange(tags, Number(e.target.value), voices, types, meter);
+        customTitleChange(tags, Number(e.target.value), voices, types, meter, transpos);
     }
 
     //onClick function for whenever tags are changed
@@ -516,11 +515,11 @@ export function Exercise({
         if(tags.includes(val)) {
             tags.splice(tags.indexOf(val), 1);
             setTags([...tags]);
-            customTitleChange([...tags], diff, voices, types, meter);
+            customTitleChange([...tags], diff, voices, types, meter, transpos);
         // tag is newly checked, needs to be added
         } else {
             setTags([...tags, val]);
-            customTitleChange([...tags, val], diff, voices, types, meter);
+            customTitleChange([...tags, val], diff, voices, types, meter, transpos);
         }
     }
 
@@ -532,24 +531,30 @@ export function Exercise({
     //onClick function for whenever types are changed
     const typesChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
         setTypes(e.target.value);
-        customTitleChange(tags, diff, voices, e.target.value, meter);
+        customTitleChange(tags, diff, voices, e.target.value, meter, transpos);
     }
 
     //onClick function for when meter is changed
     const meterChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
         setMeter(e.target.value);
-        customTitleChange(tags, diff, voices, types, e.target.value);
+        customTitleChange(tags, diff, voices, types, e.target.value, transpos);
+    }
+
+    //onClick function for when transposition is changed
+    const transposChange = function(e: React.ChangeEvent<HTMLInputElement>) {
+        setTranspos(!transpos);
     }
 
     //function used in customTitleChange to find the number of exercises with certain fields for unique exercise naming
-    const findNum = function(tags:string[],difficulty:number,voices:number,types:string,meter:string):number{
+    const findNum = function(tags: string[], difficulty: number, voices: number, types: string, meter: string, transpos: boolean) : number {
         const count = allExData.filter((exData:ExerciseData | undefined) => {
             if (exData !== undefined && exData.tags !== undefined && exData.difficulty !== undefined){
                 return exData.tags.sort().toString() === tags.sort().toString() && 
                     exData.difficulty === difficulty && 
                     exData.voices === voices && 
                     exData.types === types && 
-                    exData.meter === meter
+                    exData.meter === meter &&
+                    exData.transpos === transpos
                 } else {return false}});
         return count.length+1;
 
@@ -664,6 +669,11 @@ export function Exercise({
                                 <option value="Ensemble Parts">Ensemble Parts</option>
                                 <option value="Both">Drone & Ensemble Parts</option>
                         </select>
+                    </form>
+                    <form id= "transpos">
+                        Transposing Instruments:
+                        <br></br>
+                        <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{marginLeft: "5.3vw"}}/>
                     </form>
                 </div>
                 <div/>

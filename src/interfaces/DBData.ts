@@ -13,6 +13,7 @@ class DBData {
     tags: string[]
     types: string
     meter: string
+    transpos: boolean
     constructor(data:ExerciseData | undefined,sound:string){
         if(data !== undefined){
             this.score = data.score;
@@ -27,6 +28,7 @@ class DBData {
             this.tags = data.tags;
             this.types = data.types;
             this.meter = data.meter;
+            this.transpos = data.transpos;
         }
         else{
             this.score = "";
@@ -41,6 +43,7 @@ class DBData {
             this.tags = [""];
             this.types = "None";
             this.meter = "Anything";
+            this.transpos = false;
         }
     }
     
