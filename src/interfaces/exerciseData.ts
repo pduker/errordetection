@@ -13,7 +13,8 @@ class ExerciseData {
     tags: string[]
     types: string
     meter: string
-    constructor(score:string,sound:File | undefined,correctAnswers:{[label: string]: (number | string)}[],feedback:string,exIndex:number, empty: boolean,title: string,difficulty: number, voices: number, tags: string[], types: string, meter: string){
+    transpos: boolean
+    constructor(score:string,sound:File | undefined,correctAnswers:{[label: string]: (number | string)}[],feedback:string,exIndex:number, empty: boolean,title: string,difficulty: number, voices: number, tags: string[], types: string, meter: string, transpos: boolean){
         this.score = score;
         this.sound = sound;
         this.correctAnswers = correctAnswers;
@@ -26,6 +27,7 @@ class ExerciseData {
         this.tags = tags;
         this.types = types;
         this.meter = meter;
+        this.transpos = transpos;
     }
     
 }
