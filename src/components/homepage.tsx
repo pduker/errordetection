@@ -47,11 +47,7 @@ export function HomePage() {
             <Link id="pitchLink" to="/exercises/pitch" hidden={true}></Link>
             {/* <Link id="rhyLink" to="/exercises/rhythm" hidden={true}></Link> */}
           </div>
-          <br></br>
-          <h3>About</h3>
-          <div>This website is an error detection practice tool! 
-            Choose a category of exercises above to get started, or visit the Help page to learn more.</div>
-       
+
       </div>
     );
 }

@@ -6,6 +6,7 @@ import './App.css';
 //import BoopButton from "./components/audiohander"
 import { HomePage } from './components/homepage';
 import { HelpPage } from './components/helppage';
+import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
@@ -82,7 +83,9 @@ function App() {
             </Navbar.Brand>
             <Navbar.Brand>Error Detectinator!</Navbar.Brand>
             <Nav className='Home-nav' justify>
+            <Link to="/about">About</Link>
             <Link to="/exercises">Exercises</Link>
+
             {authorized ?
             <Link to="/exercise-management">Exercise Management</Link>
             : <></>}
@@ -99,7 +102,9 @@ function App() {
             <Routes>
               <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]}></ExercisesPage>} />
             </Routes>
-
+            <Routes>
+              <Route path="/about" element={<AboutPage/>} />
+            </Routes>
             <Routes>
               <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]}></ExercisesPage>} />
             </Routes>
