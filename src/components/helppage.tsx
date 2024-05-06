@@ -25,7 +25,7 @@ export function HelpPage({
 
     return (
         <div>
-            <h2>Welcome to the Help Page!</h2>
+            <h2 style={{ marginLeft: '3mm' }}>Welcome to the Help Page!</h2>
             <div style={{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
             This site is meant to help you practice your error detection skills.<br/>
             On the Exercises page, you’ll find a list of the exercises currently uploaded to the site. <br/>

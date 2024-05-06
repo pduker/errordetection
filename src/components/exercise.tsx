@@ -714,8 +714,8 @@ export function Exercise({
                 {/* note info blurb in case teachers want to see which staff/measure the note is on (and can't/don't want to count i guess) */}
                 {lastClicked !== undefined && Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) % 3 !== 0 ? <div style={{marginLeft: "1vw"}}>Note Info: {ana}</div> : <div/>}
                 <br/>
-                {/* <button onClick={debug}>bebug bubbon</button> */}
-                <Button variant='success' onClick={save}>Save Exercise</Button><Button onClick={() => handleExerciseDelete(exIndex)} variant="danger">Delete Exercise</Button>
+                <Button variant='success' onClick={save}>Save Exercise</Button>
+                <Button onClick={() => handleExerciseDelete(exIndex)} style={{ marginLeft: "10px", marginTop: "10px" }} variant="danger">Delete Exercise</Button>
             </span>
             :
             /* student view */
