@@ -386,6 +386,7 @@ export function Exercise({
 
         // holds indexes of answers that were the right note, but wrong error
         let closeList: Number[] = [];
+        let wrongList = [];
 
         // loops through corr/sel copies in a unique way to compare answers
         for(var i=0,j=0;i<correctAnswers.length && j<selAnswers.length && tmpCorrect[i] !== undefined;){
@@ -405,7 +406,10 @@ export function Exercise({
             } else if(noteElems.getAttribute("index") > tmpCorrect[i]["index"]) i++;
 
             // note index is smaller than the i'th element of correct array: selected iterator moved forward
-            else if(noteElems.getAttribute("index") < tmpCorrect[i]["index"]) j++;
+            else if(noteElems.getAttribute("index") < tmpCorrect[i]["index"]){
+                wrongList.push(noteElems);
+                j++;
+            } 
         }
 
         // no missed answers in correct array and selected array is the same length as the original correct array: all good!
@@ -416,7 +420,18 @@ export function Exercise({
         } else if(tmpSelected.length !== correctAnswers.length){
             var plural = " are ";
             if (correctAnswers.length === 1) plural = " is ";
-            feedback = (["You selected " + selAnswers.length + " answer(s). There" + plural + correctAnswers.length + " correct answer(s)."]);
+            feedback = (["You selected " + selAnswers.length + " answer(s). There" + plural + correctAnswers.length + " correct answer(s). Here are some specific places to look at and listen to more closely:"]);
+            for(let i = 0;i < tmpCorrect.length;i++){
+                // generic note position feedback
+                feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                
+            }
+            for(let i = 0;i < wrongList.length;i++){
+                feedback = ([...feedback,"Wrong answer selected at: " + "Measure " + (Number(wrongList[i].getAttribute("measurePos"))+1) + ", Staff " + (Number(wrongList[i].getAttribute("staffPos"))+1)])
+                console.log(wrongList[i]);
+                
+            }
+
 
         // no correct answers selected
         } else if(tmpCorrect.length === correctAnswers.length){
@@ -490,15 +505,26 @@ export function Exercise({
         if(meter === "Anything"){
             if(types === "None"){
                 setCustomTitle(tags.sort().join(" & ") + ": Level " + diff + ", Exercise: " + exNum);
+                if(transpos)setCustomTitle(tags.sort().join(" & ") + ": Transpose Insts - Level " + diff + ", Exercise: " + exNum);
             } else if (types === "Both"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts") + " - Level " + diff + ", Exercise: " + exNum);
-            } else setCustomTitle(tags.sort().join(" & ") + ": " + (types) + " - Level " + diff + ", Exercise: " + exNum);
+                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone/Ens Parts")  +  " - Level " + diff + ", Exercise: " + exNum);
+                if(transpos)setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone/Ens Parts") + " w/ Transpose Insts - Level " + diff + ", Exercise: " + exNum);
+            } else {
+                setCustomTitle(tags.sort().join(" & ") + ": " + (types) + " - Level " + diff + ", Exercise: " + exNum);
+                if(transpos) setCustomTitle(tags.sort().join(" & ") + ": " + (types) + " w/ Transpose Insts - Level " + diff + ", Exercise: " + exNum);
+            }
         }else{
             if(types === "None"){
                 setCustomTitle(tags.sort().join(" & ") + ": " + meter + " - Level " + diff + ", Exercise: " + exNum);
+                if(transpos)setCustomTitle(tags.sort().join(" & ") + ": " + meter + "  w/ Transpose Insts - Level " + diff + ", Exercise: " + exNum);
+
             } else if (types === "Both"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone & Ensemble Parts: ") + meter + " - Level " + diff + ", Exercise: " + exNum);
-            } else setCustomTitle(tags.sort().join(" & ") + ": " + (types) + ": " + meter  + " - Level " + diff + ", Exercise: " + exNum);
+                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone/Ens Parts: ") + meter + " - Level " + diff + ", Exercise: " + exNum);
+                if(transpos) setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone/Ens Parts: ") + meter + " w/ Transpose Insts - Level " + diff + ", Exercise: " + exNum);
+            } else{
+                setCustomTitle(tags.sort().join(" & ") + ": " + (types) + ": " + meter  +   " - Level " + diff + ", Exercise: " + exNum);
+                if(transpos)setCustomTitle(tags.sort().join(" & ") + ": " + (types) + ": " + meter  +   " w/ Transpose Insts - Level " + diff + ", Exercise: " + exNum);
+            }
         }
     }
 
@@ -542,7 +568,9 @@ export function Exercise({
 
     //onClick function for when transposition is changed
     const transposChange = function(e: React.ChangeEvent<HTMLInputElement>) {
+        let val = e.target.value;
         setTranspos(!transpos);
+        customTitleChange(tags,diff,voices,types,meter,!transpos);
     }
 
     //function used in customTitleChange to find the number of exercises with certain fields for unique exercise naming
@@ -551,7 +579,7 @@ export function Exercise({
             if (exData !== undefined && exData.tags !== undefined && exData.difficulty !== undefined){
                 return exData.tags.sort().toString() === tags.sort().toString() && 
                     exData.difficulty === difficulty && 
-                    exData.voices === voices && 
+                    //exData.voices === voices && 
                     exData.types === types && 
                     exData.meter === meter &&
                     exData.transpos === transpos
@@ -673,7 +701,7 @@ export function Exercise({
                     <form id= "transpos">
                         Transposing Instruments:
                         <br></br>
-                        <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{marginLeft: "5.3vw"}}/>
+                        <input type="checkbox" name="transpos" value="true" checked={transpos} onChange={transposChange} style={{marginLeft: "5.3vw"}}/>
                     </form>
                 </div>
                 <div/>
