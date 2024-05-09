@@ -83,12 +83,13 @@ function App() {
             </Navbar.Brand>
             <Navbar.Brand>Error Detectinator!</Navbar.Brand>
             <Nav className='Home-nav' justify>
-            <Link to="/about">About</Link>
+            
             <Link to="/exercises">Exercises</Link>
 
             {authorized ?
             <Link to="/exercise-management">Exercise Management</Link>
             : <></>}
+            <Link to="/about">About</Link>
             <Link to="/help">Help</Link>
             </Nav>
           </Navbar>
