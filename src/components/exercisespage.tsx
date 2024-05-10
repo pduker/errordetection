@@ -6,11 +6,13 @@ import { Button } from 'react-bootstrap';
 export function ExercisesPage({
     allExData,
     setAllExData,
-    defaultTags
+    defaultTags,
+    scoresRet
 }:{
     allExData: (ExerciseData | undefined)[];
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
     defaultTags: string[];
+    scoresRet: boolean;
 }){
     useEffect(() => {
         if(exList.length === 0) {
@@ -346,7 +348,9 @@ export function ExercisesPage({
                         )}
                     else return <></>;
                 })}
-                {exList.length === 0 ? <div>No exercises with those criteria found!</div> : <></>}
+                {exList.length === 0 ? 
+                    !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
+                <div>No exercises with those criteria found!</div> : <></>}
             </div>
             <div style={{float:'right',width:'70%'}}>
                 {selExercise !== undefined ? <div>

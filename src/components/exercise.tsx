@@ -386,6 +386,8 @@ export function Exercise({
 
         // holds indexes of answers that were the right note, but wrong error
         let closeList: Number[] = [];
+        
+        // holds incorrect answer info for feedback
         let wrongList = [];
 
         // loops through corr/sel copies in a unique way to compare answers
@@ -405,7 +407,7 @@ export function Exercise({
             // note index is larger than the i'th element of correct array: correct iterator moved forward (preserves missed answers for feedback)
             } else if(noteElems.getAttribute("index") > tmpCorrect[i]["index"]) i++;
 
-            // note index is smaller than the i'th element of correct array: selected iterator moved forward
+            // note index is smaller than the i'th element of correct array: selected iterator moved forward and value added to wrongList
             else if(noteElems.getAttribute("index") < tmpCorrect[i]["index"]){
                 wrongList.push(noteElems);
                 j++;
@@ -416,7 +418,7 @@ export function Exercise({
         if(tmpCorrect.length === 0 && tmpSelected.length === correctAnswers.length){
             feedback = ["Great job identifying the errors in this passage!"];
 
-        // wrong amount of answers selected: first/only feedback displayed until right amt selected
+        // wrong amount of answers selected: shows general positions of corr answers and wrong answer positions
         } else if(tmpSelected.length !== correctAnswers.length){
             var plural = " are ";
             if (correctAnswers.length === 1) plural = " is ";
@@ -427,8 +429,9 @@ export function Exercise({
                 
             }
             for(let i = 0;i < wrongList.length;i++){
+                // position of any wrong answers selected
                 feedback = ([...feedback,"Wrong answer selected at: " + "Measure " + (Number(wrongList[i].getAttribute("measurePos"))+1) + ", Staff " + (Number(wrongList[i].getAttribute("staffPos"))+1)])
-                console.log(wrongList[i]);
+                //console.log(wrongList[i]);
                 
             }
 

@@ -52,8 +52,10 @@ function App() {
             //console.log(thing);
             }
         });
-          setTimeout(function(){setAllExData(scoresData2)}, 350*scoresData.length);
-          setScoresRetrieved(true); // Set scoresRetrieved to true after retrieving scores
+        // After timed delay: set scoresRetrieved to true after retrieving scores
+          if(scoresData.length < 80) setTimeout(function(){setAllExData(scoresData2); setScoresRetrieved(true);}, 2000 + (100*scoresData.length));
+          else setTimeout(function(){setAllExData(scoresData2); setScoresRetrieved(true);}, 10000);
+           
         });
       } catch (error) {
         console.error('Error fetching scores:', error);
@@ -97,15 +99,15 @@ function App() {
             </Routes>
 
             <Routes>
-              <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]}></ExercisesPage>} />
+              <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}></ExercisesPage>} />
             </Routes>
 
             <Routes>
-              <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]}></ExercisesPage>} />
+              <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}></ExercisesPage>} />
             </Routes>
 
             <Routes>
-              <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]}></ExercisesPage>} />
+              <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}></ExercisesPage>} />
             </Routes>
 
             {/* <Routes>
