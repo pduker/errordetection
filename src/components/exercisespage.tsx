@@ -255,24 +255,36 @@ export function ExercisesPage({
 
     return (
         <div style={{margin: "10px"}}>
+            <div>
             <h2>Welcome to the Exercises Page!</h2>
+            </div>
             <h5 style={{fontStyle: "italic"}}>Sort by tags, difficulty, and voices, then click an exercise to get started.</h5>
             <div style={{float:'left', width: "30%"}}>
                 <span>
-                    <div id="boxes" style={{display: "inline-flex", padding: "4px"}}>
-                        <form id= "tags">
-                            <div style={{fontSize:"16px", display:"inline"}}>Tags:</div>
-                            <br></br>
-                            <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange}style={{margin: "4px"}}/>Pitch
-                            <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Intonation
-                            {/* <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm */}
-                        </form>
-                        <form id="transpos">
-                            <div style={{fontSize:"16px", display:"inline"}}>Transposing Instruments:</div>
-                            <br></br>
-                            <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{marginLeft: "5.3vw"}}/>
-                        </form>
-                    </div>
+
+                <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
+                    <form id="tags" style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>
+                        <div style={{ fontSize: "16px", marginRight: "8px" }}>Tags:</div>
+                        <label style={{ display: "flex", alignItems: "center", marginRight: "12px" }}>
+                            <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{ marginRight: "4px" }} />
+                            Pitch
+                        </label>
+                        <label style={{ display: "flex", alignItems: "center", marginLeft: "-5px"}}>
+                            <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{ marginRight: "4px" }} />
+                            Intonation
+                        </label>
+                    </form>
+                    <form id="transpos" style={{ display: "flex", alignItems: "center", marginLeft: "-20px" }}>
+                        <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "8px" }} />
+                        <div style={{ fontSize: "16px", whiteSpace: "nowrap" }}>Transposing Instruments</div>
+                    </form>
+                </div>
+
+                
+
+
+
+
                     <div id="dropdowns" style={{display: "inline-flex", padding: "4px"}}>
                         <form id="difficulty">
                             <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>

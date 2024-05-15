@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { sha256 } from 'js-sha256';
 import noteKey from "../assets/note-color-key.png"
 
 export function HelpPage({
@@ -14,7 +15,7 @@ export function HelpPage({
         var box = document.getElementById("mng-pwd");
         if(box !== null && "value" in box) {
             var str = box.value as string;
-            if(str === "ILoveMusic") {
+            if(sha256(str) === "e276575ffd747ae76d2a4969d4cc64bba550243efd9786cc044b07fdbd149fbd") {
                 setAuthorized(true);
                 setError(false);
             } else {
@@ -25,7 +26,7 @@ export function HelpPage({
 
     return (
         <div>
-            <h2>Welcome to the Help Page!</h2>
+            <h2 style={{ marginLeft: '3mm' }}>Welcome to the Help Page!</h2>
             <div style={{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
             This site is meant to help you practice your error detection skills.<br/>
             On the Exercises page, you’ll find a list of the exercises currently uploaded to the site. <br/>

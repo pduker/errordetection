@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
-import logo from './assets/doof.png';
+import logo from './assets/UD-circle-logo-email.png';
 import './App.css';
 //import BoopButton from "./components/audiohander"
 import { HomePage } from './components/homepage';
@@ -77,12 +77,12 @@ function App() {
               <img
                 alt=""
                 src={logo}
-                width="100"
-                height="100"
+                width="75"
+                height="75"
                 className="d-inline-block align-top"
               />
             </Navbar.Brand>
-            <Navbar.Brand>Error Detectinator!</Navbar.Brand>
+            
             <Nav className='Home-nav' justify>
             <Link to="/exercises">Exercises</Link>
             {authorized ?
