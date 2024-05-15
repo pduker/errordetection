@@ -31,7 +31,6 @@ export function Exercise({
     ExData,
     allExData,
     setAllExData,
-    setNewExercise,
     handleSelectExercise, 
     isSelected,
     fetch
@@ -41,7 +40,6 @@ export function Exercise({
     ExData: ExerciseData;
     allExData: (ExerciseData | undefined)[]
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
-    setNewExercise: ((newEx: (ExerciseData | undefined)) => void) | undefined;
     handleSelectExercise: ((exIndex: number) => void) | undefined; 
     isSelected: boolean | undefined; 
     fetch: ((val: boolean) => void) | undefined;
@@ -247,6 +245,8 @@ export function Exercise({
                         // sets attributes to their proper values
                         noteElems.setAttribute("selectedTimes", correctAnswers[ansSearch].selectedTimes);
                         noteElems.setAttribute("feedback", correctAnswers[ansSearch].feedback);
+
+                        
                         
                         // little bit of jank: for some reason this stuff gets run twice? with the second set of notes being the ones we actually want
                         // so the if part adds the bad values to selNotes (which we may not need to do? who knows, it works for now)
@@ -326,7 +326,6 @@ export function Exercise({
             
         }
 
-        if(setNewExercise !== undefined) setNewExercise(undefined);
         if(fetch !== undefined) fetch(false);
 
         } else {
@@ -711,10 +710,10 @@ export function Exercise({
                 
                 {/* file uploads */}
                 <div id="xmlUpload" style={{display:"inline",float:"left"}}>
-                    XML Upload: <FileUpload setFile={setXmlFile} file={xmlFile} setAbcFile={setAbcFile} type="xml"></FileUpload>
+                    XML Upload: <FileUpload setFile={setXmlFile} file={xmlFile} setAbcFile={setAbcFile} type="xml" setLoaded={setLoaded}></FileUpload>
                 </div>
                 <div id="mp3Upload" style={{display:"inline"}}>
-                    MP3 Upload: <FileUpload setFile={setMp3File} file={mp3File} setAbcFile={setAbcFile} type="mp3"></FileUpload>
+                    MP3 Upload: <FileUpload setFile={setMp3File} file={mp3File} setAbcFile={setAbcFile} type="mp3" setLoaded={setLoaded}></FileUpload>
                 </div>
                 
                 {mp3File.name === "" ? <br></br> : <></>}

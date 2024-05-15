@@ -373,7 +373,6 @@ export function ExercisesPage({
                         allExData={allExData} 
                         setAllExData={setAllExData} 
                         exIndex={selExercise.exIndex} 
-                        setNewExercise={undefined} 
                         handleSelectExercise={undefined} 
                         isSelected={undefined}
                         fetch={undefined}

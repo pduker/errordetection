@@ -73,7 +73,7 @@ function App() {
         <header className="App-header" >
           
           <Navbar className="Home-bar" fixed='top'>
-            <Navbar.Brand href="/">
+            <Navbar.Brand> {/* href="/" */}
               <img
                 alt=""
                 src={logo}
@@ -95,19 +95,19 @@ function App() {
         </header>
         
           <Routes>
-              <Route path="/" element={<HomePage/>}/>
+              <Route path="/" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>}/>
             </Routes>
 
             <Routes>
-              <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}></ExercisesPage>} />
+              <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>} />
             </Routes>
 
             <Routes>
-              <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}></ExercisesPage>} />
+              <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>} />
             </Routes>
 
             <Routes>
-              <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}></ExercisesPage>} />
+              <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}/>} />
             </Routes>
 
             {/* <Routes>
@@ -115,7 +115,7 @@ function App() {
             </Routes> */}
 
             <Routes>
-              <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase}/>} />
+              <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase} authorized={authorized}/>} />
             </Routes>
 
             <Routes>
