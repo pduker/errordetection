@@ -261,7 +261,7 @@ export function ExercisesPage({
             <h5 style={{fontStyle: "italic"}}>Sort by any of the given fields, then click an exercise to get started.</h5>
             <div style={{float:'left', width: "30%"}}>
                 <span>
-
+dsdsd
                 <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
                     <form id="tags" style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>
                         <div style={{ fontSize: "16px", marginRight: "8px" }}>Tags:</div>
@@ -279,9 +279,6 @@ export function ExercisesPage({
                         <div style={{ fontSize: "16px", whiteSpace: "nowrap" }}>Transposing Instruments</div>
                     </form>
                 </div>
-
-                
-
 
 
 
