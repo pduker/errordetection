@@ -19,6 +19,7 @@
   padding-left: 1vw;
   padding-top: 1vh;
   background-color: #ffdb63;
+  border-radius: 0 !important;
 }
 
 .Home-nav {
@@ -49,7 +50,7 @@ a:hover {
 * {
   margin: 0;
   padding: 0;
-  font-family: "Poppins", sans-serif;
+  font-family: Helvetica;
   box-sizing: border-box;
 }
 html {
@@ -87,6 +88,7 @@ body {
   border-radius: 10px;
   margin: "10px";
 }
+
 
 .logo {
   position: sticky;
@@ -281,7 +283,7 @@ nav ul li a:hover::after {
 .layer {
   width: 100%;
   height: 0;
-  background: linear-gradient(rgba(256, 256, 256, 0.6), #a1c0dc);
+  background: linear-gradient(rgba(256, 256, 256, 0.6), #9dd1e8);
   border-radius: 10px;
   position: absolute;
   left: 0;
