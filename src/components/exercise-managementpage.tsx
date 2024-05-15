@@ -7,11 +7,13 @@ import { get, getDatabase, ref, remove } from 'firebase/database';
 export function ExerciseManagementPage({
     allExData,
     setAllExData,
-    fetch
+    fetch,
+    authorized
 }:{
     allExData: (ExerciseData | undefined)[];
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
     fetch: (val: boolean) => void;
+    authorized: boolean;
 }) {
     useEffect(() => {
         if(exList.length === 0) {
@@ -22,8 +24,7 @@ export function ExerciseManagementPage({
 
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
 
-    const [mode, setMode] = useState<boolean>(false);
-    const [newExercise, setNewExercise] = useState<ExerciseData |  undefined>(undefined);
+    /* const [mode, setMode] = useState<boolean>(false); */
 
     const [diff, setDiff] = useState<string>("All");
     const [types, setTypes] = useState<string>("None");
@@ -34,6 +35,7 @@ export function ExerciseManagementPage({
 
     const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
 
+    /* previously used when add/edit mode were separate, keeping for now for posterity
     const modeChange = function () {
         setMode(!mode);
         setDiff("All");
@@ -42,16 +44,15 @@ export function ExerciseManagementPage({
         setVoices(0);
         setTags([]);
         sortExercises(undefined,"");
-    }
+    } */
 
     const createExercise = function () {
         var last = allExData[allExData.sort(indexSort).length-1];
         var newEx: ExerciseData;
         if(last !== undefined) newEx = new ExerciseData("", undefined, [], "", (last.exIndex) + 1, true,"Exercise " + (allExData.length+1), 1, 1, [], "None", "Anything", false);
         else newEx = new ExerciseData("", undefined, [], "", 0, true,"Exercise " + (allExData.length+1), 1, 1, [], "None", "Anything", false);
-        setAllExData([...allExData, newEx]);
-        setExList([...allExData, newEx]);
-        setNewExercise(newEx);
+        setAllExData([newEx, ...allExData]);
+        setExList([newEx, ...allExData]);
     }
 
     const sortExercises = function (input: string | string[] | number | boolean | undefined, inputType:string) {
@@ -108,8 +109,14 @@ export function ExerciseManagementPage({
     const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
         if (e1 !== undefined && e2 !== undefined) {
             try {
-                if(e1.title.startsWith("Exercise ")) return 1;
-                else if(e2.title.startsWith("Exercise ")) return -1;
+                if(e1.title.startsWith("Exercise ") && e2.title.startsWith("Exercise ")) {
+                    if (e1.title > e2.title) return 1;
+                    else if (e1.title < e2.title) return -1;
+                    else return 0;
+                }
+                else if(e1.title.startsWith("Exercise ")) return -1;
+                else if(e2.title.startsWith("Exercise ")) return 1;
+
                 var e1Sorted = e1.tags.sort().length;
                 var e2Sorted = e2.tags.sort().length;
                 if (e1Sorted > e2Sorted) return 1;
@@ -198,6 +205,8 @@ export function ExerciseManagementPage({
         if(meterBox !== null) meterBox.options[0].selected = true;
 
         setTranspos(false);
+
+        exList.sort(exSortFunc);
     }
 
     // function to handle selection of exercises - for deletion 
@@ -245,143 +254,144 @@ export function ExerciseManagementPage({
     };
 
     return (
-        <div style={{margin: "10px"}}>
-            <div>
-            <h2 style={{display:"inline"}}>Welcome to the Exercise Management Page!</h2>
-            </div>
-            <form id="editMode" style={{display: "inline", float:"right"}}>
-                <div className="form-check form-switch">
-                    <input className="form-check-input" type="checkbox" role="switch" id="switchCheckDefault" checked={mode} onChange={modeChange}/>
-                </div>
-            </form>
-            <h5 style={{marginTop: "8px", fontStyle: "italic"}}>Use the slider on the right to toggle between adding and editing exercises.</h5>
-            {!mode ? 
+        <div style={{width: "90vw"}}>
+            {authorized ? 
                 <div>
-                    <h5 style={{marginLeft: "4px", marginBottom: "-20px"}}>Sort By:</h5>
-                    <br/>
-
-                <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
-                    <form id="tags" style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>
-                        <div style={{ fontSize: "16px", marginRight: "8px" }}>Tags:</div>
-                        <label style={{ display: "flex", alignItems: "center", marginRight: "12px" }}>
-                            <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{ marginRight: "4px" }} />
-                            Pitch
-                        </label>
-                        <label style={{ display: "flex", alignItems: "center" }}>
-                            <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{ marginRight: "4px" }} />
-                            Intonation
-                        </label>
-                    </form>
-                    <form id="transpos" style={{ display: "flex", alignItems: "center" }}>
-                        <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "8px" }} />
-                        <div style={{ fontSize: "16px" }}>Transposing Instruments</div>
-                    </form>
-                </div>
-
-                    <br/>
-                    <div id="dropdowns" style={{display: "inline-flex", padding: "4px"}}>
-                        <form id="difficulty">
-                            <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>
-                            <br></br>
-                            <select name="difficulty" onChange={diffChange}>
-                                <option value="All">All</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </form>
-                        <form id="voiceCt">
-                            Voices:
-                            <br></br>
-                            <select name="voices" onChange={voiceChange}>
-                                <option value={0}>Any</option>
-                                <option value={1}>1</option>
-                                <option value={2}>2</option>
-                                <option value={3}>3</option>
-                                <option value={4}>4</option>
-                                <option value={5}>5</option>
-                            </select>
-                        </form>
-                        <form id="meterForm">
-                            Meter:
-                            <br></br>
-                            <select name='meter' defaultValue={types} onChange={meterChange}>
-                                    <option value="Anything">Anything</option>
-                                    <option value="Simple">Simple</option>
-                                    <option value="Compound">Compound</option>
-                                    
-                            </select>
-                        </form>
+                    <div>
+                    <h2 style={{display:"inline"}}>Welcome to the Exercise Management Page!</h2>
                     </div>
-                    
-                    <div id="secondLine" style={{display: "inline-flex", padding: "4px"}}>
-                        <form id="typesForm">
-                            Textural Factors:
-                            <br></br>
-                            <select name="types" onChange={typesChange}>
-                                <option value="None">None</option>
-                                <option value="Drone">Drone</option>
-                                <option value="Ensemble Parts">Ensemble Parts</option>
-                                <option value="Both">Drone & Ensemble Parts</option>
-                            </select>
-                        </form>
-                        <Button variant="danger" onClick={resetSort} style={{marginLeft: "10px"}}>Reset Sort</Button>
-                        {!mode && (
+                    {/*<form id="editMode" style={{display: "inline", float:"right"}}>
+                        <div className="form-check form-switch">
+                            <input className="form-check-input" type="checkbox" role="switch" id="switchCheckDefault" checked={mode} onChange={modeChange}/>
+                        </div> 
+                    </form>*/}
+                    <Button style={{display: "inline", float:"right", marginRight: "1vw"}} onClick={createExercise}>+</Button>
+                    <h5 style={{marginTop: "8px", fontStyle: "italic"}}>Click the + in the top right to add a new exercise, then edit as needed and save.</h5>
+                        <div>
+                            <h5 style={{marginLeft: "4px", marginBottom: "-20px"}}>Sort By:</h5>
+                            <br/>
+
+                        <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
+                            <form id="tags" style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>
+                                <div style={{ fontSize: "16px", marginRight: "8px" }}>Tags:</div>
+                                <label style={{ display: "flex", alignItems: "center", marginRight: "12px" }}>
+                                    <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{ marginRight: "4px" }} />
+                                    Pitch
+                                </label>
+                                <label style={{ display: "flex", alignItems: "center" }}>
+                                    <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{ marginRight: "4px" }} />
+                                    Intonation
+                                </label>
+                            </form>
+                            <form id="transpos" style={{ display: "flex", alignItems: "center" }}>
+                                <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "8px" }} />
+                                <div style={{ fontSize: "16px" }}>Transposing Instruments</div>
+                            </form>
+                        </div>
+
+                            <br/>
+                            <div id="dropdowns" style={{display: "inline-flex", padding: "4px"}}>
+                                <form id="difficulty">
+                                    <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>
+                                    <br></br>
+                                    <select name="difficulty" onChange={diffChange}>
+                                        <option value="All">All</option>
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                    </select>
+                                </form>
+                                <form id="voiceCt">
+                                    Voices:
+                                    <br></br>
+                                    <select name="voices" onChange={voiceChange}>
+                                        <option value={0}>Any</option>
+                                        <option value={1}>1</option>
+                                        <option value={2}>2</option>
+                                        <option value={3}>3</option>
+                                        <option value={4}>4</option>
+                                        <option value={5}>5</option>
+                                    </select>
+                                </form>
+                                <form id="meterForm">
+                                    Meter:
+                                    <br></br>
+                                    <select name='meter' defaultValue={types} onChange={meterChange}>
+                                            <option value="Anything">Anything</option>
+                                            <option value="Simple">Simple</option>
+                                            <option value="Compound">Compound</option>
+                                            
+                                    </select>
+                                </form>
+                            </div>
+                            
+                            <div id="secondLine" style={{display: "inline-flex", padding: "4px"}}>
+                                <form id="typesForm">
+                                    Textural Factors:
+                                    <br></br>
+                                    <select name="types" onChange={typesChange}>
+                                        <option value="None">None</option>
+                                        <option value="Drone">Drone</option>
+                                        <option value="Ensemble Parts">Ensemble Parts</option>
+                                        <option value="Both">Drone & Ensemble Parts</option>
+                                    </select>
+                                </form>
+                                <Button variant="danger" onClick={resetSort} style={{marginLeft: "10px"}}>Reset Sort</Button>
                                 <Button
-                                variant="danger" 
-                                onClick={() => handleMultipleExerciseDelete(selectedIndexes)} 
-                                style={{ marginLeft: "10px", marginTop: "10px" }}
-                                >Delete Selected Exercises
+                                    variant="danger" 
+                                    onClick={() => handleMultipleExerciseDelete(selectedIndexes)} 
+                                    style={{ marginLeft: "10px", marginTop: "10px" }}>
+                                    Delete Selected Exercises
                                 </Button>
-                            )}
-                    </div>
-                    
-                {/* </span> */}
-                {exList.map((exercise) => {
-                        if (exercise !== undefined)
-                            return (
+                            </div>
+
+                        {exList.map((exercise) => {
+                                if (exercise !== undefined)
+                                    return (
+                                        <Exercise
+                                            key={exercise.exIndex}
+                                            teacherMode={true}
+                                            ExData={exercise}
+                                            allExData={allExData}
+                                            setAllExData={setAllExData}
+                                            exIndex={exercise.exIndex}
+                                            handleSelectExercise={handleSelectExercise}
+                                            isSelected={selectedIndexes.includes(exercise.exIndex)}
+                                            fetch={fetch}
+                                        />
+                                    )
+                                else return (<div key={Math.random()} />);
+                            })}
+                        {exList.length === 0 ? <div>No exercises found! Maybe try adding one?</div> : <></>}
+
+                        </div> 
+                        
+                        {/* previously used when add/edit modes were separate, keeping for posterity
+                        <div>
+                        <Button style={{ color: "white", borderColor: "blue", display: "flex" }} onClick={createExercise}>+ New Exercise</Button>
+                            {newExercise !== undefined ? <div>
                                 <Exercise
-                                    key={exercise.exIndex}
+                                    key={newExercise.exIndex}
                                     teacherMode={true}
-                                    ExData={exercise}
+                                    ExData={newExercise}
                                     allExData={allExData}
                                     setAllExData={setAllExData}
-                                    exIndex={exercise.exIndex}
-                                    setNewExercise={undefined}
-                                    handleSelectExercise={handleSelectExercise}
-                                    isSelected={selectedIndexes.includes(exercise.exIndex)}
-                                    fetch={undefined}
+                                    exIndex={newExercise.exIndex}
+                                    setNewExercise={setNewExercise}
+                                    handleSelectExercise={undefined}
+                                    isSelected={undefined}
+                                    fetch={fetch}
                                 />
-                            )
-                        else return (<div key={Math.random()} />);
-                    })}
-                {exList.length === 0 ? <div>No exercises found! Maybe try adding one?</div> : <></>}
 
-                </div> 
-                : <div>
-                   <Button style={{ color: "white", borderColor: "blue", display: "flex" }} onClick={createExercise}>+ New Exercise</Button>
-                    {newExercise !== undefined ? <div>
-                        <Exercise
-                            key={newExercise.exIndex}
-                            teacherMode={true}
-                            ExData={newExercise}
-                            allExData={allExData}
-                            setAllExData={setAllExData}
-                            exIndex={newExercise.exIndex}
-                            setNewExercise={setNewExercise}
-                            handleSelectExercise={undefined}
-                            isSelected={undefined}
-                            fetch={fetch}
-                        />
-
-                    </div> : <></>}
-                </div>}
-            
-            
-            <br></br>
-            {/* <Button onClick={fetch} variant="success">Sync with Database</Button> */}
+                            </div> : <></>}
+                        </div> */}
+                    
+                    <br></br>
+                    {/* <Button onClick={fetch} variant="success">Sync with Database</Button> */}
+                </div>
+            : <div>Unauthorized access. See help page to enter admin password for access.</div>}
         </div>
     );
 }

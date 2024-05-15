@@ -6,12 +6,14 @@ export default function FileUpload ({
   setFile,
   setAbcFile,
   file,
-  type
+  type,
+  setLoaded
 }:{
   file:File | undefined;
   setFile: ((newFile: File) => void);
   setAbcFile: ((newFile: string) => void) | null;
   type:string;
+  setLoaded: ((newVal: boolean) => void);
 }):JSX.Element{
 
     //state declarations, can be used to access file in the future
@@ -32,6 +34,7 @@ export default function FileUpload ({
       var errorText = result[1];
       if (setAbcFile != null) {
           setAbcFile(abcText);
+          setLoaded(false);
           /* console.log("file? " + abcText + "<- should be here");
           console.log("error text: " + errorText); */
       }

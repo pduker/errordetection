@@ -6,11 +6,13 @@ import { Button } from 'react-bootstrap';
 export function ExercisesPage({
     allExData,
     setAllExData,
-    defaultTags
+    defaultTags,
+    scoresRet
 }:{
     allExData: (ExerciseData | undefined)[];
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
     defaultTags: string[];
+    scoresRet: boolean;
 }){
     useEffect(() => {
         if(exList.length === 0) {
@@ -252,14 +254,13 @@ export function ExercisesPage({
     }
 
     return (
-        <div style={{margin: "10px"}}>
+        <div style={{width: "90vw"}}>
             <div>
             <h2>Welcome to the Exercises Page!</h2>
             </div>
-            <h5 style={{fontStyle: "italic"}}>Sort by tags, difficulty, and voices, then click an exercise to get started.</h5>
+            <h5 style={{fontStyle: "italic"}}>Sort by any of the given fields, then click an exercise to get started.</h5>
             <div style={{float:'left', width: "30%"}}>
                 <span>
-dsdsd
                 <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
                     <form id="tags" style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>
                         <div style={{ fontSize: "16px", marginRight: "8px" }}>Tags:</div>
@@ -273,7 +274,7 @@ dsdsd
                         </label>
                     </form>
                     <form id="transpos" style={{ display: "flex", alignItems: "center", marginLeft: "-20px" }}>
-                        <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "8px" }} />
+                        <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "4px" }} />
                         <div style={{ fontSize: "16px", whiteSpace: "nowrap" }}>Transposing Instruments</div>
                     </form>
                 </div>
@@ -291,11 +292,6 @@ dsdsd
                                 <option value="3">3</option>
                                 <option value="4">4</option>
                                 <option value="5">5</option>
-                                {/* <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option> */}
                             </select>
                         </form>
                         <form id="voiceCt">
@@ -308,11 +304,6 @@ dsdsd
                                 <option value={3}>3</option>
                                 <option value={4}>4</option>
                                 <option value={5}>5</option>
-                                {/* <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option> */}
                             </select>
                         </form>
                         <form id="meterForm">
@@ -355,9 +346,11 @@ dsdsd
                         )}
                     else return <></>;
                 })}
-                {exList.length === 0 ? <div>No exercises with those criteria found!</div> : <></>}
+                {exList.length === 0 ? 
+                    !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
+                <div>No exercises with those criteria found!</div> : <></>}
             </div>
-            <div style={{float:'right',width:'70%'}}>
+            <div style={{float:'right',width:'65%', marginRight: "2vw"}}>
                 {selExercise !== undefined ? <div>
                     <Exercise 
                         key={selExercise.exIndex} 
@@ -366,7 +359,6 @@ dsdsd
                         allExData={allExData} 
                         setAllExData={setAllExData} 
                         exIndex={selExercise.exIndex} 
-                        setNewExercise={undefined} 
                         handleSelectExercise={undefined} 
                         isSelected={undefined}
                         fetch={undefined}
@@ -374,8 +366,8 @@ dsdsd
                     
                 </div> : <></>}
             <div style={{display:"flex", justifyContent: "center"}}>
-                <button style={{width: "5%"}}id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
-                <button style={{width: "5%"}} id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
+                <button  className= "btnback" id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
+                <button className= "btnback" id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
             </div>
                 
             </div>

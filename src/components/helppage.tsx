@@ -29,15 +29,15 @@ export function HelpPage({
             <h2 style={{ marginLeft: '3mm' }}>Welcome to the Help Page!</h2>
             <div style={{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
             This site is meant to help you practice your error detection skills.<br/>
-            On the Exercises page, you’ll find a list of the exercises currently uploaded to the site. <br/>
+            On the Exercises page, you’ll find a list of the exercises currently uploaded to the site. <br/><br />
             You can use the different filters to sort and find appropriately challenging exercises for you (e.g. if you are new to this, consider starting with: intonation + 1 voice + level 1 + drone). <br/>
-            Clicking on the “drone” checkbox will find exercises that have a drone on tonic. <br/>
+            Clicking on the “drone” checkbox will find exercises that have a drone on tonic. <br/> <br />
             Clicking on the “ensemble parts” checkbox will have multiple voices/instruments performing the same part (e.g., 3 different clarinets playing the top line, one of which will perform the error(s)). <br/>
-            After finding some exercises, simply click the exercise to open it! <br/>
-            A short excerpt of a score and an audio player will show up. Assume that the score will always be correct. <br/>
+            After finding some exercises, simply click the exercise to open it! <br/> <br />
+            A short excerpt of a score and an audio player will show up. Assume that the score will always be correct. <br/> <br />
             The Audio file will play a short intro (2 bars long) to let you entrain to the key, tempo, and meter (you can move the cursor to skip past this if you don’t need it). <br/>
-            Your job is to click on the notes where you hear something different from what is in the score. <br/>
-            Click a note multiple times to change which type of error you hear. <br/>
+            Your job is to click on the notes where you hear something different from what is in the score. <br/><br />
+            Click a note multiple times to change which type of error you hear. <br/><br />
             A key will be present on each exercise to remind you which color corresponds to which kind of error.<br/>
             This key is also included here: <br/>
                 <div>

@@ -6,6 +6,7 @@ import './App.css';
 //import BoopButton from "./components/audiohander"
 import { HomePage } from './components/homepage';
 import { HelpPage } from './components/helppage';
+import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
@@ -52,8 +53,10 @@ function App() {
             //console.log(thing);
             }
         });
-          setTimeout(function(){setAllExData(scoresData2)}, 350*scoresData.length);
-          setScoresRetrieved(true); // Set scoresRetrieved to true after retrieving scores
+        // After timed delay: set scoresRetrieved to true after retrieving scores
+          if(scoresData.length < 80) setTimeout(function(){setAllExData(scoresData2); setScoresRetrieved(true);}, 2000 + (100*scoresData.length));
+          else setTimeout(function(){setAllExData(scoresData2); setScoresRetrieved(true);}, 10000);
+           
         });
       } catch (error) {
         console.error('Error fetching scores:', error);
@@ -71,41 +74,47 @@ function App() {
         <header className="App-header" >
           
           <Navbar className="Home-bar" fixed='top'>
-            <Navbar.Brand href="/">
+            <Navbar.Brand> {/* href="/" */}
               <img
                 alt=""
                 src={logo}
-                width="75"
-                height="75"
+                width="60"
+                height="60"
                 className="d-inline-block align-top"
               />
             </Navbar.Brand>
             
             <Nav className='Home-nav' justify>
+            
             <Link to="/exercises">Exercises</Link>
+
             {authorized ?
             <Link to="/exercise-management">Exercise Management</Link>
             : <></>}
+            <Link to="/about">About</Link>
             <Link to="/help">Help</Link>
             </Nav>
           </Navbar>
           
         </header>
-        
+        <div className='pagediv'>
+        <div  style={{overflowY: "scroll",margin: "10px"}}>
           <Routes>
-              <Route path="/" element={<HomePage/>}/>
+              <Route path="/" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>}/>
             </Routes>
 
             <Routes>
-              <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]}></ExercisesPage>} />
+              <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>} />
+            </Routes>
+            <Routes>
+              <Route path="/about" element={<AboutPage/>} />
+            </Routes>
+            <Routes>
+              <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>} />
             </Routes>
 
             <Routes>
-              <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]}></ExercisesPage>} />
-            </Routes>
-
-            <Routes>
-              <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]}></ExercisesPage>} />
+              <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}/>} />
             </Routes>
 
             {/* <Routes>
@@ -113,13 +122,14 @@ function App() {
             </Routes> */}
 
             <Routes>
-              <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase}/>} />
+              <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase} authorized={authorized}/>} />
             </Routes>
 
             <Routes>
               <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>} />
             </Routes>
-
+          </div>
+        </div>
       </div>
     </Router>
   );
