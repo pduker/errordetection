@@ -261,7 +261,6 @@ export function ExercisesPage({
             <h5 style={{fontStyle: "italic"}}>Sort by any of the given fields, then click an exercise to get started.</h5>
             <div style={{float:'left', width: "30%"}}>
                 <span>
-dsdsd
                 <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
                     <form id="tags" style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>
                         <div style={{ fontSize: "16px", marginRight: "8px" }}>Tags:</div>
@@ -293,11 +292,6 @@ dsdsd
                                 <option value="3">3</option>
                                 <option value="4">4</option>
                                 <option value="5">5</option>
-                                {/* <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option> */}
                             </select>
                         </form>
                         <form id="voiceCt">
@@ -310,11 +304,6 @@ dsdsd
                                 <option value={3}>3</option>
                                 <option value={4}>4</option>
                                 <option value={5}>5</option>
-                                {/* <option value="6">6</option>
-                                <option value="7">7</option>
-                                <option value="8">8</option>
-                                <option value="9">9</option>
-                                <option value="10">10</option> */}
                             </select>
                         </form>
                         <form id="meterForm">
