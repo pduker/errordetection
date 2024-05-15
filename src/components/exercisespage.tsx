@@ -360,7 +360,7 @@ export function ExercisesPage({
                 })}
                 {exList.length === 0 ? <div>No exercises with those criteria found!</div> : <></>}
             </div>
-            <div style={{float:'right',width:'70%'}}>
+            <div style={{float:'right',width:'60%'}}>
                 {selExercise !== undefined ? <div>
                     <Exercise 
                         key={selExercise.exIndex} 
@@ -377,8 +377,8 @@ export function ExercisesPage({
                     
                 </div> : <></>}
             <div style={{display:"flex", justifyContent: "center"}}>
-                <button style={{width: "5%"}}id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
-                <button style={{width: "5%"}} id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
+                <button  className= "btnback" id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
+                <button className= "btnback" id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
             </div>
                 
             </div>

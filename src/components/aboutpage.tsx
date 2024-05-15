@@ -4,11 +4,9 @@ import noteKey from "../assets/note-color-key.png"
 export function AboutPage() {
     return (
         <div>
-           
-           <div className="container ">
           
-          <h3>About</h3>
-        <div style={{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
+          <h2>About</h2>
+        <div className="about">
           <div>
           This website is an error detection practice tool!
             Choose a category of exercises above to get started, or visit the Help page to learn more. 
@@ -16,7 +14,11 @@ export function AboutPage() {
 
           </div>
           <br />
-    
+          <div>This project was led by Phil Duker with the help of the following wonderful UD students:
+Alex Daley, Weldin Dunn, Benjamin McMonagle, Sean O’Sullivan, Sonika Sharma, Colin Stetler
+Victor Umoren-Udo, and Lillian Woulfe
+</div>
+<br />
           <div>
             This project was funded by through a Paul J. Rickards,
             Jr. Teaching Innovation Grant and supported through the university of Delaware’s Academic Technology Services 
@@ -25,6 +27,6 @@ export function AboutPage() {
         </div>
        
       </div>
-        </div>
+   
     );
 }

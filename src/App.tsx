@@ -95,7 +95,8 @@ function App() {
           </Navbar>
           
         </header>
-        
+        <div className='pagediv'>
+        <div  style={{height:'600px',overflowY: "scroll",margin: "10px"}}>
           <Routes>
               <Route path="/" element={<HomePage/>}/>
             </Routes>
@@ -125,7 +126,8 @@ function App() {
             <Routes>
               <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>} />
             </Routes>
-
+          </div>
+        </div>
       </div>
     </Router>
   );
