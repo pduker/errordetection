@@ -6,6 +6,7 @@ import './App.css';
 //import BoopButton from "./components/audiohander"
 import { HomePage } from './components/homepage';
 import { HelpPage } from './components/helppage';
+import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
@@ -84,16 +85,20 @@ function App() {
             </Navbar.Brand>
             
             <Nav className='Home-nav' justify>
+            
             <Link to="/exercises">Exercises</Link>
+
             {authorized ?
             <Link to="/exercise-management">Exercise Management</Link>
             : <></>}
+            <Link to="/about">About</Link>
             <Link to="/help">Help</Link>
             </Nav>
           </Navbar>
           
         </header>
-        
+        <div className='pagediv'>
+        <div  style={{height:'600px',overflowY: "scroll",margin: "10px"}}>
           <Routes>
               <Route path="/" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>}/>
             </Routes>
@@ -101,7 +106,9 @@ function App() {
             <Routes>
               <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>} />
             </Routes>
-
+            <Routes>
+              <Route path="/about" element={<AboutPage/>} />
+            </Routes>
             <Routes>
               <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>} />
             </Routes>
@@ -121,7 +128,8 @@ function App() {
             <Routes>
               <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>} />
             </Routes>
-
+          </div>
+        </div>
       </div>
     </Router>
   );

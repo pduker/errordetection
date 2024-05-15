@@ -772,7 +772,7 @@ export function Exercise({
                 {/* check button/feedback loaded only when score is present: should always happen based on mng upload parameters but here as a failsafe */}
                 {(abcFile !== undefined && abcFile !== "" && loaded) ? 
                     <div>
-                        <button onClick={checkAnswers}>Check Answer</button>
+                        <button className= "btnback" onClick={checkAnswers}>Check Answer</button>
                         <div>Next step(s): {customFeedback.map(function(feedback) {
                             // this key generation is COOKED but we don't need to access it and they all gotta be different sooooooo
                             return <li style={{marginLeft: "12px"}} key={Math.random()}>{feedback}</li>
