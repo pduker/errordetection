@@ -81,7 +81,7 @@ function App() {
                 className="d-inline-block align-top"
               />
             </Navbar.Brand>
-            <Navbar.Brand>Error Detectinator!</Navbar.Brand>
+            
             <Nav className='Home-nav' justify>
             
             <Link to="/exercises">Exercises</Link>

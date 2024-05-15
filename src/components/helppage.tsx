@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { sha256 } from 'js-sha256';
 import noteKey from "../assets/note-color-key.png"
 
 export function HelpPage({
@@ -14,7 +15,7 @@ export function HelpPage({
         var box = document.getElementById("mng-pwd");
         if(box !== null && "value" in box) {
             var str = box.value as string;
-            if(str === "ILoveMusic") {
+            if(sha256(str) === "e276575ffd747ae76d2a4969d4cc64bba550243efd9786cc044b07fdbd149fbd") {
                 setAuthorized(true);
                 setError(false);
             } else {

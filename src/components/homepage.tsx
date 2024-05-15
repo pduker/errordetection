@@ -19,7 +19,9 @@ export function HomePage() {
   } */
     return (
         <div className="container ">
-          <div><h1>Home Page</h1></div>
+          
+          <center><h1>University of Delaware </h1></center>
+          <center><h1>Aural Skills Error Detection Practice Site</h1></center>
           <div className="work-list">
 
             <div className="work" onClick={pitchLink}>
