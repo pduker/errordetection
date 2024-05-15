@@ -254,11 +254,11 @@ export function ExercisesPage({
     }
 
     return (
-        <div style={{margin: "10px"}}>
+        <div style={{width: "90vw"}}>
             <div>
             <h2>Welcome to the Exercises Page!</h2>
             </div>
-            <h5 style={{fontStyle: "italic"}}>Sort by tags, difficulty, and voices, then click an exercise to get started.</h5>
+            <h5 style={{fontStyle: "italic"}}>Sort by any of the given fields, then click an exercise to get started.</h5>
             <div style={{float:'left', width: "30%"}}>
                 <span>
 
@@ -275,7 +275,7 @@ export function ExercisesPage({
                         </label>
                     </form>
                     <form id="transpos" style={{ display: "flex", alignItems: "center", marginLeft: "-20px" }}>
-                        <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "8px" }} />
+                        <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "4px" }} />
                         <div style={{ fontSize: "16px", whiteSpace: "nowrap" }}>Transposing Instruments</div>
                     </form>
                 </div>
@@ -364,7 +364,7 @@ export function ExercisesPage({
                     !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
                 <div>No exercises with those criteria found!</div> : <></>}
             </div>
-            <div style={{float:'right',width:'60%'}}>
+            <div style={{float:'right',width:'65%', marginRight: "2vw"}}>
                 {selExercise !== undefined ? <div>
                     <Exercise 
                         key={selExercise.exIndex} 

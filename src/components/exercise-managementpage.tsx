@@ -254,7 +254,7 @@ export function ExerciseManagementPage({
     };
 
     return (
-        <div style={{margin: "10px"}}>
+        <div style={{width: "90vw"}}>
             {authorized ? 
                 <div>
                     <div>

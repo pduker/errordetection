@@ -13,12 +13,12 @@ export function AboutPage() {
             See a problem? Please get in touch with Phil Duker
 
           </div>
-          <br />
+        <br />
           <div>This project was led by Phil Duker with the help of the following wonderful UD students:
-Alex Daley, Weldin Dunn, Benjamin McMonagle, Sean O’Sullivan, Sonika Sharma, Colin Stetler
-Victor Umoren-Udo, and Lillian Woulfe
-</div>
-<br />
+          Alex Daley, Weldin Dunn, Benjamin McMonagle, Sean O’Sullivan, Sonika Sharma, Colin Stetler,
+          Victor Umoren-Udo, and Lillian Woulfe
+          </div>
+        <br />
           <div>
             This project was funded by through a Paul J. Rickards,
             Jr. Teaching Innovation Grant and supported through the university of Delaware’s Academic Technology Services 

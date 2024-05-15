@@ -46,7 +46,7 @@ export function Exercise({
 
 }) {
     //for score styling
-    const score = {display: "inline-block", margin: "auto", backgroundColor: "white", borderRadius: "2px", width: "400px"};
+    const score = {display: "inline-block", margin: "auto", backgroundColor: "white", borderRadius: "10px", width: "100%"};
 
     // lots of variable initialization
     var abc = "", feed = "", color: string;
@@ -751,16 +751,16 @@ export function Exercise({
             /* student view */
             <span>
                 {/* score div */}
-                <div style = {{width:"75%", display: "inline-flex"}}>
+                <div style = {{width:"100%", display: "inline-flex"}}>
                     <div id={"target" + exIndex} style={score}></div>
                 </div>
-
+                <br/>
                 <img
                     alt="note-color-key"
                     src={noteKey}
                     width="14%"
                     height="7%"
-                    style={{display:"inline-flex", marginLeft: "1vw", marginTop: "-30vh"}}
+                    style={{display:"inline-flex", marginRight: "1vw", marginTop: "-2.5vh", borderRadius: "1px"}}
                 />
 
                 {/* container for the audio player and reset button */}
@@ -775,7 +775,7 @@ export function Exercise({
                         <button className= "btnback" onClick={checkAnswers}>Check Answer</button>
                         <div>Next step(s): {customFeedback.map(function(feedback) {
                             // this key generation is COOKED but we don't need to access it and they all gotta be different sooooooo
-                            return <li style={{marginLeft: "12px"}} key={Math.random()}>{feedback}</li>
+                            return <li style={{display: "flex", margin: "auto", justifyContent:"center"}} key={Math.random()}>{feedback}</li>
                         })}</div>
                     </div>
                 : <div/>}

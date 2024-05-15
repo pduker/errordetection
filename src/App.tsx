@@ -78,8 +78,8 @@ function App() {
               <img
                 alt=""
                 src={logo}
-                width="75"
-                height="75"
+                width="60"
+                height="60"
                 className="d-inline-block align-top"
               />
             </Navbar.Brand>
@@ -98,7 +98,7 @@ function App() {
           
         </header>
         <div className='pagediv'>
-        <div  style={{height:'600px',overflowY: "scroll",margin: "10px"}}>
+        <div  style={{overflowY: "scroll",margin: "10px"}}>
           <Routes>
               <Route path="/" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>}/>
             </Routes>

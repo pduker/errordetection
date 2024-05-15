@@ -5,7 +5,7 @@
 
 .App-header {
   background-color: #12efef;
-  min-height: 15vh;
+  min-height: 11vh;
   display: inline-block;
   flex-direction: row;
   justify-content: flex-start;
@@ -66,7 +66,7 @@ body {
 }
 /* find better font and colors for the page */
 #navbar {
-  height: 100%;
+  height: 90%;
   position: sticky;
   top: 20px;
 }
@@ -81,18 +81,19 @@ body {
   /* 600px 1000px; */
 }
 .pagediv {
-  width: 90%;
+  height: 86.5vh;
+  width: 95vw;
   display: flex;
   box-shadow: inset 0 0 5px grey;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 20px 5% 30px 5%;
+  padding: 1vh 1vw 1vh 1vw;
   margin-top: 0px;
   background: #ffdb63;
   border-radius: 10px;
-  margin-left: 5%;
+  margin-left: 2.5vw;
 }
 
 .about {
@@ -227,7 +228,6 @@ nav {
   align-items: left;
   justify-content: space-between;
   z-index: 3;
-  border-radius: 10px;
   flex-wrap: wrap;
   background: #785812;
   position: fixed;
