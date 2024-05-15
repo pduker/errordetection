@@ -709,10 +709,10 @@ export function Exercise({
                 <div/>
                 
                 {/* file uploads */}
-                <div id="xmlUpload" style={{display:"inline",float:"left"}}>
+                <div id="xmlUpload" style={{display:"inline-flex"}}>
                     XML Upload: <FileUpload setFile={setXmlFile} file={xmlFile} setAbcFile={setAbcFile} type="xml" setLoaded={setLoaded}></FileUpload>
                 </div>
-                <div id="mp3Upload" style={{display:"inline"}}>
+                <div id="mp3Upload" style={{display:"inline-flex"}}>
                     MP3 Upload: <FileUpload setFile={setMp3File} file={mp3File} setAbcFile={setAbcFile} type="mp3" setLoaded={setLoaded}></FileUpload>
                 </div>
                 
