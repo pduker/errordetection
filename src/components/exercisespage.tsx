@@ -254,7 +254,7 @@ export function ExercisesPage({
     }
 
     return (
-        <div style={{width: "90vw"}}>
+        <div style={{ width: "90vw", marginTop: "10px" }}>
             <div>
             <h2>Welcome to the Exercises Page!</h2>
             </div>
@@ -332,7 +332,7 @@ export function ExercisesPage({
                             </select>
                         </form>
 
-                        <Button variant="danger" onClick={resetSort} style={{marginLeft: "10px"}}>Reset Sort</Button>
+                        <Button variant="danger" onClick={resetSort} style={{marginLeft: "8px"}}>Reset Sort</Button>
                     </div>
                     
                 </span>

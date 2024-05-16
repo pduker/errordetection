@@ -634,7 +634,8 @@ export function Exercise({
 
     return (
         // big yellow exercise box
-        <div style = {{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
+        <div style={{ margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px", marginLeft: "100px", marginTop: "20px" }}>
+
 
             {/* custom exercise title box */}
             {editingTitle && teacherMode ? 
