@@ -370,6 +370,54 @@ export function Exercise({
         setChecking(true);
     } */
 
+    //adding highlinght measure function
+    function highlightMeasure(selectedNotes: Element[]) {
+        // Create a set to store unique measure positions
+        const measurePositions = new Set<number>();
+    
+        // Iterate through selected notes to collect measure positions
+        selectedNotes.forEach(noteElem => {
+            const measurePos = Number(noteElem.getAttribute("measurePos"));
+            if (!isNaN(measurePos)) {
+                measurePositions.add(measurePos);
+            }
+        });
+    
+        // Iterate through each unique measure position and create overlays
+        measurePositions.forEach(measurePos => {
+            // Select all note elements with the same `measurePos`
+            const measureNotes = document.querySelectorAll(`[measurePos='${measurePos}']`);
+    
+            // Calculate the bounding box for the entire measure
+            let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    
+            measureNotes.forEach(note => {
+                const bbox = (note as SVGAElement).getBBox();
+                minX = Math.min(minX, bbox.x);
+                minY = Math.min(minY, bbox.y);
+                maxX = Math.max(maxX, bbox.x + bbox.width);
+                maxY = Math.max(maxY, bbox.y + bbox.height);
+            });
+    
+            // Set up overlay dimensions and positioning
+            const overlay = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+            overlay.setAttribute("x", minX.toString());
+            overlay.setAttribute("y", minY.toString());
+            overlay.setAttribute("width", (maxX - minX).toString());
+            overlay.setAttribute("height", (maxY - minY).toString());
+            overlay.setAttribute("fill", "rgba(255, 0, 0, 0.2)");  // semi-transparent red overlay for feedback
+            overlay.setAttribute("class", "measure-highlight");
+    
+            // Get the SVG element and append the overlay if it exists
+            const svgElement = document.querySelector("svg");
+            if (svgElement) {
+                svgElement.appendChild(overlay);
+            } else {
+                console.error("SVG element not found!");
+            }
+        });
+    }
+
     //function run when check answers button pressed on ex view: checks selected vs correct answers and displays feedback accordingly
     const checkAnswers = function(){
         var tmpSelected = [...selAnswers];
@@ -425,12 +473,13 @@ export function Exercise({
             for(let i = 0;i < tmpCorrect.length;i++){
                 // generic note position feedback
                 feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
-                
+                highlightMeasure(wrongList);
             }
             for(let i = 0;i < wrongList.length;i++){
                 // position of any wrong answers selected
                 feedback = ([...feedback,"Wrong answer selected at: " + "Measure " + (Number(wrongList[i].getAttribute("measurePos"))+1) + ", Staff " + (Number(wrongList[i].getAttribute("staffPos"))+1)])
                 //console.log(wrongList[i]);
+                highlightMeasure(wrongList);
                 
             }
 
@@ -442,7 +491,7 @@ export function Exercise({
             for(let i = 0;i < tmpCorrect.length;i++){
                 // generic note position feedback
                 feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
-
+                highlightMeasure(wrongList);
                 // specific note feedback added on mng page
                 let addtlFeedback = tmpCorrect[i]["feedback"];
 
@@ -454,6 +503,7 @@ export function Exercise({
                 if(addtlFeedback !== ""){
                     let add = feedback.pop();
                     feedback = [...feedback, add + ". Additional feedback: " + addtlFeedback];
+                    highlightMeasure(wrongList);
                 } 
             }
         
@@ -463,12 +513,14 @@ export function Exercise({
             // same as above feedback loop
             for(let i = 0;i < tmpCorrect.length;i++){
                 feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                highlightMeasure(wrongList);
                 let addtlFeedback = tmpCorrect[i]["feedback"];
                 if(closeList.includes(Number(tmpCorrect[i]["index"])) && !tmpCorrect[i]["feedback"].toString().startsWith("You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). "))
                         addtlFeedback = "You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). " + tmpCorrect[i]["feedback"];
                 if(addtlFeedback !== ""){
                     let add = feedback.pop();
                     feedback = [...feedback, add + ". Additional feedback: " + addtlFeedback];
+                    highlightMeasure(wrongList);
                 } 
             }
         }
