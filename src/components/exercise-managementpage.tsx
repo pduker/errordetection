@@ -246,7 +246,7 @@ export function ExerciseManagementPage({
             setAllExData(updatedExercises);
             alert("selected exercises deleted!");
             // reload the page without changing the url 
-            window.location.href = window.location.href;
+            window.location.reload();
         } catch (error) {
             console.error('error deleting exercises:', error);
             alert('error deleting exercises.');
