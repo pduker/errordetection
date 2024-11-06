@@ -31,7 +31,7 @@ export default function FileUpload ({
       //console.log(xmldata);
       var result = vertaal(xmldata, options);
       var abcText = result[0];
-      var errorText = result[1];
+      //var errorText = result[1];
       if (setAbcFile != null) {
           setAbcFile(abcText);
           setLoaded(false);

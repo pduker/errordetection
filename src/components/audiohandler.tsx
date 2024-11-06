@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 
 export default function AudioHandler({ file }: { file: File }): JSX.Element {
   //state declarations, can be used to access file in the future
-  const [msgContent, setMsgContent] = useState<string>("");
+  const [msgContent] = useState<string>("");
   const audioRef = useRef<HTMLAudioElement>(null);
 
   //sets the audio that is uploaded

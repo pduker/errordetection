@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ref, push, get, remove, child, set } from 'firebase/database';
+import { ref, get, remove, child, set } from 'firebase/database';
 import  abcjs from 'abcjs';
 import FileUpload  from './fileupload';
 import ExerciseData from '../interfaces/exerciseData';
@@ -477,7 +477,7 @@ export function Exercise({
             }
             for(let i = 0;i < wrongList.length;i++){
                 // position of any wrong answers selected
-                feedback = ([...feedback,"Wrong answer selected at: " + "Measure " + (Number(wrongList[i].getAttribute("measurePos"))+1) + ", Staff " + (Number(wrongList[i].getAttribute("staffPos"))+1)])
+                feedback = ([...feedback,"Wrong answer selected at:  Measure " + (Number(wrongList[i].getAttribute("measurePos"))+1) + ", Staff " + (Number(wrongList[i].getAttribute("staffPos"))+1)])
                 //console.log(wrongList[i]);
                 highlightMeasure(wrongList);
                 
@@ -561,8 +561,8 @@ export function Exercise({
                 setCustomTitle(tags.sort().join(" & ") + ": Level " + diff + ", Exercise: " + exNum);
                 if(transpos)setCustomTitle(tags.sort().join(" & ") + ": Transpose Insts - Level " + diff + ", Exercise: " + exNum);
             } else if (types === "Both"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone/Ens Parts")  +  " - Level " + diff + ", Exercise: " + exNum);
-                if(transpos)setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone/Ens Parts") + " w/ Transpose Insts - Level " + diff + ", Exercise: " + exNum);
+                setCustomTitle(tags.sort().join(" & ") + ": Drone/Ens Parts  - Level " + diff + ", Exercise: " + exNum);
+                if(transpos)setCustomTitle(tags.sort().join(" & ") + ": Drone/Ens Parts w/ Transpose Insts - Level " + diff + ", Exercise: " + exNum);
             } else {
                 setCustomTitle(tags.sort().join(" & ") + ": " + (types) + " - Level " + diff + ", Exercise: " + exNum);
                 if(transpos) setCustomTitle(tags.sort().join(" & ") + ": " + (types) + " w/ Transpose Insts - Level " + diff + ", Exercise: " + exNum);
@@ -573,8 +573,8 @@ export function Exercise({
                 if(transpos)setCustomTitle(tags.sort().join(" & ") + ": " + meter + "  w/ Transpose Insts - Level " + diff + ", Exercise: " + exNum);
 
             } else if (types === "Both"){
-                setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone/Ens Parts: ") + meter + " - Level " + diff + ", Exercise: " + exNum);
-                if(transpos) setCustomTitle(tags.sort().join(" & ") + ": " + ("Drone/Ens Parts: ") + meter + " w/ Transpose Insts - Level " + diff + ", Exercise: " + exNum);
+                setCustomTitle(tags.sort().join(" & ") + ": Drone/Ens Parts: " + meter + " - Level " + diff + ", Exercise: " + exNum);
+                if(transpos) setCustomTitle(tags.sort().join(" & ") + ": Drone/Ens Parts: " + meter + " w/ Transpose Insts - Level " + diff + ", Exercise: " + exNum);
             } else{
                 setCustomTitle(tags.sort().join(" & ") + ": " + (types) + ": " + meter  +   " - Level " + diff + ", Exercise: " + exNum);
                 if(transpos)setCustomTitle(tags.sort().join(" & ") + ": " + (types) + ": " + meter  +   " w/ Transpose Insts - Level " + diff + ", Exercise: " + exNum);
@@ -622,7 +622,7 @@ export function Exercise({
 
     //onClick function for when transposition is changed
     const transposChange = function(e: React.ChangeEvent<HTMLInputElement>) {
-        let val = e.target.value;
+        //let val = e.target.value;
         setTranspos(!transpos);
         customTitleChange(tags,diff,voices,types,meter,!transpos);
     }
@@ -669,7 +669,7 @@ export function Exercise({
                 alert("exercise " + exTitle + " deleted!");
     
                 // reload the page without changing the url 
-                window.location.href = window.location.href;
+                window.location.reload();
 
             } else {
                 //if no matching exercise is found

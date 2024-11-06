@@ -4,18 +4,18 @@ import Nav from 'react-bootstrap/Nav';
 import logo from './assets/UD-circle-logo-email.png';
 import './App.css';
 //import BoopButton from "./components/audiohander"
-import { HomePage } from './components/homepage';
+//import { HomePage } from './components/homepage';
 import { HelpPage } from './components/helppage';
 import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import { Interface } from 'readline';
+//import { Interface } from 'readline';
 import ExerciseData from './interfaces/exerciseData';
 import DBData from './interfaces/DBData';
 import { getDatabase } from 'firebase/database';
-import { ref, push, onValue, DataSnapshot } from 'firebase/database';
-import { getBlob, getDownloadURL, getStorage, ref as storageRef } from 'firebase/storage';
+import { ref, onValue, DataSnapshot } from 'firebase/database';
+import { getBlob, getStorage, ref as storageRef } from 'firebase/storage';
 
 //import Navbar from "./components/navbar"
 
