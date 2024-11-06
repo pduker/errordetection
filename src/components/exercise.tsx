@@ -69,7 +69,7 @@ export function Exercise({
         if(exerciseData.score !== undefined) abc = exerciseData.score;
         if(exerciseData.sound !== undefined) mp3 = exerciseData.sound;
         if(exerciseData.correctAnswers !== undefined) ans = exerciseData.correctAnswers;
-        if(exerciseData.feedback !== undefined) feed = exerciseData.feedback;
+        //if(exerciseData.feedback !== undefined) feed = exerciseData.feedback;
         if(exerciseData.title !== undefined) title = exerciseData.title;
         if(exerciseData.tags !== undefined) tagsInit = exerciseData.tags;
         if(exerciseData.difficulty !== undefined) diffInit = exerciseData.difficulty;
