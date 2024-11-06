@@ -15,12 +15,6 @@ export function ExerciseManagementPage({
     fetch: (val: boolean) => void;
     authorized: boolean;
 }) {
-    useEffect(() => {
-        if(exList.length === 0) {
-            if(tags.length === 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos) setExList(allExData.sort(exSortFunc));
-        }
-        if(exList.length > allExData.length) setExList(allExData.sort(exSortFunc));
-    });
 
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
 
@@ -45,7 +39,13 @@ export function ExerciseManagementPage({
         setTags([]);
         sortExercises(undefined,"");
     } */
-
+    useEffect(() => {
+        if(exList.length === 0) {
+            if(tags.length === 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos) setExList(allExData.sort(exSortFunc));
+        }
+        if(exList.length > allExData.length) setExList(allExData.sort(exSortFunc));
+    },[exList.length, allExData, tags.length, diff, voices, types, meter, transpos]);
+    
     const createExercise = function () {
         var last = allExData[allExData.sort(indexSort).length-1];
         var newEx: ExerciseData;
