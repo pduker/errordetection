@@ -249,15 +249,14 @@ export function Exercise({
       });
 
       const beatNum = visualObjs[0].getBeatsPerMeasure();
-      console.log("measure" + beatNum);
-      let beatSum:number = 0;
+      let beatSum: number = 0;
       let barStartX = 0;
 
       const svgElement = document.querySelector("svg");
-        const boundingBox: DOMRect | undefined =
-          svgElement?.getBoundingClientRect();
+      const boundingBox: DOMRect | undefined =
+        svgElement?.getBoundingClientRect();
 
-      
+
       // adds staff #, measure #, index, selectedTimes of 0, and empty feedback to each note when the score is first loaded
       var staffArray = visualObjs[0].lines[0].staff;
 
@@ -289,14 +288,11 @@ export function Exercise({
           measure = 0;
         }
 
-        // const svgElement = document.querySelector("svg");
-        // const boundingBox: DOMRect | undefined =
-        //   svgElement?.getBoundingClientRect();
-
         if (!boundingBox) {
           return;
         }
 
+        //save the starting point of the beat
         if (beatSum === 0) {
           barStartX = noteElems.getBoundingClientRect().left;
         }
@@ -305,7 +301,8 @@ export function Exercise({
           beatSum += note.duration;
         }
         let noteEndX = noteElems.nextSibling.getBoundingClientRect().left;
-        
+
+        //create bar and coverbox by beat
         if (beatSum === visualObjs[0].getBeatLength()) {
           const bar = document.createElement("div");
           bar.classList.add("bar");
@@ -317,102 +314,51 @@ export function Exercise({
           bar.style.backgroundColor = "blue";
           bar.style.opacity = "0.2";
 
-          // Create the cover box element
-        const coverBox = document.createElement("div");
-        coverBox.classList.add("cover-box");
-        coverBox.style.position = "absolute";
-        coverBox.style.top = bar.style.top;
-        coverBox.style.left = bar.style.left;
-        // coverBox.style.width = (noteBox.right - noteBox.left)+ "px";
-        coverBox.style.width = bar.style.width;
-        coverBox.style.height = (boundingBox.height / 2)+ "px";
-        coverBox.style.backgroundColor = "blue";
-        coverBox.style.opacity = "0";
-        coverBox.style.pointerEvents = "none";
-        bar.addEventListener("mouseenter", () => {
-          if (bar.style.opacity === "0.2") {
-            bar.style.opacity = "0.5";
-          }
-        });
-        bar.addEventListener("mouseleave", () => {
-          if (bar.style.opacity !== "1") {
-            bar.style.opacity = "0.2";
-          }
-        });
+          const coverBox = document.createElement("div");
+          coverBox.classList.add("cover-box");
+          coverBox.style.position = "absolute";
+          coverBox.style.top = bar.style.top;
+          coverBox.style.left = bar.style.left;
+          coverBox.style.width = bar.style.width;
+          coverBox.style.height = (boundingBox.height / 2) + "px";
+          coverBox.style.backgroundColor = "blue";
+          coverBox.style.opacity = "0";
+          coverBox.style.pointerEvents = "none";
 
-        bar.addEventListener("click", () => {
-          if (bar.style.opacity === "0.5") {
-            bar.style.opacity = "1";
-            coverBox.style.opacity = "0.5";
-          } else if (bar.style.opacity === "1") {
-            bar.style.opacity = "0.2";
-            coverBox.style.opacity = "0";
+          bar.addEventListener("mouseenter", () => {
+            if (bar.style.opacity === "0.2") {
+              bar.style.opacity = "0.5";
+            }
+          });
+          bar.addEventListener("mouseleave", () => {
+            if (bar.style.opacity !== "1") {
+              bar.style.opacity = "0.2";
+            }
+          });
+
+          bar.addEventListener("click", () => {
+            if (bar.style.opacity === "0.5") {
+              bar.style.opacity = "1";
+              coverBox.style.opacity = "0.5";
+            } else if (bar.style.opacity === "1") {
+              bar.style.opacity = "0.2";
+              coverBox.style.opacity = "0";
+            }
+          });
+
+          // Append the bar and coverBox to the appropriate parent element
+          const parentElement = document.getElementById("target" + exIndex);
+          if (parentElement) {
+            parentElement.appendChild(bar);
+            parentElement.appendChild(coverBox);
           }
-        });
-        // Append the bar and coverBox to the appropriate parent element
-        const parentElement = document.getElementById("target" + exIndex);
-        if (parentElement) {
-          parentElement.appendChild(bar);
-          parentElement.appendChild(coverBox);
+          
+          document.body.appendChild(bar);
+          document.body.appendChild(coverBox);
+
+          //reset beatSum
+          beatSum = 0;
         }
-
-        beatSum = 0;
-
-
-        document.body.appendChild(bar);
-        document.body.appendChild(coverBox);
-        }
-        // // const noteBox = noteElems.getBoundingClientRect();
-        // const bar = document.createElement("div");
-        // bar.classList.add("bar");
-        // bar.style.position = "absolute";
-        // bar.style.top = boundingBox.y + 50 + "px";
-        // bar.style.left = noteElems.getBoundingClientRect().left + "px";
-        // bar.style.width = noteElems.nextSibling.getBoundingClientRect().left - noteElems.getBoundingClientRect().left + "px";
-        // bar.style.height = "5px";
-        // bar.style.backgroundColor = "blue";
-        // bar.style.opacity = "0.2";
-        // // Create the cover box element
-        // const coverBox = document.createElement("div");
-        // coverBox.classList.add("cover-box");
-        // coverBox.style.position = "absolute";
-        // coverBox.style.top = bar.style.top;
-        // coverBox.style.left = bar.style.left;
-        // // coverBox.style.width = (noteBox.right - noteBox.left)+ "px";
-        // coverBox.style.width = bar.style.width;
-        // coverBox.style.height = (boundingBox.height / 2)+ "px";
-        // coverBox.style.backgroundColor = "blue";
-        // coverBox.style.opacity = "0";
-        // coverBox.style.pointerEvents = "none";
-        // bar.addEventListener("mouseenter", () => {
-        //   if (bar.style.opacity === "0.2") {
-        //     bar.style.opacity = "0.5";
-        //   }
-        // });
-        // bar.addEventListener("mouseleave", () => {
-        //   if (bar.style.opacity !== "1") {
-        //     bar.style.opacity = "0.2";
-        //   }
-        // });
-
-        // bar.addEventListener("click", () => {
-        //   if (bar.style.opacity === "0.5") {
-        //     bar.style.opacity = "1";
-        //     coverBox.style.opacity = "0.5";
-        //   } else if (bar.style.opacity === "1") {
-        //     bar.style.opacity = "0.2";
-        //     coverBox.style.opacity = "0";
-        //   }
-        // });
-        // // Append the bar and coverBox to the appropriate parent element
-        // const parentElement = document.getElementById("target" + exIndex);
-        // if (parentElement) {
-        //   parentElement.appendChild(bar);
-        //   parentElement.appendChild(coverBox);
-        // }
-
-        // document.body.appendChild(bar);
-        // document.body.appendChild(coverBox);
 
         // rehighlights correct answers on mng page for ex editing purposes
         if (teacherMode) {
