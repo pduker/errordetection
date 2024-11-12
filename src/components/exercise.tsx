@@ -247,7 +247,17 @@ export function Exercise({
         lineThickness: 0.4,
         responsive: "resize",
       });
-      //createBars();
+
+      const beatNum = visualObjs[0].getBeatsPerMeasure();
+      console.log("measure" + beatNum);
+      let beatSum:number = 0;
+      let barStartX = 0;
+
+      const svgElement = document.querySelector("svg");
+        const boundingBox: DOMRect | undefined =
+          svgElement?.getBoundingClientRect();
+
+      
       // adds staff #, measure #, index, selectedTimes of 0, and empty feedback to each note when the score is first loaded
       var staffArray = visualObjs[0].lines[0].staff;
 
@@ -279,28 +289,35 @@ export function Exercise({
           measure = 0;
         }
 
-        const svgElement = document.querySelector("svg");
-        const boundingBox: DOMRect | undefined =
-          svgElement?.getBoundingClientRect();
+        // const svgElement = document.querySelector("svg");
+        // const boundingBox: DOMRect | undefined =
+        //   svgElement?.getBoundingClientRect();
 
         if (!boundingBox) {
           return;
         }
 
-        const timeSignature = visualObjs[0].getBeatsPerMeasure();
-        console.log("measure"+timeSignature);
+        if (beatSum === 0) {
+          barStartX = noteElems.getBoundingClientRect().left;
+        }
+
+        if (typeof note.duration === "number" && !isNaN(note.duration)) {
+          beatSum += note.duration;
+        }
+        let noteEndX = noteElems.nextSibling.getBoundingClientRect().left;
         
-        // const noteBox = noteElems.getBoundingClientRect();
-        const bar = document.createElement("div");
-        bar.classList.add("bar");
-        bar.style.position = "absolute";
-        bar.style.top = boundingBox.y + 50 + "px";
-        bar.style.left = noteElems.getBoundingClientRect().left + "px";
-        bar.style.width = noteElems.nextSibling.getBoundingClientRect().left - noteElems.getBoundingClientRect().left + "px";
-        bar.style.height = "5px";
-        bar.style.backgroundColor = "blue";
-        bar.style.opacity = "0.2";
-        // Create the cover box element
+        if (beatSum === visualObjs[0].getBeatLength()) {
+          const bar = document.createElement("div");
+          bar.classList.add("bar");
+          bar.style.position = "absolute";
+          bar.style.top = boundingBox.y + 50 + "px";
+          bar.style.left = barStartX + "px";
+          bar.style.width = noteEndX - barStartX - 5 + "px";
+          bar.style.height = "5px";
+          bar.style.backgroundColor = "blue";
+          bar.style.opacity = "0.2";
+
+          // Create the cover box element
         const coverBox = document.createElement("div");
         coverBox.classList.add("cover-box");
         coverBox.style.position = "absolute";
@@ -339,8 +356,63 @@ export function Exercise({
           parentElement.appendChild(coverBox);
         }
 
+        beatSum = 0;
+
+
         document.body.appendChild(bar);
         document.body.appendChild(coverBox);
+        }
+        // // const noteBox = noteElems.getBoundingClientRect();
+        // const bar = document.createElement("div");
+        // bar.classList.add("bar");
+        // bar.style.position = "absolute";
+        // bar.style.top = boundingBox.y + 50 + "px";
+        // bar.style.left = noteElems.getBoundingClientRect().left + "px";
+        // bar.style.width = noteElems.nextSibling.getBoundingClientRect().left - noteElems.getBoundingClientRect().left + "px";
+        // bar.style.height = "5px";
+        // bar.style.backgroundColor = "blue";
+        // bar.style.opacity = "0.2";
+        // // Create the cover box element
+        // const coverBox = document.createElement("div");
+        // coverBox.classList.add("cover-box");
+        // coverBox.style.position = "absolute";
+        // coverBox.style.top = bar.style.top;
+        // coverBox.style.left = bar.style.left;
+        // // coverBox.style.width = (noteBox.right - noteBox.left)+ "px";
+        // coverBox.style.width = bar.style.width;
+        // coverBox.style.height = (boundingBox.height / 2)+ "px";
+        // coverBox.style.backgroundColor = "blue";
+        // coverBox.style.opacity = "0";
+        // coverBox.style.pointerEvents = "none";
+        // bar.addEventListener("mouseenter", () => {
+        //   if (bar.style.opacity === "0.2") {
+        //     bar.style.opacity = "0.5";
+        //   }
+        // });
+        // bar.addEventListener("mouseleave", () => {
+        //   if (bar.style.opacity !== "1") {
+        //     bar.style.opacity = "0.2";
+        //   }
+        // });
+
+        // bar.addEventListener("click", () => {
+        //   if (bar.style.opacity === "0.5") {
+        //     bar.style.opacity = "1";
+        //     coverBox.style.opacity = "0.5";
+        //   } else if (bar.style.opacity === "1") {
+        //     bar.style.opacity = "0.2";
+        //     coverBox.style.opacity = "0";
+        //   }
+        // });
+        // // Append the bar and coverBox to the appropriate parent element
+        // const parentElement = document.getElementById("target" + exIndex);
+        // if (parentElement) {
+        //   parentElement.appendChild(bar);
+        //   parentElement.appendChild(coverBox);
+        // }
+
+        // document.body.appendChild(bar);
+        // document.body.appendChild(coverBox);
 
         // rehighlights correct answers on mng page for ex editing purposes
         if (teacherMode) {
@@ -387,10 +459,10 @@ export function Exercise({
   //runs when reset answers button is pushed on mng view: essentially reloads score/resets answers
   const reload = function () {
     // see exReload for explanation of this jank
-    for (let i = 0; i < selNotes.length; ) selNotes.pop();
+    for (let i = 0; i < selNotes.length;) selNotes.pop();
     setSelNotes([]);
     // ditto
-    for (let i = 0; i < correctAnswers.length; ) correctAnswers.pop();
+    for (let i = 0; i < correctAnswers.length;) correctAnswers.pop();
     setCorrectAnswers([]);
     loadScore();
   };
@@ -398,7 +470,7 @@ export function Exercise({
   //same as above, but on exercises page
   const exReload = function () {
     // workaround because state is jank: empties selAnswers via popping before... setting it to an empty list (thanks react)
-    for (let i = 0; i < selAnswers.length; ) selAnswers.pop();
+    for (let i = 0; i < selAnswers.length;) selAnswers.pop();
     setSelAnswers([]);
     loadScore();
   };
@@ -634,20 +706,20 @@ export function Exercise({
       if (correctAnswers.length === 1) plural = " is ";
       feedback = [
         "You selected " +
-          selAnswers.length +
-          " answer(s). There" +
-          plural +
-          correctAnswers.length +
-          " correct answer(s). Here are some specific places to look at and listen to more closely:",
+        selAnswers.length +
+        " answer(s). There" +
+        plural +
+        correctAnswers.length +
+        " correct answer(s). Here are some specific places to look at and listen to more closely:",
       ];
       for (let i = 0; i < tmpCorrect.length; i++) {
         // generic note position feedback
         feedback = [
           ...feedback,
           "Measure " +
-            (Number(tmpCorrect[i]["measurePos"]) + 1) +
-            ", Staff " +
-            (Number(tmpCorrect[i]["staffPos"]) + 1),
+          (Number(tmpCorrect[i]["measurePos"]) + 1) +
+          ", Staff " +
+          (Number(tmpCorrect[i]["staffPos"]) + 1),
         ];
         highlightMeasure(wrongList);
       }
@@ -656,9 +728,9 @@ export function Exercise({
         feedback = [
           ...feedback,
           "Wrong answer selected at:  Measure " +
-            (Number(wrongList[i].getAttribute("measurePos")) + 1) +
-            ", Staff " +
-            (Number(wrongList[i].getAttribute("staffPos")) + 1),
+          (Number(wrongList[i].getAttribute("measurePos")) + 1) +
+          ", Staff " +
+          (Number(wrongList[i].getAttribute("staffPos")) + 1),
         ];
         //console.log(wrongList[i]);
         highlightMeasure(wrongList);
@@ -675,9 +747,9 @@ export function Exercise({
         feedback = [
           ...feedback,
           "Measure " +
-            (Number(tmpCorrect[i]["measurePos"]) + 1) +
-            ", Staff " +
-            (Number(tmpCorrect[i]["staffPos"]) + 1),
+          (Number(tmpCorrect[i]["measurePos"]) + 1) +
+          ", Staff " +
+          (Number(tmpCorrect[i]["staffPos"]) + 1),
         ];
         highlightMeasure(wrongList);
         // specific note feedback added on mng page
@@ -717,9 +789,9 @@ export function Exercise({
         feedback = [
           ...feedback,
           "Measure " +
-            (Number(tmpCorrect[i]["measurePos"]) + 1) +
-            ", Staff " +
-            (Number(tmpCorrect[i]["staffPos"]) + 1),
+          (Number(tmpCorrect[i]["measurePos"]) + 1) +
+          ", Staff " +
+          (Number(tmpCorrect[i]["staffPos"]) + 1),
         ];
         highlightMeasure(wrongList);
         let addtlFeedback = tmpCorrect[i]["feedback"];
@@ -790,112 +862,112 @@ export function Exercise({
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-              ": Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum
+            ": Transpose Insts - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
           );
       } else if (types === "Both") {
         setCustomTitle(
           tags.sort().join(" & ") +
-            ": Drone/Ens Parts  - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+          ": Drone/Ens Parts  - Level " +
+          diff +
+          ", Exercise: " +
+          exNum
         );
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-              ": Drone/Ens Parts w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum
+            ": Drone/Ens Parts w/ Transpose Insts - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
           );
       } else {
         setCustomTitle(
           tags.sort().join(" & ") +
-            ": " +
-            types +
-            " - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+          ": " +
+          types +
+          " - Level " +
+          diff +
+          ", Exercise: " +
+          exNum
         );
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-              ": " +
-              types +
-              " w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum
+            ": " +
+            types +
+            " w/ Transpose Insts - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
           );
       }
     } else {
       if (types === "None") {
         setCustomTitle(
           tags.sort().join(" & ") +
-            ": " +
-            meter +
-            " - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+          ": " +
+          meter +
+          " - Level " +
+          diff +
+          ", Exercise: " +
+          exNum
         );
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-              ": " +
-              meter +
-              "  w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum
+            ": " +
+            meter +
+            "  w/ Transpose Insts - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
           );
       } else if (types === "Both") {
         setCustomTitle(
           tags.sort().join(" & ") +
-            ": Drone/Ens Parts: " +
-            meter +
-            " - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+          ": Drone/Ens Parts: " +
+          meter +
+          " - Level " +
+          diff +
+          ", Exercise: " +
+          exNum
         );
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-              ": Drone/Ens Parts: " +
-              meter +
-              " w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum
+            ": Drone/Ens Parts: " +
+            meter +
+            " w/ Transpose Insts - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
           );
       } else {
         setCustomTitle(
           tags.sort().join(" & ") +
-            ": " +
-            types +
-            ": " +
-            meter +
-            " - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+          ": " +
+          types +
+          ": " +
+          meter +
+          " - Level " +
+          diff +
+          ", Exercise: " +
+          exNum
         );
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-              ": " +
-              types +
-              ": " +
-              meter +
-              " w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum
+            ": " +
+            types +
+            ": " +
+            meter +
+            " w/ Transpose Insts - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
           );
       }
     }
@@ -1162,7 +1234,7 @@ export function Exercise({
 
           {/* this button shouldn't actually be able to appear, but is a backup in case useEffect doesn't load the score */}
           {(exerciseData !== undefined && !exerciseData.empty && !loaded) ||
-          (abcFile !== undefined && abcFile !== "" && !loaded) ? (
+            (abcFile !== undefined && abcFile !== "" && !loaded) ? (
             <button onClick={loadScore}>Load Score</button>
           ) : (
             <></>
@@ -1183,7 +1255,7 @@ export function Exercise({
 
           {/* stuff that only shows once an xml has been passed in: individual note feedback, reset answers button */}
           {(abcFile !== undefined && abcFile !== "" && loaded) ||
-          (exerciseData !== undefined && !exerciseData.empty) ? (
+            (exerciseData !== undefined && !exerciseData.empty) ? (
             <div
               style={{
                 display: "inline-block",
@@ -1210,7 +1282,7 @@ export function Exercise({
 
           {/* note info blurb in case teachers want to see which staff/measure the note is on (and can't/don't want to count i guess) */}
           {lastClicked !== undefined &&
-          Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) %
+            Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) %
             3 !==
             0 ? (
             <div style={{ marginLeft: "1vw" }}>Note Info: {ana}</div>
