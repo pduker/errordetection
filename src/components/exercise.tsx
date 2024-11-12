@@ -287,6 +287,9 @@ export function Exercise({
           return;
         }
 
+        const timeSignature = visualObjs[0].getBeatsPerMeasure();
+        console.log("measure"+timeSignature);
+        
         // const noteBox = noteElems.getBoundingClientRect();
         const bar = document.createElement("div");
         bar.classList.add("bar");
