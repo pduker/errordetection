@@ -15,14 +15,14 @@ export function HelpPage({
         var box = document.getElementById("mng-pwd");
         if(box !== null && "value" in box) {
             var str = box.value as string;
-            if(sha256(str) === "e276575ffd747ae76d2a4969d4cc64bba550243efd9786cc044b07fdbd149fbd") {
+            //if(sha256(str) === "e276575ffd747ae76d2a4969d4cc64bba550243efd9786cc044b07fdbd149fbd") {
                 setAuthorized(true);
                 setError(false);
-            } else {
-                setError(true);
+            //} else {
+                //setError(true);
             }
         }
-    }
+    //}
 
     return (
         <div>
