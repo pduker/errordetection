@@ -710,6 +710,10 @@ export function Exercise({
                         {/* <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm */}
                         <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{margin: "4px"}}/>Pitch
                         <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Intonation
+                        <label>
+                                <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange} />
+                                Rhythm
+                            </label>
                     </form>
                     <form id="voiceCt">
                         Voices:
