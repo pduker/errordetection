@@ -251,6 +251,8 @@ export function Exercise({
       let beatSum: number = 0;
       let noteCount: number = 0;
       let barStartX = 0;
+      let created = false;
+      let remainLen = 0;
 
       const svgElement = document.querySelector("svg");
       const boundingBox: DOMRect | undefined =
@@ -287,6 +289,7 @@ export function Exercise({
           measure = 0;
         }
 
+        //create bar when it is rhythm exercise
         if (tags.includes("Rhythm")) {
           if (!boundingBox) {
             return;
@@ -302,44 +305,81 @@ export function Exercise({
             noteCount++;
           }
 
-          console.log("beatSum: " + beatSum);
-          console.log("beatLength: " + visualObjs[0].getBeatLength());
-
-          const bar = document.createElement("div");
-          bar.classList.add("bar");
-          bar.style.position = "absolute";
-
-          const coverBox = document.createElement("div");
-          coverBox.classList.add("cover-box");
-          coverBox.style.position = "absolute";
-
           const topLines = svgElement?.querySelectorAll(".abcjs-top-line");
-          if (topLines) {
-            if (topLines[staff]) {
-               const topBox = topLines[staff].getBoundingClientRect();
-            bar.style.top = topBox.top - boundingBox.top - 10 + "px";
-            }
-           
-          }
-          bar.style.left = barStartX - boundingBox.left + "px";
+          let totalSum: number = 0;
 
+          //when note is longer than a beat
           if (beatSum > visualObjs[0].getBeatLength()) {
-            console.log("len: "+beatSum/visualObjs[0].getBeatLength())
-            for (let k = 0; k < beatSum/visualObjs[0].getBeatLength(); k++) {
+            const bar = document.createElement("div");
+            bar.classList.add("bar");
+            bar.style.position = "absolute";
+
+            const coverBox = document.createElement("div");
+            coverBox.classList.add("cover-box");
+            coverBox.style.position = "absolute";
+
+            if (topLines) {
+              if (topLines[staff]) {
+                const topBox = topLines[staff].getBoundingClientRect();
+                bar.style.top = topBox.top - boundingBox.top - 10 + "px";
+              }
+            }
+
+            if (
+              Math.floor(beatSum / visualObjs[0].getBeatLength()) ===
+              beatSum / visualObjs[0].getBeatLength()
+            ) {
               bar.style.width =
                 (noteElems.nextSibling.getBoundingClientRect().left -
-                  barStartX) /
-                  (beatSum/visualObjs[0].getBeatLength()) -
+                  barStartX) *
+                  (1 / (beatSum / visualObjs[0].getBeatLength())) -
                 5 +
                 "px";
+            } else {
+              bar.style.width =
+                ((noteElems.nextSibling.getBoundingClientRect().left -
+                  noteElems.getBoundingClientRect().left) *
+                  2) /
+                  3 +
+                "px";
+              remainLen =
+                ((noteElems.nextSibling.getBoundingClientRect().left -
+                  noteElems.getBoundingClientRect().left) *
+                  1) /
+                3;
             }
+
+            bar.style.left = barStartX - boundingBox.left + "px";
+            bar.style.height = "5px";
+            bar.style.backgroundColor = "blue";
+            bar.style.opacity = "0.2";
+
+            coverBox.style.top = bar.style.top;
+            coverBox.style.left = bar.style.left;
+            coverBox.style.width = bar.style.width;
+            coverBox.style.height =
+              boundingBox.height / 2 / staffArray.length + "px";
+            coverBox.style.backgroundColor = "blue";
+            coverBox.style.opacity = "0";
+            coverBox.style.pointerEvents = "none";
+
+            bar.addEventListener("mouseenter", () => {
+              if (bar.style.opacity === "0.2") {
+                bar.style.opacity = "0.5";
+              }
+            });
+            bar.addEventListener("mouseleave", () => {
+              if (bar.style.opacity !== "1") {
+                bar.style.opacity = "0.2";
+              }
+            });
 
             bar.addEventListener("click", () => {
               if (bar.style.opacity === "0.5") {
                 bar.style.opacity = "1";
                 coverBox.style.opacity = "0.5";
+
                 const noteToSelect = staffArray[staff].voices[0][j];
-                console.log("note: "+noteToSelect)
                 if (!selAnswers.includes(noteToSelect)) {
                   selAnswers.push(noteToSelect);
                 }
@@ -350,7 +390,9 @@ export function Exercise({
               } else if (bar.style.opacity === "1") {
                 bar.style.opacity = "0.2";
                 coverBox.style.opacity = "0";
+
                 const noteToSelect = staffArray[staff].voices[0][j];
+
                 const answerIndex = selAnswers.indexOf(noteToSelect);
                 if (answerIndex !== -1) {
                   selAnswers.splice(answerIndex, 1);
@@ -361,19 +403,107 @@ export function Exercise({
                 );
               }
             });
+
+            // Append the bar and coverBox to the appropriate parent element
+            const parentElement = document.getElementById("target" + exIndex);
+            if (parentElement) {
+              parentElement.style.position = "relative";
+              parentElement.appendChild(bar);
+              parentElement.appendChild(coverBox);
+            }
+
             //reset beatSum
+            totalSum = beatSum;
             beatSum -= visualObjs[0].getBeatLength();
             noteCount = 0;
+            created = true;
           }
 
           //create bar and coverbox by beat
           if (beatSum === visualObjs[0].getBeatLength()) {
             const currentCount = noteCount;
-            bar.style.width =
-              noteElems.nextSibling.getBoundingClientRect().left -
-              barStartX -
-              5 +
-              "px";
+
+            const bar = document.createElement("div");
+            bar.classList.add("bar");
+            bar.style.position = "absolute";
+
+            const coverBox = document.createElement("div");
+            coverBox.classList.add("cover-box");
+            coverBox.style.position = "absolute";
+
+            if (topLines) {
+              if (topLines[staff]) {
+                const topBox = topLines[staff].getBoundingClientRect();
+                bar.style.top = topBox.top - boundingBox.top - 10 + "px";
+              }
+            }
+
+            if (created) {
+              if (note.duration < beatSum) {
+                bar.style.left =
+                  noteElems.getBoundingClientRect().left -
+                  boundingBox.left -
+                  remainLen +
+                  5 +
+                  "px";
+                bar.style.width =
+                  noteElems.nextSibling.getBoundingClientRect().left -
+                  noteElems.getBoundingClientRect().left +
+                  remainLen -
+                  5 +
+                  "px";
+                bar.style.backgroundColor = "blue";
+              } else {
+                bar.style.width =
+                  (noteElems.nextSibling.getBoundingClientRect().left -
+                    barStartX) /
+                    Math.round(totalSum / visualObjs[0].getBeatLength()) -
+                  5 +
+                  "px";
+                bar.style.left =
+                  barStartX -
+                  boundingBox.left +
+                  (noteElems.nextSibling.getBoundingClientRect().left -
+                    barStartX) /
+                    (totalSum / visualObjs[0].getBeatLength()) +
+                  "px";
+                bar.style.backgroundColor = "blue";
+              }
+              created = false;
+            } else {
+              bar.style.left = barStartX - boundingBox.left + "px";
+              bar.style.width =
+                noteElems.nextSibling.getBoundingClientRect().left -
+                barStartX -
+                5 +
+                "px";
+              bar.style.backgroundColor = "blue";
+              created = false;
+            }
+
+            bar.style.height = "5px";
+            // bar.style.backgroundColor = "blue";
+            bar.style.opacity = "0.2";
+
+            coverBox.style.top = bar.style.top;
+            coverBox.style.left = bar.style.left;
+            coverBox.style.width = bar.style.width;
+            coverBox.style.height =
+              boundingBox.height / 2 / staffArray.length + "px";
+            coverBox.style.backgroundColor = "blue";
+            coverBox.style.opacity = "0";
+            coverBox.style.pointerEvents = "none";
+
+            bar.addEventListener("mouseenter", () => {
+              if (bar.style.opacity === "0.2") {
+                bar.style.opacity = "0.5";
+              }
+            });
+            bar.addEventListener("mouseleave", () => {
+              if (bar.style.opacity !== "1") {
+                bar.style.opacity = "0.2";
+              }
+            });
 
             bar.addEventListener("click", () => {
               if (bar.style.opacity === "0.5") {
@@ -406,38 +536,17 @@ export function Exercise({
               }
             });
 
+            // Append the bar and coverBox to the appropriate parent element
+            const parentElement = document.getElementById("target" + exIndex);
+            if (parentElement) {
+              parentElement.style.position = "relative";
+              parentElement.appendChild(bar);
+              parentElement.appendChild(coverBox);
+            }
+
             //reset beatSum
             beatSum = 0;
             noteCount = 0;
-          }
-          bar.style.height = "5px";
-          bar.style.backgroundColor = "blue";
-          bar.style.opacity = "0.2";
-
-          coverBox.style.top = bar.style.top;
-          coverBox.style.left = bar.style.left;
-          coverBox.style.width = bar.style.width;
-          coverBox.style.height = (boundingBox.height / 2) / staffArray.length + "px";
-          coverBox.style.backgroundColor = "blue";
-          coverBox.style.opacity = "0";
-          coverBox.style.pointerEvents = "none";
-
-          bar.addEventListener("mouseenter", () => {
-            if (bar.style.opacity === "0.2") {
-              bar.style.opacity = "0.5";
-            }
-          });
-          bar.addEventListener("mouseleave", () => {
-            if (bar.style.opacity !== "1") {
-              bar.style.opacity = "0.2";
-            }
-          });
-          // Append the bar and coverBox to the appropriate parent element
-          const parentElement = document.getElementById("target" + exIndex);
-          if (parentElement) {
-            parentElement.style.position = "relative";
-            parentElement.appendChild(bar);
-            parentElement.appendChild(coverBox);
           }
         }
 
