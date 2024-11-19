@@ -287,49 +287,137 @@ export function Exercise({
           measure = 0;
         }
 
-        if (!boundingBox) {
-          return;
-        }
+        if (tags.includes("Rhythm")) {
+          if (!boundingBox) {
+            return;
+          }
 
-        //save the starting point of the beat
-        if (beatSum === 0) {
-          barStartX = noteElems.getBoundingClientRect().left;
-        }
+          //save the starting point of the beat
+          if (beatSum === 0) {
+            barStartX = noteElems.getBoundingClientRect().left;
+          }
 
-        if (typeof note.duration === "number" && !isNaN(note.duration)) {
-          beatSum += note.duration;
-          noteCount++;
-        }
+          if (typeof note.duration === "number" && !isNaN(note.duration)) {
+            beatSum += note.duration;
+            noteCount++;
+          }
 
-        //create bar and coverbox by beat
-        if (beatSum === visualObjs[0].getBeatLength()) {
-          const currentCount = noteCount;
+          console.log("beatSum: " + beatSum);
+          console.log("beatLength: " + visualObjs[0].getBeatLength());
 
           const bar = document.createElement("div");
           bar.classList.add("bar");
           bar.style.position = "absolute";
-          const topLine = svgElement?.querySelector(".abcjs-top-line");
-          if (topLine) {
-            const staffBox = topLine.getBoundingClientRect();
-            bar.style.top = staffBox.top - boundingBox.top - 10 + "px";
-          }
-          bar.style.left = barStartX - boundingBox.left + "px";
-          bar.style.width =
-            noteElems.nextSibling.getBoundingClientRect().left -
-            barStartX -
-            5 +
-            "px";
-          bar.style.height = "5px";
-          bar.style.backgroundColor = "blue";
-          bar.style.opacity = "0.2";
 
           const coverBox = document.createElement("div");
           coverBox.classList.add("cover-box");
           coverBox.style.position = "absolute";
+
+          const topLines = svgElement?.querySelectorAll(".abcjs-top-line");
+          if (topLines) {
+            if (topLines[staff]) {
+               const topBox = topLines[staff].getBoundingClientRect();
+            bar.style.top = topBox.top - boundingBox.top - 10 + "px";
+            }
+           
+          }
+          bar.style.left = barStartX - boundingBox.left + "px";
+
+          if (beatSum > visualObjs[0].getBeatLength()) {
+            console.log("len: "+beatSum/visualObjs[0].getBeatLength())
+            for (let k = 0; k < beatSum/visualObjs[0].getBeatLength(); k++) {
+              bar.style.width =
+                (noteElems.nextSibling.getBoundingClientRect().left -
+                  barStartX) /
+                  (beatSum/visualObjs[0].getBeatLength()) -
+                5 +
+                "px";
+            }
+
+            bar.addEventListener("click", () => {
+              if (bar.style.opacity === "0.5") {
+                bar.style.opacity = "1";
+                coverBox.style.opacity = "0.5";
+                const noteToSelect = staffArray[staff].voices[0][j];
+                console.log("note: "+noteToSelect)
+                if (!selAnswers.includes(noteToSelect)) {
+                  selAnswers.push(noteToSelect);
+                }
+                noteToSelect.abselem.elemset[0].setAttribute(
+                  "selectedTimes",
+                  3
+                );
+              } else if (bar.style.opacity === "1") {
+                bar.style.opacity = "0.2";
+                coverBox.style.opacity = "0";
+                const noteToSelect = staffArray[staff].voices[0][j];
+                const answerIndex = selAnswers.indexOf(noteToSelect);
+                if (answerIndex !== -1) {
+                  selAnswers.splice(answerIndex, 1);
+                }
+                noteToSelect.abselem.elemset[0].setAttribute(
+                  "selectedTimes",
+                  0
+                );
+              }
+            });
+            //reset beatSum
+            beatSum -= visualObjs[0].getBeatLength();
+            noteCount = 0;
+          }
+
+          //create bar and coverbox by beat
+          if (beatSum === visualObjs[0].getBeatLength()) {
+            const currentCount = noteCount;
+            bar.style.width =
+              noteElems.nextSibling.getBoundingClientRect().left -
+              barStartX -
+              5 +
+              "px";
+
+            bar.addEventListener("click", () => {
+              if (bar.style.opacity === "0.5") {
+                bar.style.opacity = "1";
+                coverBox.style.opacity = "0.5";
+                for (let p = 0; p < currentCount; p++) {
+                  const noteToSelect = staffArray[staff].voices[0][j - p];
+                  if (!selAnswers.includes(noteToSelect)) {
+                    selAnswers.push(noteToSelect);
+                  }
+                  noteToSelect.abselem.elemset[0].setAttribute(
+                    "selectedTimes",
+                    3
+                  );
+                }
+              } else if (bar.style.opacity === "1") {
+                bar.style.opacity = "0.2";
+                coverBox.style.opacity = "0";
+                for (let p = 0; p < currentCount; p++) {
+                  const noteToSelect = staffArray[staff].voices[0][j - p];
+                  const answerIndex = selAnswers.indexOf(noteToSelect);
+                  if (answerIndex !== -1) {
+                    selAnswers.splice(answerIndex, 1);
+                  }
+                  noteToSelect.abselem.elemset[0].setAttribute(
+                    "selectedTimes",
+                    0
+                  );
+                }
+              }
+            });
+
+            //reset beatSum
+            beatSum = 0;
+            noteCount = 0;
+          }
+          bar.style.height = "5px";
+          bar.style.backgroundColor = "blue";
+          bar.style.opacity = "0.2";
+
           coverBox.style.top = bar.style.top;
           coverBox.style.left = bar.style.left;
           coverBox.style.width = bar.style.width;
-          coverBox.style.height = boundingBox.height / 2 + "px";
+          coverBox.style.height = (boundingBox.height / 2) / staffArray.length + "px";
           coverBox.style.backgroundColor = "blue";
           coverBox.style.opacity = "0";
           coverBox.style.pointerEvents = "none";
@@ -344,38 +432,6 @@ export function Exercise({
               bar.style.opacity = "0.2";
             }
           });
-
-          bar.addEventListener("click", () => {
-            if (bar.style.opacity === "0.5") {
-              bar.style.opacity = "1";
-              coverBox.style.opacity = "0.5";
-              for (i = 0; i < currentCount; i++) {
-                const noteToSelect = staffArray[staff].voices[0][j - i];
-                if (!selAnswers.includes(noteToSelect)) {
-                  selAnswers.push(noteToSelect);
-                }
-                noteToSelect.abselem.elemset[0].setAttribute(
-                  "selectedTimes",
-                  3
-                );
-              }
-            } else if (bar.style.opacity === "1") {
-              bar.style.opacity = "0.2";
-              coverBox.style.opacity = "0";
-              for (i = 0; i < currentCount; i++) {
-                const noteToSelect = staffArray[staff].voices[0][j - i];
-                const answerIndex = selAnswers.indexOf(noteToSelect);
-                if (answerIndex !== -1) {
-                  selAnswers.splice(answerIndex, 1);
-                }
-                noteToSelect.abselem.elemset[0].setAttribute(
-                  "selectedTimes",
-                  0
-                );
-              }
-            }
-          });
-
           // Append the bar and coverBox to the appropriate parent element
           const parentElement = document.getElementById("target" + exIndex);
           if (parentElement) {
@@ -383,10 +439,6 @@ export function Exercise({
             parentElement.appendChild(bar);
             parentElement.appendChild(coverBox);
           }
-
-          //reset beatSum
-          beatSum = 0;
-          noteCount = 0;
         }
 
         // rehighlights correct answers on mng page for ex editing purposes
