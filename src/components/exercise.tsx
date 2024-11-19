@@ -595,10 +595,10 @@ export function Exercise({
   //runs when reset answers button is pushed on mng view: essentially reloads score/resets answers
   const reload = function () {
     // see exReload for explanation of this jank
-    for (let i = 0; i < selNotes.length;) selNotes.pop();
+    for (let i = 0; i < selNotes.length; ) selNotes.pop();
     setSelNotes([]);
     // ditto
-    for (let i = 0; i < correctAnswers.length;) correctAnswers.pop();
+    for (let i = 0; i < correctAnswers.length; ) correctAnswers.pop();
     setCorrectAnswers([]);
     loadScore();
   };
@@ -606,7 +606,7 @@ export function Exercise({
   //same as above, but on exercises page
   const exReload = function () {
     // workaround because state is jank: empties selAnswers via popping before... setting it to an empty list (thanks react)
-    for (let i = 0; i < selAnswers.length;) selAnswers.pop();
+    for (let i = 0; i < selAnswers.length; ) selAnswers.pop();
     setSelAnswers([]);
     loadScore();
   };
@@ -842,20 +842,20 @@ export function Exercise({
       if (correctAnswers.length === 1) plural = " is ";
       feedback = [
         "You selected " +
-        selAnswers.length +
-        " answer(s). There" +
-        plural +
-        correctAnswers.length +
-        " correct answer(s). Here are some specific places to look at and listen to more closely:",
+          selAnswers.length +
+          " answer(s). There" +
+          plural +
+          correctAnswers.length +
+          " correct answer(s). Here are some specific places to look at and listen to more closely:",
       ];
       for (let i = 0; i < tmpCorrect.length; i++) {
         // generic note position feedback
         feedback = [
           ...feedback,
           "Measure " +
-          (Number(tmpCorrect[i]["measurePos"]) + 1) +
-          ", Staff " +
-          (Number(tmpCorrect[i]["staffPos"]) + 1),
+            (Number(tmpCorrect[i]["measurePos"]) + 1) +
+            ", Staff " +
+            (Number(tmpCorrect[i]["staffPos"]) + 1),
         ];
         highlightMeasure(wrongList);
       }
@@ -864,9 +864,9 @@ export function Exercise({
         feedback = [
           ...feedback,
           "Wrong answer selected at:  Measure " +
-          (Number(wrongList[i].getAttribute("measurePos")) + 1) +
-          ", Staff " +
-          (Number(wrongList[i].getAttribute("staffPos")) + 1),
+            (Number(wrongList[i].getAttribute("measurePos")) + 1) +
+            ", Staff " +
+            (Number(wrongList[i].getAttribute("staffPos")) + 1),
         ];
         //console.log(wrongList[i]);
         highlightMeasure(wrongList);
@@ -883,9 +883,9 @@ export function Exercise({
         feedback = [
           ...feedback,
           "Measure " +
-          (Number(tmpCorrect[i]["measurePos"]) + 1) +
-          ", Staff " +
-          (Number(tmpCorrect[i]["staffPos"]) + 1),
+            (Number(tmpCorrect[i]["measurePos"]) + 1) +
+            ", Staff " +
+            (Number(tmpCorrect[i]["staffPos"]) + 1),
         ];
         highlightMeasure(wrongList);
         // specific note feedback added on mng page
@@ -925,9 +925,9 @@ export function Exercise({
         feedback = [
           ...feedback,
           "Measure " +
-          (Number(tmpCorrect[i]["measurePos"]) + 1) +
-          ", Staff " +
-          (Number(tmpCorrect[i]["staffPos"]) + 1),
+            (Number(tmpCorrect[i]["measurePos"]) + 1) +
+            ", Staff " +
+            (Number(tmpCorrect[i]["staffPos"]) + 1),
         ];
         highlightMeasure(wrongList);
         let addtlFeedback = tmpCorrect[i]["feedback"];
@@ -998,112 +998,112 @@ export function Exercise({
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-            ": Transpose Insts - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+              ": Transpose Insts - Level " +
+              diff +
+              ", Exercise: " +
+              exNum
           );
       } else if (types === "Both") {
         setCustomTitle(
           tags.sort().join(" & ") +
-          ": Drone/Ens Parts  - Level " +
-          diff +
-          ", Exercise: " +
-          exNum
+            ": Drone/Ens Parts  - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
         );
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-            ": Drone/Ens Parts w/ Transpose Insts - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+              ": Drone/Ens Parts w/ Transpose Insts - Level " +
+              diff +
+              ", Exercise: " +
+              exNum
           );
       } else {
         setCustomTitle(
           tags.sort().join(" & ") +
-          ": " +
-          types +
-          " - Level " +
-          diff +
-          ", Exercise: " +
-          exNum
+            ": " +
+            types +
+            " - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
         );
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-            ": " +
-            types +
-            " w/ Transpose Insts - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+              ": " +
+              types +
+              " w/ Transpose Insts - Level " +
+              diff +
+              ", Exercise: " +
+              exNum
           );
       }
     } else {
       if (types === "None") {
         setCustomTitle(
           tags.sort().join(" & ") +
-          ": " +
-          meter +
-          " - Level " +
-          diff +
-          ", Exercise: " +
-          exNum
+            ": " +
+            meter +
+            " - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
         );
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-            ": " +
-            meter +
-            "  w/ Transpose Insts - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+              ": " +
+              meter +
+              "  w/ Transpose Insts - Level " +
+              diff +
+              ", Exercise: " +
+              exNum
           );
       } else if (types === "Both") {
         setCustomTitle(
           tags.sort().join(" & ") +
-          ": Drone/Ens Parts: " +
-          meter +
-          " - Level " +
-          diff +
-          ", Exercise: " +
-          exNum
+            ": Drone/Ens Parts: " +
+            meter +
+            " - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
         );
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-            ": Drone/Ens Parts: " +
-            meter +
-            " w/ Transpose Insts - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+              ": Drone/Ens Parts: " +
+              meter +
+              " w/ Transpose Insts - Level " +
+              diff +
+              ", Exercise: " +
+              exNum
           );
       } else {
         setCustomTitle(
           tags.sort().join(" & ") +
-          ": " +
-          types +
-          ": " +
-          meter +
-          " - Level " +
-          diff +
-          ", Exercise: " +
-          exNum
-        );
-        if (transpos)
-          setCustomTitle(
-            tags.sort().join(" & ") +
             ": " +
             types +
             ": " +
             meter +
-            " w/ Transpose Insts - Level " +
+            " - Level " +
             diff +
             ", Exercise: " +
             exNum
+        );
+        if (transpos)
+          setCustomTitle(
+            tags.sort().join(" & ") +
+              ": " +
+              types +
+              ": " +
+              meter +
+              " w/ Transpose Insts - Level " +
+              diff +
+              ", Exercise: " +
+              exNum
           );
       }
     }
@@ -1230,172 +1230,310 @@ export function Exercise({
     }
   };
 
-    return (
-        // big yellow exercise box
-        <div style={{ margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px", marginLeft: "100px", marginTop: "20px" }}>
+  return (
+    // big yellow exercise box
+    <div
+      style={{
+        margin: "10px",
+        padding: "10px",
+        backgroundColor: "#fcfcd2",
+        borderRadius: "10px",
+        marginLeft: "100px",
+        marginTop: "20px",
+      }}
+    >
+      {/* custom exercise title box */}
+      {editingTitle && teacherMode ? (
+        <span>
+          <textarea id="title">{customTitle}</textarea>
+          <button onClick={saveTitle}>Save Title</button>
+        </span>
+      ) : (
+        <h3 onClick={() => setEditingTitle(!editingTitle)}>{customTitle}</h3>
+      )}
 
-
-            {/* custom exercise title box */}
-            {editingTitle && teacherMode ? 
-                <span>
-                    <textarea id="title">{customTitle}</textarea> 
-                    <button onClick={saveTitle}>Save Title</button>
-                </span>
-                : 
-                <h3 onClick={()=>setEditingTitle(!editingTitle)}>{customTitle}</h3>
-            }
-
-            {/* <h4>Global Index: {exIndex}</h4> <- use for debugging in case something goes wrong w indexing*/}
-            {teacherMode ?
-            <span>
-                {/* all the fields you can apply to an exercise: tags, voices, etc, you can read */}
-                <div id="forms" style={{display: "inline-flex", padding: "4px"}}>
-                    <form id= "tags">
-                        Tags:
-                        <br></br>
-                        {/* <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm */}
-                        <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{margin: "4px"}}/>Pitch
-                        <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{marginLeft: "12px"}}/> Intonation
-                        <label>
-                                <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange} />
-                                Rhythm
-                            </label>
-                    </form>
-                    <form id="voiceCt">
-                        Voices:
-                        <br></br>
-                        <select name="voices" defaultValue={voices} onChange={voiceChange}>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
-                    </form>
-                    <form id="difficulty">
-                        Difficulty:
-                        <br></br>
-                        <select name="difficulty" defaultValue={diff} onChange={diffChange}>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
-                    </form>
-                    <form id="meter">
-                        Meter:
-                        <br></br>
-                        <select name='meter' defaultValue={types} onChange={meterChange}>
-                                <option value="Anything">Anything</option>
-                                <option value="Simple">Simple</option>
-                                <option value="Compound">Compound</option>
-                                
-                        </select>
-                    </form>
-                    <form id="types">
-                        Textural Factors:
-                        <br></br>
-                        <select name='types' defaultValue={types} onChange={typesChange}>
-                                <option value="None">None</option>
-                                <option value="Drone">Drone</option>
-                                <option value="Ensemble Parts">Ensemble Parts</option>
-                                <option value="Both">Drone & Ensemble Parts</option>
-                        </select>
-                    </form>
-                    <form id= "transpos">
-                        Transposing Instruments:
-                        <br></br>
-                        <input type="checkbox" name="transpos" value="true" checked={transpos} onChange={transposChange} style={{marginLeft: "5.3vw"}}/>
-                    </form>
-                </div>
-                <div/>
-                
-                {/* file uploads */}
-                <div id="xmlUpload" style={{display:"inline-flex"}}>
-                    XML Upload: <FileUpload setFile={setXmlFile} file={xmlFile} setAbcFile={setAbcFile} type="xml" setLoaded={setLoaded}></FileUpload>
-                </div>
-                <div id="mp3Upload" style={{display:"inline-flex"}}>
-                    MP3 Upload: <FileUpload setFile={setMp3File} file={mp3File} setAbcFile={setAbcFile} type="mp3" setLoaded={setLoaded}></FileUpload>
-                </div>
-                
-                {mp3File.name === "" ? <br></br> : <></>}
-
-                {/* this button shouldn't actually be able to appear, but is a backup in case useEffect doesn't load the score */}
-                {(exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded) ? <button onClick={loadScore}>Load Score</button> : <></>}
-
-                {/* div that actually contains the score */}
-                <div style = {{display: "inline-block", width:"75%"}}>
-                    <div id={"target" + exIndex} style={score}></div>
-                </div>
-
-                <img
-                    alt="note-color-key"
-                    src={noteKey}
-                    width="14%"
-                    height="7%"
-                    style={{display:"inline", marginLeft:"1vw"}}
-                />
-                
-                {/* stuff that only shows once an xml has been passed in: individual note feedback, reset answers button */}
-                {(abcFile !== undefined && abcFile !== "" && loaded) || (exerciseData !== undefined && !exerciseData.empty) ? 
-                <div style={{display: "inline-block", marginLeft:"1vw", marginTop: "1vh"}}>
-                    <textarea id={"note-feedback-"+exIndex} placeholder={"Note feedback..."} onChange={saveFeedback}></textarea>
-                    <Button variant='danger' onClick={reload} style={{marginLeft: "1vw", float:"right"}}>Reset Answers</Button>
-                </div> : <></>}
-
-                {/* note info blurb in case teachers want to see which staff/measure the note is on (and can't/don't want to count i guess) */}
-                {lastClicked !== undefined && Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) % 4 !== 0 ? <div style={{marginLeft: "1vw"}}>Note Info: {ana}</div> : <div/>}
-                <br/>
-                <Button variant='success' onClick={save}>Save Exercise</Button>
-                <Button onClick={() => handleExerciseDelete(exIndex)} style={{ marginLeft: "10px", marginTop: "10px" }} variant="danger">Delete Exercise</Button>
-            </span>
-            :
-            /* student view */
-            <span>
-                {/* score div */}
-                <div style = {{width:"100%", display: "inline-flex"}}>
-                    <div id={"target" + exIndex} style={score}></div>
-                </div>
-                <br/>
-                <img
-                    alt="note-color-key"
-                    src={noteKey}
-                    width="14%"
-                    height="7%"
-                    style={{display:"inline-flex", marginRight: "1vw", marginTop: "-2.5vh", borderRadius: "1px"}}
-                />
-
-                {/* container for the audio player and reset button */}
-                <div style={{display: "inline-flex", marginTop: "-2vh"}}>
-                    {mp3 !== undefined ? <div style={{marginTop: "2vh"}}><AudioHandler file={mp3}></AudioHandler></div> : <></>}
-                    <Button variant='danger' onClick={exReload} style={{position: "relative", marginLeft: "1vw", marginBottom: "2vh"}}>Reset Answers</Button>
-                </div>
-                
-                {/* check button/feedback loaded only when score is present: should always happen based on mng upload parameters but here as a failsafe */}
-                {(abcFile !== undefined && abcFile !== "" && loaded) ? 
-                    <div>
-                        <button className= "btnback" onClick={checkAnswers}>Check Answer</button>
-                        <div>Next step(s): {customFeedback.map(function(feedback) {
-                            // this key generation is COOKED but we don't need to access it and they all gotta be different sooooooo
-                            return <li style={{display: "flex", margin: "auto", justifyContent:"center"}} key={Math.random()}>{feedback}</li>
-                        })}</div>
-                    </div>
-                : <div/>}
-            </span>
-            }
-
-            {/* multi-exercise deletion box, only loads on teacher view because of how handle is defined (or "un"defined HAHAHA) */}
-            {handleSelectExercise !== undefined ? <div>
-                <input
+      {/* <h4>Global Index: {exIndex}</h4> <- use for debugging in case something goes wrong w indexing*/}
+      {teacherMode ? (
+        <span>
+          {/* all the fields you can apply to an exercise: tags, voices, etc, you can read */}
+          <div id="forms" style={{ display: "inline-flex", padding: "4px" }}>
+            <form id="tags">
+              Tags:
+              <br></br>
+              {/* <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange}/>Rhythm */}
+              <input
                 type="checkbox"
-                checked={isSelected}
-                onChange={() => handleSelectExercise(exIndex)}
-                /> Select to Delete (Multiple Deletion)
-            </div> : <></>}
+                name="tags"
+                value="Pitch"
+                checked={tags.includes("Pitch")}
+                onChange={tagsChange}
+                style={{ margin: "4px" }}
+              />
+              Pitch
+              <input
+                type="checkbox"
+                name="tags"
+                value="Intonation"
+                checked={tags.includes("Intonation")}
+                onChange={tagsChange}
+                style={{ marginLeft: "12px" }}
+              />{" "}
+              Intonation
+              <label>
+                <input
+                  type="checkbox"
+                  name="tags"
+                  value="Rhythm"
+                  checked={tags.includes("Rhythm")}
+                  onChange={tagsChange}
+                />
+                Rhythm
+              </label>
+            </form>
+            <form id="voiceCt">
+              Voices:
+              <br></br>
+              <select
+                name="voices"
+                defaultValue={voices}
+                onChange={voiceChange}
+              >
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </form>
+            <form id="difficulty">
+              Difficulty:
+              <br></br>
+              <select
+                name="difficulty"
+                defaultValue={diff}
+                onChange={diffChange}
+              >
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </form>
+            <form id="meter">
+              Meter:
+              <br></br>
+              <select name="meter" defaultValue={types} onChange={meterChange}>
+                <option value="Anything">Anything</option>
+                <option value="Simple">Simple</option>
+                <option value="Compound">Compound</option>
+              </select>
+            </form>
+            <form id="types">
+              Textural Factors:
+              <br></br>
+              <select name="types" defaultValue={types} onChange={typesChange}>
+                <option value="None">None</option>
+                <option value="Drone">Drone</option>
+                <option value="Ensemble Parts">Ensemble Parts</option>
+                <option value="Both">Drone & Ensemble Parts</option>
+              </select>
+            </form>
+            <form id="transpos">
+              Transposing Instruments:
+              <br></br>
+              <input
+                type="checkbox"
+                name="transpos"
+                value="true"
+                checked={transpos}
+                onChange={transposChange}
+                style={{ marginLeft: "5.3vw" }}
+              />
+            </form>
+          </div>
+          <div />
 
-            
+          {/* file uploads */}
+          <div id="xmlUpload" style={{ display: "inline-flex" }}>
+            XML Upload:{" "}
+            <FileUpload
+              setFile={setXmlFile}
+              file={xmlFile}
+              setAbcFile={setAbcFile}
+              type="xml"
+              setLoaded={setLoaded}
+            ></FileUpload>
+          </div>
+          <div id="mp3Upload" style={{ display: "inline-flex" }}>
+            MP3 Upload:{" "}
+            <FileUpload
+              setFile={setMp3File}
+              file={mp3File}
+              setAbcFile={setAbcFile}
+              type="mp3"
+              setLoaded={setLoaded}
+            ></FileUpload>
+          </div>
+
+          {mp3File.name === "" ? <br></br> : <></>}
+
+          {/* this button shouldn't actually be able to appear, but is a backup in case useEffect doesn't load the score */}
+          {(exerciseData !== undefined && !exerciseData.empty && !loaded) ||
+          (abcFile !== undefined && abcFile !== "" && !loaded) ? (
+            <button onClick={loadScore}>Load Score</button>
+          ) : (
+            <></>
+          )}
+
+          {/* div that actually contains the score */}
+          <div style={{ display: "inline-block", width: "75%" }}>
+            <div id={"target" + exIndex} style={score}></div>
+          </div>
+
+          <img
+            alt="note-color-key"
+            src={noteKey}
+            width="14%"
+            height="7%"
+            style={{ display: "inline", marginLeft: "1vw" }}
+          />
+
+          {/* stuff that only shows once an xml has been passed in: individual note feedback, reset answers button */}
+          {(abcFile !== undefined && abcFile !== "" && loaded) ||
+          (exerciseData !== undefined && !exerciseData.empty) ? (
+            <div
+              style={{
+                display: "inline-block",
+                marginLeft: "1vw",
+                marginTop: "1vh",
+              }}
+            >
+              <textarea
+                id={"note-feedback-" + exIndex}
+                placeholder={"Note feedback..."}
+                onChange={saveFeedback}
+              ></textarea>
+              <Button
+                variant="danger"
+                onClick={reload}
+                style={{ marginLeft: "1vw", float: "right" }}
+              >
+                Reset Answers
+              </Button>
+            </div>
+          ) : (
+            <></>
+          )}
+
+          {/* note info blurb in case teachers want to see which staff/measure the note is on (and can't/don't want to count i guess) */}
+          {lastClicked !== undefined &&
+          Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) %
+            4 !==
+            0 ? (
+            <div style={{ marginLeft: "1vw" }}>Note Info: {ana}</div>
+          ) : (
+            <div />
+          )}
+          <br />
+          <Button variant="success" onClick={save}>
+            Save Exercise
+          </Button>
+          <Button
+            onClick={() => handleExerciseDelete(exIndex)}
+            style={{ marginLeft: "10px", marginTop: "10px" }}
+            variant="danger"
+          >
+            Delete Exercise
+          </Button>
+        </span>
+      ) : (
+        /* student view */
+        <span>
+          {/* score div */}
+          <div style={{ width: "100%", display: "inline-flex" }}>
+            <div id={"target" + exIndex} style={score}></div>
+          </div>
+          <br />
+          <img
+            alt="note-color-key"
+            src={noteKey}
+            width="14%"
+            height="7%"
+            style={{
+              display: "inline-flex",
+              marginRight: "1vw",
+              marginTop: "-2.5vh",
+              borderRadius: "1px",
+            }}
+          />
+
+          {/* container for the audio player and reset button */}
+          <div style={{ display: "inline-flex", marginTop: "-2vh" }}>
+            {mp3 !== undefined ? (
+              <div style={{ marginTop: "2vh" }}>
+                <AudioHandler file={mp3}></AudioHandler>
+              </div>
+            ) : (
+              <></>
+            )}
+            <Button
+              variant="danger"
+              onClick={exReload}
+              style={{
+                position: "relative",
+                marginLeft: "1vw",
+                marginBottom: "2vh",
+              }}
+            >
+              Reset Answers
+            </Button>
+          </div>
+
+          {/* check button/feedback loaded only when score is present: should always happen based on mng upload parameters but here as a failsafe */}
+          {abcFile !== undefined && abcFile !== "" && loaded ? (
+            <div>
+              <button className="btnback" onClick={checkAnswers}>
+                Check Answer
+              </button>
+              <div>
+                Next step(s):
+                {customFeedback.map(function (feedback) {
+                  // this key generation is COOKED but we don't need to access it and they all gotta be different sooooooo
+                  return (
+                    <li
+                      style={{
+                        display: "flex",
+                        margin: "auto",
+                        justifyContent: "center",
+                      }}
+                      key={Math.random()}
+                    >
+                      {feedback}
+                    </li>
+                  );
+                })}
+              </div>
+            </div>
+          ) : (
+            <div />
+          )}
+        </span>
+      )}
+
+      {/* multi-exercise deletion box, only loads on teacher view because of how handle is defined (or "un"defined HAHAHA) */}
+      {handleSelectExercise !== undefined ? (
+        <div>
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => handleSelectExercise(exIndex)}
+          />
+          Select to Delete (Multiple Deletion)
         </div>
-
-    );
+      ) : (
+        <></>
+      )}
+    </div>
+  );
 }
