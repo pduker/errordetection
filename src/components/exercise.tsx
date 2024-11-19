@@ -595,10 +595,10 @@ export function Exercise({
   //runs when reset answers button is pushed on mng view: essentially reloads score/resets answers
   const reload = function () {
     // see exReload for explanation of this jank
-    for (let i = 0; i < selNotes.length; ) selNotes.pop();
+    for (let i = 0; i < selNotes.length;) selNotes.pop();
     setSelNotes([]);
     // ditto
-    for (let i = 0; i < correctAnswers.length; ) correctAnswers.pop();
+    for (let i = 0; i < correctAnswers.length;) correctAnswers.pop();
     setCorrectAnswers([]);
     loadScore();
   };
@@ -606,7 +606,7 @@ export function Exercise({
   //same as above, but on exercises page
   const exReload = function () {
     // workaround because state is jank: empties selAnswers via popping before... setting it to an empty list (thanks react)
-    for (let i = 0; i < selAnswers.length; ) selAnswers.pop();
+    for (let i = 0; i < selAnswers.length;) selAnswers.pop();
     setSelAnswers([]);
     loadScore();
   };
@@ -842,20 +842,20 @@ export function Exercise({
       if (correctAnswers.length === 1) plural = " is ";
       feedback = [
         "You selected " +
-          selAnswers.length +
-          " answer(s). There" +
-          plural +
-          correctAnswers.length +
-          " correct answer(s). Here are some specific places to look at and listen to more closely:",
+        selAnswers.length +
+        " answer(s). There" +
+        plural +
+        correctAnswers.length +
+        " correct answer(s). Here are some specific places to look at and listen to more closely:",
       ];
       for (let i = 0; i < tmpCorrect.length; i++) {
         // generic note position feedback
         feedback = [
           ...feedback,
           "Measure " +
-            (Number(tmpCorrect[i]["measurePos"]) + 1) +
-            ", Staff " +
-            (Number(tmpCorrect[i]["staffPos"]) + 1),
+          (Number(tmpCorrect[i]["measurePos"]) + 1) +
+          ", Staff " +
+          (Number(tmpCorrect[i]["staffPos"]) + 1),
         ];
         highlightMeasure(wrongList);
       }
@@ -864,9 +864,9 @@ export function Exercise({
         feedback = [
           ...feedback,
           "Wrong answer selected at:  Measure " +
-            (Number(wrongList[i].getAttribute("measurePos")) + 1) +
-            ", Staff " +
-            (Number(wrongList[i].getAttribute("staffPos")) + 1),
+          (Number(wrongList[i].getAttribute("measurePos")) + 1) +
+          ", Staff " +
+          (Number(wrongList[i].getAttribute("staffPos")) + 1),
         ];
         //console.log(wrongList[i]);
         highlightMeasure(wrongList);
@@ -883,9 +883,9 @@ export function Exercise({
         feedback = [
           ...feedback,
           "Measure " +
-            (Number(tmpCorrect[i]["measurePos"]) + 1) +
-            ", Staff " +
-            (Number(tmpCorrect[i]["staffPos"]) + 1),
+          (Number(tmpCorrect[i]["measurePos"]) + 1) +
+          ", Staff " +
+          (Number(tmpCorrect[i]["staffPos"]) + 1),
         ];
         highlightMeasure(wrongList);
         // specific note feedback added on mng page
@@ -925,9 +925,9 @@ export function Exercise({
         feedback = [
           ...feedback,
           "Measure " +
-            (Number(tmpCorrect[i]["measurePos"]) + 1) +
-            ", Staff " +
-            (Number(tmpCorrect[i]["staffPos"]) + 1),
+          (Number(tmpCorrect[i]["measurePos"]) + 1) +
+          ", Staff " +
+          (Number(tmpCorrect[i]["staffPos"]) + 1),
         ];
         highlightMeasure(wrongList);
         let addtlFeedback = tmpCorrect[i]["feedback"];
@@ -998,112 +998,112 @@ export function Exercise({
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-              ": Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum
+            ": Transpose Insts - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
           );
       } else if (types === "Both") {
         setCustomTitle(
           tags.sort().join(" & ") +
-            ": Drone/Ens Parts  - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+          ": Drone/Ens Parts  - Level " +
+          diff +
+          ", Exercise: " +
+          exNum
         );
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-              ": Drone/Ens Parts w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum
+            ": Drone/Ens Parts w/ Transpose Insts - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
           );
       } else {
         setCustomTitle(
           tags.sort().join(" & ") +
-            ": " +
-            types +
-            " - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+          ": " +
+          types +
+          " - Level " +
+          diff +
+          ", Exercise: " +
+          exNum
         );
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-              ": " +
-              types +
-              " w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum
+            ": " +
+            types +
+            " w/ Transpose Insts - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
           );
       }
     } else {
       if (types === "None") {
         setCustomTitle(
           tags.sort().join(" & ") +
-            ": " +
-            meter +
-            " - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+          ": " +
+          meter +
+          " - Level " +
+          diff +
+          ", Exercise: " +
+          exNum
         );
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-              ": " +
-              meter +
-              "  w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum
+            ": " +
+            meter +
+            "  w/ Transpose Insts - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
           );
       } else if (types === "Both") {
         setCustomTitle(
           tags.sort().join(" & ") +
-            ": Drone/Ens Parts: " +
-            meter +
-            " - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+          ": Drone/Ens Parts: " +
+          meter +
+          " - Level " +
+          diff +
+          ", Exercise: " +
+          exNum
         );
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-              ": Drone/Ens Parts: " +
-              meter +
-              " w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum
+            ": Drone/Ens Parts: " +
+            meter +
+            " w/ Transpose Insts - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
           );
       } else {
         setCustomTitle(
           tags.sort().join(" & ") +
-            ": " +
-            types +
-            ": " +
-            meter +
-            " - Level " +
-            diff +
-            ", Exercise: " +
-            exNum
+          ": " +
+          types +
+          ": " +
+          meter +
+          " - Level " +
+          diff +
+          ", Exercise: " +
+          exNum
         );
         if (transpos)
           setCustomTitle(
             tags.sort().join(" & ") +
-              ": " +
-              types +
-              ": " +
-              meter +
-              " w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum
+            ": " +
+            types +
+            ": " +
+            meter +
+            " w/ Transpose Insts - Level " +
+            diff +
+            ", Exercise: " +
+            exNum
           );
       }
     }
@@ -1370,7 +1370,7 @@ export function Exercise({
 
           {/* this button shouldn't actually be able to appear, but is a backup in case useEffect doesn't load the score */}
           {(exerciseData !== undefined && !exerciseData.empty && !loaded) ||
-          (abcFile !== undefined && abcFile !== "" && !loaded) ? (
+            (abcFile !== undefined && abcFile !== "" && !loaded) ? (
             <button onClick={loadScore}>Load Score</button>
           ) : (
             <></>
@@ -1391,7 +1391,7 @@ export function Exercise({
 
           {/* stuff that only shows once an xml has been passed in: individual note feedback, reset answers button */}
           {(abcFile !== undefined && abcFile !== "" && loaded) ||
-          (exerciseData !== undefined && !exerciseData.empty) ? (
+            (exerciseData !== undefined && !exerciseData.empty) ? (
             <div
               style={{
                 display: "inline-block",
