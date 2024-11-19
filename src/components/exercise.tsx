@@ -249,6 +249,7 @@ export function Exercise({
       });
 
       let beatSum: number = 0;
+      let noteCount: number = 0;
       let barStartX = 0;
 
       const svgElement = document.querySelector("svg");
@@ -297,23 +298,27 @@ export function Exercise({
 
         if (typeof note.duration === "number" && !isNaN(note.duration)) {
           beatSum += note.duration;
+          noteCount++;
         }
-        let noteEndX = noteElems.nextSibling.getBoundingClientRect().left;
 
         //create bar and coverbox by beat
         if (beatSum === visualObjs[0].getBeatLength()) {
+          const currentCount = noteCount;
+
           const bar = document.createElement("div");
           bar.classList.add("bar");
           bar.style.position = "absolute";
-          // bar.style.top = 70 + "px";
           const topLine = svgElement?.querySelector(".abcjs-top-line");
-          console.log(topLine)
           if (topLine) {
             const staffBox = topLine.getBoundingClientRect();
             bar.style.top = staffBox.top - boundingBox.top - 10 + "px";
           }
           bar.style.left = barStartX - boundingBox.left + "px";
-          bar.style.width = noteEndX - barStartX - 5 + "px";
+          bar.style.width =
+            noteElems.nextSibling.getBoundingClientRect().left -
+            barStartX -
+            5 +
+            "px";
           bar.style.height = "5px";
           bar.style.backgroundColor = "blue";
           bar.style.opacity = "0.2";
@@ -344,9 +349,30 @@ export function Exercise({
             if (bar.style.opacity === "0.5") {
               bar.style.opacity = "1";
               coverBox.style.opacity = "0.5";
+              for (i = 0; i < currentCount; i++) {
+                const noteToSelect = staffArray[staff].voices[0][j - i];
+                if (!selAnswers.includes(noteToSelect)) {
+                  selAnswers.push(noteToSelect);
+                }
+                noteToSelect.abselem.elemset[0].setAttribute(
+                  "selectedTimes",
+                  3
+                );
+              }
             } else if (bar.style.opacity === "1") {
               bar.style.opacity = "0.2";
               coverBox.style.opacity = "0";
+              for (i = 0; i < currentCount; i++) {
+                const noteToSelect = staffArray[staff].voices[0][j - i];
+                const answerIndex = selAnswers.indexOf(noteToSelect);
+                if (answerIndex !== -1) {
+                  selAnswers.splice(answerIndex, 1);
+                }
+                noteToSelect.abselem.elemset[0].setAttribute(
+                  "selectedTimes",
+                  0
+                );
+              }
             }
           });
 
@@ -360,6 +386,7 @@ export function Exercise({
 
           //reset beatSum
           beatSum = 0;
+          noteCount = 0;
         }
 
         // rehighlights correct answers on mng page for ex editing purposes
@@ -1231,7 +1258,7 @@ export function Exercise({
           {/* note info blurb in case teachers want to see which staff/measure the note is on (and can't/don't want to count i guess) */}
           {lastClicked !== undefined &&
           Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) %
-            3 !==
+            4 !==
             0 ? (
             <div style={{ marginLeft: "1vw" }}>Note Info: {ana}</div>
           ) : (
