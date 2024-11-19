@@ -306,12 +306,11 @@ export function Exercise({
           bar.classList.add("bar");
           bar.style.position = "absolute";
           // bar.style.top = 70 + "px";
-          const staffGroup = svgElement?.querySelector(".abcjs-top-line");
-          if (staffGroup) {
-            const staffBox = staffGroup.getBoundingClientRect();
-            console.log(boundingBox.height)
-            bar.style.top = staffBox.top + boundingBox.height + "px";
-            console.log("top" + bar.style.top)
+          const topLine = svgElement?.querySelector(".abcjs-top-line");
+          console.log(topLine)
+          if (topLine) {
+            const staffBox = topLine.getBoundingClientRect();
+            bar.style.top = staffBox.top - boundingBox.top - 10 + "px";
           }
           bar.style.left = barStartX - boundingBox.left + "px";
           bar.style.width = noteEndX - barStartX - 5 + "px";
