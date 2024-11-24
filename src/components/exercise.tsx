@@ -713,23 +713,37 @@ export function Exercise({
     } */
 
   //adding highlinght measure function
-  function highlightMeasure(selectedNotes: Element[]) {
+  function highlightMeasure(selectedNotes: Element[], correctAnswers: any[]) {
     // Create a set to store unique measure positions
-    const measurePositions = new Set<number>();
+    const measurePositionsSel = new Set<number>();
+    const measurePositionsCorr = new Set<number>();
+    const errorMeasures = new Set<Element>();
 
     // Iterate through selected notes to collect measure positions
     selectedNotes.forEach((noteElem) => {
       const measurePos = Number(noteElem.getAttribute("measurePos"));
       if (!isNaN(measurePos)) {
-        measurePositions.add(measurePos);
+        measurePositionsSel.add(measurePos);
       }
     });
 
+    correctAnswers.forEach((note) => {
+        const corrPos = Number(note.measurePos);
+        if (!isNaN(corrPos)){
+            measurePositionsCorr.add(corrPos);
+        }
+    })
+
+    for (let i = 0; i < selectedNotes.length; i++){
+        let measure: string = "";
+        if (selectedNotes[i].getAttribute('measurePos') !== measure){
+            errorMeasures.add(selectedNotes[i]);
+        }
+    }
     // Iterate through each unique measure position and create overlays
-    measurePositions.forEach((measurePos) => {
-      // Select all note elements with the same `measurePos`
+    measurePositionsCorr.forEach((pos) => {
       const measureNotes = document.querySelectorAll(
-        `[measurePos='${measurePos}']`
+        `[measurePos='${pos}']`
       );
 
       // Calculate the bounding box for the entire measure
@@ -857,7 +871,7 @@ export function Exercise({
             ", Staff " +
             (Number(tmpCorrect[i]["staffPos"]) + 1),
         ];
-        highlightMeasure(wrongList);
+        highlightMeasure(wrongList, tmpCorrect);
       }
       for (let i = 0; i < wrongList.length; i++) {
         // position of any wrong answers selected
@@ -869,7 +883,7 @@ export function Exercise({
             (Number(wrongList[i].getAttribute("staffPos")) + 1),
         ];
         //console.log(wrongList[i]);
-        highlightMeasure(wrongList);
+        highlightMeasure(wrongList, tmpCorrect);
       }
 
       // no correct answers selected
@@ -887,7 +901,7 @@ export function Exercise({
             ", Staff " +
             (Number(tmpCorrect[i]["staffPos"]) + 1),
         ];
-        highlightMeasure(wrongList);
+        highlightMeasure(wrongList, tmpCorrect);
         // specific note feedback added on mng page
         let addtlFeedback = tmpCorrect[i]["feedback"];
 
@@ -911,7 +925,7 @@ export function Exercise({
             ...feedback,
             add + ". Additional feedback: " + addtlFeedback,
           ];
-          highlightMeasure(wrongList);
+          highlightMeasure(wrongList, tmpCorrect);
         }
       }
 
@@ -929,7 +943,7 @@ export function Exercise({
             ", Staff " +
             (Number(tmpCorrect[i]["staffPos"]) + 1),
         ];
-        highlightMeasure(wrongList);
+        highlightMeasure(wrongList, tmpCorrect);
         let addtlFeedback = tmpCorrect[i]["feedback"];
         if (
           closeList.includes(Number(tmpCorrect[i]["index"])) &&
@@ -948,7 +962,7 @@ export function Exercise({
             ...feedback,
             add + ". Additional feedback: " + addtlFeedback,
           ];
-          highlightMeasure(wrongList);
+          highlightMeasure(wrongList, tmpCorrect);
         }
       }
     }
