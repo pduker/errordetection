@@ -725,9 +725,9 @@ nav .fas {
   display: block;
 }
 
-.measure-highlight {
-  fill: rgba(255, 0, 0, 0.3); /* Adjust color and opacity as needed */
-  stroke: red;
+.hint-highlight {
+  fill: rgba(61, 245, 39, 0.8); /* Adjust color and opacity as needed */
+  stroke: green;
   stroke-width: 2;
 }
 /* my colors

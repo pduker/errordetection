@@ -10,6 +10,7 @@ import { Button } from "react-bootstrap";
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import noteKey from "../assets/note-color-key.png";
+import { updateMethodSignature } from "typescript";
 
 const firebaseConfig = {
   apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
@@ -717,8 +718,7 @@ export function Exercise({
     // Create a set to store unique measure positions
     const measurePositionsSel = new Set<number>();
     const measurePositionsCorr = new Set<number>();
-    const errorMeasures = new Set<Element>();
-
+    
     // Iterate through selected notes to collect measure positions
     selectedNotes.forEach((noteElem) => {
       const measurePos = Number(noteElem.getAttribute("measurePos"));
@@ -734,53 +734,61 @@ export function Exercise({
         }
     })
 
-    for (let i = 0; i < selectedNotes.length; i++){
-        let measure: string = "";
-        if (selectedNotes[i].getAttribute('measurePos') !== measure){
-            errorMeasures.add(selectedNotes[i]);
-        }
+    const errorMeasures = new Set<number>(Array.from(measurePositionsSel).filter((pos)=> !measurePositionsCorr.has(pos)));
+
+    console.log("selected measures: ", measurePositionsSel);
+    console.log("correct measures: ", measurePositionsCorr);
+    console.log("wrong measures", errorMeasures);
+
+    if (errorMeasures.size > 0){
+        console.log("there are incorrect measures selected, running throuhgh overlay functionality");
+        measurePositionsCorr.forEach((corrPos) => {
+            const existingOverlay = document.querySelector(`rect[data-measurePos='${corrPos}']`);
+            if (existingOverlay){
+                console.log("overlay exists, no need to add on top");
+                return;
+            } 
+
+                const measure = document.querySelectorAll(`[measurePos='${corrPos}']`);
+                //logic for creating green overlay
+                
+                // Calculate the bounding box for the entire measure
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  
+                measure.forEach((pos) => {
+                    const bbox = (pos as SVGAElement).getBBox();
+                    minX = Math.min(minX, bbox.x);
+                    minY = Math.min(minY, bbox.y);
+                    maxX = Math.max(maxX, bbox.x + bbox.width);
+                    maxY = Math.max(maxY, bbox.y + bbox.height);
+                });
+  
+                // Set up overlay dimensions and positioning
+                const overlay = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "rect"
+                );
+                overlay.setAttribute("x", minX.toString());
+                overlay.setAttribute("y", minY.toString());
+                overlay.setAttribute("width", (maxX - minX).toString());
+                overlay.setAttribute("height", (maxY - minY).toString());
+                overlay.setAttribute("fill", "rgba(61, 245, 39, 0.8)"); // semi-transparent red overlay for feedback
+                overlay.setAttribute("class", "hint-highlight");
+                overlay.setAttribute("data-measurePos", corrPos.toString());
+  
+                // Get the SVG element and append the overlay if it exists
+                const svgElement = document.querySelector("svg");
+                if (svgElement) {
+                    svgElement.appendChild(overlay);
+                } else {
+                    console.error("SVG element not found!");
+                }
+        });
+     } else {
+            console.log("no incorrect answers chosen");
     }
-    // Iterate through each unique measure position and create overlays
-    measurePositionsCorr.forEach((pos) => {
-      const measureNotes = document.querySelectorAll(
-        `[measurePos='${pos}']`
-      );
+}
 
-      // Calculate the bounding box for the entire measure
-      let minX = Infinity,
-        minY = Infinity,
-        maxX = -Infinity,
-        maxY = -Infinity;
-
-      measureNotes.forEach((note) => {
-        const bbox = (note as SVGAElement).getBBox();
-        minX = Math.min(minX, bbox.x);
-        minY = Math.min(minY, bbox.y);
-        maxX = Math.max(maxX, bbox.x + bbox.width);
-        maxY = Math.max(maxY, bbox.y + bbox.height);
-      });
-
-      // Set up overlay dimensions and positioning
-      const overlay = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "rect"
-      );
-      overlay.setAttribute("x", minX.toString());
-      overlay.setAttribute("y", minY.toString());
-      overlay.setAttribute("width", (maxX - minX).toString());
-      overlay.setAttribute("height", (maxY - minY).toString());
-      overlay.setAttribute("fill", "rgba(255, 0, 0, 0.2)"); // semi-transparent red overlay for feedback
-      overlay.setAttribute("class", "measure-highlight");
-
-      // Get the SVG element and append the overlay if it exists
-      const svgElement = document.querySelector("svg");
-      if (svgElement) {
-        svgElement.appendChild(overlay);
-      } else {
-        console.error("SVG element not found!");
-      }
-    });
-  }
 
   //function run when check answers button pressed on ex view: checks selected vs correct answers and displays feedback accordingly
   const checkAnswers = function () {
