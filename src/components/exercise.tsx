@@ -741,7 +741,7 @@ export function Exercise({
     console.log("wrong measures", errorMeasures);
 
     if (errorMeasures.size > 0){
-        console.log("there are incorrect measures selected, running throuhgh overlay functionality");
+        console.log("there are incorrect measures selected, running through overlay functionality");
         measurePositionsCorr.forEach((corrPos) => {
             const existingOverlay = document.querySelector(`rect[data-measurePos='${corrPos}']`);
             if (existingOverlay){
@@ -775,6 +775,49 @@ export function Exercise({
                 overlay.setAttribute("fill", "rgba(61, 245, 39, 0.8)"); // semi-transparent red overlay for feedback
                 overlay.setAttribute("class", "hint-highlight");
                 overlay.setAttribute("data-measurePos", corrPos.toString());
+  
+                // Get the SVG element and append the overlay if it exists
+                const svgElement = document.querySelector("svg");
+                if (svgElement) {
+                    svgElement.appendChild(overlay);
+                } else {
+                    console.error("SVG element not found!");
+                }
+        });
+
+        measurePositionsSel.forEach((selPos) => {
+            const existingOverlay = document.querySelector(`rect[data-measurePos='${selPos}']`);
+            if (existingOverlay){
+                console.log("overlay exists, no need to add on top");
+                return;
+            } 
+
+                const measure = document.querySelectorAll(`[measurePos='${selPos}']`);
+                //logic for creating green overlay
+                
+                // Calculate the bounding box for the entire measure
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  
+                measure.forEach((pos) => {
+                    const bbox = (pos as SVGAElement).getBBox();
+                    minX = Math.min(minX, bbox.x);
+                    minY = Math.min(minY, bbox.y);
+                    maxX = Math.max(maxX, bbox.x + bbox.width);
+                    maxY = Math.max(maxY, bbox.y + bbox.height);
+                });
+  
+                // Set up overlay dimensions and positioning
+                const overlay = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "rect"
+                );
+                overlay.setAttribute("x", minX.toString());
+                overlay.setAttribute("y", minY.toString());
+                overlay.setAttribute("width", (maxX - minX).toString());
+                overlay.setAttribute("height", (maxY - minY).toString());
+                overlay.setAttribute("fill", "rgba(255, 0, 0, 0.7)"); // semi-transparent red overlay for feedback
+                overlay.setAttribute("class", "error-highlight");
+                overlay.setAttribute("data-measurePos", selPos.toString());
   
                 // Get the SVG element and append the overlay if it exists
                 const svgElement = document.querySelector("svg");

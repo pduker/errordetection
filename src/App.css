@@ -730,6 +730,11 @@ nav .fas {
   stroke: green;
   stroke-width: 2;
 }
+.error-highlight {
+  fill: rgba(255, 0, 0, 0,8);
+  stroke: red;
+  stroke-width: 2;
+}
 /* my colors
  #ffdb63 -darker yellow
 #1f28fd -some red
