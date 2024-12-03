@@ -772,7 +772,7 @@ export function Exercise({
                 overlay.setAttribute("y", minY.toString());
                 overlay.setAttribute("width", (maxX - minX).toString());
                 overlay.setAttribute("height", (maxY - minY).toString());
-                overlay.setAttribute("fill", "rgba(61, 245, 39, 0.8)"); // semi-transparent red overlay for feedback
+                overlay.setAttribute("fill", "rgba(61, 245, 39, 0.6)"); // semi-transparent red overlay for feedback
                 overlay.setAttribute("class", "hint-highlight");
                 overlay.setAttribute("data-measurePos", corrPos.toString());
   
@@ -815,7 +815,7 @@ export function Exercise({
                 overlay.setAttribute("y", minY.toString());
                 overlay.setAttribute("width", (maxX - minX).toString());
                 overlay.setAttribute("height", (maxY - minY).toString());
-                overlay.setAttribute("fill", "rgba(255, 0, 0, 0.7)"); // semi-transparent red overlay for feedback
+                overlay.setAttribute("fill", "rgba(255, 0, 0, 0.6)"); // semi-transparent red overlay for feedback
                 overlay.setAttribute("class", "error-highlight");
                 overlay.setAttribute("data-measurePos", selPos.toString());
   
@@ -828,9 +828,52 @@ export function Exercise({
                 }
         });
      } else {
-            console.log("no incorrect answers chosen");
+        console.log("in correct measure checking if correct note was selected, otherwise highlight correct note");
+        // Additional logic for correct measure, wrong note
+        correctAnswers.forEach((corrNote) =>{
+            const existingOverlay = document.querySelector(`rect[data-index='${corrNote.index}']`);
+            if (existingOverlay){
+                console.log("overlay exists, no need to add on top");
+                return;
+            } 
+
+                const note = document.querySelectorAll(`[index='${corrNote.index}']`);
+                //logic for creating green overlay
+                
+                // Calculate the bounding box for the entire measure
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  
+                note.forEach((elem) => {
+                    const bbox = (elem as SVGAElement).getBBox();
+                    minX = Math.min(minX, bbox.x);
+                    minY = Math.min(minY, bbox.y);
+                    maxX = Math.max(maxX, bbox.x + bbox.width);
+                    maxY = Math.max(maxY, bbox.y + bbox.height);
+                });
+  
+                // Set up overlay dimensions and positioning
+                const overlay = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "rect"
+                );
+                overlay.setAttribute("x", minX.toString());
+                overlay.setAttribute("y", minY.toString());
+                overlay.setAttribute("width", (maxX - minX).toString());
+                overlay.setAttribute("height", (maxY - minY).toString());
+                overlay.setAttribute("fill", "rgba(61, 245, 39, 0.6)"); // semi-transparent red overlay for feedback
+                overlay.setAttribute("class", "hint-highlight");
+                overlay.setAttribute("data-index", corrNote.toString());
+  
+                // Get the SVG element and append the overlay if it exists
+                const svgElement = document.querySelector("svg");
+                if (svgElement) {
+                    svgElement.appendChild(overlay);
+                } else {
+                }
+        });
+       
+        }
     }
-}
 
 
   //function run when check answers button pressed on ex view: checks selected vs correct answers and displays feedback accordingly
