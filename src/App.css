@@ -725,6 +725,7 @@ nav .fas {
   display: block;
 }
 
+<<<<<<< HEAD
 /* classes for highlight functions*/
 .hint-highlight {
   fill: rgba(61, 245, 39, 0.6); 
@@ -738,6 +739,13 @@ nav .fas {
 }
 .hint-highlight {
   fill: rgba(61, 245, 39, 0.6); /* Adjust color and opacity as needed */
+=======
+
+/* classes for highlight functions*/
+.hint-highlight {
+  fill: rgba(61, 245, 39, 0.6); 
+
+>>>>>>> 6f73f54adfea409c975d4ae9dc022898302ced0f
   stroke: green;
   stroke-width: 2;
 }
