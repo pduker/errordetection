@@ -713,9 +713,9 @@ export function Exercise({
         setChecking(true);
     } */
 
-  //adding highlinght measure function
-  function highlightMeasure(selectedNotes: Element[], correctAnswers: any[]) {
-    // Create a set to store unique measure positions
+    //adding highlight measure function
+    function highlightMeasure(selectedNotes: Element[], correctAnswers: any[]) {
+    // Create a sets to store unique measure positions
     const measurePositionsSel = new Set<number>();
     const measurePositionsCorr = new Set<number>();
     
@@ -727,6 +727,8 @@ export function Exercise({
       }
     });
 
+
+    //iterate through correct answers to collect measure positions
     correctAnswers.forEach((note) => {
         const corrPos = Number(note.measurePos);
         if (!isNaN(corrPos)){
@@ -734,13 +736,17 @@ export function Exercise({
         }
     })
 
+    //set of incorrect measures
     const errorMeasures = new Set<number>(Array.from(measurePositionsSel).filter((pos)=> !measurePositionsCorr.has(pos)));
 
+    //console logs for debugging
     console.log("selected measures: ", measurePositionsSel);
     console.log("correct measures: ", measurePositionsCorr);
     console.log("wrong measures", errorMeasures);
 
+    //check if there are any incorrect measures selected
     if (errorMeasures.size > 0){
+        //create overlay(s) oon the measures that are incorrect and hint over correct
         console.log("there are incorrect measures selected, running through overlay functionality");
         measurePositionsCorr.forEach((corrPos) => {
             const existingOverlay = document.querySelector(`rect[data-measurePos='${corrPos}']`);
@@ -748,9 +754,7 @@ export function Exercise({
                 console.log("overlay exists, no need to add on top");
                 return;
             } 
-
                 const measure = document.querySelectorAll(`[measurePos='${corrPos}']`);
-                //logic for creating green overlay
                 
                 // Calculate the bounding box for the entire measure
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -784,6 +788,222 @@ export function Exercise({
                     console.error("SVG element not found!");
                 }
         });
+
+        //repeat above but for the incorrect measures (in red)
+        measurePositionsSel.forEach((selPos) => {
+            const existingOverlay = document.querySelector(`rect[data-measurePos='${selPos}']`);
+            if (existingOverlay){
+                console.log("overlay exists, no need to add on top");
+                return;
+            } 
+                const measure = document.querySelectorAll(`[measurePos='${selPos}']`);
+                
+                // Calculate the bounding box for the entire measure
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  
+                measure.forEach((pos) => {
+                    const bbox = (pos as SVGAElement).getBBox();
+                    minX = Math.min(minX, bbox.x);
+                    minY = Math.min(minY, bbox.y);
+                    maxX = Math.max(maxX, bbox.x + bbox.width);
+                    maxY = Math.max(maxY, bbox.y + bbox.height);
+                });
+  
+                // Set up overlay dimensions and positioning
+                const overlay = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "rect"
+                );
+                overlay.setAttribute("x", minX.toString());
+                overlay.setAttribute("y", minY.toString());
+                overlay.setAttribute("width", (maxX - minX).toString());
+                overlay.setAttribute("height", (maxY - minY).toString());
+                overlay.setAttribute("fill", "rgba(255, 0, 0, 0.6)"); // semi-transparent red overlay for feedback
+                overlay.setAttribute("class", "error-highlight");
+                overlay.setAttribute("data-measurePos", selPos.toString());
+  
+                // Get the SVG element and append the overlay if it exists
+                const svgElement = document.querySelector("svg");
+                if (svgElement) {
+                    svgElement.appendChild(overlay);
+                } else {
+                    console.error("SVG element not found!");
+                }
+        });
+        //logic for when in the correct measure
+     } else {
+        console.log("in correct measure checking if correct note was selected, otherwise highlight correct note");
+        // Additional logic for correct measure, wrong note
+        correctAnswers.forEach((corrNote) =>{
+            const existingOverlay = document.querySelector(`rect[data-index='${corrNote.index}']`);
+            if (existingOverlay){
+                console.log("overlay exists, no need to add on top");
+                return;
+            } 
+                //create a bounding box for the overlat of the note
+                const note = document.querySelectorAll(`[index='${corrNote.index}']`);
+                
+                // Calculate the bounding box for the note
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  
+                note.forEach((elem) => {
+                    const bbox = (elem as SVGAElement).getBBox();
+                    minX = Math.min(minX, bbox.x);
+                    minY = Math.min(minY, bbox.y);
+                    maxX = Math.max(maxX, bbox.x + bbox.width);
+                    maxY = Math.max(maxY, bbox.y + bbox.height);
+                });
+  
+                // Set up overlay dimensions and positioning
+                const overlay = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "rect"
+                );
+                overlay.setAttribute("x", minX.toString());
+                overlay.setAttribute("y", minY.toString());
+                overlay.setAttribute("width", (maxX - minX).toString());
+                overlay.setAttribute("height", (maxY - minY).toString());
+                overlay.setAttribute("fill", "rgba(61, 245, 39, 0.6)"); // semi-transparent red overlay for feedback
+                overlay.setAttribute("class", "hint-highlight");
+                overlay.setAttribute("data-index", corrNote.toString());
+  
+                // Get the SVG element and append the overlay if it exists
+                const svgElement = document.querySelector("svg");
+                if (svgElement) {
+                    svgElement.appendChild(overlay);
+                } else {
+                }
+        });
+       
+        }
+    }
+
+    //function run when check answers button pressed on ex view: checks selected vs correct answers and displays feedback accordingly
+    const checkAnswers = function(){
+        var tmpSelected = [...selAnswers];
+        var tmpCorrect = [...correctAnswers];
+        var feedback: string[] = [];
+
+        // sorting copy of selAnswers for comparison against copy of correctAnswers
+        tmpSelected.sort((i1, i2) => {
+            if ((i1.abselem.elemset[0].getAttribute("index") as number) > (i2.abselem.elemset[0].getAttribute("index") as number)) return 1;
+            if ((i1.abselem.elemset[0].getAttribute("index") as number) < (i2.abselem.elemset[0].getAttribute("index") as number)) return -1;
+            return 0;
+        })
+
+        // holds indexes of answers that were the right note, but wrong error
+        let closeList: Number[] = [];
+        
+        // holds incorrect answer info for feedback
+        let wrongList = [];
+
+        // loops through corr/sel copies in a unique way to compare answers
+        for(var i=0,j=0;i<correctAnswers.length && j<selAnswers.length && tmpCorrect[i] !== undefined;){
+            let noteElems = tmpSelected[j].abselem.elemset[0];
+            // note index is right -- but is it the right error?
+            if(noteElems.getAttribute("index") === tmpCorrect[i]["index"]){
+                // answer is fully correct: removes note from correct array
+                if((noteElems.getAttribute("selectedTimes")) === tmpCorrect[i]["selectedTimes"])
+                    tmpCorrect = tmpCorrect.filter(function(ans){return ans["index"] !== tmpCorrect[i]["index"]});
+                // wrong error type selected: note is added to closeList
+                else closeList.push(Number(tmpCorrect[i]["index"]));
+
+                // either way, if the index is correct, selected copy iterator moved forward
+                j++;
+
+            // note index is larger than the i'th element of correct array: correct iterator moved forward (preserves missed answers for feedback)
+            } else if(noteElems.getAttribute("index") > tmpCorrect[i]["index"]) i++;
+
+            // note index is smaller than the i'th element of correct array: selected iterator moved forward and value added to wrongList
+            else if(noteElems.getAttribute("index") < tmpCorrect[i]["index"]){
+                wrongList.push(noteElems);
+                j++;
+            } 
+        }
+    })
+
+
+        // no missed answers in correct array and selected array is the same length as the original correct array: all good!
+        if(tmpCorrect.length === 0 && tmpSelected.length === correctAnswers.length){
+            feedback = ["Great job identifying the errors in this passage!"];
+
+        // wrong amount of answers selected: shows general positions of corr answers and wrong answer positions
+        } else if(tmpSelected.length !== correctAnswers.length){
+            var plural = " are ";
+            if (correctAnswers.length === 1) plural = " is ";
+            feedback = (["You selected " + selAnswers.length + " answer(s). There" + plural + correctAnswers.length + " correct answer(s). Here are some specific places to look at and listen to more closely:"]);
+            for(let i = 0;i < tmpCorrect.length;i++){
+                // generic note position feedback
+                feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                //call highlight measure function
+                highlightMeasure(wrongList, tmpCorrect);
+                
+            }
+            for(let i = 0;i < wrongList.length;i++){
+                // position of any wrong answers selected
+                feedback = ([...feedback,"Wrong answer selected at: " + "Measure " + (Number(wrongList[i].getAttribute("measurePos"))+1) + ", Staff " + (Number(wrongList[i].getAttribute("staffPos"))+1)])
+                //console.log(wrongList[i]);
+                //call highlight measure function
+                highlightMeasure(wrongList, tmpCorrect);
+                
+            }
+
+
+        // no correct answers selected
+        } else if(tmpCorrect.length === correctAnswers.length){
+            feedback = ["Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:"];
+            // iterates through missed answers giving info/note specific feedback (if added on mng page)
+            for(let i = 0;i < tmpCorrect.length;i++){
+                // generic note position feedback
+                feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                //call highlight meausre function
+                highlightMeasure(wrongList, tmpCorrect);
+
+
+    if (errorMeasures.size > 0){
+        console.log("there are incorrect measures selected, running through overlay functionality");
+        measurePositionsCorr.forEach((corrPos) => {
+            const existingOverlay = document.querySelector(`rect[data-measurePos='${corrPos}']`);
+            if (existingOverlay){
+                console.log("overlay exists, no need to add on top");
+                return;
+            } 
+
+                const measure = document.querySelectorAll(`[measurePos='${corrPos}']`);
+                //logic for creating green overlay
+                
+                // adds any feedback to array for display later
+                if(addtlFeedback !== ""){
+                    let add = feedback.pop();
+                    feedback = [...feedback, add + ". Additional feedback: " + addtlFeedback];
+                    //call highlight measure function
+                    highlightMeasure(wrongList, tmpCorrect);
+                } 
+            }
+        
+        // one or more correct answers selected 
+        }else if(tmpCorrect.length < correctAnswers.length){
+            feedback = ["Good work – you’ve found some of the errors, but here are some specific places to look at and listen to more closely:"];
+            // same as above feedback loop
+            for(let i = 0;i < tmpCorrect.length;i++){
+                feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                //call highlight measure function
+                highlightMeasure(wrongList, tmpCorrect);
+                let addtlFeedback = tmpCorrect[i]["feedback"];
+                if(closeList.includes(Number(tmpCorrect[i]["index"])) && !tmpCorrect[i]["feedback"].toString().startsWith("You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). "))
+                        addtlFeedback = "You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). " + tmpCorrect[i]["feedback"];
+                if(addtlFeedback !== ""){
+                    let add = feedback.pop();
+                    feedback = [...feedback, add + ". Additional feedback: " + addtlFeedback];
+                    //call highlight measure function
+                    highlightMeasure(wrongList, tmpCorrect);
+                } 
+            }
+        }
+
+        // sets customFeedback to copy of feedback array, to eventually be mapped into a list on the page
+        setCustomFeedback([...feedback]);
+    }
 
         measurePositionsSel.forEach((selPos) => {
             const existingOverlay = document.querySelector(`rect[data-measurePos='${selPos}']`);

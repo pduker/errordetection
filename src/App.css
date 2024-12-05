@@ -725,8 +725,10 @@ nav .fas {
   display: block;
 }
 
+
+/* classes for highlight functions*/
 .hint-highlight {
-  fill: rgba(61, 245, 39, 0.6); /* Adjust color and opacity as needed */
+  fill: rgba(61, 245, 39, 0.6); 
   stroke: green;
   stroke-width: 2;
 }
@@ -735,6 +737,7 @@ nav .fas {
   stroke: red;
   stroke-width: 2;
 }
+
 /* my colors
  #ffdb63 -darker yellow
 #1f28fd -some red
