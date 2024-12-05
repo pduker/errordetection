@@ -713,7 +713,10 @@ export function Exercise({
         setChecking(true);
     } */
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 6f73f54adfea409c975d4ae9dc022898302ced0f
     //adding highlight measure function
     function highlightMeasure(selectedNotes: Element[], correctAnswers: any[]) {
     // Create a sets to store unique measure positions
@@ -727,7 +730,10 @@ export function Exercise({
         measurePositionsSel.add(measurePos);
       }
     });
+<<<<<<< HEAD
+=======
 
+>>>>>>> 6f73f54adfea409c975d4ae9dc022898302ced0f
 
     //iterate through correct answers to collect measure positions
     correctAnswers.forEach((note) => {
@@ -880,6 +886,8 @@ export function Exercise({
         }
     }
 
+<<<<<<< HEAD
+=======
     //function run when check answers button pressed on ex view: checks selected vs correct answers and displays feedback accordingly
     const checkAnswers = function(){
         var tmpSelected = [...selAnswers];
@@ -1100,6 +1108,7 @@ export function Exercise({
     }
 
 
+>>>>>>> 6f73f54adfea409c975d4ae9dc022898302ced0f
   //function run when check answers button pressed on ex view: checks selected vs correct answers and displays feedback accordingly
   const checkAnswers = function () {
     var tmpSelected = [...selAnswers];
@@ -1168,122 +1177,61 @@ export function Exercise({
     ) {
       feedback = ["Great job identifying the errors in this passage!"];
 
-      // wrong amount of answers selected: shows general positions of corr answers and wrong answer positions
-    } else if (tmpSelected.length !== correctAnswers.length) {
-      var plural = " are ";
-      if (correctAnswers.length === 1) plural = " is ";
-      feedback = [
-        "You selected " +
-          selAnswers.length +
-          " answer(s). There" +
-          plural +
-          correctAnswers.length +
-          " correct answer(s). Here are some specific places to look at and listen to more closely:",
-      ];
-      for (let i = 0; i < tmpCorrect.length; i++) {
-        // generic note position feedback
-        feedback = [
-          ...feedback,
-          "Measure " +
-            (Number(tmpCorrect[i]["measurePos"]) + 1) +
-            ", Staff " +
-            (Number(tmpCorrect[i]["staffPos"]) + 1),
-        ];
-        highlightMeasure(wrongList, tmpCorrect);
-      }
-      for (let i = 0; i < wrongList.length; i++) {
-        // position of any wrong answers selected
-        feedback = [
-          ...feedback,
-          "Wrong answer selected at:  Measure " +
-            (Number(wrongList[i].getAttribute("measurePos")) + 1) +
-            ", Staff " +
-            (Number(wrongList[i].getAttribute("staffPos")) + 1),
-        ];
-        //console.log(wrongList[i]);
-        highlightMeasure(wrongList, tmpCorrect);
-      }
+        // wrong amount of answers selected: shows general positions of corr answers and wrong answer positions
+        } else if(tmpSelected.length !== correctAnswers.length){
+            var plural = " are ";
+            if (correctAnswers.length === 1) plural = " is ";
+            feedback = (["You selected " + selAnswers.length + " answer(s). There" + plural + correctAnswers.length + " correct answer(s). Here are some specific places to look at and listen to more closely:"]);
+            for(let i = 0;i < tmpCorrect.length;i++){
+                // generic note position feedback
+                feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                
+            }
+            for(let i = 0;i < wrongList.length;i++){
+                // position of any wrong answers selected
+                feedback = ([...feedback,"Wrong answer selected at: " + "Measure " + (Number(wrongList[i].getAttribute("measurePos"))+1) + ", Staff " + (Number(wrongList[i].getAttribute("staffPos"))+1)])
+                //console.log(wrongList[i]);
+                
+            }
 
-      // no correct answers selected
-    } else if (tmpCorrect.length === correctAnswers.length) {
-      feedback = [
-        "Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:",
-      ];
-      // iterates through missed answers giving info/note specific feedback (if added on mng page)
-      for (let i = 0; i < tmpCorrect.length; i++) {
-        // generic note position feedback
-        feedback = [
-          ...feedback,
-          "Measure " +
-            (Number(tmpCorrect[i]["measurePos"]) + 1) +
-            ", Staff " +
-            (Number(tmpCorrect[i]["staffPos"]) + 1),
-        ];
-        highlightMeasure(wrongList, tmpCorrect);
-        // specific note feedback added on mng page
-        let addtlFeedback = tmpCorrect[i]["feedback"];
 
-        // additional msg for if wrong error is selected
-        if (
-          closeList.includes(Number(tmpCorrect[i]["index"])) &&
-          !tmpCorrect[i]["feedback"]
-            .toString()
-            .startsWith(
-              "You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). "
-            )
-        )
-          addtlFeedback =
-            "You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). " +
-            tmpCorrect[i]["feedback"];
+        // no correct answers selected
+        } else if(tmpCorrect.length === correctAnswers.length){
+            feedback = ["Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:"];
+            // iterates through missed answers giving info/note specific feedback (if added on mng page)
+            for(let i = 0;i < tmpCorrect.length;i++){
+                // generic note position feedback
+                feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
 
-        // adds any feedback to array for display later
-        if (addtlFeedback !== "") {
-          let add = feedback.pop();
-          feedback = [
-            ...feedback,
-            add + ". Additional feedback: " + addtlFeedback,
-          ];
-          highlightMeasure(wrongList, tmpCorrect);
+                // specific note feedback added on mng page
+                let addtlFeedback = tmpCorrect[i]["feedback"];
+
+                // additional msg for if wrong error is selected
+                if(closeList.includes(Number(tmpCorrect[i]["index"])) && !tmpCorrect[i]["feedback"].toString().startsWith("You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). "))
+                        addtlFeedback = "You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). " + tmpCorrect[i]["feedback"];
+                
+                // adds any feedback to array for display later
+                if(addtlFeedback !== ""){
+                    let add = feedback.pop();
+                    feedback = [...feedback, add + ". Additional feedback: " + addtlFeedback];
+                } 
+            }
+        
+        // one or more correct answers selected 
+        }else if(tmpCorrect.length < correctAnswers.length){
+            feedback = ["Good work – you’ve found some of the errors, but here are some specific places to look at and listen to more closely:"];
+            // same as above feedback loop
+            for(let i = 0;i < tmpCorrect.length;i++){
+                feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                let addtlFeedback = tmpCorrect[i]["feedback"];
+                if(closeList.includes(Number(tmpCorrect[i]["index"])) && !tmpCorrect[i]["feedback"].toString().startsWith("You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). "))
+                        addtlFeedback = "You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). " + tmpCorrect[i]["feedback"];
+                if(addtlFeedback !== ""){
+                    let add = feedback.pop();
+                    feedback = [...feedback, add + ". Additional feedback: " + addtlFeedback];
+                } 
+            }
         }
-      }
-
-      // one or more correct answers selected
-    } else if (tmpCorrect.length < correctAnswers.length) {
-      feedback = [
-        "Good work – you’ve found some of the errors, but here are some specific places to look at and listen to more closely:",
-      ];
-      // same as above feedback loop
-      for (let i = 0; i < tmpCorrect.length; i++) {
-        feedback = [
-          ...feedback,
-          "Measure " +
-            (Number(tmpCorrect[i]["measurePos"]) + 1) +
-            ", Staff " +
-            (Number(tmpCorrect[i]["staffPos"]) + 1),
-        ];
-        highlightMeasure(wrongList, tmpCorrect);
-        let addtlFeedback = tmpCorrect[i]["feedback"];
-        if (
-          closeList.includes(Number(tmpCorrect[i]["index"])) &&
-          !tmpCorrect[i]["feedback"]
-            .toString()
-            .startsWith(
-              "You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). "
-            )
-        )
-          addtlFeedback =
-            "You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). " +
-            tmpCorrect[i]["feedback"];
-        if (addtlFeedback !== "") {
-          let add = feedback.pop();
-          feedback = [
-            ...feedback,
-            add + ". Additional feedback: " + addtlFeedback,
-          ];
-          highlightMeasure(wrongList, tmpCorrect);
-        }
-      }
-    }
 
     // sets customFeedback to copy of feedback array, to eventually be mapped into a list on the page
     setCustomFeedback([...feedback]);
