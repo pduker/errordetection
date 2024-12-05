@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { sha256 } from 'js-sha256';
 import noteKey from "../assets/note-color-key.png"
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "./database"
 
 export function HelpPage({
     authorized,
@@ -11,16 +13,26 @@ export function HelpPage({
 }) {
     const [error, setError] = useState<boolean>(false);
 
+    const login = async (email: string, password: string) => {
+        try {
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          console.log("Logged in as:", userCredential.user.email);
+          // Set admin privileges based on login
+          setAuthorized(true);
+          setError(false);
+        } catch (error) {
+          console.error("Login failed");
+          setError(true);
+        }
+    };
+    
     const checkAuth = function() {
-        var box = document.getElementById("mng-pwd");
-        if(box !== null && "value" in box) {
-            var str = box.value as string;
-            if(sha256(str) === "e276575ffd747ae76d2a4969d4cc64bba550243efd9786cc044b07fdbd149fbd") {
-                setAuthorized(true);
-                setError(false);
-            } else {
-                setError(true);
-            }
+        var box1 = document.getElementById("mng-email");
+        var box2 = document.getElementById("mng-pwd");
+        if(box2 !== null && "value" in box2 && box1 !== null && "value" in box1) {
+            var email = box1.value as string;
+            var password = box2.value as string;
+            login(email,password);
         }
     }
 
@@ -51,6 +63,7 @@ export function HelpPage({
             After selecting all errors, click "Check Answers" to receive feedback on how you did.<br/>
             </div>
             <div style={{margin: "6px"}}>
+                <input id="mng-email" placeholder="Enter admin email..."></input>
                 <input id="mng-pwd" placeholder="Enter admin password..."></input>
                 <button onClick={checkAuth}>Submit</button>
             </div>
