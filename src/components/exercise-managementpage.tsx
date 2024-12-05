@@ -15,12 +15,6 @@ export function ExerciseManagementPage({
     fetch: (val: boolean) => void;
     authorized: boolean;
 }) {
-    useEffect(() => {
-        if(exList.length === 0) {
-            if(tags.length === 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos) setExList(allExData.sort(exSortFunc));
-        }
-        if(exList.length > allExData.length) setExList(allExData.sort(exSortFunc));
-    });
 
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
 
@@ -45,7 +39,13 @@ export function ExerciseManagementPage({
         setTags([]);
         sortExercises(undefined,"");
     } */
-
+    useEffect(() => {
+        if(exList.length === 0) {
+            if(tags.length === 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos) setExList(allExData.sort(exSortFunc));
+        }
+        if(exList.length > allExData.length) setExList(allExData.sort(exSortFunc));
+    },[exList.length, allExData, tags.length, diff, voices, types, meter, transpos]);
+    
     const createExercise = function () {
         var last = allExData[allExData.sort(indexSort).length-1];
         var newEx: ExerciseData;
@@ -246,7 +246,7 @@ export function ExerciseManagementPage({
             setAllExData(updatedExercises);
             alert("selected exercises deleted!");
             // reload the page without changing the url 
-            window.location.href = window.location.href;
+            window.location.reload();
         } catch (error) {
             console.error('error deleting exercises:', error);
             alert('error deleting exercises.');
@@ -281,6 +281,10 @@ export function ExerciseManagementPage({
                                 <label style={{ display: "flex", alignItems: "center" }}>
                                     <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{ marginRight: "4px" }} />
                                     Intonation
+                                </label>
+                                <label style={{ display: "flex", alignItems: "center", marginRight: "12px" }}>
+                                    <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange} style={{ marginRight: "4px" }} />
+                                    Rhythm
                                 </label>
                             </form>
                             <form id="transpos" style={{ display: "flex", alignItems: "center" }}>

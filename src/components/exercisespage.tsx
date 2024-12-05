@@ -14,16 +14,6 @@ export function ExercisesPage({
     defaultTags: string[];
     scoresRet: boolean;
 }){
-    useEffect(() => {
-        if(exList.length === 0) {
-            if(tags.length === 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos) setExList(allExData.sort(exSortFunc));
-            else if(tags.length > 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos && !upd) {
-                sortExercises(tags,"tags");
-                setUpd(true);
-            }
-        }
-    })
-
     const [diff, setDiff] = useState<string>("All");
     const [types, setTypes] = useState<string>("None");
     const [meter, setMeter] = useState<string>("Anything");
@@ -85,6 +75,16 @@ export function ExercisesPage({
         list = list.sort(exSortFunc);
         setExList(list);
     } 
+
+    useEffect(() => {
+        if(exList.length === 0) {
+            if(tags.length === 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos) setExList(allExData.sort(exSortFunc));
+            else if(tags.length > 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos && !upd) {
+                sortExercises(tags,"tags");
+                setUpd(true);
+            }
+        }
+    }, [exList.length, tags, diff, voices, types, meter, transpos, allExData, upd, sortExercises]);
 
     const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
         if (e1 !== undefined && e2 !== undefined) {
@@ -268,9 +268,13 @@ export function ExercisesPage({
                             <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{ marginRight: "4px" }} />
                             Pitch
                         </label>
-                        <label style={{ display: "flex", alignItems: "center", marginLeft: "-5px"}}>
+                        <label style={{ display: "flex", alignItems: "center", marginRight: "12px"}}>
                             <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{ marginRight: "4px" }} />
                             Intonation
+                        </label>
+                        <label style={{ display: "flex", alignItems: "center" }}>
+                            <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange} style={{ marginRight: "4px" }} />
+                            Rhythm
                         </label>
                     </form>
                     <form id="transpos" style={{ display: "flex", alignItems: "center", marginLeft: "-20px" }}>

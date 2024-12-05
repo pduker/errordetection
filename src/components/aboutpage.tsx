@@ -1,5 +1,5 @@
-import { useState } from "react";
-import noteKey from "../assets/note-color-key.png";
+//import { useState } from "react";
+//import noteKey from "../assets/note-color-key.png";
 
 export function AboutPage() {
     return (
