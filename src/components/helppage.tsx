@@ -27,7 +27,7 @@ export function HelpPage({
     return (
         <div>
             <h2 style={{ marginLeft: '3mm' }}>Welcome to the Help Page!</h2>
-            <div style={{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
+            <div style={{textAlign: "left", margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
             This site is meant to help you practice your error detection skills.<br/>
             On the Exercises page, you’ll find a list of the exercises currently uploaded to the site. <br/><br />
             You can use the different filters to sort and find appropriately challenging exercises for you (e.g. if you are new to this, consider starting with: intonation + 1 voice + level 1 + drone). <br/>

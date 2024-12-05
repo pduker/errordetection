@@ -15,16 +15,24 @@
 }
 
 .Home-bar {
-  display: inline-block;
+  display: flex;
   padding-left: 1vw;
   padding-top: 1vh;
   background-color: #ffdb63;
+  height: 70px;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .Home-nav {
   align-items: center;
   display: inline;
 }
+
+.Home-nav-right {
+  margin-left: auto;
+}
+
 
 a {
   color: #114b96; /*Blue that matches UD logo */
@@ -134,10 +142,10 @@ body {
 .container {
   box-shadow: inset 0 0 5px grey;
   width: 100%;
-  padding: 20px 10%;
+  padding: 15px 10%;
   background: #ffdb63;
-  border-radius: 10px;
-  margin: "10px";
+  border-radius: 5px;
+  margin: "5px";
 }
 
 .checkbox-wrapper-46 input[type="checkbox"] {
@@ -401,6 +409,13 @@ nav ul li a:hover::after {
   position: relative;
   overflow: hidden;
   cursor: pointer;
+}
+h2{
+  text-align: left;
+}
+
+h5{
+  text-align: left;
 }
 .work img {
   width: 100%;
@@ -708,6 +723,18 @@ nav .fas {
   color: #51b752;
   margin-top: -40px;
   display: block;
+}
+
+/* classes for highlight functions*/
+.hint-highlight {
+  fill: rgba(61, 245, 39, 0.6); 
+  stroke: green;
+  stroke-width: 2;
+}
+.error-highlight {
+  fill: rgba(255, 0, 0, 0,6);
+  stroke: red;
+  stroke-width: 2;
 }
 
 /* my colors

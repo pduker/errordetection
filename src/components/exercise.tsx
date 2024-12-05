@@ -370,6 +370,170 @@ export function Exercise({
         setChecking(true);
     } */
 
+    //adding highlight measure function
+    function highlightMeasure(selectedNotes: Element[], correctAnswers: any[]) {
+    // Create a sets to store unique measure positions
+    const measurePositionsSel = new Set<number>();
+    const measurePositionsCorr = new Set<number>();
+    
+    // Iterate through selected notes to collect measure positions
+    selectedNotes.forEach((noteElem) => {
+      const measurePos = Number(noteElem.getAttribute("measurePos"));
+      if (!isNaN(measurePos)) {
+        measurePositionsSel.add(measurePos);
+      }
+    });
+
+    //iterate through correct answers to collect measure positions
+    correctAnswers.forEach((note) => {
+        const corrPos = Number(note.measurePos);
+        if (!isNaN(corrPos)){
+            measurePositionsCorr.add(corrPos);
+        }
+    })
+
+    //set of incorrect measures
+    const errorMeasures = new Set<number>(Array.from(measurePositionsSel).filter((pos)=> !measurePositionsCorr.has(pos)));
+
+    //console logs for debugging
+    console.log("selected measures: ", measurePositionsSel);
+    console.log("correct measures: ", measurePositionsCorr);
+    console.log("wrong measures", errorMeasures);
+
+    //check if there are any incorrect measures selected
+    if (errorMeasures.size > 0){
+        //create overlay(s) oon the measures that are incorrect and hint over correct
+        console.log("there are incorrect measures selected, running through overlay functionality");
+        measurePositionsCorr.forEach((corrPos) => {
+            const existingOverlay = document.querySelector(`rect[data-measurePos='${corrPos}']`);
+            if (existingOverlay){
+                console.log("overlay exists, no need to add on top");
+                return;
+            } 
+                const measure = document.querySelectorAll(`[measurePos='${corrPos}']`);
+                
+                // Calculate the bounding box for the entire measure
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  
+                measure.forEach((pos) => {
+                    const bbox = (pos as SVGAElement).getBBox();
+                    minX = Math.min(minX, bbox.x);
+                    minY = Math.min(minY, bbox.y);
+                    maxX = Math.max(maxX, bbox.x + bbox.width);
+                    maxY = Math.max(maxY, bbox.y + bbox.height);
+                });
+  
+                // Set up overlay dimensions and positioning
+                const overlay = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "rect"
+                );
+                overlay.setAttribute("x", minX.toString());
+                overlay.setAttribute("y", minY.toString());
+                overlay.setAttribute("width", (maxX - minX).toString());
+                overlay.setAttribute("height", (maxY - minY).toString());
+                overlay.setAttribute("fill", "rgba(61, 245, 39, 0.6)"); // semi-transparent red overlay for feedback
+                overlay.setAttribute("class", "hint-highlight");
+                overlay.setAttribute("data-measurePos", corrPos.toString());
+  
+                // Get the SVG element and append the overlay if it exists
+                const svgElement = document.querySelector("svg");
+                if (svgElement) {
+                    svgElement.appendChild(overlay);
+                } else {
+                    console.error("SVG element not found!");
+                }
+        });
+
+        //repeat above but for the incorrect measures (in red)
+        measurePositionsSel.forEach((selPos) => {
+            const existingOverlay = document.querySelector(`rect[data-measurePos='${selPos}']`);
+            if (existingOverlay){
+                console.log("overlay exists, no need to add on top");
+                return;
+            } 
+                const measure = document.querySelectorAll(`[measurePos='${selPos}']`);
+                
+                // Calculate the bounding box for the entire measure
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  
+                measure.forEach((pos) => {
+                    const bbox = (pos as SVGAElement).getBBox();
+                    minX = Math.min(minX, bbox.x);
+                    minY = Math.min(minY, bbox.y);
+                    maxX = Math.max(maxX, bbox.x + bbox.width);
+                    maxY = Math.max(maxY, bbox.y + bbox.height);
+                });
+  
+                // Set up overlay dimensions and positioning
+                const overlay = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "rect"
+                );
+                overlay.setAttribute("x", minX.toString());
+                overlay.setAttribute("y", minY.toString());
+                overlay.setAttribute("width", (maxX - minX).toString());
+                overlay.setAttribute("height", (maxY - minY).toString());
+                overlay.setAttribute("fill", "rgba(255, 0, 0, 0.6)"); // semi-transparent red overlay for feedback
+                overlay.setAttribute("class", "error-highlight");
+                overlay.setAttribute("data-measurePos", selPos.toString());
+  
+                // Get the SVG element and append the overlay if it exists
+                const svgElement = document.querySelector("svg");
+                if (svgElement) {
+                    svgElement.appendChild(overlay);
+                } else {
+                    console.error("SVG element not found!");
+                }
+        });
+        //logic for when in the correct measure
+     } else {
+        console.log("in correct measure checking if correct note was selected, otherwise highlight correct note");
+        // Additional logic for correct measure, wrong note
+        correctAnswers.forEach((corrNote) =>{
+            const existingOverlay = document.querySelector(`rect[data-index='${corrNote.index}']`);
+            if (existingOverlay){
+                console.log("overlay exists, no need to add on top");
+                return;
+            } 
+                //create a bounding box for the overlat of the note
+                const note = document.querySelectorAll(`[index='${corrNote.index}']`);
+                
+                // Calculate the bounding box for the note
+                let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  
+                note.forEach((elem) => {
+                    const bbox = (elem as SVGAElement).getBBox();
+                    minX = Math.min(minX, bbox.x);
+                    minY = Math.min(minY, bbox.y);
+                    maxX = Math.max(maxX, bbox.x + bbox.width);
+                    maxY = Math.max(maxY, bbox.y + bbox.height);
+                });
+  
+                // Set up overlay dimensions and positioning
+                const overlay = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "rect"
+                );
+                overlay.setAttribute("x", minX.toString());
+                overlay.setAttribute("y", minY.toString());
+                overlay.setAttribute("width", (maxX - minX).toString());
+                overlay.setAttribute("height", (maxY - minY).toString());
+                overlay.setAttribute("fill", "rgba(61, 245, 39, 0.6)"); // semi-transparent red overlay for feedback
+                overlay.setAttribute("class", "hint-highlight");
+                overlay.setAttribute("data-index", corrNote.toString());
+  
+                // Get the SVG element and append the overlay if it exists
+                const svgElement = document.querySelector("svg");
+                if (svgElement) {
+                    svgElement.appendChild(overlay);
+                } else {
+                }
+        });
+       
+        }
+    }
+
     //function run when check answers button pressed on ex view: checks selected vs correct answers and displays feedback accordingly
     const checkAnswers = function(){
         var tmpSelected = [...selAnswers];
@@ -425,12 +589,16 @@ export function Exercise({
             for(let i = 0;i < tmpCorrect.length;i++){
                 // generic note position feedback
                 feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                //call highlight measure function
+                highlightMeasure(wrongList, tmpCorrect);
                 
             }
             for(let i = 0;i < wrongList.length;i++){
                 // position of any wrong answers selected
                 feedback = ([...feedback,"Wrong answer selected at: " + "Measure " + (Number(wrongList[i].getAttribute("measurePos"))+1) + ", Staff " + (Number(wrongList[i].getAttribute("staffPos"))+1)])
                 //console.log(wrongList[i]);
+                //call highlight measure function
+                highlightMeasure(wrongList, tmpCorrect);
                 
             }
 
@@ -442,6 +610,8 @@ export function Exercise({
             for(let i = 0;i < tmpCorrect.length;i++){
                 // generic note position feedback
                 feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                //call highlight meausre function
+                highlightMeasure(wrongList, tmpCorrect);
 
                 // specific note feedback added on mng page
                 let addtlFeedback = tmpCorrect[i]["feedback"];
@@ -454,6 +624,8 @@ export function Exercise({
                 if(addtlFeedback !== ""){
                     let add = feedback.pop();
                     feedback = [...feedback, add + ". Additional feedback: " + addtlFeedback];
+                    //call highlight measure function
+                    highlightMeasure(wrongList, tmpCorrect);
                 } 
             }
         
@@ -463,12 +635,16 @@ export function Exercise({
             // same as above feedback loop
             for(let i = 0;i < tmpCorrect.length;i++){
                 feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                //call highlight measure function
+                highlightMeasure(wrongList, tmpCorrect);
                 let addtlFeedback = tmpCorrect[i]["feedback"];
                 if(closeList.includes(Number(tmpCorrect[i]["index"])) && !tmpCorrect[i]["feedback"].toString().startsWith("You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). "))
                         addtlFeedback = "You’ve found where the error is (hurray!) but you’ve mis-identified the kind of error (try again!). " + tmpCorrect[i]["feedback"];
                 if(addtlFeedback !== ""){
                     let add = feedback.pop();
                     feedback = [...feedback, add + ". Additional feedback: " + addtlFeedback];
+                    //call highlight measure function
+                    highlightMeasure(wrongList, tmpCorrect);
                 } 
             }
         }
@@ -634,7 +810,8 @@ export function Exercise({
 
     return (
         // big yellow exercise box
-        <div style = {{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
+        <div style={{ margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px", marginLeft: "100px", marginTop: "20px" }}>
+
 
             {/* custom exercise title box */}
             {editingTitle && teacherMode ? 

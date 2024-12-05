@@ -73,28 +73,41 @@ function App() {
       <div>
         <header className="App-header" >
           
-          <Navbar className="Home-bar" fixed='top'>
-            <Navbar.Brand> {/* href="/" */}
-              <img
-                alt=""
-                src={logo}
-                width="60"
-                height="60"
-                className="d-inline-block align-top"
-              />
-            </Navbar.Brand>
-            
-            <Nav className='Home-nav' justify>
-            
-            <Link to="/exercises">Exercises</Link>
+        <Navbar className="Home-bar" fixed='top'>
 
-            {authorized ?
-            <Link to="/exercise-management">Exercise Management</Link>
-            : <></>}
-            <Link to="/about">About</Link>
-            <Link to="/help">Help</Link>
-            </Nav>
-          </Navbar>
+        <Navbar.Brand>
+          <img
+          alt=""
+          src={logo}
+          width="60"
+          height="60"
+          className="d-inline-block align-top"
+        />
+        </Navbar.Brand>
+
+        <Nav className='Home-nav'>
+        <Link to="/exercises" style={{ marginRight: '10px' }}>Exercises</Link>
+        {authorized ?
+        <Link to="/exercise-management" style={{ marginRight: '10px' }}>Exercise Management</Link>
+        : <></>}
+        </Nav>
+
+        <div style={{ position: 'absolute', right: '50%', transform: 'translateX(50%)', textAlign: 'center' }}>
+        <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginBottom: '5px' }}>
+        University of Delaware
+        </Navbar.Brand>
+        <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block' }}>
+        Aural Skills Error Detection Practice Site
+        </Navbar.Brand>
+        </div>
+
+
+        <Nav className='Home-nav-right'>
+        <Link to="/about" style={{ marginLeft: '-225px' }}>About</Link>
+        <Link to="/help" style={{ marginLeft: '10px' }}>Help</Link>
+        </Nav>
+        </Navbar>
+
           
         </header>
         <div className='pagediv'>
