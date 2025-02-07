@@ -828,22 +828,22 @@ export function Exercise({
                 }
         });
      } else {
-        console.log("in correct measure checking if correct note was selected, otherwise highlight correct note");
+        console.log("in correct measure checking if correct note was selected, otherwise highlight correct measure");
         // Additional logic for correct measure, wrong note
         correctAnswers.forEach((corrNote) =>{
-            const existingOverlay = document.querySelector(`rect[data-index='${corrNote.index}']`);
+            const existingOverlay = document.querySelector(`rect[data-measurePos='${corrNote.measurePos}']`);
             if (existingOverlay){
                 console.log("overlay exists, no need to add on top");
                 return;
             } 
 
-                const note = document.querySelectorAll(`[index='${corrNote.index}']`);
+                const measure = document.querySelectorAll(`[measurePos='${corrNote.measurePos}']`);
                 //logic for creating green overlay
                 
                 // Calculate the bounding box for the entire measure
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   
-                note.forEach((elem) => {
+                measure.forEach((elem) => {
                     const bbox = (elem as SVGAElement).getBBox();
                     minX = Math.min(minX, bbox.x);
                     minY = Math.min(minY, bbox.y);
@@ -862,7 +862,7 @@ export function Exercise({
                 overlay.setAttribute("height", (maxY - minY).toString());
                 overlay.setAttribute("fill", "rgba(61, 245, 39, 0.6)"); // semi-transparent red overlay for feedback
                 overlay.setAttribute("class", "hint-highlight");
-                overlay.setAttribute("data-index", corrNote.toString());
+                overlay.setAttribute("data-measurePos", corrNote.toString());
   
                 // Get the SVG element and append the overlay if it exists
                 const svgElement = document.querySelector("svg");
