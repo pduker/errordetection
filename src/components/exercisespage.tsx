@@ -268,9 +268,13 @@ export function ExercisesPage({
                             <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{ marginRight: "4px" }} />
                             Pitch
                         </label>
-                        <label style={{ display: "flex", alignItems: "center", marginLeft: "-5px"}}>
+                        <label style={{ display: "flex", alignItems: "center", marginRight: "12px"}}>
                             <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{ marginRight: "4px" }} />
                             Intonation
+                        </label>
+                        <label style={{ display: "flex", alignItems: "center" }}>
+                            <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange} style={{ marginRight: "4px" }} />
+                            Rhythm
                         </label>
                     </form>
                     <form id="transpos" style={{ display: "flex", alignItems: "center", marginLeft: "-20px" }}>
