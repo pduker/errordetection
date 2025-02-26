@@ -874,12 +874,25 @@ export function Exercise({
         }
     }
 
+    // function to get instrument list from abc score
+    function getInstrumentList(abcScore: string): string[] {
+      const instrumentNames: string[] = [];
+      const regex = /V:\d+.*?nm="(.*?)"/g;
+      let match;
+    
+      while ((match = regex.exec(abcScore)) !== null) {
+        instrumentNames.push(match[1]);
+      }
+    
+      return instrumentNames;
+    }
 
   //function run when check answers button pressed on ex view: checks selected vs correct answers and displays feedback accordingly
   const checkAnswers = function () {
     var tmpSelected = [...selAnswers];
     var tmpCorrect = [...correctAnswers];
     var feedback: string[] = [];
+    const instruments = getInstrumentList(exerciseData.score);
 
     // sorting copy of selAnswers for comparison against copy of correctAnswers
     tmpSelected.sort((i1, i2) => {
@@ -947,15 +960,38 @@ export function Exercise({
         } else if(tmpSelected.length !== correctAnswers.length){
             var plural = " are ";
             if (correctAnswers.length === 1) plural = " is ";
-            feedback = (["You selected " + selAnswers.length + " answer(s). There" + plural + correctAnswers.length + " correct answer(s). Here are some specific places to look at and listen to more closely:"]);
+            feedback = [
+              "You selected " +
+                selAnswers.length +
+                " answer(s). There" +
+                plural +
+                correctAnswers.length +
+                " correct answer(s).",
+            ];
             for(let i = 0;i < tmpCorrect.length;i++){
                 // generic note position feedback
-                feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                // feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                feedback = [
+                  ...feedback,
+                  "\nTry checking Measure " +
+                  (Number(tmpCorrect[i]["measurePos"]) + 1) +
+                  " in the " +
+                  (instruments[Number(tmpCorrect[i]["staffPos"])]) + 
+                  " staff more carefully!"
+                ];
                 highlightMeasure(wrongList, tmpCorrect);
             }
             for(let i = 0;i < wrongList.length;i++){
                 // position of any wrong answers selected
-                feedback = ([...feedback,"Wrong answer selected at:  Measure " + (Number(wrongList[i].getAttribute("measurePos"))+1) + ", Staff " + (Number(wrongList[i].getAttribute("staffPos"))+1)])
+                // feedback = ([...feedback,"Wrong answer selected at:  Measure " + (Number(wrongList[i].getAttribute("measurePos"))+1) + ", Staff " + (Number(wrongList[i].getAttribute("staffPos"))+1)])
+                feedback = [
+                  ...feedback,
+                  "\nWrong answer selected at Measure " +
+                  (Number(wrongList[i].getAttribute("measurePos")) + 1) +
+                  " in the " +
+                  (instruments[Number(wrongList[i].getAttribute("staffPos"))]) + 
+                  " staff!"
+                ];
                 //console.log(wrongList[i]);
                 highlightMeasure(wrongList, tmpCorrect);
                 
@@ -964,11 +1000,22 @@ export function Exercise({
 
         // no correct answers selected
         } else if(tmpCorrect.length === correctAnswers.length){
-            feedback = ["Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:"];
+            // feedback = ["Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:"];
+            feedback = [
+              "Keep trying; the more you practice the better you will get.",
+            ];
             // iterates through missed answers giving info/note specific feedback (if added on mng page)
             for(let i = 0;i < tmpCorrect.length;i++){
                 // generic note position feedback
-                feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                // feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
+                feedback = [
+                  ...feedback,
+                  "\nTry checking Measure " +
+                  (Number(tmpCorrect[i]["measurePos"]) + 1) +
+                  " in the " +
+                  (instruments[Number(tmpCorrect[i]["staffPos"])]) + 
+                  " staff more carefully!",
+                ];
                 highlightMeasure(wrongList, tmpCorrect);
                 // specific note feedback added on mng page
                 let addtlFeedback = tmpCorrect[i]["feedback"];
