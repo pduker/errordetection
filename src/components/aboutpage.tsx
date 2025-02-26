@@ -5,10 +5,10 @@
 export function AboutPage() {
     return (
         <div>
-            /* header for page */
+            {/* header for page */}
             <h2>About</h2>
             
-            /* class for about text */
+            {/* class for about text */}
             <div className="about">
                 <div style={{ textAlign: 'left' }}>
                     This website is an error detection practice tool! Choose a category of exercises above to get started, or visit the Help page to learn more. See a problem? Please get in touch with Phil Duker.
