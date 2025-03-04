@@ -1,8 +1,10 @@
+//imports
 import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
 import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
 
+//function to create the exercise page, takes exercise data and renders a page
 export function ExercisesPage({
     allExData,
     setAllExData,
@@ -14,6 +16,7 @@ export function ExercisesPage({
     defaultTags: string[];
     scoresRet: boolean;
 }){
+    //state init for the differnt attributes
     const [diff, setDiff] = useState<string>("All");
     const [types, setTypes] = useState<string>("None");
     const [meter, setMeter] = useState<string>("Anything");
@@ -25,8 +28,10 @@ export function ExercisesPage({
     const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
     const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
 
+    //sort exercises function, takes user input an dorders exerceses based on the input
     const sortExercises = function (input: string | string[] | number | boolean, inputType:string) {
         var tempTags = tags, tempDiff = diff, tempVoices = voices, tempTypes = types, tempMeter = meter, tempTranspos = transpos;
+        //what parameter to filter by
         if (inputType === "tags") tempTags = input as string[];
         else if (inputType === "diff")tempDiff = input as string;
         else if (inputType === "voices") tempVoices = input as number;
@@ -34,6 +39,7 @@ export function ExercisesPage({
         else if (inputType === "meter") tempMeter = input as string;
         else if (inputType === "transpos") tempTranspos = input as boolean;
         
+        //extra logic based on certain input values
         var list: (ExerciseData | undefined)[] = [...allExData];
         if (tempTags.length > 0) {
             list = list.filter(function(exercise) {
@@ -76,6 +82,7 @@ export function ExercisesPage({
         setExList(list);
     } 
 
+    //loads the sorted exercises
     useEffect(() => {
         if(exList.length === 0) {
             if(tags.length === 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos) setExList(allExData.sort(exSortFunc));
@@ -86,14 +93,17 @@ export function ExercisesPage({
         }
     }, [exList.length, tags, diff, voices, types, meter, transpos, allExData, upd, sortExercises]);
 
+    //exercise sort function for comparing exercises against each other
     const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
         if (e1 !== undefined && e2 !== undefined) {
             try {
+                //alphabetical comparison?
                 if(e1.title.startsWith("Exercise ") && e2.title.startsWith("Exercise ")) {
                     if (e1.title > e2.title) return 1;
                     else if (e1.title < e2.title) return -1;
                     else return 0;
                 }
+                //tags sort?
                 else if(e1.title.startsWith("Exercise ")) return 1;
                 else if(e2.title.startsWith("Exercise ")) return -1;
                 var e1Sorted = e1.tags.sort().length;
@@ -101,6 +111,7 @@ export function ExercisesPage({
                 if (e1Sorted > e2Sorted) return 1;
                 else if (e1Sorted < e2Sorted) return -1;
                 else {
+                    //difficulty sort
                     if(Number(e1.difficulty) > Number(e2.difficulty)) return 1;
                     else if(Number(e1.difficulty) < Number(e2.difficulty)) return -1;
                     else {
@@ -122,6 +133,7 @@ export function ExercisesPage({
         } else return 0;
     }
 
+    //exercise change function for when you want to move from one exercise to the next
     const exChange = function (e:React.MouseEvent<HTMLSpanElement>){
         var ex = allExData.find((exercise: ExerciseData | undefined) => {if (exercise !== undefined && exercise.title === (e.target as Element).id){return exercise} else {return undefined}})
         var nBtn = document.getElementById("next-btn");
@@ -253,6 +265,7 @@ export function ExercisesPage({
 
     }
 
+    //html to render page
     return (
         <div style={{ width: "90vw", marginTop: "10px" }}>
             <div>

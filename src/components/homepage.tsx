@@ -1,10 +1,13 @@
+//imports
 import '../App.css';
 import musicnote from "../assets/musicnote.jpg";
 import othernote from "../assets/othernote.png";
 import logo from '../assets/doof.png';
 import { Link } from 'react-router-dom';
 
+//function for creating the home page
 export function HomePage() {
+  //links for exercises on page
   const intLink = function () {
     var exLink = document.getElementById("intLink");
     if(exLink !== null) exLink.click();
@@ -17,6 +20,7 @@ export function HomePage() {
     var exLink = document.getElementById("rhyLink");
     if(exLink !== null) exLink.click();
   } */
+  //return for rendering home page
     return (
         <div className="container ">
           

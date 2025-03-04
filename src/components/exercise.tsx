@@ -1,3 +1,4 @@
+//imports for handling exercises
 import React, { useEffect, useState } from 'react';
 import { ref, get, remove, child, set } from 'firebase/database';
 import  abcjs from 'abcjs';
@@ -11,6 +12,7 @@ import { getStorage, ref as storageRef, uploadBytes } from 'firebase/storage';
 import { initializeApp } from 'firebase/app';
 import noteKey from "../assets/note-color-key.png"
 
+//firebase connection string
 const firebaseConfig = {
     apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
     authDomain: "errordetectinator.firebaseapp.com",
@@ -20,11 +22,13 @@ const firebaseConfig = {
     messagingSenderId: "442966541608",
     appId: "1:442966541608:web:b08d5b8a9ea1d5ba2ffc1d"
 };
+//initializing app
 const app = initializeApp(firebaseConfig);
 
 // Export initialized Firebase app
 export const firebaseApp = app; 
 
+//exercise function,  defines all exercise attributes
 export function Exercise({
     exIndex, 
     teacherMode,
@@ -108,7 +112,7 @@ export function Exercise({
         if ((exerciseData !== undefined && !exerciseData.empty && !loaded) || (abcFile !== undefined && abcFile !== "" && !loaded)) loadScore();
     })
     
-    // yoinked/edited from abcjs! probably don't need all of it for highlighting but oh well
+    // from abcjs for highlighting
     const setClass = function (elemset: any, addClass: any, removeClass: any, color: any) {
         if (!elemset)
             return;
@@ -129,7 +133,7 @@ export function Exercise({
         }
     };
 
-    // yoinked/edited from abcjs! changed behavior so it works how we want it to B)
+    // from abcjs changed behavior so it works how we want it to, second part for highlight
     const highlight = function (note: any, klass: any, clicked: boolean): number {
         var retval = 0;
         var selTim = Number(note.abselem.elemset[0].getAttribute("selectedTimes"));
@@ -177,8 +181,7 @@ export function Exercise({
                     if(highlight(selNotes[i], undefined, false) === 1) i--;
                 }
             }
-            // this state set doesn't seem to be necessary? leaving in for posterity/just in case it becomes necessary
-            //setSelNotes([...selNotes]);
+            
         }
         // selected notes handling: non-teacher edition (that means it's called selected ANSWERS now)
         else{
@@ -245,11 +248,8 @@ export function Exercise({
                         // sets attributes to their proper values
                         noteElems.setAttribute("selectedTimes", correctAnswers[ansSearch].selectedTimes);
                         noteElems.setAttribute("feedback", correctAnswers[ansSearch].feedback);
-
                         
-                        
-                        // little bit of jank: for some reason this stuff gets run twice? with the second set of notes being the ones we actually want
-                        // so the if part adds the bad values to selNotes (which we may not need to do? who knows, it works for now)
+                        // so the if part adds the bad values to selNotes
                         // and the else writes over the bad values with the good ones
                         if(selNotes.findIndex((val) => val.startChar === note.startChar) === -1) selNotes.push(note);
                         else selNotes[selNotes.findIndex((val) => val.startChar === note.startChar)] = note;
@@ -267,10 +267,10 @@ export function Exercise({
 
     //runs when reset answers button is pushed on mng view: essentially reloads score/resets answers
     const reload = function() {
-        // see exReload for explanation of this jank
+        // see exReload for explanation
         for(let i=0; i<selNotes.length;) selNotes.pop();
         setSelNotes([]);
-        // ditto
+
         for(let i=0; i<correctAnswers.length;) correctAnswers.pop();
         setCorrectAnswers([]);
         loadScore();
@@ -278,7 +278,7 @@ export function Exercise({
 
     //same as above, but on exercises page
     const exReload = function() {
-        // workaround because state is jank: empties selAnswers via popping before... setting it to an empty list (thanks react)
+        // workaround, empties selAnswers via popping before setting it to an empty list
         for(let i=0; i<selAnswers.length;) selAnswers.pop();
         setSelAnswers([]);
         loadScore();
@@ -299,7 +299,6 @@ export function Exercise({
         if (abcFile !== undefined && abcFile !== "" && mp3File.name !== "" && correctAnswers.length > 0) {
             data = new ExerciseData(abcFile, mp3File, correctAnswers, "", exInd, false, customTitle, diff, voices,tags,types,meter, transpos);
         
-        //setExerciseData(data);
     
         // Get database reference
         const database = getDatabase();
@@ -362,15 +361,8 @@ export function Exercise({
         setCorrectAnswers(dict);
     }
 
-    //runs when check answers button is pushed on ex view: logs selected and correct answers for debug and toggles feedback to appear
-    /* const log = function(){
-        console.log(selAnswers);
-        console.log(correctAnswers);
-        setCustomFeedback([]);
-        setChecking(true);
-    } */
 
-    //adding highlinght measure function
+    //adding highlinght measure function, used for feedbakc on user choices
   function highlightMeasure(selectedNotes: Element[], correctAnswers: any[]) {
     // Create a set to store unique measure positions
     const measurePositionsSel = new Set<number>();
@@ -391,15 +383,20 @@ export function Exercise({
         }
     })
 
+    //grab incorrect measures from sets of measure positions
     const errorMeasures = new Set<number>(Array.from(measurePositionsSel).filter((pos)=> !measurePositionsCorr.has(pos)));
 
+    //logs for debuuging, ensure coorect functionality
     console.log("selected measures: ", measurePositionsSel);
     console.log("correct measures: ", measurePositionsCorr);
     console.log("wrong measures", errorMeasures);
 
+    //if incorrect options were selected then we will create overlays in the selected measure that was icnorrect adn a highlight in the
+    //correct measure as a hint highlight 
     if (errorMeasures.size > 0){
         console.log("there are incorrect measures selected, running through overlay functionality");
         measurePositionsCorr.forEach((corrPos) => {
+            //prevent multiple shapes being added on top of one another, keep transparency
             const existingOverlay = document.querySelector(`rect[data-measurePos='${corrPos}']`);
             if (existingOverlay){
                 console.log("overlay exists, no need to add on top");
@@ -407,8 +404,8 @@ export function Exercise({
             } 
 
                 const measure = document.querySelectorAll(`[measurePos='${corrPos}']`);
-                //logic for creating green overlay
                 
+                //logic for creating green overlay
                 // Calculate the bounding box for the entire measure
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
   
@@ -429,7 +426,7 @@ export function Exercise({
                 overlay.setAttribute("y", minY.toString());
                 overlay.setAttribute("width", (maxX - minX).toString());
                 overlay.setAttribute("height", (maxY - minY).toString());
-                overlay.setAttribute("fill", "rgba(61, 245, 39, 0.6)"); // semi-transparent red overlay for feedback
+                overlay.setAttribute("fill", "rgba(61, 245, 39, 0.6)"); // semi-transparent green overlay for hint
                 overlay.setAttribute("class", "hint-highlight");
                 overlay.setAttribute("data-measurePos", corrPos.toString());
   
@@ -442,6 +439,7 @@ export function Exercise({
                 }
         });
 
+        //repeat process
         measurePositionsSel.forEach((selPos) => {
             const existingOverlay = document.querySelector(`rect[data-measurePos='${selPos}']`);
             if (existingOverlay){
@@ -450,7 +448,7 @@ export function Exercise({
             } 
 
                 const measure = document.querySelectorAll(`[measurePos='${selPos}']`);
-                //logic for creating green overlay
+                //logic for creating red overlay
                 
                 // Calculate the bounding box for the entire measure
                 let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -486,7 +484,7 @@ export function Exercise({
         });
      } else {
         console.log("in correct measure checking if correct note was selected, otherwise highlight correct measure");
-        // Additional logic for correct measure, wrong note
+        // Additional logic for correct measure, wrong note selected
         correctAnswers.forEach((corrNote) =>{
             const existingOverlay = document.querySelector(`rect[data-measurePos='${corrNote.measurePos}']`);
             if (existingOverlay){
@@ -757,11 +755,6 @@ export function Exercise({
 
     }
 
-    //function used with bebug bubbon for testing
-    /* const debug = function() {
-        console.log(selNotes);
-    } */
-
     //deleting the exercise from database and website
     const handleExerciseDelete = async (exIndex: number) => {
         try {
@@ -909,7 +902,7 @@ export function Exercise({
                     <Button variant='danger' onClick={reload} style={{marginLeft: "1vw", float:"right"}}>Reset Answers</Button>
                 </div> : <></>}
 
-                {/* note info blurb in case teachers want to see which staff/measure the note is on (and can't/don't want to count i guess) */}
+                {/* note info blurb in case teachers want to see which staff/measure the note is on*/}
                 {lastClicked !== undefined && Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) % 3 !== 0 ? <div style={{marginLeft: "1vw"}}>Note Info: {ana}</div> : <div/>}
                 <br/>
                 <Button variant='success' onClick={save}>Save Exercise</Button>
@@ -942,7 +935,6 @@ export function Exercise({
                     <div>
                         <button className= "btnback" onClick={checkAnswers}>Check Answer</button>
                         <div>Next step(s): {customFeedback.map(function(feedback) {
-                            // this key generation is COOKED but we don't need to access it and they all gotta be different sooooooo
                             return <li style={{display: "flex", margin: "auto", justifyContent:"center"}} key={Math.random()}>{feedback}</li>
                         })}</div>
                     </div>
@@ -950,7 +942,7 @@ export function Exercise({
             </span>
             }
 
-            {/* multi-exercise deletion box, only loads on teacher view because of how handle is defined (or "un"defined HAHAHA) */}
+            {/* multi-exercise deletion box, only loads on teacher view because of how handle is defined */}
             {handleSelectExercise !== undefined ? <div>
                 <input
                 type="checkbox"
