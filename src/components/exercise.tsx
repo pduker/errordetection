@@ -145,8 +145,11 @@ export function Exercise({
     }
   };
 
-  // highlighting function
+  // highlighting function with guard added to avoid accessing undefined properties
   const highlight = function (note: any, klass: any, clicked: boolean): number {
+    if (!note || !note.abselem || !note.abselem.elemset || note.abselem.elemset.length === 0) {
+      return 0;
+    }
     var retval = 0;
     var selTim = Number(note.abselem.elemset[0].getAttribute("selectedTimes"));
     if (clicked) selTim++;
@@ -172,7 +175,7 @@ export function Exercise({
     return retval;
   };
 
-  // click listener for notes
+  // click listener for notes with a guard to ensure note.abselem exists
   const clickListener = function (
     abcelem: any,
     tuneNumber: number,
@@ -181,6 +184,9 @@ export function Exercise({
     drag: abcjs.ClickListenerDrag
   ) {
     var note = abcelem;
+    if (!note || !note.abselem || !note.abselem.elemset || note.abselem.elemset.length === 0) {
+      return;
+    }
     var noteElems = note.abselem.elemset[0];
 
     if (teacherMode) {
@@ -647,7 +653,7 @@ export function Exercise({
         measurePos: noteElems.getAttribute("measurePos"),
         selectedTimes: noteElems.getAttribute("selectedTimes"),
         feedback: noteElems.getAttribute("feedback"),
-        type: "note"
+        type: "note",
       };
       dict.push(dict2);
     }
