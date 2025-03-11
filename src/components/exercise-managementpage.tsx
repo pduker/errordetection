@@ -4,6 +4,8 @@ import { Exercise } from './exercise';
 import { useEffect, useState } from 'react';
 import { get, getDatabase, ref, remove } from 'firebase/database';
 
+//code for creating the exercise management page, seen by admin to work on updating exercises
+//take in exercise data and return updated data, must be authorized users
 export function ExerciseManagementPage({
     allExData,
     setAllExData,
@@ -16,6 +18,7 @@ export function ExerciseManagementPage({
     authorized: boolean;
 }) {
 
+    //use states for getting and setting specific attributes of exercises and music
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
 
     /* const [mode, setMode] = useState<boolean>(false); */
@@ -39,13 +42,18 @@ export function ExerciseManagementPage({
         setTags([]);
         sortExercises(undefined,"");
     } */
+
+    //main function 
     useEffect(() => {
+        //if no exercises
         if(exList.length === 0) {
             if(tags.length === 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos) setExList(allExData.sort(exSortFunc));
         }
+        //more exercises then all exercise data
         if(exList.length > allExData.length) setExList(allExData.sort(exSortFunc));
     },[exList.length, allExData, tags.length, diff, voices, types, meter, transpos]);
     
+    //function to allow admin to create a new exercise
     const createExercise = function () {
         var last = allExData[allExData.sort(indexSort).length-1];
         var newEx: ExerciseData;
@@ -55,6 +63,7 @@ export function ExerciseManagementPage({
         setExList([newEx, ...allExData]);
     }
 
+    //function to sort exercises in the list
     const sortExercises = function (input: string | string[] | number | boolean | undefined, inputType:string) {
         var tempTags = tags, tempDiff = diff, tempVoices = voices, tempTypes = types, tempMeter = meter, tempTranspos = transpos;
         if (inputType === "tags") tempTags = input as string[];
@@ -64,7 +73,10 @@ export function ExerciseManagementPage({
         else if (inputType === "meter") tempMeter = input as string;
         else if (inputType === "transpos") tempTranspos = input as boolean;
         
+        //filtering based on temp exercise parameters
+        //copy of data to prevent messing with original data
         var list: (ExerciseData | undefined)[] = [...allExData];
+        //filtering with exercise tags
         if (tempTags.length > 0) {
             list = list.filter(function(exercise) {
                 if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
@@ -72,30 +84,35 @@ export function ExerciseManagementPage({
                 }
                 else return false;})
         }
+        //filtering with exercise difficulty
         if (tempDiff !== "All") {
             list = list.filter(function(exercise) {
                 if (exercise !== undefined) 
                     return tempDiff === String(exercise.difficulty) 
                 else return false;})
         }
+        //filtering with exercise voices
         if (tempVoices !== 0) {
             list = list.filter(function(exercise) {
                 if (exercise !== undefined) 
                     return tempVoices === exercise.voices
                 else return false;})
         }
+        //filtering with exrcise types
         if (tempTypes !== "None") {
             list = list.filter(function(exercise) {
                 if (exercise !== undefined){
                     return (tempTypes === exercise.types)}
                 else return false;})
         }
+        //filtering with exercise meter
         if (tempMeter !== "Anything") {
             list = list.filter(function(exercise) {
                 if (exercise !== undefined) 
                     return tempMeter === String(exercise.meter)
                 else return false;})
         }
+        //filtering with exercise transpositon, transposed instruments
         if (tempTranspos === true) {
             list = list.filter(function(exercise) {
                 if (exercise !== undefined) 
@@ -106,9 +123,11 @@ export function ExerciseManagementPage({
         setExList(list);
     }
 
+    //sort function for the exercises
     const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
         if (e1 !== undefined && e2 !== undefined) {
             try {
+                //sorts exercises alphabetically
                 if(e1.title.startsWith("Exercise ") && e2.title.startsWith("Exercise ")) {
                     if (e1.title > e2.title) return 1;
                     else if (e1.title < e2.title) return -1;
@@ -117,6 +136,7 @@ export function ExerciseManagementPage({
                 else if(e1.title.startsWith("Exercise ")) return -1;
                 else if(e2.title.startsWith("Exercise ")) return 1;
 
+                //compare number of tags, more tags come later (increasing order)
                 var e1Sorted = e1.tags.sort().length;
                 var e2Sorted = e2.tags.sort().length;
                 if (e1Sorted > e2Sorted) return 1;
@@ -129,20 +149,24 @@ export function ExerciseManagementPage({
                         if(Number(e1Split[e1Split.length-1]) > Number(e2Split[e2Split.length-1])) return 1;
                         else if(Number(e1Split[e1Split.length-1]) < Number(e2Split[e2Split.length-1])) return -1;
                         else {
+                            //final comparison isf equal up to this point
                             if (e1.title > e2.title) return 1;
                             else if (e1.title < e2.title) return -1;
                             else return 0;
                         }
                     }
                 }
+                //if an error occurs default to sorting alphabetically
             } catch {
                 if(e1.title > e2.title) return 1;
                 else if(e1.title < e2.title) return -1;
                 else return 0;
             };
+            //if undefined treat as equal
         } else return 0;
     }
 
+    //sort indexes alphabetically
     const indexSort = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
         if (e1 !== undefined && e2 !== undefined) {
             if(e1.exIndex > e2.exIndex) return 1;
@@ -152,10 +176,12 @@ export function ExerciseManagementPage({
     }
 
     //all the onClicks for when a sorting field changes
+    //changing difficulty
     const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setDiff((e.target.value));
         sortExercises(e.target.value,"diff");
     }
+    //changing tags
     const tagsChange = function (e: React.ChangeEvent<HTMLInputElement>) {
         let val = e.target.value;
         if(tags.includes(val)) {
@@ -167,18 +193,22 @@ export function ExerciseManagementPage({
             sortExercises([...tags, val],"tags");
         } 
     }
+    //changing voice
     const voiceChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setVoices(Number(e.target.value));
         sortExercises(Number(e.target.value),"voices");
     }
+    //changing types
     const typesChange = function (e: React.ChangeEvent<HTMLSelectElement>){
         setTypes(e.target.value);
         sortExercises(e.target.value,"types");
     }
+    //changing meter
     const meterChange = function (e: React.ChangeEvent<HTMLSelectElement>){
         setMeter(e.target.value);
         sortExercises(e.target.value,"meter");
     }
+    //changing transposition, transposed instruments
     const transposChange = function (e: React.ChangeEvent<HTMLInputElement>){
         setTranspos(!transpos);
         sortExercises(!transpos,"transpos");
@@ -186,24 +216,30 @@ export function ExerciseManagementPage({
 
     //onClick to reset all exercise sort fields
     const resetSort = function () {
+        //reset tags to original state
         setTags([]);
 
+        //reset difficulty to original state
         setDiff("All");
         var diffBox = document.getElementsByName("difficulty")[0] as HTMLSelectElement;
         if (diffBox !== null) diffBox.options[0].selected = true;
 
+        //reset voices to original state
         setVoices(0);
         var voiceBox = document.getElementsByName("voices")[0] as HTMLSelectElement;
         if (voiceBox !== null) voiceBox.options[0].selected = true;
 
+        //reset types to original state
         setTypes("None");
         var typesBox = document.getElementsByName("types")[0] as HTMLSelectElement;
         if(typesBox !== null) typesBox.options[0].selected = true;
 
+        //reset meter to rginal state
         setMeter("Anything");
         var meterBox = document.getElementsByName("meter")[0] as HTMLSelectElement;
         if(meterBox !== null) meterBox.options[0].selected = true;
 
+        //reset transposition/transposed instruments to orignal state
         setTranspos(false);
 
         exList.sort(exSortFunc);
@@ -253,11 +289,14 @@ export function ExerciseManagementPage({
         }
     };
 
+    //html for the page
     return (
         <div style={{width: "90vw"}}>
+            {/* if authorized user then they can see the page*/}
             {authorized ? 
                 <div>
                     <div>
+                        {/*page header*/}
                     <h2 style={{display:"inline"}}>Welcome to the Exercise Management Page!</h2>
                     </div>
                     {/*<form id="editMode" style={{display: "inline", float:"right"}}>
@@ -265,12 +304,15 @@ export function ExerciseManagementPage({
                             <input className="form-check-input" type="checkbox" role="switch" id="switchCheckDefault" checked={mode} onChange={modeChange}/>
                         </div> 
                     </form>*/}
+                    
+                    {/*creating an exercise*/}
                     <Button style={{display: "inline", float:"right", marginRight: "1vw"}} onClick={createExercise}>+</Button>
                     <h5 style={{marginTop: "8px", fontStyle: "italic"}}>Click the + in the top right to add a new exercise, then edit as needed and save.</h5>
                         <div>
                             <h5 style={{marginLeft: "4px", marginBottom: "-20px"}}>Sort By:</h5>
                             <br/>
 
+                        {/*editing an exercise, filling in all paramters*/}
                         <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
                             <form id="tags" style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>
                                 <div style={{ fontSize: "16px", marginRight: "8px" }}>Tags:</div>
@@ -342,6 +384,7 @@ export function ExerciseManagementPage({
                                         <option value="Both">Drone & Ensemble Parts</option>
                                     </select>
                                 </form>
+                                {/*reset sort*/}
                                 <Button variant="danger" onClick={resetSort} style={{marginLeft: "10px"}}>Reset Sort</Button>
                                 <Button
                                     variant="danger" 
@@ -351,6 +394,7 @@ export function ExerciseManagementPage({
                                 </Button>
                             </div>
 
+                        {/*returning exercise data */}
                         {exList.map((exercise) => {
                                 if (exercise !== undefined)
                                     return (

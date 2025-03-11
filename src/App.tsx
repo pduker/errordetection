@@ -1,3 +1,4 @@
+//imports
 import React, { useEffect, useState } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
@@ -19,10 +20,14 @@ import { getBlob, getStorage, ref as storageRef } from 'firebase/storage';
 
 //import Navbar from "./components/navbar"
 
+//app function to initlize site
 function App() {
+  //state initialization
   const [allExData,setAllExData] = useState<(ExerciseData | undefined)[]>([]);
   const [scoresRetrieved, setScoresRetrieved] = useState<boolean>(false); // Track whether scores are retrieved
   const [authorized, setAuthorized] = useState<boolean>(false); // has the user put in the admin pwd on help page?
+  
+  //get data from the database
   const fetchScoresFromDatabase = async (scoresRet: boolean) => {
     if(!scoresRet) {
       console.log("Retrieving scores");
@@ -68,6 +73,7 @@ function App() {
 
   useEffect(()=>{fetchScoresFromDatabase(scoresRetrieved)});
   
+  //return fucntion for rendering app
   return (
     <Router>
       <div>
