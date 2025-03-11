@@ -513,6 +513,7 @@ export function Exercise({
                   const noteToSelect = staffArray[staff].voices[0][j - p];
                   if (!selAnswers.includes(noteToSelect)) {
                     selAnswers.push(noteToSelect);
+                    console.log("added note to selAnswers: ", selAnswers);  
                   }
                   noteToSelect.abselem.elemset[0].setAttribute(
                     "selectedTimes",
@@ -915,6 +916,9 @@ export function Exercise({
     // holds incorrect answer info for feedback
     let wrongList = [];
 
+    console.log("answers: "+correctAnswers)
+    console.log("selected: "+selAnswers)
+
     // loops through corr/sel copies in a unique way to compare answers
     for (
       var i = 0, j = 0;
@@ -924,6 +928,8 @@ export function Exercise({
 
     ) {
       let noteElems = tmpSelected[j].abselem.elemset[0];
+      console.log("-----------selected in checkAnswers: "+noteElems.getAttribute("selectedTimes"), instruments[Number(noteElems.getAttribute("staffPos"))]);
+
       // note index is right -- but is it the right error?
       if (noteElems.getAttribute("index") === tmpCorrect[i]["index"]) {
         // answer is fully correct: removes note from correct array
@@ -968,6 +974,7 @@ export function Exercise({
                 correctAnswers.length +
                 " correct answer(s).",
             ];
+            tmpCorrect.sort((a, b) => Number(a.measurePos) - Number(b.measurePos));
             for(let i = 0;i < tmpCorrect.length;i++){
                 // generic note position feedback
                 // feedback = ([...feedback, "Measure " + (Number(tmpCorrect[i]["measurePos"])+1) + ", Staff " + (Number(tmpCorrect[i]["staffPos"])+1)]);
@@ -1004,6 +1011,7 @@ export function Exercise({
             feedback = [
               "Keep trying; the more you practice the better you will get.",
             ];
+            tmpCorrect.sort((a, b) => Number(a.measurePos) - Number(b.measurePos));
             // iterates through missed answers giving info/note specific feedback (if added on mng page)
             for(let i = 0;i < tmpCorrect.length;i++){
                 // generic note position feedback
