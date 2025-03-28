@@ -845,7 +845,7 @@ export function Exercise({
         );
         if (!found) {
           allCorrect = false;
-          feedback += `Missing correct beat: Measure ${Number(corr.measurePos) + 1}, Beat ${corr.beatIndex}. `;
+          feedback += `Missing correct beat: Measure ${Number(corr.measurePos) + 1}, Beat ? `;
         }
       });
       selAnswers.forEach((sel) => {
