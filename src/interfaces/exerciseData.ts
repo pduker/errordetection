@@ -1,6 +1,7 @@
 
-
+//exercise data structre
 class ExerciseData {
+    //exercise attribute
     score: string
     sound: File | undefined
     correctAnswers: {[label: string]: (number | string)}[]
@@ -14,6 +15,7 @@ class ExerciseData {
     types: string
     meter: string
     transpos: boolean
+    //exercise constructor for defining exercise
     constructor(score:string,sound:File | undefined,correctAnswers:{[label: string]: (number | string)}[],feedback:string,exIndex:number, empty: boolean,title: string,difficulty: number, voices: number, tags: string[], types: string, meter: string, transpos: boolean){
         this.score = score;
         this.sound = sound;

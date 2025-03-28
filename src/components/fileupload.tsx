@@ -1,7 +1,9 @@
+//imports
 import { useState } from 'react';
 import { vertaal } from 'xml2abc';
 import AudioHandler from './audiohandler';
 
+//function for uploading a music file
 export default function FileUpload ({
   setFile,
   setAbcFile,
@@ -19,6 +21,7 @@ export default function FileUpload ({
     //state declarations, can be used to access file in the future
     const [msgContent, setMsgContent] = useState<string>(); //"Nothing selected."
     
+    //taking file content and translating to abcjs
     const abcTranslate = function (fileContent: string) {
       var domparser = new DOMParser();
       var xmldata = domparser.parseFromString(fileContent, 'application/xml');
@@ -35,8 +38,7 @@ export default function FileUpload ({
       if (setAbcFile != null) {
           setAbcFile(abcText);
           setLoaded(false);
-          /* console.log("file? " + abcText + "<- should be here");
-          console.log("error text: " + errorText); */
+          
       }
   }
 
@@ -75,26 +77,8 @@ export default function FileUpload ({
           }
         }
       };
-          
-        
-        
-  // Function to print information about uploaded files
-  /* const printFileInformation = () => {
-    return files.map((file, index) => (
-      <div key={index}>
-        <p>Name: {file.name}</p>
-        <p>Size: {file.size}</p>
-        <p>Type: {file.type}</p>
-      </div>
-    ));
-  }; */
 
-  // Function to show the file information
-  // const toggleFileDisplay = () => {
-  //   setShowFiles(!showFiles);
-  // };
-
-  //rendered stuff
+  //render musical file 
   return (
     <div style={{display:"inline"}}>
       <input style={{display:"inline"}} type="file" onChange={fileChange} />

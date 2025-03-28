@@ -1,9 +1,11 @@
+//imports
 import { useState } from "react";
 import { sha256 } from 'js-sha256';
 import noteKey from "../assets/note-color-key.png"
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./database"
 
+//function for creating the help page, for authorized users
 export function HelpPage({
     authorized,
     setAuthorized
@@ -11,7 +13,10 @@ export function HelpPage({
     authorized: boolean;
     setAuthorized: ((authorized: boolean) => void);
 }) {
+    //setting state
     const [error, setError] = useState<boolean>(false);
+
+    //checking user with login functionality
 
     const login = async (email: string, password: string) => {
         try {
@@ -36,6 +41,7 @@ export function HelpPage({
         }
     }
 
+    //rendering page with help information
     return (
         <div>
             <h2 style={{ marginLeft: '3mm' }}>Welcome to the Help Page!</h2>

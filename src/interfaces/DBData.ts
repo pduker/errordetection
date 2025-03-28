@@ -1,6 +1,9 @@
 import ExerciseData from "./exerciseData"
 
+//data base structuring
+//putting exercises into database
 class DBData {
+    //eercise attributes
     score: string
     sound: string
     correctAnswers: {[label: string]: (number | string)}[]
@@ -15,6 +18,7 @@ class DBData {
     meter: string
     transpos: boolean
     constructor(data:ExerciseData | undefined,sound:string){
+        //define variables
         if(data !== undefined){
             this.score = data.score;
             this.sound = sound;
@@ -30,6 +34,7 @@ class DBData {
             this.meter = data.meter;
             this.transpos = data.transpos;
         }
+        //set to empty otherwise
         else{
             this.score = "";
             this.sound = sound;
