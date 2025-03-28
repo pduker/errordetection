@@ -11,7 +11,6 @@ import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import noteKey from "../assets/note-color-key.png";
 
-//firebase connection string
 const firebaseConfig = {
   apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
   authDomain: "errordetectinator.firebaseapp.com",
@@ -21,13 +20,11 @@ const firebaseConfig = {
   messagingSenderId: "442966541608",
   appId: "1:442966541608:web:b08d5b8a9ea1d5ba2ffc1d",
 };
-//initializing app
 const app = initializeApp(firebaseConfig);
 
 // Export initialized Firebase app
 export const firebaseApp = app;
 
-//exercise function,  defines all exercise attributes
 export function Exercise({
   exIndex,
   teacherMode,
@@ -123,8 +120,7 @@ export function Exercise({
       loadScore();
   });
 
-  // from abcjs for highlighting
-
+  // helper function from abcjs for highlighting
   const setClass = function (
     elemset: any,
     addClass: any,
@@ -149,7 +145,6 @@ export function Exercise({
     }
   };
 
-
   // highlighting function with guard added to avoid accessing undefined properties
   const highlight = function (note: any, klass: any, clicked: boolean): number {
     if (!note || !note.abselem || !note.abselem.elemset || note.abselem.elemset.length === 0) {
@@ -171,7 +166,6 @@ export function Exercise({
     if (selTim === 1) {
       color = "#ff6100"; // orange
     }
-
     if (selTim === 2) {
       color = "#648fff"; // blue
     }
@@ -208,7 +202,6 @@ export function Exercise({
       }
       if (teacherMode) multiAnswer();
     } else {
-
       if (!selAnswers.includes(note)) {
         selAnswers.push(note);
       }
@@ -485,10 +478,8 @@ export function Exercise({
             bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
 
             bar.addEventListener("click", () => {
-
               if (bar.getAttribute("data-selected") === "true") {
                 bar.setAttribute("data-selected", "false");
-
                 bar.style.opacity = "0.2";
                 coverBox.style.opacity = "0";
                 const index = selAnswers.findIndex(
@@ -543,10 +534,6 @@ export function Exercise({
               correctAnswers[ansSearch].feedback
             );
 
-
-            // so the if part adds the bad values to selNotes (which we may not need to do? who knows, it works for now)
-            // and the else writes over the bad values with the good ones
-
             if (
               selNotes.findIndex((val) => val.startChar === note.startChar) ===
               -1
@@ -569,19 +556,14 @@ export function Exercise({
   };
 
   const reload = function () {
-
     for (let i = 0; i < selNotes.length; ) selNotes.pop();
     setSelNotes([]);
-
     for (let i = 0; i < correctAnswers.length; ) correctAnswers.pop();
     setCorrectAnswers([]);
     loadScore();
   };
 
   const exReload = function () {
-
-    // workaround, empties selAnswers via popping before setting it to an empty list
-
     for (let i = 0; i < selAnswers.length; ) selAnswers.pop();
     setSelAnswers([]);
     loadScore();
@@ -618,9 +600,6 @@ export function Exercise({
           meter,
           transpos
         );
-
-
-        // Get database reference
 
         const database = getDatabase();
         const storage = getStorage();
@@ -694,7 +673,6 @@ export function Exercise({
     setCorrectAnswers(dict);
   };
 
-
   // Added highlightMeasure function to resolve missing name error.
   // This function creates SVG overlays to highlight measures for non-rhythm exercises.
   const highlightMeasure = function (
@@ -704,7 +682,6 @@ export function Exercise({
     const measurePositionsSel = new Set<number>();
     const measurePositionsCorr = new Set<number>();
 
-
     selectedNotes.forEach((noteElem) => {
       const measurePos = Number(noteElem.getAttribute("measurePos"));
       if (!isNaN(measurePos)) {
@@ -713,7 +690,6 @@ export function Exercise({
     });
 
     correctAnswers.forEach((note) => {
-
       const corrPos = Number(note.measurePos);
       if (!isNaN(corrPos)) {
         measurePositionsCorr.add(corrPos);
@@ -725,7 +701,6 @@ export function Exercise({
         (pos) => !measurePositionsCorr.has(pos)
       )
     );
-
 
     console.log("selected measures: ", measurePositionsSel);
     console.log("correct measures: ", measurePositionsCorr);
@@ -857,7 +832,6 @@ export function Exercise({
     }
   };
 
-
   // Updated checkAnswers: branch for rhythm exercises
   const checkAnswers = function () {
     if (tags.includes("Rhythm")) {
@@ -895,7 +869,6 @@ export function Exercise({
     var tmpSelected = [...selAnswers];
     var tmpCorrect = [...correctAnswers];
     var feedback: string[] = [];
-    const instruments = getInstrumentList(exerciseData.score);
 
     tmpSelected.sort((i1, i2) => {
       if (
@@ -914,7 +887,6 @@ export function Exercise({
     let closeList: Number[] = [];
     let wrongList = [];
 
-
     for (
       var i = 0, j = 0;
       i < correctAnswers.length &&
@@ -922,7 +894,6 @@ export function Exercise({
       tmpCorrect[i] !== undefined;
     ) {
       let noteElems = tmpSelected[j].abselem.elemset[0];
-
       if (noteElems.getAttribute("index") === tmpCorrect[i]["index"]) {
         if (
           noteElems.getAttribute("selectedTimes") ===
@@ -945,7 +916,6 @@ export function Exercise({
       tmpSelected.length === correctAnswers.length
     ) {
       feedback = ["Great job identifying the errors in this passage!"];
-
     } else if (tmpSelected.length !== correctAnswers.length) {
       var plural = " are ";
       if (correctAnswers.length === 1) plural = " is ";
@@ -1044,6 +1014,8 @@ export function Exercise({
           ];
           highlightMeasure(wrongList, tmpCorrect);
         }
+      }
+    }
 
     setCustomFeedback([...feedback]);
   };
@@ -1267,9 +1239,6 @@ export function Exercise({
     return count.length + 1;
   };
 
-
-  //deleting the exercise from database and website
-
   const handleExerciseDelete = async (exIndex: number) => {
     try {
       const database = getDatabase();
@@ -1470,10 +1439,6 @@ export function Exercise({
           ) : (
             <></>
           )}
-
-
-          {/* note info blurb in case teachers want to see which staff/measure the note is on */}
-
           {lastClicked !== undefined &&
           Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) %
             4 !==
@@ -1560,10 +1525,6 @@ export function Exercise({
           )}
         </span>
       )}
-
-
-      {/* multi-exercise deletion box, only loads on teacher view because of how handle is defined */}
-
       {handleSelectExercise !== undefined ? (
         <div>
           <input
