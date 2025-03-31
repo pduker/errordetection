@@ -28,6 +28,27 @@ export function ExercisesPage({
     const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
     const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
 
+    //adding in state for pagination
+    const [currentPage, setCurrentPage] = useState(1);
+    const pageSize = 5; //show 5 exercises at a time
+
+    //showing exercises for the current page
+    const startIndex = (currentPage -1) * pageSize;
+    const pageExercises = exList.slice(startIndex, startIndex + pageSize);
+
+    //pagination functions, navigate between functions
+    const nextPage = () =>{
+        if (currentPage < Math.ceil(exList.length /pageSize)){
+            setCurrentPage(currentPage + 1);
+        }
+    }
+
+    const prevPage = () => {
+        if (currentPage > 1){
+            setCurrentPage(currentPage - 1);
+        }
+    }
+
     //sort exercises function, takes user input an dorders exerceses based on the input
     const sortExercises = function (input: string | string[] | number | boolean, inputType:string) {
         var tempTags = tags, tempDiff = diff, tempVoices = voices, tempTypes = types, tempMeter = meter, tempTranspos = transpos;
@@ -353,8 +374,8 @@ export function ExercisesPage({
                     </div>
                     
                 </span>
-                
-                {exList.map(function(exercise){
+                {/* pull from paginated exercises */}
+                {pageExercises.map(function(exercise){
                     if(exercise !== undefined) {
                         return (
                         <div key = {exercise.title} id = {exercise.title} onClick={exChange} style={{margin: "8px", padding: "6px", cursor: "pointer", backgroundColor: "#fcfcd2", borderRadius: "2px"}}>
@@ -363,6 +384,12 @@ export function ExercisesPage({
                         )}
                     else return <></>;
                 })}
+                {/* add page navigation buttons, call newly defined functions */}
+                <div>
+                        <Button onClick={prevPage} disabled={currentPage === 1}>Previous</Button>
+                        <span> Page {currentPage} of {Math.ceil(exList.length / pageSize)} </span>
+                        <Button onClick={nextPage} disabled={currentPage >= Math.ceil(exList.length / pageSize)}>Next</Button>
+                </div>
                 {exList.length === 0 ? 
                     !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
                 <div>No exercises with those criteria found!</div> : <></>}
@@ -382,10 +409,12 @@ export function ExercisesPage({
                     />
                     
                 </div> : <></>}
+            
             <div style={{display:"flex", justifyContent: "center"}}>
                 <button  className= "btnback" id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
                 <button className= "btnback" id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
             </div>
+            
                 
             </div>
             
