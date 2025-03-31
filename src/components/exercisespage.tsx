@@ -386,9 +386,9 @@ export function ExercisesPage({
                 })}
                 {/* add page navigation buttons, call newly defined functions */}
                 <div>
-                        <Button onClick={prevPage} disabled={currentPage === 1}>Previous</Button>
+                        <Button onClick={prevPage} disabled={currentPage === 1} style={{marginLeft: "8px"}}>Previous</Button>
                         <span> Page {currentPage} of {Math.ceil(exList.length / pageSize)} </span>
-                        <Button onClick={nextPage} disabled={currentPage >= Math.ceil(exList.length / pageSize)}>Next</Button>
+                        <Button onClick={nextPage} disabled={currentPage >= Math.ceil(exList.length / pageSize)} style={{marginLeft: "8px"}}>Next</Button>
                 </div>
                 {exList.length === 0 ? 
                     !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
