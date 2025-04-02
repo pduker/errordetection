@@ -17,6 +17,7 @@ export function HelpPage({
     const [error, setError] = useState<boolean>(false);
 
     //checking user with login functionality
+
     const login = async (email: string, password: string) => {
         try {
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -30,7 +31,6 @@ export function HelpPage({
         }
     };
     
-    //check authorization function, checks input values
     const checkAuth = function() {
         var box1 = document.getElementById("mng-email");
         var box2 = document.getElementById("mng-pwd");

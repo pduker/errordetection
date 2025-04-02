@@ -15,7 +15,7 @@ export function AboutPage() {
                 </div>
                 <br />
                 <div style={{ textAlign: 'left' }}>
-                    This project was led by Phil Duker with the help of the following wonderful UD students: Alex Daley, Weldin Dunn, Benjamin McMonagle, Sean O’Sullivan, Sonika Sharma, Colin Stetler, Victor Umoren-Udo, and Lillian Woulfe.
+                    This project was led by Phil Duker with the help of the following wonderful UD students: Alex Daley, Weldin Dunn, Benjamin McMonagle, Sean O’Sullivan, Sonika Sharma, Colin Stetler, Victor Umoren-Udo, Lillian Woulfe, Adam Beck, Sehee Hwang, Michael Murphy, Mann Patel, Tyran Rice, and Sydni Wright.
                 </div>
                 <br />
                 <div style={{ textAlign: 'left' }}>
