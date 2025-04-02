@@ -323,7 +323,18 @@ export function Exercise({
             if (topLines) {
               if (topLines[staff]) {
                 const topBox = topLines[staff].getBoundingClientRect();
-                bar.style.top = topBox.top - boundingBox.top - 10 + "px";
+                // bar.style.top = topBox.top - noteElems.getBoundingClientRect().top - 10 + "px";
+                bar.style.top =
+                  noteElems.getBoundingClientRect().top - boundingBox.top - 15 <
+                  topBox.top - boundingBox.top - 15
+                    ? noteElems.getBoundingClientRect().top -
+                      boundingBox.top -
+                      15 + "px"
+                    : topBox.top -
+                      boundingBox.top -
+                      15 +
+                      "px";
+
               }
             }
 
@@ -436,7 +447,17 @@ export function Exercise({
             if (topLines) {
               if (topLines[staff]) {
                 const topBox = topLines[staff].getBoundingClientRect();
-                bar.style.top = topBox.top - boundingBox.top - 10 + "px";
+                // bar.style.top = topBox.top - boundingBox.top - 10 + "px";
+                bar.style.top =
+                  noteElems.getBoundingClientRect().top - boundingBox.top - 15 <
+                  topBox.top - boundingBox.top - 15
+                    ? noteElems.getBoundingClientRect().top -
+                      boundingBox.top -
+                      15 + "px"
+                    : topBox.top -
+                      boundingBox.top -
+                      15 +
+                      "px";
               }
             }
 
