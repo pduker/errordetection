@@ -381,6 +381,7 @@ export function Exercise({
                   (item) =>
                     item.type === "beat" &&
                     item.measurePos == measure &&
+                    item.staffPos == staff &&
                     item.beatIndex == beatIndexForOverlay
                 );
                 if (index !== -1) {
@@ -392,6 +393,7 @@ export function Exercise({
                 coverBox.style.opacity = "0.5";
                 const beatObj = {
                   measurePos: measure,
+                  staffPos: staff,
                   beatIndex: beatIndexForOverlay,
                   type: "beat",
                 };
@@ -507,6 +509,7 @@ export function Exercise({
                   (item) =>
                     item.type === "beat" &&
                     item.measurePos == measure &&
+                    item.staffPos == staff &&
                     item.beatIndex == beatIndexForOverlay
                 );
                 if (index !== -1) {
@@ -518,6 +521,7 @@ export function Exercise({
                 coverBox.style.opacity = "0.5";
                 const beatObj = {
                   measurePos: measure,
+                  staffPos: staff,
                   beatIndex: beatIndexForOverlay,
                   type: "beat",
                 };
@@ -853,11 +857,38 @@ export function Exercise({
     }
   };
 
+   // function to get instrument list from abc score
+   function getInstrumentList(abcScore: string): string[] {
+    const instrumentNames: string[] = [];
+    const regex = /V:\d+.*?nm="(.*?)"/g;
+    let match;
+  
+    while ((match = regex.exec(abcScore)) !== null) {
+      instrumentNames.push(match[1]);
+    }
+  
+    return instrumentNames;
+  }
+
   // Updated checkAnswers: branch for rhythm exercises
   const checkAnswers = function () {
+    const instruments = getInstrumentList(exerciseData.score);
+
     if (tags.includes("Rhythm")) {
-      let feedback = "";
+      var feedback: string[] = [];
+      var plural = " are ";
+      if (correctAnswers.length === 1) plural = " is ";
       let allCorrect = true;
+      
+      feedback = [
+        "You selected " +
+          selAnswers.length +
+          " answer(s). There" +
+          plural +
+          correctAnswers.length +
+          " correct answer(s).",
+      ];
+
       // Compare teacher-marked correct beats with student selections
       correctAnswers.forEach((corr) => {
         const found = selAnswers.find(
@@ -866,9 +897,34 @@ export function Exercise({
         );
         if (!found) {
           allCorrect = false;
-          feedback += `Missing correct beat: Measure ${Number(corr.measurePos) + 1}, Beat ? `;
+          if (corr.selectedTimes === '3') {
+            if (instruments[Number(corr.staffPos)] !== undefined) {
+              feedback = [
+                ...feedback,
+                `\nMissing correct beat: Measure ${Number(corr.measurePos) + 1} in the ${instruments[Number(corr.staffPos)]}, Beat ?`
+              ];
+            } else {
+              feedback = [
+                ...feedback,
+                `\nMissing correct beat: Measure ${Number(corr.measurePos) + 1}, Beat ?`
+              ];
+            }
+          } else {
+            if (instruments[Number(corr.staffPos)] !== undefined) {
+              feedback = [
+                ...feedback,
+                `\nTry checking Measure ${Number(corr.measurePos) + 1} in the ${instruments[Number(corr.staffPos)]} staff more carefully!`
+              ];
+            } else {
+              feedback = [
+                ...feedback,
+                `\nTry checking Measure ${Number(corr.measurePos) + 1} more carefully!`
+              ];
+            }
+          }
         }
       });
+      
       selAnswers.forEach((sel) => {
         const found = correctAnswers.find(
           (c) =>
@@ -876,13 +932,39 @@ export function Exercise({
         );
         if (!found) {
           allCorrect = false;
-          feedback += `Incorrect beat selected: Measure ${Number(sel.measurePos) + 1}, Beat ${sel.beatIndex}. `;
+          if (sel.beatIndex) {
+            if (instruments[Number(sel.staffPos)] !== undefined) {
+              feedback = [
+                ...feedback,
+                `\nIncorrect beat selected: Measure ${Number(sel.measurePos) + 1} in the ${instruments[Number(sel.staffPos)]}, Beat ${sel.beatIndex}.`
+              ];
+            }
+            else {
+              feedback = [
+                ...feedback,
+                `\nIncorrect beat selected: Measure ${Number(sel.measurePos) + 1}, Beat ${sel.beatIndex}.`
+              ];
+            }
+          } else {
+            if (instruments[Number(sel.abselem.elemset[0].getAttribute("staffPos"))] !== undefined) {
+              feedback = [
+                ...feedback,
+                `\nWrong answer selected at Measure ${Number(sel.abselem.elemset[0].getAttribute("measurePos")) + 1} in the ${instruments[Number(sel.abselem.elemset[0].getAttribute("staffPos"))]} staff.`
+              ];
+            } else {
+              feedback = [
+                ...feedback,
+                `\nWrong answer selected at Measure ${Number(sel.abselem.elemset[0].getAttribute("measurePos")) + 1}.`
+              ];
+            }
+          }
+          
         }
       });
       if (allCorrect) {
-        feedback = "Great job!";
+        feedback = ["Great job!"];
       }
-      setCustomFeedback([feedback]);
+      setCustomFeedback([...feedback]);
       return;
     }
 
@@ -940,45 +1022,30 @@ export function Exercise({
     } else if (tmpSelected.length !== correctAnswers.length) {
       var plural = " are ";
       if (correctAnswers.length === 1) plural = " is ";
-      feedback = [
-        "You selected " +
-          selAnswers.length +
-          " answer(s). There" +
-          plural +
-          correctAnswers.length +
-          " correct answer(s). Here are some specific places to look at and listen to more closely:",
-      ];
+      feedback = [`\nYou selected ${selAnswers.length} answer(s). There  ${plural} ${correctAnswers.length} correct answer(s).`];
+
       for (let i = 0; i < tmpCorrect.length; i++) {
         feedback = [
           ...feedback,
-          "Measure " +
-            (Number(tmpCorrect[i]["measurePos"]) + 1) +
-            ", Staff " +
-            (Number(tmpCorrect[i]["staffPos"]) + 1),
+          `\nTry checking Measure ${Number(tmpCorrect[i]["measurePos"]) + 1} in the ${instruments[Number(tmpCorrect[i]["staffPos"])]} staff more carefully!`
         ];
         highlightMeasure(wrongList, tmpCorrect);
       }
       for (let i = 0; i < wrongList.length; i++) {
         feedback = [
           ...feedback,
-          "Wrong answer selected at:  Measure " +
-            (Number(wrongList[i].getAttribute("measurePos")) + 1) +
-            ", Staff " +
-            (Number(wrongList[i].getAttribute("staffPos")) + 1),
+          `\nWrong answer selected at Measure ${Number(wrongList[i].getAttribute("measurePos")) + 1} in the ${instruments[Number(wrongList[i].getAttribute("staffPos"))]} staff!`
         ];
         highlightMeasure(wrongList, tmpCorrect);
       }
     } else if (tmpCorrect.length === correctAnswers.length) {
       feedback = [
-        "Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:",
+        "Keep trying; the more you practice the better you will get.",
       ];
       for (let i = 0; i < tmpCorrect.length; i++) {
         feedback = [
           ...feedback,
-          "Measure " +
-            (Number(tmpCorrect[i]["measurePos"]) + 1) +
-            ", Staff " +
-            (Number(tmpCorrect[i]["staffPos"]) + 1),
+          `\nTry checking Measure ${Number(tmpCorrect[i]["measurePos"]) + 1} in the ${instruments[Number(tmpCorrect[i]["staffPos"])]} staff more carefully!`
         ];
         highlightMeasure(wrongList, tmpCorrect);
         let addtlFeedback = tmpCorrect[i]["feedback"];
@@ -1009,10 +1076,7 @@ export function Exercise({
       for (let i = 0; i < tmpCorrect.length; i++) {
         feedback = [
           ...feedback,
-          "Measure " +
-            (Number(tmpCorrect[i]["measurePos"]) + 1) +
-            ", Staff " +
-            (Number(tmpCorrect[i]["staffPos"]) + 1),
+          `\nTry checking Measure ${Number(tmpCorrect[i]["measurePos"]) + 1} in the ${instruments[Number(tmpCorrect[i]["staffPos"])]} staff more carefully!`
         ];
         highlightMeasure(wrongList, tmpCorrect);
         let addtlFeedback = tmpCorrect[i]["feedback"];
