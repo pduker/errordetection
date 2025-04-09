@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { ref, get, remove, child, set } from "firebase/database";
 import abcjs from "abcjs";
 import FileUpload from "./fileupload";
@@ -371,6 +371,8 @@ export function Exercise({
             // Assign beat index for this overlay
             const beatIndexForOverlay = currentBeatIndex;
             bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
+            bar.setAttribute("data-measure-pos", measure.toString());
+            bar.setAttribute("data-staff-pos", staff.toString());
 
             bar.addEventListener("click", () => {
               if (bar.getAttribute("data-selected") === "true") {
@@ -499,6 +501,8 @@ export function Exercise({
             // Assign beat index for this overlay
             const beatIndexForOverlay = currentBeatIndex;
             bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
+            bar.setAttribute("data-measure-pos", measure.toString());
+            bar.setAttribute("data-staff-pos", staff.toString());
 
             bar.addEventListener("click", () => {
               if (bar.getAttribute("data-selected") === "true") {
@@ -509,7 +513,6 @@ export function Exercise({
                   (item) =>
                     item.type === "beat" &&
                     item.measurePos == measure &&
-                    item.staffPos == staff &&
                     item.beatIndex == beatIndexForOverlay
                 );
                 if (index !== -1) {
@@ -589,8 +592,41 @@ export function Exercise({
   };
 
   const exReload = function () {
+    // Clear all beat selections by resetting all data-selected attributes
+    const selectedBeatElements = document.querySelectorAll("[data-selected='true']");
+    selectedBeatElements.forEach(elem => {
+      elem.setAttribute("data-selected", "false");
+      (elem as HTMLElement).style.opacity = "0.2";
+      
+      // Find the associated cover box and reset it
+      const parentElement = elem.parentElement;
+      if (parentElement) {
+        const coverBox = parentElement.querySelector(".cover-box");
+        if (coverBox) {
+          (coverBox as HTMLElement).style.opacity = "0";
+        }
+      }
+    });
+    
+    // Clear note selections by resetting highlighting
+    const selectedNoteElements = document.querySelectorAll("[selectedTimes='1'], [selectedTimes='2']");
+    selectedNoteElements.forEach(elem => {
+      elem.setAttribute("selectedTimes", "0");
+      setClass(elem, "", "abcjs-note_selected", "#000000");
+    });
+    
+    // Clear the arrays
     for (let i = 0; i < selAnswers.length; ) selAnswers.pop();
     setSelAnswers([]);
+    
+    // Remove any highlight overlays
+    const overlays = document.querySelectorAll(".hint-highlight, .error-highlight");
+    overlays.forEach(overlay => overlay.remove());
+    
+    // Clear feedback
+    setCustomFeedback([]);
+    
+    // Reload the score
     loadScore();
   };
 
@@ -663,13 +699,44 @@ export function Exercise({
     }
   };
 
-  // Updated multiAnswer: for Rhythm exercises, only use beat selections.
+  // Updated multiAnswer: for Rhythm exercises, include both note and beat selections
   const multiAnswer = function () {
+    // Start with an empty array for correct answers
+    const dict: { [label: string]: number | string }[] = [];
+    
+    // For rhythm exercises, include both notes AND beats
     if (tags.includes("Rhythm")) {
-      setCorrectAnswers([...selAnswers]);
+      // First add all selected notes
+      for (let i = 0; i < selNotes.length; i++) {
+        var noteElems = selNotes[i].abselem.elemset[0];
+        const dict2: { [label: string]: number | string } = {
+          index: noteElems.getAttribute("index"),
+          staffPos: noteElems.getAttribute("staffPos"),
+          measurePos: noteElems.getAttribute("measurePos"),
+          selectedTimes: noteElems.getAttribute("selectedTimes"),
+          feedback: noteElems.getAttribute("feedback"),
+          type: "note",
+        };
+        dict.push(dict2);
+      }
+      
+      // Then add all beat selections
+      selAnswers.forEach((ans) => {
+        if (ans.type === "beat") {
+          dict.push({
+            measurePos: ans.measurePos,
+            staffPos: ans.staffPos,
+            beatIndex: ans.beatIndex,
+            type: "beat"
+          });
+        }
+      });
+      
+      setCorrectAnswers(dict);
       return;
     }
-    const dict: { [label: string]: number | string }[] = [];
+    
+    // Non-rhythm exercise handling (unchanged)
     for (let i = 0; i < selNotes.length; i++) {
       var noteElems = selNotes[i].abselem.elemset[0];
       const dict2: { [label: string]: number | string } = {
@@ -682,19 +749,7 @@ export function Exercise({
       };
       dict.push(dict2);
     }
-
-    if (tags.includes("Rhythm")) {
-      selAnswers.forEach((ans) => {
-        if (
-          ans.type === "beat" &&
-          !dict.find(
-            (d) =>
-              d.measurePos == ans.measurePos && d.beatIndex == ans.beatIndex
-          )
-        )
-          dict.push(ans);
-      });
-    }
+    
     setCorrectAnswers(dict);
   };
 
@@ -870,240 +925,294 @@ export function Exercise({
     return instrumentNames;
   }
 
+  const selAnswersRef = useRef<any[]>([]);
+  useEffect(() => {
+    selAnswersRef.current = selAnswers;
+  }, [selAnswers]);
   // Updated checkAnswers: branch for rhythm exercises
   const checkAnswers = function () {
-    const instruments = getInstrumentList(exerciseData.score);
-
     if (tags.includes("Rhythm")) {
-      var feedback: string[] = [];
-      var plural = " are ";
-      if (correctAnswers.length === 1) plural = " is ";
+      const instruments = getInstrumentList(exerciseData.score);
+      
+      // Define proper types for beat and note selections
+      type BeatSelection = {
+        type: 'beat';
+        measurePos: number;
+        staffPos: number;
+        beatIndex: number;
+      };
+      
+      type NoteSelection = {
+        type: 'note';
+        measurePos: number;
+        staffPos: number;
+        index: number;
+        selectedTimes: number;
+      };
+      
+      type CombinedSelection = BeatSelection | NoteSelection;
+      
+      // Check for all elements with data-selected="true" to find selected beats
+      const selectedBeatElements = document.querySelectorAll("[data-selected='true']");
+      const selectedBeats: BeatSelection[] = Array.from(selectedBeatElements).map(elem => ({
+        type: "beat" as const,
+        measurePos: Number(elem.closest(".bar")?.getAttribute("data-measure-pos")) || 
+                    Number(elem.getAttribute("data-measure-pos")),
+        staffPos: Number(elem.closest(".bar")?.getAttribute("data-staff-pos")) || 
+                  Number(elem.getAttribute("data-staff-pos")),
+        beatIndex: Number(elem.getAttribute("data-beatIndex"))
+      })).filter(beat => !isNaN(beat.measurePos) && !isNaN(beat.beatIndex));
+      
+      // Get all selected notes by checking for selectedTimes attribute
+      const selectedNoteElements = document.querySelectorAll("[selectedTimes='1'], [selectedTimes='2']");
+      const selectedNotes: NoteSelection[] = Array.from(selectedNoteElements).map(elem => ({
+        type: "note" as const,
+        measurePos: Number(elem.getAttribute("measurePos")),
+        staffPos: Number(elem.getAttribute("staffPos")),
+        index: Number(elem.getAttribute("index")),
+        selectedTimes: Number(elem.getAttribute("selectedTimes"))
+      }));
+      
+      // Combine selections for comparison
+      const combinedSelections: CombinedSelection[] = [...selectedBeats, ...selectedNotes];
+      console.log("Combined selections:", combinedSelections);
+      
+      // Get correct answers that include both notes and beats
+      const currentCorrectAnswers = [...correctAnswers].map(ans => ({
+        measurePos: Number(ans.measurePos),
+        staffPos: Number(ans.staffPos),
+        beatIndex: Number(ans.beatIndex),
+        index: Number(ans.index),
+        selectedTimes: Number(ans.selectedTimes),
+        type: ans.type as 'beat' | 'note',
+        feedback: ans.feedback
+      }));
+      console.log("Correct answers:", currentCorrectAnswers);
+      
+      let feedback: string[] = [];
       let allCorrect = true;
+      const plural = currentCorrectAnswers.length === 1 ? " is " : " are ";
       
-      feedback = [
-        "You selected " +
-          selAnswers.length +
-          " answer(s). There" +
-          plural +
-          correctAnswers.length +
-          " correct answer(s).",
-      ];
-
-      // Compare teacher-marked correct beats with student selections
-      correctAnswers.forEach((corr) => {
-        const found = selAnswers.find(
-          (s) =>
-            s.measurePos == corr.measurePos && s.beatIndex == corr.beatIndex
-        );
-        if (!found) {
-          allCorrect = false;
-          if (corr.selectedTimes === '3') {
-            if (instruments[Number(corr.staffPos)] !== undefined) {
-              feedback = [
-                ...feedback,
-                `\nMissing correct beat: Measure ${Number(corr.measurePos) + 1} in the ${instruments[Number(corr.staffPos)]}, Beat ?`
-              ];
-            } else {
-              feedback = [
-                ...feedback,
-                `\nMissing correct beat: Measure ${Number(corr.measurePos) + 1}, Beat ?`
-              ];
-            }
-          } else {
-            if (instruments[Number(corr.staffPos)] !== undefined) {
-              feedback = [
-                ...feedback,
-                `\nTry checking Measure ${Number(corr.measurePos) + 1} in the ${instruments[Number(corr.staffPos)]} staff more carefully!`
-              ];
-            } else {
-              feedback = [
-                ...feedback,
-                `\nTry checking Measure ${Number(corr.measurePos) + 1} more carefully!`
-              ];
-            }
-          }
-        }
-      });
+      feedback.push(
+        `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`
+      );
       
-      selAnswers.forEach((sel) => {
-        const found = correctAnswers.find(
-          (c) =>
-            c.measurePos == sel.measurePos && c.beatIndex == sel.beatIndex
-        );
-        if (!found) {
-          allCorrect = false;
-          if (sel.beatIndex) {
-            if (instruments[Number(sel.staffPos)] !== undefined) {
-              feedback = [
-                ...feedback,
-                `\nIncorrect beat selected: Measure ${Number(sel.measurePos) + 1} in the ${instruments[Number(sel.staffPos)]}, Beat ${sel.beatIndex}.`
-              ];
-            }
-            else {
-              feedback = [
-                ...feedback,
-                `\nIncorrect beat selected: Measure ${Number(sel.measurePos) + 1}, Beat ${sel.beatIndex}.`
-              ];
-            }
-          } else {
-            if (instruments[Number(sel.abselem.elemset[0].getAttribute("staffPos"))] !== undefined) {
-              feedback = [
-                ...feedback,
-                `\nWrong answer selected at Measure ${Number(sel.abselem.elemset[0].getAttribute("measurePos")) + 1} in the ${instruments[Number(sel.abselem.elemset[0].getAttribute("staffPos"))]} staff.`
-              ];
-            } else {
-              feedback = [
-                ...feedback,
-                `\nWrong answer selected at Measure ${Number(sel.abselem.elemset[0].getAttribute("measurePos")) + 1}.`
-              ];
-            }
-          }
+      // Check for missing correct answers (both notes and beats)
+      currentCorrectAnswers.forEach((corr) => {
+        let found = false;
+        
+        if (corr.type === "beat") {
+          // Check if this beat was selected
+          found = combinedSelections.some(s => 
+            s.type === "beat" && 
+            Number(s.measurePos) === Number(corr.measurePos) && 
+            Number(s.beatIndex) === Number(corr.beatIndex)
+          );
           
+          if (!found) {
+            allCorrect = false;
+            console.log(`Missing beat: measure ${corr.measurePos}, beat ${corr.beatIndex}, staff ${corr.staffPos}`);
+            
+            if (!isNaN(corr.staffPos) && instruments[Number(corr.staffPos)] !== undefined) {
+              feedback.push(
+                `\nMissing correct beat in Measure ${Number(corr.measurePos) + 1} on the ${instruments[Number(corr.staffPos)]} staff.`
+              );
+            } else {
+              feedback.push(`\nMissing correct beat in Measure ${Number(corr.measurePos) + 1}.`);
+            }
+          }
+        } else if (corr.type === "note") {
+          // Check if this note was selected
+          found = combinedSelections.some(s => 
+            s.type === "note" && 
+            Number(s.measurePos) === Number(corr.measurePos) && 
+            Number(s.index) === Number(corr.index)
+          );
+          
+          if (!found) {
+            allCorrect = false;
+            console.log(`Missing note: measure ${corr.measurePos}, index ${corr.index}, staff ${corr.staffPos}`);
+            
+            if (!isNaN(corr.staffPos) && instruments[Number(corr.staffPos)] !== undefined) {
+              feedback.push(
+                `\nMissing correct note in Measure ${Number(corr.measurePos) + 1} on the ${instruments[Number(corr.staffPos)]} staff.`
+              );
+            } else {
+              feedback.push(`\nMissing correct note in Measure ${Number(corr.measurePos) + 1}.`);
+            }
+          }
         }
       });
-      if (allCorrect) {
+      
+      // Check for extra (incorrect) selections
+      combinedSelections.forEach((sel) => {
+        let found = false;
+        
+        if (sel.type === "beat") {
+          // Check if this beat is correct
+          found = currentCorrectAnswers.some(c => 
+            c.type === "beat" && 
+            Number(c.measurePos) === Number(sel.measurePos) && 
+            Number(c.beatIndex) === Number(sel.beatIndex)
+          );
+          
+          if (!found) {
+            allCorrect = false;
+            console.log(`Extra beat: measure ${sel.measurePos}, beat ${sel.beatIndex}, staff ${sel.staffPos}`);
+            
+            if (!isNaN(sel.staffPos) && instruments[Number(sel.staffPos)] !== undefined) {
+              feedback.push(
+                `\nIncorrect beat selected in Measure ${Number(sel.measurePos) + 1} on the ${instruments[Number(sel.staffPos)]} staff (Beat ${sel.beatIndex}).`
+              );
+            } else {
+              feedback.push(
+                `\nIncorrect beat selected in Measure ${Number(sel.measurePos) + 1}, Beat ${sel.beatIndex}.`
+              );
+            }
+          }
+        } else if (sel.type === "note") {
+          // Check if this note is correct
+          found = currentCorrectAnswers.some(c => 
+            c.type === "note" && 
+            Number(c.measurePos) === Number(sel.measurePos) && 
+            Number(c.index) === Number(sel.index)
+          );
+          
+          if (!found) {
+            allCorrect = false;
+            console.log(`Extra note: measure ${sel.measurePos}, index ${sel.index}, staff ${sel.staffPos}`);
+            
+            if (!isNaN(sel.staffPos) && instruments[Number(sel.staffPos)] !== undefined) {
+              feedback.push(
+                `\nIncorrect note selected in Measure ${Number(sel.measurePos) + 1} on the ${instruments[Number(sel.staffPos)]} staff.`
+              );
+            } else {
+              feedback.push(
+                `\nIncorrect note selected in Measure ${Number(sel.measurePos) + 1}.`
+              );
+            }
+          }
+        }
+      });
+      
+      if (allCorrect && combinedSelections.length > 0) {
         feedback = ["Great job!"];
       }
-      setCustomFeedback([...feedback]);
+      
+      setCustomFeedback(feedback);
       return;
     }
-
-    // Existing logic for non-rhythm exercises:
+    
+    // Non-Rhythm branch (existing logic, unchanged)
     var tmpSelected = [...selAnswers];
     var tmpCorrect = [...correctAnswers];
     var feedback: string[] = [];
-
+   
     tmpSelected.sort((i1, i2) => {
-      if (
-        (i1.abselem.elemset[0].getAttribute("index") as number) >
-        (i2.abselem.elemset[0].getAttribute("index") as number)
-      )
-        return 1;
-      if (
-        (i1.abselem.elemset[0].getAttribute("index") as number) <
-        (i2.abselem.elemset[0].getAttribute("index") as number)
-      )
-        return -1;
-      return 0;
+      const idx1 = Number(i1.abselem.elemset[0].getAttribute("index"));
+      const idx2 = Number(i2.abselem.elemset[0].getAttribute("index"));
+      return idx1 - idx2;
     });
-
-    let closeList: Number[] = [];
-    let wrongList = [];
-
-    for (
-      var i = 0, j = 0;
-      i < correctAnswers.length &&
-      j < selAnswers.length &&
-      tmpCorrect[i] !== undefined;
-    ) {
+   
+    let closeList: number[] = [];
+    let wrongList: any[] = [];
+   
+    for (var i = 0, j = 0; i < tmpCorrect.length && j < tmpSelected.length;) {
       let noteElems = tmpSelected[j].abselem.elemset[0];
-      if (noteElems.getAttribute("index") === tmpCorrect[i]["index"]) {
-        if (
-          noteElems.getAttribute("selectedTimes") ===
-          tmpCorrect[i]["selectedTimes"]
-        )
-          tmpCorrect = tmpCorrect.filter(function (ans) {
-            return ans["index"] !== tmpCorrect[i]["index"];
-          });
-        else closeList.push(Number(tmpCorrect[i]["index"]));
+      const indexSelected = Number(noteElems.getAttribute("index"));
+      const indexCorrect = Number(tmpCorrect[i]["index"]);
+      if (indexSelected === indexCorrect) {
+        if (noteElems.getAttribute("selectedTimes") === tmpCorrect[i]["selectedTimes"]) {
+          tmpCorrect = tmpCorrect.filter((ans) => Number(ans["index"]) !== indexCorrect);
+        } else {
+          closeList.push(indexCorrect);
+        }
         j++;
-      } else if (noteElems.getAttribute("index") > tmpCorrect[i]["index"]) i++;
-      else if (noteElems.getAttribute("index") < tmpCorrect[i]["index"]) {
+      } else if (indexSelected > indexCorrect) {
+        i++;
+      } else if (indexSelected < indexCorrect) {
         wrongList.push(noteElems);
         j++;
       }
     }
-
-    if (
-      tmpCorrect.length === 0 &&
-      tmpSelected.length === correctAnswers.length
-    ) {
+   
+    if (tmpCorrect.length === 0 && tmpSelected.length === correctAnswers.length) {
       feedback = ["Great job identifying the errors in this passage!"];
     } else if (tmpSelected.length !== correctAnswers.length) {
-      var plural = " are ";
-      if (correctAnswers.length === 1) plural = " is ";
-      feedback = [`\nYou selected ${selAnswers.length} answer(s). There  ${plural} ${correctAnswers.length} correct answer(s).`];
-
+      var pluralText = correctAnswers.length === 1 ? " is " : " are ";
+      feedback = [
+        `\nYou selected ${selAnswers.length} answer(s). There${pluralText}${correctAnswers.length} correct answer(s). Here are some specific places to look at and listen to more closely:`
+      ];
+   
       for (let i = 0; i < tmpCorrect.length; i++) {
-        feedback = [
-          ...feedback,
-          `\nTry checking Measure ${Number(tmpCorrect[i]["measurePos"]) + 1} in the ${instruments[Number(tmpCorrect[i]["staffPos"])]} staff more carefully!`
-        ];
+        feedback.push(
+          `\nMeasure ${Number(tmpCorrect[i]["measurePos"]) + 1}, Staff ${Number(tmpCorrect[i]["staffPos"]) + 1}`
+        );
         highlightMeasure(wrongList, tmpCorrect);
       }
       for (let i = 0; i < wrongList.length; i++) {
-        feedback = [
-          ...feedback,
-          `\nWrong answer selected at Measure ${Number(wrongList[i].getAttribute("measurePos")) + 1} in the ${instruments[Number(wrongList[i].getAttribute("staffPos"))]} staff!`
-        ];
+        feedback.push(
+          `\nWrong answer selected at: Measure ${Number(wrongList[i].getAttribute("measurePos")) + 1}, Staff ${Number(wrongList[i].getAttribute("staffPos")) + 1}`
+        );
         highlightMeasure(wrongList, tmpCorrect);
       }
     } else if (tmpCorrect.length === correctAnswers.length) {
       feedback = [
-        "Keep trying; the more you practice the better you will get.",
+        "Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:"
       ];
       for (let i = 0; i < tmpCorrect.length; i++) {
-        feedback = [
-          ...feedback,
-          `\nTry checking Measure ${Number(tmpCorrect[i]["measurePos"]) + 1} in the ${instruments[Number(tmpCorrect[i]["staffPos"])]} staff more carefully!`
-        ];
+        feedback.push(
+          `\nMeasure ${Number(tmpCorrect[i]["measurePos"]) + 1}, Staff ${Number(tmpCorrect[i]["staffPos"]) + 1}`
+        );
         highlightMeasure(wrongList, tmpCorrect);
         let addtlFeedback = tmpCorrect[i]["feedback"];
         if (
           closeList.includes(Number(tmpCorrect[i]["index"])) &&
           !tmpCorrect[i]["feedback"]
             .toString()
-            .startsWith(
-              "You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). "
-            )
-        )
+            .startsWith("You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). ")
+        ) {
           addtlFeedback =
             "You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). " +
             tmpCorrect[i]["feedback"];
+        }
         if (addtlFeedback !== "") {
           let add = feedback.pop();
-          feedback = [
-            ...feedback,
-            add + ". Additional feedback: " + addtlFeedback,
-          ];
+          feedback.push(add + ". Additional feedback: " + addtlFeedback);
           highlightMeasure(wrongList, tmpCorrect);
         }
       }
     } else if (tmpCorrect.length < correctAnswers.length) {
       feedback = [
-        "Good work – you've found some of the errors, but here are some specific places to look at and listen to more closely:",
+        "Good work – you've found some of the errors, but here are some specific places to look at and listen to more closely:"
       ];
       for (let i = 0; i < tmpCorrect.length; i++) {
-        feedback = [
-          ...feedback,
-          `\nTry checking Measure ${Number(tmpCorrect[i]["measurePos"]) + 1} in the ${instruments[Number(tmpCorrect[i]["staffPos"])]} staff more carefully!`
-        ];
+        feedback.push(
+          `\nMeasure ${Number(tmpCorrect[i]["measurePos"]) + 1}, Staff ${Number(tmpCorrect[i]["staffPos"]) + 1}`
+        );
         highlightMeasure(wrongList, tmpCorrect);
         let addtlFeedback = tmpCorrect[i]["feedback"];
         if (
           closeList.includes(Number(tmpCorrect[i]["index"])) &&
           !tmpCorrect[i]["feedback"]
             .toString()
-            .startsWith(
-              "You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). "
-            )
-        )
+            .startsWith("You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). ")
+        ) {
           addtlFeedback =
             "You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). " +
             tmpCorrect[i]["feedback"];
+        }
         if (addtlFeedback !== "") {
           let add = feedback.pop();
-          feedback = [
-            ...feedback,
-            add + ". Additional feedback: " + addtlFeedback,
-          ];
+          feedback.push(add + ". Additional feedback: " + addtlFeedback);
           highlightMeasure(wrongList, tmpCorrect);
         }
       }
     }
-
-    setCustomFeedback([...feedback]);
+   
+    setCustomFeedback(feedback);
   };
+  
 
   const saveFeedback = function (e: React.ChangeEvent<HTMLTextAreaElement>) {
     var feedBox = document.getElementById("note-feedback-" + exIndex);
