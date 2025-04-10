@@ -4,6 +4,8 @@ import { sha256 } from 'js-sha256';
 import noteKey from "../assets/note-color-key.png"
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./database"
+import execPage from "../assets/exc-page.png";
+import filterSec from "../assets/filterPage.png";
 
 //function for creating the help page, for authorized users
 export function HelpPage({
@@ -46,27 +48,86 @@ export function HelpPage({
         <div>
             <h2 style={{ marginLeft: '3mm' }}>Welcome to the Help Page!</h2>
             <div style={{textAlign: "left", margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
-            This site is meant to help you practice your error detection skills.<br/>
-            On the Exercises page, you’ll find a list of the exercises currently uploaded to the site. <br/><br />
-            You can use the different filters to sort and find appropriately challenging exercises for you (e.g. if you are new to this, consider starting with: intonation + 1 voice + level 1 + drone). <br/>
-            Clicking on the “drone” checkbox will find exercises that have a drone on tonic. <br/> <br />
-            Clicking on the “ensemble parts” checkbox will have multiple voices/instruments performing the same part (e.g., 3 different clarinets playing the top line, one of which will perform the error(s)). <br/>
-            After finding some exercises, simply click the exercise to open it! <br/> <br />
-            A short excerpt of a score and an audio player will show up. Assume that the score will always be correct. <br/> <br />
-            The Audio file will play a short intro (2 bars long) to let you entrain to the key, tempo, and meter (you can move the cursor to skip past this if you don’t need it). <br/>
-            Your job is to click on the notes where you hear something different from what is in the score. <br/><br />
-            Click a note multiple times to change which type of error you hear. <br/><br />
-            A key will be present on each exercise to remind you which color corresponds to which kind of error.<br/>
-            This key is also included here: <br/>
-                <div>
-                    <img
-                    alt="note-color-key"
-                    src={noteKey}
-                    width="250"
-                    height="125"
-                    />
+                <div style={{textAlign: "center", margin: "10px", padding: "25px", backgroundColor: "white", borderRadius: "10px"}}>
+                    This site is meant to help you practice your <strong>error detection skills</strong>. You will have the chance to pracitce on a variety of <strong>exercises</strong>. On each you will the <strong>read a music score</strong> attached to the exercise. 
+                    Attached to the exercise is also the <strong>audio sample</strong> of the music. This sample should match the score,
+                    however in each exercise there is <strong>at least one incorrect note</strong>. Students will be able to develop their error detection skills more by working to identify
+                    the error.<br/>
                 </div>
-            After selecting all errors, click "Check Answers" to receive feedback on how you did.<br/>
+                <div style={{ display: "flex", justifyContent: "center" , backgroundColor: "#8ecbe1", borderRadius: "10px"}}>
+                    <div style={{textAlign: "center", margin: "10px", padding: "20px", backgroundColor: "white", borderRadius: "10px", width: "200px", height: "150px", marginTop: "75px"}}>
+                        On the <strong>Exercises page</strong>, you’ll find a list of the exercises currently uploaded to the site. <br/>
+                    </div>
+                    <div style={{textAlign: "center", margin: "10px", marginRight: "20px", padding: "20px", backgroundColor: "white", borderRadius: "10px", marginTop: "75px", width: "200px", height: "150px"}}>
+                        On this page we can view <strong>all exercises</strong> that are stored in our database. <br/>
+                    </div>
+                    <div>
+                        <img
+                            alt="exc-page"
+                            src={execPage}
+                            width="500"
+                            height="300"
+                        />
+                    </div>
+
+                </div>
+
+                <div style={{ display: "flex", justifyContent: "center", margin: "10px"}}>
+                    <div>
+                        <img 
+                            alt="filter"
+                            src={filterSec}
+                            width = "500"
+                            height = "300"
+                        />
+                    </div>
+                    <div style={{textAlign: "center", margin: "10px", padding: "20px", backgroundColor: "white", borderRadius: "10px", width: "300px", height: "200px", marginTop: "45px"}}>
+                        You can use the different <strong>filters to sort</strong> and find appropriately challenging exercises for you (e.g. if you are new to this, consider starting with: <i>intonation + 1 voice + level 1 + drone</i>). <br/>
+                    </div>
+                </div>
+                <div style={{ display: "flex", justifyContent: "center"}}>
+                    <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "#8ecbe1", borderRadius: "10px"}}>
+                        Clicking on the “drone” checkbox will find exercises that have a drone on tonic. <br/> <br/>
+                    </div>
+                    <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "#8ecbe1", borderRadius: "10px"}}>
+                        Clicking on the “ensemble parts” checkbox will have multiple voices/instruments performing the same part (e.g., 3 different clarinets playing the top line, one of which will perform the error(s)). <br/>
+                    </div>
+                </div>
+                <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px"}}>
+                    After finding some exercises, simply click the exercise to open it! <br/> <br />
+                </div>
+                <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px"}}>
+                    A short excerpt of a score and an audio player will show up. Assume that the score will always be correct. <br/> <br />
+                </div>
+                <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px"}}>
+                    The Audio file will play a short intro (2 bars long) to let you entrain to the key, tempo, and meter (you can move the cursor to skip past this if you don’t need it). <br/>
+                </div>
+                <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px"}}>
+                    Your job is to click on the notes where you hear something different from what is in the score. <br/><br />
+                </div>
+                <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px"}}>
+                    Click a note multiple times to change which type of error you hear. <br/><br />
+                </div>
+                <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px"}}>
+                    A key will be present on each exercise to remind you which color corresponds to which kind of error.<br/>
+                </div>
+                <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px"}}>          
+                    This key is also included here: <br/>
+                    <div>
+                        <img
+                            alt="note-color-key"
+                            src={noteKey}
+                            width="250"
+                            height="125"
+                        />
+                    </div>
+                </div>
+            
+            
+            <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px"}}>
+                After selecting all errors, click "Check Answers" to receive feedback on how you did.<br/>
+            </div>
+
             </div>
             <div style={{margin: "6px"}}>
                 <input id="mng-email" placeholder="Enter admin email..."></input>
