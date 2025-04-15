@@ -248,7 +248,8 @@ export function Exercise({
       let currentBeatIndex = 1;
 
       const svgElement = document.querySelector("svg");
-      const boundingBox: DOMRect | undefined =
+      if (!svgElement) return;
+      const boundingBox: DOMRect =
         svgElement?.getBoundingClientRect();
 
       var staffArray = visualObjs[0].lines[0].staff;
@@ -287,88 +288,301 @@ export function Exercise({
         }
 
         if (tags.includes("Rhythm")) {
-          if (!boundingBox) {
-            return;
-          }
+          // if (!boundingBox) {
+          //   return;
+          // }
 
+          // if (beatSum === 0) {
+          //   barStartX = noteElems.getBoundingClientRect().left;
+          // }
+
+          // if (typeof note.duration === "number" && !isNaN(note.duration)) {
+          //   beatSum += note.duration;
+          //   noteCount++;
+          // }
+
+          // const topLines = svgElement?.querySelectorAll(".abcjs-top-line");
+          // let totalSum: number = 0;
+
+          // if (beatSum > visualObjs[0].getBeatLength()) {
+          //   const bar = document.createElement("div");
+          //   bar.classList.add("bar");
+          //   bar.style.position = "absolute";
+
+          //   const coverBox = document.createElement("div");
+          //   coverBox.classList.add("cover-box");
+          //   coverBox.style.position = "absolute";
+
+          //   if (topLines) {
+          //     if (topLines[staff]) {
+          //       const topBox = topLines[staff].getBoundingClientRect();
+          //       // bar.style.top = topBox.top - noteElems.getBoundingClientRect().top - 10 + "px";
+          //       bar.style.top =
+          //         noteElems.getBoundingClientRect().top - boundingBox.top - 15 <
+          //         topBox.top - boundingBox.top - 15
+          //           ? noteElems.getBoundingClientRect().top -
+          //             boundingBox.top -
+          //             15 + "px"
+          //           : topBox.top -
+          //             boundingBox.top -
+          //             15 +
+          //             "px";
+
+          //     }
+          //   }
+
+          //   if (
+          //     Math.floor(beatSum / visualObjs[0].getBeatLength()) ===
+          //     beatSum / visualObjs[0].getBeatLength()
+          //   ) {
+          //     bar.style.width =
+          //       (noteElems.nextSibling.getBoundingClientRect().left -
+          //         barStartX) *
+          //         (1 / (beatSum / visualObjs[0].getBeatLength())) -
+          //       5 +
+          //       "px";
+          //   } else {
+          //     bar.style.width =
+          //       ((noteElems.nextSibling.getBoundingClientRect().left -
+          //         noteElems.getBoundingClientRect().left) *
+          //         2) /
+          //         3 +
+          //       "px";
+          //     remainLen =
+          //       ((noteElems.nextSibling.getBoundingClientRect().left -
+          //         noteElems.getBoundingClientRect().left) *
+          //         1) /
+          //       3;
+          //   }
+
+          //   bar.style.left = barStartX - boundingBox.left + "px";
+          //   bar.style.height = "5px";
+          //   bar.style.backgroundColor = "blue";
+          //   bar.style.opacity = "0.2";
+
+          //   coverBox.style.top = bar.style.top;
+          //   coverBox.style.left = bar.style.left;
+          //   coverBox.style.width = bar.style.width;
+          //   coverBox.style.height =
+          //     boundingBox.height / 2 / staffArray.length + "px";
+          //   coverBox.style.backgroundColor = "blue";
+          //   coverBox.style.opacity = "0";
+          //   coverBox.style.pointerEvents = "none";
+
+          //   // Assign beat index for this overlay
+          //   const beatIndexForOverlay = currentBeatIndex;
+          //   bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
+          //   bar.setAttribute("data-measure-pos", measure.toString());
+          //   bar.setAttribute("data-staff-pos", staff.toString());
+
+          //   bar.addEventListener("click", () => {
+          //     if (bar.getAttribute("data-selected") === "true") {
+          //       bar.setAttribute("data-selected", "false");
+          //       bar.style.opacity = "0.2";
+          //       coverBox.style.opacity = "0";
+          //       const index = selAnswers.findIndex(
+          //         (item) =>
+          //           item.type === "beat" &&
+          //           item.measurePos == measure &&
+          //           item.staffPos == staff &&
+          //           item.beatIndex == beatIndexForOverlay
+          //       );
+          //       if (index !== -1) {
+          //         selAnswers.splice(index, 1);
+          //       }
+          //     } else {
+          //       bar.setAttribute("data-selected", "true");
+          //       bar.style.opacity = "1";
+          //       coverBox.style.opacity = "0.5";
+          //       const beatObj = {
+          //         measurePos: measure,
+          //         staffPos: staff,
+          //         beatIndex: beatIndexForOverlay,
+          //         type: "beat",
+          //       };
+          //       selAnswers.push(beatObj);
+          //     }
+          //     if (teacherMode) multiAnswer();
+          //   });
+
+          //   const parentElement = document.getElementById("target" + exIndex);
+          //   if (parentElement) {
+          //     parentElement.style.position = "relative";
+          //     parentElement.appendChild(bar);
+          //     parentElement.appendChild(coverBox);
+          //   }
+
+          //   totalSum = beatSum;
+          //   beatSum -= visualObjs[0].getBeatLength();
+          //   noteCount = 0;
+          //   created = true;
+
+          //   // Increment beat index for next beat in same measure
+          //   currentBeatIndex++;
+          // }
+
+          // if (beatSum === visualObjs[0].getBeatLength()) {
+          //   const bar = document.createElement("div");
+          //   bar.classList.add("bar");
+          //   bar.style.position = "absolute";
+
+          //   const coverBox = document.createElement("div");
+          //   coverBox.classList.add("cover-box");
+          //   coverBox.style.position = "absolute";
+
+          //   if (topLines) {
+          //     if (topLines[staff]) {
+          //       const topBox = topLines[staff].getBoundingClientRect();
+          //       // bar.style.top = topBox.top - boundingBox.top - 10 + "px";
+          //       bar.style.top =
+          //         noteElems.getBoundingClientRect().top - boundingBox.top - 15 <
+          //         topBox.top - boundingBox.top - 15
+          //           ? noteElems.getBoundingClientRect().top -
+          //             boundingBox.top -
+          //             15 + "px"
+          //           : topBox.top -
+          //             boundingBox.top -
+          //             15 +
+          //             "px";
+          //     }
+          //   }
+
+          //   if (created) {
+          //     if (note.duration < beatSum) {
+          //       bar.style.left =
+          //         noteElems.getBoundingClientRect().left -
+          //         boundingBox.left -
+          //         remainLen +
+          //         5 +
+          //         "px";
+          //       bar.style.width =
+          //         noteElems.nextSibling.getBoundingClientRect().left -
+          //         noteElems.getBoundingClientRect().left +
+          //         remainLen -
+          //         5 +
+          //         "px";
+          //     } else {
+          //       bar.style.width =
+          //         (noteElems.nextSibling.getBoundingClientRect().left -
+          //           barStartX) /
+          //           Math.round(totalSum / visualObjs[0].getBeatLength()) -
+          //         5 +
+          //         "px";
+          //       bar.style.left =
+          //         barStartX -
+          //         boundingBox.left +
+          //         (noteElems.nextSibling.getBoundingClientRect().left - barStartX) /
+          //           (totalSum / visualObjs[0].getBeatLength()) +
+          //         "px";
+          //     }
+          //     bar.style.backgroundColor = "blue";
+          //     created = false;
+          //   } else {
+          //     bar.style.left = barStartX - boundingBox.left + "px";
+          //     bar.style.width =
+          //       noteElems.nextSibling.getBoundingClientRect().left -
+          //       barStartX -
+          //       5 +
+          //       "px";
+          //     bar.style.backgroundColor = "blue";
+          //     created = false;
+          //   }
+          //   bar.style.height = "5px";
+          //   bar.style.opacity = "0.2";
+
+          //   coverBox.style.top = bar.style.top;
+          //   coverBox.style.left = bar.style.left;
+          //   coverBox.style.width = bar.style.width;
+          //   coverBox.style.height =
+          //     boundingBox.height / 2 / staffArray.length + "px";
+          //   coverBox.style.backgroundColor = "blue";
+          //   coverBox.style.opacity = "0";
+          //   coverBox.style.pointerEvents = "none";
+
+          //   // Assign beat index for this overlay
+          //   const beatIndexForOverlay = currentBeatIndex;
+          //   bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
+          //   bar.setAttribute("data-measure-pos", measure.toString());
+          //   bar.setAttribute("data-staff-pos", staff.toString());
+
+          //   bar.addEventListener("click", () => {
+          //     if (bar.getAttribute("data-selected") === "true") {
+          //       bar.setAttribute("data-selected", "false");
+          //       bar.style.opacity = "0.2";
+          //       coverBox.style.opacity = "0";
+          //       const index = selAnswers.findIndex(
+          //         (item) =>
+          //           item.type === "beat" &&
+          //           item.measurePos == measure &&
+          //           item.beatIndex == beatIndexForOverlay
+          //       );
+          //       if (index !== -1) {
+          //         selAnswers.splice(index, 1);
+          //       }
+          //     } else {
+          //       bar.setAttribute("data-selected", "true");
+          //       bar.style.opacity = "1";
+          //       coverBox.style.opacity = "0.5";
+          //       const beatObj = {
+          //         measurePos: measure,
+          //         staffPos: staff,
+          //         beatIndex: beatIndexForOverlay,
+          //         type: "beat",
+          //       };
+          //       selAnswers.push(beatObj);
+          //     }
+          //     if (teacherMode) multiAnswer();
+          //   });
+
+          //   const parentElement = document.getElementById("target" + exIndex);
+          //   if (parentElement) {
+          //     parentElement.style.position = "relative";
+          //     parentElement.appendChild(bar);
+          //     parentElement.appendChild(coverBox);
+          //   }
+          //   beatSum = 0;
+          //   noteCount = 0;
+          //   // Increment beat index after a beat is completed
+          //   currentBeatIndex++;
+          // }
+          const svgNS = "http://www.w3.org/2000/svg";
+          
+          if (!boundingBox) return;
+          
           if (beatSum === 0) {
             barStartX = noteElems.getBoundingClientRect().left;
           }
-
+          
           if (typeof note.duration === "number" && !isNaN(note.duration)) {
             beatSum += note.duration;
             noteCount++;
           }
-
+          
           const topLines = svgElement?.querySelectorAll(".abcjs-top-line");
-          let totalSum: number = 0;
+          let totalSum = 0;
 
-          if (beatSum > visualObjs[0].getBeatLength()) {
-            const bar = document.createElement("div");
+          const addRects = (x: number, y: number, width: number, height: number) => {
+            const bar = document.createElementNS(svgNS, "rect");
+            const coverBox = document.createElementNS(svgNS, "rect");
+
             bar.classList.add("bar");
-            bar.style.position = "absolute";
+            bar.setAttribute("x", x.toString());
+            bar.setAttribute("y", y.toString());
+            bar.setAttribute("width", width.toString());
+            bar.setAttribute("height", "5");
+            bar.setAttribute("fill", "blue");
+            bar.setAttribute("opacity", "0.2");
 
-            const coverBox = document.createElement("div");
             coverBox.classList.add("cover-box");
-            coverBox.style.position = "absolute";
-
-            if (topLines) {
-              if (topLines[staff]) {
-                const topBox = topLines[staff].getBoundingClientRect();
-                // bar.style.top = topBox.top - noteElems.getBoundingClientRect().top - 10 + "px";
-                bar.style.top =
-                  noteElems.getBoundingClientRect().top - boundingBox.top - 15 <
-                  topBox.top - boundingBox.top - 15
-                    ? noteElems.getBoundingClientRect().top -
-                      boundingBox.top -
-                      15 + "px"
-                    : topBox.top -
-                      boundingBox.top -
-                      15 +
-                      "px";
-
-              }
-            }
-
-            if (
-              Math.floor(beatSum / visualObjs[0].getBeatLength()) ===
-              beatSum / visualObjs[0].getBeatLength()
-            ) {
-              bar.style.width =
-                (noteElems.nextSibling.getBoundingClientRect().left -
-                  barStartX) *
-                  (1 / (beatSum / visualObjs[0].getBeatLength())) -
-                5 +
-                "px";
-            } else {
-              bar.style.width =
-                ((noteElems.nextSibling.getBoundingClientRect().left -
-                  noteElems.getBoundingClientRect().left) *
-                  2) /
-                  3 +
-                "px";
-              remainLen =
-                ((noteElems.nextSibling.getBoundingClientRect().left -
-                  noteElems.getBoundingClientRect().left) *
-                  1) /
-                3;
-            }
-
-            bar.style.left = barStartX - boundingBox.left + "px";
-            bar.style.height = "5px";
-            bar.style.backgroundColor = "blue";
-            bar.style.opacity = "0.2";
-
-            coverBox.style.top = bar.style.top;
-            coverBox.style.left = bar.style.left;
-            coverBox.style.width = bar.style.width;
-            coverBox.style.height =
-              boundingBox.height / 2 / staffArray.length + "px";
-            coverBox.style.backgroundColor = "blue";
-            coverBox.style.opacity = "0";
+            coverBox.setAttribute("x", x.toString());
+            coverBox.setAttribute("y", y.toString());
+            coverBox.setAttribute("width", width.toString());
+            coverBox.setAttribute("height", (boundingBox.height / 2 / staffArray.length).toString());
+            coverBox.setAttribute("fill", "blue");
+            coverBox.setAttribute("opacity", "0");
             coverBox.style.pointerEvents = "none";
 
-            // Assign beat index for this overlay
+            // Metadata + event
             const beatIndexForOverlay = currentBeatIndex;
             bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
             bar.setAttribute("data-measure-pos", measure.toString());
@@ -377,8 +591,8 @@ export function Exercise({
             bar.addEventListener("click", () => {
               if (bar.getAttribute("data-selected") === "true") {
                 bar.setAttribute("data-selected", "false");
-                bar.style.opacity = "0.2";
-                coverBox.style.opacity = "0";
+                bar.setAttribute("opacity", "0.2");
+                coverBox.setAttribute("opacity", "0");
                 const index = selAnswers.findIndex(
                   (item) =>
                     item.type === "beat" &&
@@ -386,162 +600,94 @@ export function Exercise({
                     item.staffPos == staff &&
                     item.beatIndex == beatIndexForOverlay
                 );
-                if (index !== -1) {
-                  selAnswers.splice(index, 1);
-                }
+                if (index !== -1) selAnswers.splice(index, 1);
               } else {
                 bar.setAttribute("data-selected", "true");
-                bar.style.opacity = "1";
-                coverBox.style.opacity = "0.5";
-                const beatObj = {
+                bar.setAttribute("opacity", "1");
+                coverBox.setAttribute("opacity", "0.5");
+                selAnswers.push({
                   measurePos: measure,
                   staffPos: staff,
                   beatIndex: beatIndexForOverlay,
                   type: "beat",
-                };
-                selAnswers.push(beatObj);
+                });
               }
               if (teacherMode) multiAnswer();
             });
 
-            const parentElement = document.getElementById("target" + exIndex);
-            if (parentElement) {
-              parentElement.style.position = "relative";
-              parentElement.appendChild(bar);
-              parentElement.appendChild(coverBox);
+            const svgGroup = svgElement.querySelector("g");
+            if (svgGroup) {
+              svgGroup.appendChild(bar);
+              svgGroup.appendChild(coverBox);
             }
+          };
+
+          if (beatSum > visualObjs[0].getBeatLength()) {
+            const barStartPt = toSvgCoords(svgElement, barStartX, 0);
+            const noteLeft = noteElems.getBoundingClientRect().left;
+            const noteRight = noteElems.nextSibling.getBoundingClientRect().left;
+            const noteRightPt = toSvgCoords(svgElement, noteRight, 0);
+            const noteLeftPt = toSvgCoords(svgElement, noteLeft, 0);
+
+            const noteTopPt = toSvgCoords(svgElement, 0, noteElems.getBoundingClientRect().top);
+            const topLinePt = topLines && topLines[staff]
+              ? toSvgCoords(svgElement, 0, topLines[staff].getBoundingClientRect().top)
+              : noteTopPt;
+            
+            const barTopY = Math.min(noteTopPt.y, topLinePt.y) - 15;
+
+            let barWidth: number;
+            if (Math.floor(beatSum / visualObjs[0].getBeatLength()) === beatSum / visualObjs[0].getBeatLength()) {
+              barWidth = (noteRightPt.x - barStartPt.x) * (1 / (beatSum / visualObjs[0].getBeatLength())) - 5;
+            } else {
+              barWidth = ((noteRightPt.x - noteLeftPt.x) * 2) / 3;
+              remainLen = ((noteRightPt.x - noteLeftPt.x) * 1) / 3;
+            }
+
+            addRects(barStartPt.x, barTopY, barWidth, 5);
 
             totalSum = beatSum;
             beatSum -= visualObjs[0].getBeatLength();
             noteCount = 0;
             created = true;
-
-            // Increment beat index for next beat in same measure
             currentBeatIndex++;
           }
 
           if (beatSum === visualObjs[0].getBeatLength()) {
-            const bar = document.createElement("div");
-            bar.classList.add("bar");
-            bar.style.position = "absolute";
+            const barStartPt = toSvgCoords(svgElement, barStartX, 0);
+            const noteLeft = noteElems.getBoundingClientRect().left;
+            const noteRight = noteElems.nextSibling.getBoundingClientRect().left;
+            const noteRightPt = toSvgCoords(svgElement, noteRight, 0);
+            const noteLeftPt = toSvgCoords(svgElement, noteLeft, 0);
 
-            const coverBox = document.createElement("div");
-            coverBox.classList.add("cover-box");
-            coverBox.style.position = "absolute";
+            const noteTopPt = toSvgCoords(svgElement, 0, noteElems.getBoundingClientRect().top);
+            const topLinePt = topLines && topLines[staff]
+              ? toSvgCoords(svgElement, 0, topLines[staff].getBoundingClientRect().top)
+              : noteTopPt;
 
-            if (topLines) {
-              if (topLines[staff]) {
-                const topBox = topLines[staff].getBoundingClientRect();
-                // bar.style.top = topBox.top - boundingBox.top - 10 + "px";
-                bar.style.top =
-                  noteElems.getBoundingClientRect().top - boundingBox.top - 15 <
-                  topBox.top - boundingBox.top - 15
-                    ? noteElems.getBoundingClientRect().top -
-                      boundingBox.top -
-                      15 + "px"
-                    : topBox.top -
-                      boundingBox.top -
-                      15 +
-                      "px";
-              }
-            }
+            const barTopY = Math.min(noteTopPt.y, topLinePt.y) - 15;
+            let barX = barStartPt.x;
+            let barWidth: number;
 
             if (created) {
               if (note.duration < beatSum) {
-                bar.style.left =
-                  noteElems.getBoundingClientRect().left -
-                  boundingBox.left -
-                  remainLen +
-                  5 +
-                  "px";
-                bar.style.width =
-                  noteElems.nextSibling.getBoundingClientRect().left -
-                  noteElems.getBoundingClientRect().left +
-                  remainLen -
-                  5 +
-                  "px";
+                barX = toSvgCoords(svgElement, noteLeft - remainLen + 5, 0).x;
+                barWidth = noteRightPt.x - noteLeftPt.x + remainLen - 5;
               } else {
-                bar.style.width =
-                  (noteElems.nextSibling.getBoundingClientRect().left -
-                    barStartX) /
-                    Math.round(totalSum / visualObjs[0].getBeatLength()) -
-                  5 +
-                  "px";
-                bar.style.left =
-                  barStartX -
-                  boundingBox.left +
-                  (noteElems.nextSibling.getBoundingClientRect().left - barStartX) /
-                    (totalSum / visualObjs[0].getBeatLength()) +
-                  "px";
+                barWidth = (noteRightPt.x - barStartPt.x) / Math.round(totalSum / visualObjs[0].getBeatLength()) - 5;
+                barX =
+                  barStartPt.x +
+                  (noteRightPt.x - barStartPt.x) / (totalSum / visualObjs[0].getBeatLength());
               }
-              bar.style.backgroundColor = "blue";
               created = false;
             } else {
-              bar.style.left = barStartX - boundingBox.left + "px";
-              bar.style.width =
-                noteElems.nextSibling.getBoundingClientRect().left -
-                barStartX -
-                5 +
-                "px";
-              bar.style.backgroundColor = "blue";
-              created = false;
+              barWidth = noteRightPt.x - barStartPt.x - 5;
             }
-            bar.style.height = "5px";
-            bar.style.opacity = "0.2";
 
-            coverBox.style.top = bar.style.top;
-            coverBox.style.left = bar.style.left;
-            coverBox.style.width = bar.style.width;
-            coverBox.style.height =
-              boundingBox.height / 2 / staffArray.length + "px";
-            coverBox.style.backgroundColor = "blue";
-            coverBox.style.opacity = "0";
-            coverBox.style.pointerEvents = "none";
+            addRects(barX, barTopY, barWidth, 5);
 
-            // Assign beat index for this overlay
-            const beatIndexForOverlay = currentBeatIndex;
-            bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
-            bar.setAttribute("data-measure-pos", measure.toString());
-            bar.setAttribute("data-staff-pos", staff.toString());
-
-            bar.addEventListener("click", () => {
-              if (bar.getAttribute("data-selected") === "true") {
-                bar.setAttribute("data-selected", "false");
-                bar.style.opacity = "0.2";
-                coverBox.style.opacity = "0";
-                const index = selAnswers.findIndex(
-                  (item) =>
-                    item.type === "beat" &&
-                    item.measurePos == measure &&
-                    item.beatIndex == beatIndexForOverlay
-                );
-                if (index !== -1) {
-                  selAnswers.splice(index, 1);
-                }
-              } else {
-                bar.setAttribute("data-selected", "true");
-                bar.style.opacity = "1";
-                coverBox.style.opacity = "0.5";
-                const beatObj = {
-                  measurePos: measure,
-                  staffPos: staff,
-                  beatIndex: beatIndexForOverlay,
-                  type: "beat",
-                };
-                selAnswers.push(beatObj);
-              }
-              if (teacherMode) multiAnswer();
-            });
-
-            const parentElement = document.getElementById("target" + exIndex);
-            if (parentElement) {
-              parentElement.style.position = "relative";
-              parentElement.appendChild(bar);
-              parentElement.appendChild(coverBox);
-            }
             beatSum = 0;
             noteCount = 0;
-            // Increment beat index after a beat is completed
             currentBeatIndex++;
           }
         }
@@ -582,6 +728,17 @@ export function Exercise({
       console.log("abcString is undefined");
     }
   };
+
+  function toSvgCoords(svg: SVGSVGElement, x: number, y: number) {
+    const pt = svg.createSVGPoint();
+    pt.x = x;
+    pt.y = y;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) {
+      throw new Error("SVG not rendered yet. Cannot compute coordinates.");
+    }
+    return pt.matrixTransform(ctm.inverse());
+  }
 
   const reload = function () {
     for (let i = 0; i < selNotes.length; ) selNotes.pop();
