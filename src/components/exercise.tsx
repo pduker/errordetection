@@ -248,7 +248,8 @@ export function Exercise({
       // Initialize beat counter for rhythm exercises
       let currentBeatIndex = 1;
 
-      const svgElement = document.querySelector("svg");
+      const container = document.getElementById("target" + exIndex);
+      const svgElement = container?.querySelector("svg");
       if (!svgElement) return;
       const boundingBox: DOMRect =
         svgElement?.getBoundingClientRect();
