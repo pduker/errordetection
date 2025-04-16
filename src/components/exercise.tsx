@@ -10,6 +10,7 @@ import { Button } from "react-bootstrap";
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import noteKey from "../assets/note-color-key.png";
+import path from "path";
 
 const firebaseConfig = {
   apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
@@ -288,271 +289,16 @@ export function Exercise({
         }
 
         if (tags.includes("Rhythm")) {
-          // if (!boundingBox) {
-          //   return;
-          // }
-
-          // if (beatSum === 0) {
-          //   barStartX = noteElems.getBoundingClientRect().left;
-          // }
-
-          // if (typeof note.duration === "number" && !isNaN(note.duration)) {
-          //   beatSum += note.duration;
-          //   noteCount++;
-          // }
-
-          // const topLines = svgElement?.querySelectorAll(".abcjs-top-line");
-          // let totalSum: number = 0;
-
-          // if (beatSum > visualObjs[0].getBeatLength()) {
-          //   const bar = document.createElement("div");
-          //   bar.classList.add("bar");
-          //   bar.style.position = "absolute";
-
-          //   const coverBox = document.createElement("div");
-          //   coverBox.classList.add("cover-box");
-          //   coverBox.style.position = "absolute";
-
-          //   if (topLines) {
-          //     if (topLines[staff]) {
-          //       const topBox = topLines[staff].getBoundingClientRect();
-          //       // bar.style.top = topBox.top - noteElems.getBoundingClientRect().top - 10 + "px";
-          //       bar.style.top =
-          //         noteElems.getBoundingClientRect().top - boundingBox.top - 15 <
-          //         topBox.top - boundingBox.top - 15
-          //           ? noteElems.getBoundingClientRect().top -
-          //             boundingBox.top -
-          //             15 + "px"
-          //           : topBox.top -
-          //             boundingBox.top -
-          //             15 +
-          //             "px";
-
-          //     }
-          //   }
-
-          //   if (
-          //     Math.floor(beatSum / visualObjs[0].getBeatLength()) ===
-          //     beatSum / visualObjs[0].getBeatLength()
-          //   ) {
-          //     bar.style.width =
-          //       (noteElems.nextSibling.getBoundingClientRect().left -
-          //         barStartX) *
-          //         (1 / (beatSum / visualObjs[0].getBeatLength())) -
-          //       5 +
-          //       "px";
-          //   } else {
-          //     bar.style.width =
-          //       ((noteElems.nextSibling.getBoundingClientRect().left -
-          //         noteElems.getBoundingClientRect().left) *
-          //         2) /
-          //         3 +
-          //       "px";
-          //     remainLen =
-          //       ((noteElems.nextSibling.getBoundingClientRect().left -
-          //         noteElems.getBoundingClientRect().left) *
-          //         1) /
-          //       3;
-          //   }
-
-          //   bar.style.left = barStartX - boundingBox.left + "px";
-          //   bar.style.height = "5px";
-          //   bar.style.backgroundColor = "blue";
-          //   bar.style.opacity = "0.2";
-
-          //   coverBox.style.top = bar.style.top;
-          //   coverBox.style.left = bar.style.left;
-          //   coverBox.style.width = bar.style.width;
-          //   coverBox.style.height =
-          //     boundingBox.height / 2 / staffArray.length + "px";
-          //   coverBox.style.backgroundColor = "blue";
-          //   coverBox.style.opacity = "0";
-          //   coverBox.style.pointerEvents = "none";
-
-          //   // Assign beat index for this overlay
-          //   const beatIndexForOverlay = currentBeatIndex;
-          //   bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
-          //   bar.setAttribute("data-measure-pos", measure.toString());
-          //   bar.setAttribute("data-staff-pos", staff.toString());
-
-          //   bar.addEventListener("click", () => {
-          //     if (bar.getAttribute("data-selected") === "true") {
-          //       bar.setAttribute("data-selected", "false");
-          //       bar.style.opacity = "0.2";
-          //       coverBox.style.opacity = "0";
-          //       const index = selAnswers.findIndex(
-          //         (item) =>
-          //           item.type === "beat" &&
-          //           item.measurePos == measure &&
-          //           item.staffPos == staff &&
-          //           item.beatIndex == beatIndexForOverlay
-          //       );
-          //       if (index !== -1) {
-          //         selAnswers.splice(index, 1);
-          //       }
-          //     } else {
-          //       bar.setAttribute("data-selected", "true");
-          //       bar.style.opacity = "1";
-          //       coverBox.style.opacity = "0.5";
-          //       const beatObj = {
-          //         measurePos: measure,
-          //         staffPos: staff,
-          //         beatIndex: beatIndexForOverlay,
-          //         type: "beat",
-          //       };
-          //       selAnswers.push(beatObj);
-          //     }
-          //     if (teacherMode) multiAnswer();
-          //   });
-
-          //   const parentElement = document.getElementById("target" + exIndex);
-          //   if (parentElement) {
-          //     parentElement.style.position = "relative";
-          //     parentElement.appendChild(bar);
-          //     parentElement.appendChild(coverBox);
-          //   }
-
-          //   totalSum = beatSum;
-          //   beatSum -= visualObjs[0].getBeatLength();
-          //   noteCount = 0;
-          //   created = true;
-
-          //   // Increment beat index for next beat in same measure
-          //   currentBeatIndex++;
-          // }
-
-          // if (beatSum === visualObjs[0].getBeatLength()) {
-          //   const bar = document.createElement("div");
-          //   bar.classList.add("bar");
-          //   bar.style.position = "absolute";
-
-          //   const coverBox = document.createElement("div");
-          //   coverBox.classList.add("cover-box");
-          //   coverBox.style.position = "absolute";
-
-          //   if (topLines) {
-          //     if (topLines[staff]) {
-          //       const topBox = topLines[staff].getBoundingClientRect();
-          //       // bar.style.top = topBox.top - boundingBox.top - 10 + "px";
-          //       bar.style.top =
-          //         noteElems.getBoundingClientRect().top - boundingBox.top - 15 <
-          //         topBox.top - boundingBox.top - 15
-          //           ? noteElems.getBoundingClientRect().top -
-          //             boundingBox.top -
-          //             15 + "px"
-          //           : topBox.top -
-          //             boundingBox.top -
-          //             15 +
-          //             "px";
-          //     }
-          //   }
-
-          //   if (created) {
-          //     if (note.duration < beatSum) {
-          //       bar.style.left =
-          //         noteElems.getBoundingClientRect().left -
-          //         boundingBox.left -
-          //         remainLen +
-          //         5 +
-          //         "px";
-          //       bar.style.width =
-          //         noteElems.nextSibling.getBoundingClientRect().left -
-          //         noteElems.getBoundingClientRect().left +
-          //         remainLen -
-          //         5 +
-          //         "px";
-          //     } else {
-          //       bar.style.width =
-          //         (noteElems.nextSibling.getBoundingClientRect().left -
-          //           barStartX) /
-          //           Math.round(totalSum / visualObjs[0].getBeatLength()) -
-          //         5 +
-          //         "px";
-          //       bar.style.left =
-          //         barStartX -
-          //         boundingBox.left +
-          //         (noteElems.nextSibling.getBoundingClientRect().left - barStartX) /
-          //           (totalSum / visualObjs[0].getBeatLength()) +
-          //         "px";
-          //     }
-          //     bar.style.backgroundColor = "blue";
-          //     created = false;
-          //   } else {
-          //     bar.style.left = barStartX - boundingBox.left + "px";
-          //     bar.style.width =
-          //       noteElems.nextSibling.getBoundingClientRect().left -
-          //       barStartX -
-          //       5 +
-          //       "px";
-          //     bar.style.backgroundColor = "blue";
-          //     created = false;
-          //   }
-          //   bar.style.height = "5px";
-          //   bar.style.opacity = "0.2";
-
-          //   coverBox.style.top = bar.style.top;
-          //   coverBox.style.left = bar.style.left;
-          //   coverBox.style.width = bar.style.width;
-          //   coverBox.style.height =
-          //     boundingBox.height / 2 / staffArray.length + "px";
-          //   coverBox.style.backgroundColor = "blue";
-          //   coverBox.style.opacity = "0";
-          //   coverBox.style.pointerEvents = "none";
-
-          //   // Assign beat index for this overlay
-          //   const beatIndexForOverlay = currentBeatIndex;
-          //   bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
-          //   bar.setAttribute("data-measure-pos", measure.toString());
-          //   bar.setAttribute("data-staff-pos", staff.toString());
-
-          //   bar.addEventListener("click", () => {
-          //     if (bar.getAttribute("data-selected") === "true") {
-          //       bar.setAttribute("data-selected", "false");
-          //       bar.style.opacity = "0.2";
-          //       coverBox.style.opacity = "0";
-          //       const index = selAnswers.findIndex(
-          //         (item) =>
-          //           item.type === "beat" &&
-          //           item.measurePos == measure &&
-          //           item.beatIndex == beatIndexForOverlay
-          //       );
-          //       if (index !== -1) {
-          //         selAnswers.splice(index, 1);
-          //       }
-          //     } else {
-          //       bar.setAttribute("data-selected", "true");
-          //       bar.style.opacity = "1";
-          //       coverBox.style.opacity = "0.5";
-          //       const beatObj = {
-          //         measurePos: measure,
-          //         staffPos: staff,
-          //         beatIndex: beatIndexForOverlay,
-          //         type: "beat",
-          //       };
-          //       selAnswers.push(beatObj);
-          //     }
-          //     if (teacherMode) multiAnswer();
-          //   });
-
-          //   const parentElement = document.getElementById("target" + exIndex);
-          //   if (parentElement) {
-          //     parentElement.style.position = "relative";
-          //     parentElement.appendChild(bar);
-          //     parentElement.appendChild(coverBox);
-          //   }
-          //   beatSum = 0;
-          //   noteCount = 0;
-          //   // Increment beat index after a beat is completed
-          //   currentBeatIndex++;
-          // }
           const svgNS = "http://www.w3.org/2000/svg";
           
           if (!boundingBox) return;
           
+          // Store the start X position of the bar
           if (beatSum === 0) {
             barStartX = noteElems.getBoundingClientRect().left;
           }
           
+          // Accumulate beat duration
           if (typeof note.duration === "number" && !isNaN(note.duration)) {
             beatSum += note.duration;
             noteCount++;
@@ -561,33 +307,55 @@ export function Exercise({
           const topLines = svgElement?.querySelectorAll(".abcjs-top-line");
           let totalSum = 0;
 
+          // Helper function to create both the beat bar and invisible cover box
           const addRects = (x: number, y: number, width: number, height: number) => {
             const bar = document.createElementNS(svgNS, "rect");
             const coverBox = document.createElementNS(svgNS, "rect");
 
+             // Set visual styles and coordinates for the beat bar
             bar.classList.add("bar");
             bar.setAttribute("x", x.toString());
             bar.setAttribute("y", y.toString());
             bar.setAttribute("width", width.toString());
-            bar.setAttribute("height", "5");
-            bar.setAttribute("fill", "blue");
+            bar.setAttribute("height", "7");
+            bar.setAttribute("fill", "purple");
             bar.setAttribute("opacity", "0.2");
+            bar.setAttribute("stroke", "none");
 
+            const noteBox = noteElems.getBoundingClientRect();
+            const noteTop = toSvgCoords(svgElement, 0, noteBox.top).y;
+            const noteBottom = toSvgCoords(svgElement, 0, noteBox.bottom).y;
+            
+            const bars = document.querySelectorAll('[data-name="bar"]');
+            const paths = Array.from(bars)
+            .filter(path => path.tagName === "path")
+            .filter((path, index, self) => {
+              const bottom = path.getBoundingClientRect().bottom;
+              return self.findIndex(p => p.getBoundingClientRect().bottom === bottom) === index;
+            });
+            const pathBottom = toSvgCoords(svgElement, 0, paths[staff].getBoundingClientRect().bottom).y;
+            const pathHeight = paths[staff].getBoundingClientRect().height;
+            const noteHeight = pathBottom - y + pathHeight / 4;
+
+            // Set styles for invisible cover box used for highlighting
             coverBox.classList.add("cover-box");
             coverBox.setAttribute("x", x.toString());
             coverBox.setAttribute("y", y.toString());
             coverBox.setAttribute("width", width.toString());
-            coverBox.setAttribute("height", (boundingBox.height / 2 / staffArray.length).toString());
-            coverBox.setAttribute("fill", "blue");
+            coverBox.setAttribute("height", noteHeight.toString());
+            coverBox.setAttribute("fill", "purple");
             coverBox.setAttribute("opacity", "0");
+            coverBox.setAttribute("stroke", "none");
+            coverBox.setAttribute("clip-path", staffArray[staff].clipPath);
             coverBox.style.pointerEvents = "none";
 
-            // Metadata + event
+            // Add metadata and beat index
             const beatIndexForOverlay = currentBeatIndex;
             bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
             bar.setAttribute("data-measure-pos", measure.toString());
             bar.setAttribute("data-staff-pos", staff.toString());
 
+            // Handle click event to toggle selection
             bar.addEventListener("click", () => {
               if (bar.getAttribute("data-selected") === "true") {
                 bar.setAttribute("data-selected", "false");
@@ -615,6 +383,7 @@ export function Exercise({
               if (teacherMode) multiAnswer();
             });
 
+            // Append rect elements to SVG <g> group
             const svgGroup = svgElement.querySelector("g");
             if (svgGroup) {
               svgGroup.appendChild(bar);
@@ -622,6 +391,7 @@ export function Exercise({
             }
           };
 
+          // --- First beat bar creation: beatSum exceeds one full beat ---
           if (beatSum > visualObjs[0].getBeatLength()) {
             const barStartPt = toSvgCoords(svgElement, barStartX, 0);
             const noteLeft = noteElems.getBoundingClientRect().left;
@@ -638,8 +408,10 @@ export function Exercise({
 
             let barWidth: number;
             if (Math.floor(beatSum / visualObjs[0].getBeatLength()) === beatSum / visualObjs[0].getBeatLength()) {
+              // Full beat division
               barWidth = (noteRightPt.x - barStartPt.x) * (1 / (beatSum / visualObjs[0].getBeatLength())) - 5;
             } else {
+              // Partial beat division
               barWidth = ((noteRightPt.x - noteLeftPt.x) * 2) / 3;
               remainLen = ((noteRightPt.x - noteLeftPt.x) * 1) / 3;
             }
@@ -653,6 +425,7 @@ export function Exercise({
             currentBeatIndex++;
           }
 
+          // --- Second beat bar creation: beatSum matches full beat exactly ---
           if (beatSum === visualObjs[0].getBeatLength()) {
             const barStartPt = toSvgCoords(svgElement, barStartX, 0);
             const noteLeft = noteElems.getBoundingClientRect().left;
@@ -671,9 +444,11 @@ export function Exercise({
 
             if (created) {
               if (note.duration < beatSum) {
+                // Partial leftover note
                 barX = toSvgCoords(svgElement, noteLeft - remainLen + 5, 0).x;
                 barWidth = noteRightPt.x - noteLeftPt.x + remainLen - 5;
               } else {
+                // Continuing bar from previous segment
                 barWidth = (noteRightPt.x - barStartPt.x) / Math.round(totalSum / visualObjs[0].getBeatLength()) - 5;
                 barX =
                   barStartPt.x +
@@ -681,6 +456,7 @@ export function Exercise({
               }
               created = false;
             } else {
+              // Simple full beat bar
               barWidth = noteRightPt.x - barStartPt.x - 5;
             }
 
