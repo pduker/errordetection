@@ -49,7 +49,7 @@ export function HelpPage({
     //rendering page with help information
     return (
         <div>
-            <h2 style={{ marginLeft: '3mm' }}>Welcome to the Help Page!</h2>
+            <h2 style={{textAlign: "center"}}>Welcome to the Help Page!</h2>
             <div style={{textAlign: "left", margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
                 <div style={{textAlign: "center", margin: "10px auto", padding: "25px", backgroundColor: "white", borderRadius: "10px", width: "1000px"}}>
                     This site is meant to help you practice your <strong>error detection skills</strong>. You will have the chance to pracitce on a variety of <strong>exercises</strong>. On each you will the <strong>read a music score</strong> attached to the exercise. 
