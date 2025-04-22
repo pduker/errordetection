@@ -112,6 +112,9 @@ export function Exercise({
   const [mp3File, setMp3File] = useState<File>(mp3);
   const [abcFile, setAbcFile] = useState<string>(abc);
 
+  //for disabling ui elements
+  const rhythmOnly = tags.length === 1 && tags.includes("Rhythm");
+
   // try to load score when there's either exerciseData or an abc file to pull from
   useEffect(() => {
     if (
@@ -234,8 +237,8 @@ export function Exercise({
     var el = document.getElementById("target" + exIndex);
     if (el !== null && abcString !== undefined) {
       visualObjs = abcjs.renderAbc(el, abcString, {
-        clickListener: clickListener,
-        selectTypes: ["note"],
+        clickListener: (rhythmOnly) ? undefined : clickListener,
+        selectTypes: (rhythmOnly) ? [] : ["note"],
         lineThickness: 0.4,
         responsive: "resize",
       });
@@ -865,7 +868,7 @@ export function Exercise({
   }, [selAnswers]);
   // Updated checkAnswers: branch for rhythm exercises
   const checkAnswers = function () {
-    if (tags.includes("Rhythm")) {
+    if (tags.includes("Rhythm") && tags.length > 1) {
       const instruments = getInstrumentList(exerciseData.score);
       
       // Define proper types for beat and note selections
@@ -1036,6 +1039,117 @@ export function Exercise({
       setCustomFeedback(feedback);
       return;
     }
+    
+    else if (tags.includes("Rhythm") && tags.length == 1){
+      const instruments = getInstrumentList(exerciseData.score);
+      
+      // Define proper types for beat and note selections
+      type BeatSelection = {
+        type: 'beat';
+        measurePos: number;
+        staffPos: number;
+        beatIndex: number;
+      };
+      
+      type CombinedSelection = BeatSelection;
+      
+      // Check for all elements with data-selected="true" to find selected beats
+      const selectedBeatElements = document.querySelectorAll("[data-selected='true']");
+      const selectedBeats: BeatSelection[] = Array.from(selectedBeatElements).map(elem => ({
+        type: "beat" as const,
+        measurePos: Number(elem.closest(".bar")?.getAttribute("data-measure-pos")) || 
+                    Number(elem.getAttribute("data-measure-pos")),
+        staffPos: Number(elem.closest(".bar")?.getAttribute("data-staff-pos")) || 
+                  Number(elem.getAttribute("data-staff-pos")),
+        beatIndex: Number(elem.getAttribute("data-beatIndex"))
+      })).filter(beat => !isNaN(beat.measurePos) && !isNaN(beat.beatIndex));
+      
+      // Combine selections for comparison
+      const combinedSelections: CombinedSelection[] = [...selectedBeats];
+      console.log("Combined selections:", combinedSelections);
+      
+      // Get correct answers that include both notes and beats
+      const currentCorrectAnswers = [...correctAnswers].map(ans => ({
+        measurePos: Number(ans.measurePos),
+        staffPos: Number(ans.staffPos),
+        beatIndex: Number(ans.beatIndex),
+        type: ans.type as 'beat',
+        feedback: ans.feedback
+      }));
+      console.log("Correct answers:", currentCorrectAnswers);
+      
+      let feedback: string[] = [];
+      let allCorrect = true;
+      const plural = currentCorrectAnswers.length === 1 ? " is " : " are ";
+      
+      feedback.push(
+        `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`
+      );
+      
+      // Check for missing correct answers (both notes and beats)
+      currentCorrectAnswers.forEach((corr) => {
+        let found = false;
+        
+        if (corr.type === "beat") {
+          // Check if this beat was selected
+          found = combinedSelections.some(s => 
+            s.type === "beat" && 
+            Number(s.measurePos) === Number(corr.measurePos) && 
+            Number(s.beatIndex) === Number(corr.beatIndex)
+          );
+          
+          if (!found) {
+            allCorrect = false;
+            console.log(`Missing beat: measure ${corr.measurePos}, beat ${corr.beatIndex}, staff ${corr.staffPos}`);
+            
+            if (!isNaN(corr.staffPos) && instruments[Number(corr.staffPos)] !== undefined) {
+              feedback.push(
+                `\nMissing correct beat in Measure ${Number(corr.measurePos) + 1} on the ${instruments[Number(corr.staffPos)]} staff.`
+              );
+            } else {
+              feedback.push(`\nMissing correct beat in Measure ${Number(corr.measurePos) + 1}.`);
+            }
+          }
+        } 
+      });
+      
+      // Check for extra (incorrect) selections
+      combinedSelections.forEach((sel) => {
+        let found = false;
+        
+        if (sel.type === "beat") {
+          // Check if this beat is correct
+          found = currentCorrectAnswers.some(c => 
+            c.type === "beat" && 
+            Number(c.measurePos) === Number(sel.measurePos) && 
+            Number(c.beatIndex) === Number(sel.beatIndex)
+          );
+          
+          if (!found) {
+            allCorrect = false;
+            console.log(`Extra beat: measure ${sel.measurePos}, beat ${sel.beatIndex}, staff ${sel.staffPos}`);
+            
+            if (!isNaN(sel.staffPos) && instruments[Number(sel.staffPos)] !== undefined) {
+              feedback.push(
+                `\nIncorrect beat selected in Measure ${Number(sel.measurePos) + 1} on the ${instruments[Number(sel.staffPos)]} staff (Beat ${sel.beatIndex}).`
+              );
+            } else {
+              feedback.push(
+                `\nIncorrect beat selected in Measure ${Number(sel.measurePos) + 1}, Beat ${sel.beatIndex}.`
+              );
+            }
+          }
+        } 
+      });
+      
+      if (allCorrect && combinedSelections.length > 0) {
+        feedback = ["Great job!"];
+      }
+      
+      setCustomFeedback(feedback);
+      return;
+    }
+
     
     // Non-Rhythm branch (existing logic, unchanged)
     var tmpSelected = [...selAnswers];
@@ -1593,18 +1707,22 @@ export function Exercise({
             <div id={"target" + exIndex} style={score}></div>
           </div>
           <br />
-          <img
-            alt="note-color-key"
-            src={noteKey}
-            width="14%"
-            height="7%"
-            style={{
-              display: "inline-flex",
-              marginRight: "1vw",
-              marginTop: "-2.5vh",
-              borderRadius: "1px",
-            }}
-          />
+          {!rhythmOnly && (
+            <img
+              alt="note-color-key"
+              src={noteKey}
+              width="14%"
+              height="7%"
+              style={{
+                display: "inline-flex",
+                marginRight: "1vw",
+                marginTop: "-2.5vh",
+                borderRadius: "1px",
+              }}
+            
+            />
+          )}
+          
           <div style={{ display: "inline-flex", marginTop: "-2vh" }}>
             {mp3 !== undefined ? (
               <div style={{ marginTop: "2vh" }}>
