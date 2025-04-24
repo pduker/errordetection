@@ -57,8 +57,9 @@ export function ExerciseManagementPage({
     const createExercise = function () {
         var last = allExData[allExData.sort(indexSort).length-1];
         var newEx: ExerciseData;
-        if(last !== undefined) newEx = new ExerciseData("", undefined, [], "", (last.exIndex) + 1, true,"Exercise " + (allExData.length+1), 1, 1, [], "None", "Anything", false);
-        else newEx = new ExerciseData("", undefined, [], "", 0, true,"Exercise " + (allExData.length+1), 1, 1, [], "None", "Anything", false);
+        if(last !== undefined) newEx = new ExerciseData("", undefined, [], "", (last.exIndex) + 1, true,"Exercise " + (allExData.length+1), 1, 1, [], "None", "Anything", false, true);
+        else newEx = new ExerciseData("", undefined, [], "", 0, true,"Exercise " + (allExData.length+1), 1, 1, [], "None", "Anything", false, true);
+        newEx.isNew = true;
         setAllExData([newEx, ...allExData]);
         setExList([newEx, ...allExData]);
     }
@@ -395,7 +396,7 @@ export function ExerciseManagementPage({
                             </div>
 
                         {/*returning exercise data */}
-                        {exList.map((exercise) => {
+                        {/* {exList.map((exercise) => {
                                 if (exercise !== undefined)
                                     return (
                                         <Exercise
@@ -411,7 +412,28 @@ export function ExerciseManagementPage({
                                         />
                                     )
                                 else return (<div key={Math.random()} />);
+                            })} */}
+                        {exList.map((exercise) => {
+                            if (!exercise) return <div key={Math.random()} />;
+
+                            console.log("Rendering exercise:", exercise.exIndex, "isNew:", exercise.isNew);
+
+                            return (
+                                <Exercise
+                                key={exercise.exIndex}
+                                teacherMode={true}
+                                ExData={exercise}
+                                allExData={allExData}
+                                setAllExData={setAllExData}
+                                exIndex={exercise.exIndex}
+                                handleSelectExercise={handleSelectExercise}
+                                isSelected={selectedIndexes.includes(exercise.exIndex)}
+                                fetch={fetch}
+                                />
+                            );
                             })}
+
+
                         {exList.length === 0 ? <div>No exercises found! Maybe try adding one?</div> : <></>}
 
                         </div> 

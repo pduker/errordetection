@@ -599,6 +599,7 @@ export function Exercise({
           transpos
         );
 
+        data.isNew = false;
         const database = getDatabase();
         const storage = getStorage();
 
@@ -1506,6 +1507,14 @@ export function Exercise({
     }
   };
 
+  const handleCancelExercise = (exIndex: number) => {
+    const updatedExercises = allExData.filter(
+      (exercise) => exercise && exercise.exIndex !== exIndex
+    );
+    setAllExData(updatedExercises);
+  };
+  
+
   return (
     <div
       style={{
@@ -1527,6 +1536,15 @@ export function Exercise({
       )}
       {teacherMode ? (
         <span>
+          {ExData.isNew && (
+            <Button 
+              variant="danger" 
+              onClick={() => handleCancelExercise(exIndex)}
+              style={{ marginBottom: "10px" }}
+            >
+              Cancel Exercise Creation
+            </Button>
+          )}
           <div id="forms" style={{ display: "inline-flex", padding: "4px" }}>
             <form id="tags">
               Tags:
@@ -1693,6 +1711,15 @@ export function Exercise({
           <Button variant="success" onClick={save}>
             Save Exercise
           </Button>
+          {teacherMode && exerciseData?.isNew && (
+            <Button
+              variant="secondary"
+              onClick={() => handleCancelExercise(exInd)}
+              style={{ marginLeft: "10px", marginTop: "10px" }}
+            >
+              Cancel
+            </Button>
+          )}
           <Button
             onClick={() => handleExerciseDelete(exIndex)}
             style={{ marginLeft: "10px", marginTop: "10px" }}
