@@ -3,6 +3,7 @@ import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
 import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
+import { isDisabled } from '@testing-library/user-event/dist/utils';
 
 //function to create the exercise page, takes exercise data and renders a page
 export function ExercisesPage({
@@ -189,6 +190,7 @@ export function ExercisesPage({
     //all the onClick functions for when a sorting field is changed
     const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setDiff((e.target.value));
+        setCurrentPage(1);
         sortExercises(e.target.value,"diff");
     }
     const tagsChange = function (e: React.ChangeEvent<HTMLInputElement>) {
@@ -196,26 +198,32 @@ export function ExercisesPage({
         if(tags.includes(val)) {
             tags.splice(tags.indexOf(val), 1);
             setTags([...tags]);
+            setCurrentPage(1);
             sortExercises([...tags],"tags");
         } else {
             setTags([...tags, val]);
+            setCurrentPage(1);
             sortExercises([...tags, val],"tags");
         } 
     }
     const voiceChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setVoices(Number(e.target.value));
+        setCurrentPage(1);
         sortExercises(Number(e.target.value),"voices");
     }
     const typesChange = function (e: React.ChangeEvent<HTMLSelectElement>){
         setTypes(e.target.value);
+        setCurrentPage(1);
         sortExercises(e.target.value,"types");
     }
     const meterChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
         setMeter(e.target.value);
+        setCurrentPage(1);
         sortExercises(e.target.value, "meter");
     }
     const transposChange = function(e: React.ChangeEvent<HTMLInputElement>) {
         setTranspos(!transpos);
+        setCurrentPage(1);
         sortExercises(!transpos, "transpos");
     }
 
@@ -385,10 +393,36 @@ export function ExercisesPage({
                     else return <></>;
                 })}
                 {/* add page navigation buttons, call newly defined functions */}
-                <div>
-                        <Button onClick={prevPage} disabled={currentPage === 1} style={{marginLeft: "8px"}}>Previous</Button>
+                <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                        <Button
+                            onClick={prevPage}
+                            disabled={currentPage === 1}
+                            style={{
+                                marginRight: "8px",
+                                fontSize: "2.5rem",
+                                background: "none",
+                                border:"none",
+                                color: currentPage === 1 ? "gray" : "black",
+                                padding: "0 8px",
+                                fontWeight: "bold",
+                                lineHeight: "1"}}
+                        >
+                            ‹
+                        </Button>
                         <span> Page {currentPage} of {Math.ceil(exList.length / pageSize)} </span>
-                        <Button onClick={nextPage} disabled={currentPage >= Math.ceil(exList.length / pageSize)} style={{marginLeft: "8px"}}>Next</Button>
+                        <Button
+                            onClick={nextPage}
+                            disabled={currentPage >= Math.ceil(exList.length / pageSize)}
+                            style={{marginLeft: "8px",fontSize: "2.5rem",
+                                background: "none",
+                                border:"none",
+                                color: currentPage >= Math.ceil(exList.length / pageSize) ? "gray" : "black",
+                                padding: "0 8px",
+                                fontWeight: "bold",
+                                lineHeight: "1"}}
+                        >
+                            ›
+                        </Button>
                 </div>
                 {exList.length === 0 ? 
                     !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 

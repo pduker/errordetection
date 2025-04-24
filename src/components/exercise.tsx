@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { ref, get, remove, child, set } from "firebase/database";
 import abcjs from "abcjs";
 import FileUpload from "./fileupload";
@@ -10,6 +10,7 @@ import { Button } from "react-bootstrap";
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import noteKey from "../assets/note-color-key.png";
+import path from "path";
 
 const firebaseConfig = {
   apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
@@ -110,6 +111,9 @@ export function Exercise({
   const [xmlFile, setXmlFile] = useState<File>();
   const [mp3File, setMp3File] = useState<File>(mp3);
   const [abcFile, setAbcFile] = useState<string>(abc);
+
+  //for disabling ui elements
+  const rhythmOnly = tags.length === 1 && tags.includes("Rhythm");
 
   // try to load score when there's either exerciseData or an abc file to pull from
   useEffect(() => {
@@ -233,8 +237,8 @@ export function Exercise({
     var el = document.getElementById("target" + exIndex);
     if (el !== null && abcString !== undefined) {
       visualObjs = abcjs.renderAbc(el, abcString, {
-        clickListener: clickListener,
-        selectTypes: ["note"],
+        clickListener: (rhythmOnly) ? undefined : clickListener,
+        selectTypes: (rhythmOnly) ? [] : ["note"],
         lineThickness: 0.4,
         responsive: "resize",
       });
@@ -247,8 +251,10 @@ export function Exercise({
       // Initialize beat counter for rhythm exercises
       let currentBeatIndex = 1;
 
-      const svgElement = document.querySelector("svg");
-      const boundingBox: DOMRect | undefined =
+      const container = document.getElementById("target" + exIndex);
+      const svgElement = container?.querySelector("svg");
+      if (!svgElement) return;
+      const boundingBox: DOMRect =
         svgElement?.getBoundingClientRect();
 
       var staffArray = visualObjs[0].lines[0].staff;
@@ -287,96 +293,78 @@ export function Exercise({
         }
 
         if (tags.includes("Rhythm")) {
-          if (!boundingBox) {
-            return;
-          }
-
+          const svgNS = "http://www.w3.org/2000/svg";
+          
+          if (!boundingBox) return;
+          
+          // Store the start X position of the bar
           if (beatSum === 0) {
             barStartX = noteElems.getBoundingClientRect().left;
           }
-
+          
+          // Accumulate beat duration
           if (typeof note.duration === "number" && !isNaN(note.duration)) {
             beatSum += note.duration;
             noteCount++;
           }
-
+          
           const topLines = svgElement?.querySelectorAll(".abcjs-top-line");
-          let totalSum: number = 0;
+          let totalSum = 0;
 
-          if (beatSum > visualObjs[0].getBeatLength()) {
-            const bar = document.createElement("div");
+          // Helper function to create both the beat bar and invisible cover box
+          const addRects = (x: number, y: number, width: number, height: number) => {
+            const bar = document.createElementNS(svgNS, "rect");
+            const coverBox = document.createElementNS(svgNS, "rect");
+
+             // Set visual styles and coordinates for the beat bar
             bar.classList.add("bar");
-            bar.style.position = "absolute";
+            bar.setAttribute("x", x.toString());
+            bar.setAttribute("y", y.toString());
+            bar.setAttribute("width", width.toString());
+            bar.setAttribute("height", "7");
+            bar.setAttribute("fill", "purple");
+            bar.setAttribute("opacity", "0.2");
+            bar.setAttribute("stroke", "none");
 
-            const coverBox = document.createElement("div");
+            const noteBox = noteElems.getBoundingClientRect();
+            const noteTop = toSvgCoords(svgElement, 0, noteBox.top).y;
+            const noteBottom = toSvgCoords(svgElement, 0, noteBox.bottom).y;
+            
+            const bars = document.querySelectorAll('[data-name="bar"]');
+            const paths = Array.from(bars)
+            .filter(path => path.tagName === "path")
+            .filter((path, index, self) => {
+              const bottom = path.getBoundingClientRect().bottom;
+              return self.findIndex(p => p.getBoundingClientRect().bottom === bottom) === index;
+            });
+            const pathBottom = toSvgCoords(svgElement, 0, paths[staff].getBoundingClientRect().bottom).y;
+            const pathHeight = paths[staff].getBoundingClientRect().height;
+            const noteHeight = pathBottom - y + pathHeight / 4;
+
+            // Set styles for invisible cover box used for highlighting
             coverBox.classList.add("cover-box");
-            coverBox.style.position = "absolute";
-
-            if (topLines) {
-              if (topLines[staff]) {
-                const topBox = topLines[staff].getBoundingClientRect();
-                // bar.style.top = topBox.top - noteElems.getBoundingClientRect().top - 10 + "px";
-                bar.style.top =
-                  noteElems.getBoundingClientRect().top - boundingBox.top - 15 <
-                  topBox.top - boundingBox.top - 15
-                    ? noteElems.getBoundingClientRect().top -
-                      boundingBox.top -
-                      15 + "px"
-                    : topBox.top -
-                      boundingBox.top -
-                      15 +
-                      "px";
-
-              }
-            }
-
-            if (
-              Math.floor(beatSum / visualObjs[0].getBeatLength()) ===
-              beatSum / visualObjs[0].getBeatLength()
-            ) {
-              bar.style.width =
-                (noteElems.nextSibling.getBoundingClientRect().left -
-                  barStartX) *
-                  (1 / (beatSum / visualObjs[0].getBeatLength())) -
-                5 +
-                "px";
-            } else {
-              bar.style.width =
-                ((noteElems.nextSibling.getBoundingClientRect().left -
-                  noteElems.getBoundingClientRect().left) *
-                  2) /
-                  3 +
-                "px";
-              remainLen =
-                ((noteElems.nextSibling.getBoundingClientRect().left -
-                  noteElems.getBoundingClientRect().left) *
-                  1) /
-                3;
-            }
-
-            bar.style.left = barStartX - boundingBox.left + "px";
-            bar.style.height = "5px";
-            bar.style.backgroundColor = "blue";
-            bar.style.opacity = "0.2";
-
-            coverBox.style.top = bar.style.top;
-            coverBox.style.left = bar.style.left;
-            coverBox.style.width = bar.style.width;
-            coverBox.style.height =
-              boundingBox.height / 2 / staffArray.length + "px";
-            coverBox.style.backgroundColor = "blue";
-            coverBox.style.opacity = "0";
+            coverBox.setAttribute("x", x.toString());
+            coverBox.setAttribute("y", y.toString());
+            coverBox.setAttribute("width", width.toString());
+            coverBox.setAttribute("height", noteHeight.toString());
+            coverBox.setAttribute("fill", "purple");
+            coverBox.setAttribute("opacity", "0");
+            coverBox.setAttribute("stroke", "none");
+            coverBox.setAttribute("clip-path", staffArray[staff].clipPath);
             coverBox.style.pointerEvents = "none";
 
-            // Assign beat index for this overlay
+            // Add metadata and beat index
             const beatIndexForOverlay = currentBeatIndex;
             bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
+            bar.setAttribute("data-measure-pos", measure.toString());
+            bar.setAttribute("data-staff-pos", staff.toString());
 
+            // Handle click event to toggle selection
             bar.addEventListener("click", () => {
               if (bar.getAttribute("data-selected") === "true") {
                 bar.setAttribute("data-selected", "false");
-                bar.style.opacity = "0.2";
-                coverBox.style.opacity = "0";
+                bar.setAttribute("opacity", "0.2");
+                coverBox.setAttribute("opacity", "0");
                 const index = selAnswers.findIndex(
                   (item) =>
                     item.type === "beat" &&
@@ -384,161 +372,102 @@ export function Exercise({
                     item.staffPos == staff &&
                     item.beatIndex == beatIndexForOverlay
                 );
-                if (index !== -1) {
-                  selAnswers.splice(index, 1);
-                }
+                if (index !== -1) selAnswers.splice(index, 1);
               } else {
                 bar.setAttribute("data-selected", "true");
-                bar.style.opacity = "1";
-                coverBox.style.opacity = "0.5";
-                const beatObj = {
+                bar.setAttribute("opacity", "1");
+                coverBox.setAttribute("opacity", "0.5");
+                selAnswers.push({
                   measurePos: measure,
                   staffPos: staff,
                   beatIndex: beatIndexForOverlay,
                   type: "beat",
-                };
-                selAnswers.push(beatObj);
+                });
               }
               if (teacherMode) multiAnswer();
             });
 
-            const parentElement = document.getElementById("target" + exIndex);
-            if (parentElement) {
-              parentElement.style.position = "relative";
-              parentElement.appendChild(bar);
-              parentElement.appendChild(coverBox);
+            // Append rect elements to SVG <g> group
+            const svgGroup = svgElement.querySelector("g");
+            if (svgGroup) {
+              svgGroup.appendChild(bar);
+              svgGroup.appendChild(coverBox);
             }
+          };
+
+          // --- First beat bar creation: beatSum exceeds one full beat ---
+          if (beatSum > visualObjs[0].getBeatLength()) {
+            const barStartPt = toSvgCoords(svgElement, barStartX, 0);
+            const noteLeft = noteElems.getBoundingClientRect().left;
+            const noteRight = noteElems.nextSibling.getBoundingClientRect().left;
+            const noteRightPt = toSvgCoords(svgElement, noteRight, 0);
+            const noteLeftPt = toSvgCoords(svgElement, noteLeft, 0);
+
+            const noteTopPt = toSvgCoords(svgElement, 0, noteElems.getBoundingClientRect().top);
+            const topLinePt = topLines && topLines[staff]
+              ? toSvgCoords(svgElement, 0, topLines[staff].getBoundingClientRect().top)
+              : noteTopPt;
+            
+            const barTopY = Math.min(noteTopPt.y, topLinePt.y) - 15;
+
+            let barWidth: number;
+            if (Math.floor(beatSum / visualObjs[0].getBeatLength()) === beatSum / visualObjs[0].getBeatLength()) {
+              // Full beat division
+              barWidth = (noteRightPt.x - barStartPt.x) * (1 / (beatSum / visualObjs[0].getBeatLength())) - 5;
+            } else {
+              // Partial beat division
+              barWidth = ((noteRightPt.x - noteLeftPt.x) * 2) / 3;
+              remainLen = ((noteRightPt.x - noteLeftPt.x) * 1) / 3;
+            }
+
+            addRects(barStartPt.x, barTopY, barWidth, 5);
 
             totalSum = beatSum;
             beatSum -= visualObjs[0].getBeatLength();
             noteCount = 0;
             created = true;
-
-            // Increment beat index for next beat in same measure
             currentBeatIndex++;
           }
 
+          // --- Second beat bar creation: beatSum matches full beat exactly ---
           if (beatSum === visualObjs[0].getBeatLength()) {
-            const bar = document.createElement("div");
-            bar.classList.add("bar");
-            bar.style.position = "absolute";
+            const barStartPt = toSvgCoords(svgElement, barStartX, 0);
+            const noteLeft = noteElems.getBoundingClientRect().left;
+            const noteRight = noteElems.nextSibling.getBoundingClientRect().left;
+            const noteRightPt = toSvgCoords(svgElement, noteRight, 0);
+            const noteLeftPt = toSvgCoords(svgElement, noteLeft, 0);
 
-            const coverBox = document.createElement("div");
-            coverBox.classList.add("cover-box");
-            coverBox.style.position = "absolute";
+            const noteTopPt = toSvgCoords(svgElement, 0, noteElems.getBoundingClientRect().top);
+            const topLinePt = topLines && topLines[staff]
+              ? toSvgCoords(svgElement, 0, topLines[staff].getBoundingClientRect().top)
+              : noteTopPt;
 
-            if (topLines) {
-              if (topLines[staff]) {
-                const topBox = topLines[staff].getBoundingClientRect();
-                // bar.style.top = topBox.top - boundingBox.top - 10 + "px";
-                bar.style.top =
-                  noteElems.getBoundingClientRect().top - boundingBox.top - 15 <
-                  topBox.top - boundingBox.top - 15
-                    ? noteElems.getBoundingClientRect().top -
-                      boundingBox.top -
-                      15 + "px"
-                    : topBox.top -
-                      boundingBox.top -
-                      15 +
-                      "px";
-              }
-            }
+            const barTopY = Math.min(noteTopPt.y, topLinePt.y) - 15;
+            let barX = barStartPt.x;
+            let barWidth: number;
 
             if (created) {
               if (note.duration < beatSum) {
-                bar.style.left =
-                  noteElems.getBoundingClientRect().left -
-                  boundingBox.left -
-                  remainLen +
-                  5 +
-                  "px";
-                bar.style.width =
-                  noteElems.nextSibling.getBoundingClientRect().left -
-                  noteElems.getBoundingClientRect().left +
-                  remainLen -
-                  5 +
-                  "px";
+                // Partial leftover note
+                barX = toSvgCoords(svgElement, noteLeft - remainLen + 5, 0).x;
+                barWidth = noteRightPt.x - noteLeftPt.x + remainLen - 5;
               } else {
-                bar.style.width =
-                  (noteElems.nextSibling.getBoundingClientRect().left -
-                    barStartX) /
-                    Math.round(totalSum / visualObjs[0].getBeatLength()) -
-                  5 +
-                  "px";
-                bar.style.left =
-                  barStartX -
-                  boundingBox.left +
-                  (noteElems.nextSibling.getBoundingClientRect().left - barStartX) /
-                    (totalSum / visualObjs[0].getBeatLength()) +
-                  "px";
+                // Continuing bar from previous segment
+                barWidth = (noteRightPt.x - barStartPt.x) / Math.round(totalSum / visualObjs[0].getBeatLength()) - 5;
+                barX =
+                  barStartPt.x +
+                  (noteRightPt.x - barStartPt.x) / (totalSum / visualObjs[0].getBeatLength());
               }
-              bar.style.backgroundColor = "blue";
               created = false;
             } else {
-              bar.style.left = barStartX - boundingBox.left + "px";
-              bar.style.width =
-                noteElems.nextSibling.getBoundingClientRect().left -
-                barStartX -
-                5 +
-                "px";
-              bar.style.backgroundColor = "blue";
-              created = false;
+              // Simple full beat bar
+              barWidth = noteRightPt.x - barStartPt.x - 5;
             }
-            bar.style.height = "5px";
-            bar.style.opacity = "0.2";
 
-            coverBox.style.top = bar.style.top;
-            coverBox.style.left = bar.style.left;
-            coverBox.style.width = bar.style.width;
-            coverBox.style.height =
-              boundingBox.height / 2 / staffArray.length + "px";
-            coverBox.style.backgroundColor = "blue";
-            coverBox.style.opacity = "0";
-            coverBox.style.pointerEvents = "none";
+            addRects(barX, barTopY, barWidth, 5);
 
-            // Assign beat index for this overlay
-            const beatIndexForOverlay = currentBeatIndex;
-            bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
-
-            bar.addEventListener("click", () => {
-              if (bar.getAttribute("data-selected") === "true") {
-                bar.setAttribute("data-selected", "false");
-                bar.style.opacity = "0.2";
-                coverBox.style.opacity = "0";
-                const index = selAnswers.findIndex(
-                  (item) =>
-                    item.type === "beat" &&
-                    item.measurePos == measure &&
-                    item.staffPos == staff &&
-                    item.beatIndex == beatIndexForOverlay
-                );
-                if (index !== -1) {
-                  selAnswers.splice(index, 1);
-                }
-              } else {
-                bar.setAttribute("data-selected", "true");
-                bar.style.opacity = "1";
-                coverBox.style.opacity = "0.5";
-                const beatObj = {
-                  measurePos: measure,
-                  staffPos: staff,
-                  beatIndex: beatIndexForOverlay,
-                  type: "beat",
-                };
-                selAnswers.push(beatObj);
-              }
-              if (teacherMode) multiAnswer();
-            });
-
-            const parentElement = document.getElementById("target" + exIndex);
-            if (parentElement) {
-              parentElement.style.position = "relative";
-              parentElement.appendChild(bar);
-              parentElement.appendChild(coverBox);
-            }
             beatSum = 0;
             noteCount = 0;
-            // Increment beat index after a beat is completed
             currentBeatIndex++;
           }
         }
@@ -580,6 +509,17 @@ export function Exercise({
     }
   };
 
+  function toSvgCoords(svg: SVGSVGElement, x: number, y: number) {
+    const pt = svg.createSVGPoint();
+    pt.x = x;
+    pt.y = y;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) {
+      throw new Error("SVG not rendered yet. Cannot compute coordinates.");
+    }
+    return pt.matrixTransform(ctm.inverse());
+  }
+
   const reload = function () {
     for (let i = 0; i < selNotes.length; ) selNotes.pop();
     setSelNotes([]);
@@ -589,8 +529,41 @@ export function Exercise({
   };
 
   const exReload = function () {
+    // Clear all beat selections by resetting all data-selected attributes
+    const selectedBeatElements = document.querySelectorAll("[data-selected='true']");
+    selectedBeatElements.forEach(elem => {
+      elem.setAttribute("data-selected", "false");
+      (elem as HTMLElement).style.opacity = "0.2";
+      
+      // Find the associated cover box and reset it
+      const parentElement = elem.parentElement;
+      if (parentElement) {
+        const coverBox = parentElement.querySelector(".cover-box");
+        if (coverBox) {
+          (coverBox as HTMLElement).style.opacity = "0";
+        }
+      }
+    });
+    
+    // Clear note selections by resetting highlighting
+    const selectedNoteElements = document.querySelectorAll("[selectedTimes='1'], [selectedTimes='2']");
+    selectedNoteElements.forEach(elem => {
+      elem.setAttribute("selectedTimes", "0");
+      setClass(elem, "", "abcjs-note_selected", "#000000");
+    });
+    
+    // Clear the arrays
     for (let i = 0; i < selAnswers.length; ) selAnswers.pop();
     setSelAnswers([]);
+    
+    // Remove any highlight overlays
+    const overlays = document.querySelectorAll(".hint-highlight, .error-highlight");
+    overlays.forEach(overlay => overlay.remove());
+    
+    // Clear feedback
+    setCustomFeedback([]);
+    
+    // Reload the score
     loadScore();
   };
 
@@ -626,6 +599,7 @@ export function Exercise({
           transpos
         );
 
+        data.isNew = false;
         const database = getDatabase();
         const storage = getStorage();
 
@@ -663,13 +637,44 @@ export function Exercise({
     }
   };
 
-  // Updated multiAnswer: for Rhythm exercises, only use beat selections.
+  // Updated multiAnswer: for Rhythm exercises, include both note and beat selections
   const multiAnswer = function () {
+    // Start with an empty array for correct answers
+    const dict: { [label: string]: number | string }[] = [];
+    
+    // For rhythm exercises, include both notes AND beats
     if (tags.includes("Rhythm")) {
-      setCorrectAnswers([...selAnswers]);
+      // First add all selected notes
+      for (let i = 0; i < selNotes.length; i++) {
+        var noteElems = selNotes[i].abselem.elemset[0];
+        const dict2: { [label: string]: number | string } = {
+          index: noteElems.getAttribute("index"),
+          staffPos: noteElems.getAttribute("staffPos"),
+          measurePos: noteElems.getAttribute("measurePos"),
+          selectedTimes: noteElems.getAttribute("selectedTimes"),
+          feedback: noteElems.getAttribute("feedback"),
+          type: "note",
+        };
+        dict.push(dict2);
+      }
+      
+      // Then add all beat selections
+      selAnswers.forEach((ans) => {
+        if (ans.type === "beat") {
+          dict.push({
+            measurePos: ans.measurePos,
+            staffPos: ans.staffPos,
+            beatIndex: ans.beatIndex,
+            type: "beat"
+          });
+        }
+      });
+      
+      setCorrectAnswers(dict);
       return;
     }
-    const dict: { [label: string]: number | string }[] = [];
+    
+    // Non-rhythm exercise handling (unchanged)
     for (let i = 0; i < selNotes.length; i++) {
       var noteElems = selNotes[i].abselem.elemset[0];
       const dict2: { [label: string]: number | string } = {
@@ -682,19 +687,7 @@ export function Exercise({
       };
       dict.push(dict2);
     }
-
-    if (tags.includes("Rhythm")) {
-      selAnswers.forEach((ans) => {
-        if (
-          ans.type === "beat" &&
-          !dict.find(
-            (d) =>
-              d.measurePos == ans.measurePos && d.beatIndex == ans.beatIndex
-          )
-        )
-          dict.push(ans);
-      });
-    }
+    
     setCorrectAnswers(dict);
   };
 
@@ -870,240 +863,405 @@ export function Exercise({
     return instrumentNames;
   }
 
+  const selAnswersRef = useRef<any[]>([]);
+  useEffect(() => {
+    selAnswersRef.current = selAnswers;
+  }, [selAnswers]);
   // Updated checkAnswers: branch for rhythm exercises
   const checkAnswers = function () {
-    const instruments = getInstrumentList(exerciseData.score);
-
-    if (tags.includes("Rhythm")) {
-      var feedback: string[] = [];
-      var plural = " are ";
-      if (correctAnswers.length === 1) plural = " is ";
+    if (tags.includes("Rhythm") && tags.length > 1) {
+      const instruments = getInstrumentList(exerciseData.score);
+      
+      // Define proper types for beat and note selections
+      type BeatSelection = {
+        type: 'beat';
+        measurePos: number;
+        staffPos: number;
+        beatIndex: number;
+      };
+      
+      type NoteSelection = {
+        type: 'note';
+        measurePos: number;
+        staffPos: number;
+        index: number;
+        selectedTimes: number;
+      };
+      
+      type CombinedSelection = BeatSelection | NoteSelection;
+      
+      // Check for all elements with data-selected="true" to find selected beats
+      const selectedBeatElements = document.querySelectorAll("[data-selected='true']");
+      const selectedBeats: BeatSelection[] = Array.from(selectedBeatElements).map(elem => ({
+        type: "beat" as const,
+        measurePos: Number(elem.closest(".bar")?.getAttribute("data-measure-pos")) || 
+                    Number(elem.getAttribute("data-measure-pos")),
+        staffPos: Number(elem.closest(".bar")?.getAttribute("data-staff-pos")) || 
+                  Number(elem.getAttribute("data-staff-pos")),
+        beatIndex: Number(elem.getAttribute("data-beatIndex"))
+      })).filter(beat => !isNaN(beat.measurePos) && !isNaN(beat.beatIndex));
+      
+      // Get all selected notes by checking for selectedTimes attribute
+      const selectedNoteElements = document.querySelectorAll("[selectedTimes='1'], [selectedTimes='2']");
+      const selectedNotes: NoteSelection[] = Array.from(selectedNoteElements).map(elem => ({
+        type: "note" as const,
+        measurePos: Number(elem.getAttribute("measurePos")),
+        staffPos: Number(elem.getAttribute("staffPos")),
+        index: Number(elem.getAttribute("index")),
+        selectedTimes: Number(elem.getAttribute("selectedTimes"))
+      }));
+      
+      // Combine selections for comparison
+      const combinedSelections: CombinedSelection[] = [...selectedBeats, ...selectedNotes];
+      console.log("Combined selections:", combinedSelections);
+      
+      // Get correct answers that include both notes and beats
+      const currentCorrectAnswers = [...correctAnswers].map(ans => ({
+        measurePos: Number(ans.measurePos),
+        staffPos: Number(ans.staffPos),
+        beatIndex: Number(ans.beatIndex),
+        index: Number(ans.index),
+        selectedTimes: Number(ans.selectedTimes),
+        type: ans.type as 'beat' | 'note',
+        feedback: ans.feedback
+      }));
+      console.log("Correct answers:", currentCorrectAnswers);
+      
+      let feedback: string[] = [];
       let allCorrect = true;
+      const plural = currentCorrectAnswers.length === 1 ? " is " : " are ";
       
-      feedback = [
-        "You selected " +
-          selAnswers.length +
-          " answer(s). There" +
-          plural +
-          correctAnswers.length +
-          " correct answer(s).",
-      ];
-
-      // Compare teacher-marked correct beats with student selections
-      correctAnswers.forEach((corr) => {
-        const found = selAnswers.find(
-          (s) =>
-            s.measurePos == corr.measurePos && s.beatIndex == corr.beatIndex
-        );
-        if (!found) {
-          allCorrect = false;
-          if (corr.selectedTimes === '3') {
-            if (instruments[Number(corr.staffPos)] !== undefined) {
-              feedback = [
-                ...feedback,
-                `\nMissing correct beat: Measure ${Number(corr.measurePos) + 1} in the ${instruments[Number(corr.staffPos)]}, Beat ?`
-              ];
-            } else {
-              feedback = [
-                ...feedback,
-                `\nMissing correct beat: Measure ${Number(corr.measurePos) + 1}, Beat ?`
-              ];
-            }
-          } else {
-            if (instruments[Number(corr.staffPos)] !== undefined) {
-              feedback = [
-                ...feedback,
-                `\nTry checking Measure ${Number(corr.measurePos) + 1} in the ${instruments[Number(corr.staffPos)]} staff more carefully!`
-              ];
-            } else {
-              feedback = [
-                ...feedback,
-                `\nTry checking Measure ${Number(corr.measurePos) + 1} more carefully!`
-              ];
-            }
-          }
-        }
-      });
+      feedback.push(
+        `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`
+      );
       
-      selAnswers.forEach((sel) => {
-        const found = correctAnswers.find(
-          (c) =>
-            c.measurePos == sel.measurePos && c.beatIndex == sel.beatIndex
-        );
-        if (!found) {
-          allCorrect = false;
-          if (sel.beatIndex) {
-            if (instruments[Number(sel.staffPos)] !== undefined) {
-              feedback = [
-                ...feedback,
-                `\nIncorrect beat selected: Measure ${Number(sel.measurePos) + 1} in the ${instruments[Number(sel.staffPos)]}, Beat ${sel.beatIndex}.`
-              ];
-            }
-            else {
-              feedback = [
-                ...feedback,
-                `\nIncorrect beat selected: Measure ${Number(sel.measurePos) + 1}, Beat ${sel.beatIndex}.`
-              ];
-            }
-          } else {
-            if (instruments[Number(sel.abselem.elemset[0].getAttribute("staffPos"))] !== undefined) {
-              feedback = [
-                ...feedback,
-                `\nWrong answer selected at Measure ${Number(sel.abselem.elemset[0].getAttribute("measurePos")) + 1} in the ${instruments[Number(sel.abselem.elemset[0].getAttribute("staffPos"))]} staff.`
-              ];
-            } else {
-              feedback = [
-                ...feedback,
-                `\nWrong answer selected at Measure ${Number(sel.abselem.elemset[0].getAttribute("measurePos")) + 1}.`
-              ];
-            }
-          }
+      // Check for missing correct answers (both notes and beats)
+      currentCorrectAnswers.forEach((corr) => {
+        let found = false;
+        
+        if (corr.type === "beat") {
+          // Check if this beat was selected
+          found = combinedSelections.some(s => 
+            s.type === "beat" && 
+            Number(s.measurePos) === Number(corr.measurePos) && 
+            Number(s.beatIndex) === Number(corr.beatIndex)
+          );
           
+          if (!found) {
+            allCorrect = false;
+            console.log(`Missing beat: measure ${corr.measurePos}, beat ${corr.beatIndex}, staff ${corr.staffPos}`);
+            
+            if (!isNaN(corr.staffPos) && instruments[Number(corr.staffPos)] !== undefined) {
+              feedback.push(
+                `\nMissing correct beat in Measure ${Number(corr.measurePos) + 1} on the ${instruments[Number(corr.staffPos)]} staff.`
+              );
+            } else {
+              feedback.push(`\nMissing correct beat in Measure ${Number(corr.measurePos) + 1}.`);
+            }
+          }
+        } else if (corr.type === "note") {
+          // Check if this note was selected
+          found = combinedSelections.some(s => 
+            s.type === "note" && 
+            Number(s.measurePos) === Number(corr.measurePos) && 
+            Number(s.index) === Number(corr.index)
+          );
+          
+          if (!found) {
+            allCorrect = false;
+            console.log(`Missing note: measure ${corr.measurePos}, index ${corr.index}, staff ${corr.staffPos}`);
+            
+            if (!isNaN(corr.staffPos) && instruments[Number(corr.staffPos)] !== undefined) {
+              feedback.push(
+                `\nMissing correct note in Measure ${Number(corr.measurePos) + 1} on the ${instruments[Number(corr.staffPos)]} staff.`
+              );
+            } else {
+              feedback.push(`\nMissing correct note in Measure ${Number(corr.measurePos) + 1}.`);
+            }
+          }
         }
       });
-      if (allCorrect) {
+      
+      // Check for extra (incorrect) selections
+      combinedSelections.forEach((sel) => {
+        let found = false;
+        
+        if (sel.type === "beat") {
+          // Check if this beat is correct
+          found = currentCorrectAnswers.some(c => 
+            c.type === "beat" && 
+            Number(c.measurePos) === Number(sel.measurePos) && 
+            Number(c.beatIndex) === Number(sel.beatIndex)
+          );
+          
+          if (!found) {
+            allCorrect = false;
+            console.log(`Extra beat: measure ${sel.measurePos}, beat ${sel.beatIndex}, staff ${sel.staffPos}`);
+            
+            if (!isNaN(sel.staffPos) && instruments[Number(sel.staffPos)] !== undefined) {
+              feedback.push(
+                `\nIncorrect beat selected in Measure ${Number(sel.measurePos) + 1} on the ${instruments[Number(sel.staffPos)]} staff (Beat ${sel.beatIndex}).`
+              );
+            } else {
+              feedback.push(
+                `\nIncorrect beat selected in Measure ${Number(sel.measurePos) + 1}, Beat ${sel.beatIndex}.`
+              );
+            }
+          }
+        } else if (sel.type === "note") {
+          // Check if this note is correct
+          found = currentCorrectAnswers.some(c => 
+            c.type === "note" && 
+            Number(c.measurePos) === Number(sel.measurePos) && 
+            Number(c.index) === Number(sel.index)
+          );
+          
+          if (!found) {
+            allCorrect = false;
+            console.log(`Extra note: measure ${sel.measurePos}, index ${sel.index}, staff ${sel.staffPos}`);
+            
+            if (!isNaN(sel.staffPos) && instruments[Number(sel.staffPos)] !== undefined) {
+              feedback.push(
+                `\nIncorrect note selected in Measure ${Number(sel.measurePos) + 1} on the ${instruments[Number(sel.staffPos)]} staff.`
+              );
+            } else {
+              feedback.push(
+                `\nIncorrect note selected in Measure ${Number(sel.measurePos) + 1}.`
+              );
+            }
+          }
+        }
+      });
+      
+      if (allCorrect && combinedSelections.length > 0) {
         feedback = ["Great job!"];
       }
-      setCustomFeedback([...feedback]);
+      
+      setCustomFeedback(feedback);
+      return;
+    }
+    
+    else if (tags.includes("Rhythm") && tags.length == 1){
+      const instruments = getInstrumentList(exerciseData.score);
+      
+      // Define proper types for beat and note selections
+      type BeatSelection = {
+        type: 'beat';
+        measurePos: number;
+        staffPos: number;
+        beatIndex: number;
+      };
+      
+      type CombinedSelection = BeatSelection;
+      
+      // Check for all elements with data-selected="true" to find selected beats
+      const selectedBeatElements = document.querySelectorAll("[data-selected='true']");
+      const selectedBeats: BeatSelection[] = Array.from(selectedBeatElements).map(elem => ({
+        type: "beat" as const,
+        measurePos: Number(elem.closest(".bar")?.getAttribute("data-measure-pos")) || 
+                    Number(elem.getAttribute("data-measure-pos")),
+        staffPos: Number(elem.closest(".bar")?.getAttribute("data-staff-pos")) || 
+                  Number(elem.getAttribute("data-staff-pos")),
+        beatIndex: Number(elem.getAttribute("data-beatIndex"))
+      })).filter(beat => !isNaN(beat.measurePos) && !isNaN(beat.beatIndex));
+      
+      // Combine selections for comparison
+      const combinedSelections: CombinedSelection[] = [...selectedBeats];
+      console.log("Combined selections:", combinedSelections);
+      
+      // Get correct answers that include both notes and beats
+      const currentCorrectAnswers = [...correctAnswers].map(ans => ({
+        measurePos: Number(ans.measurePos),
+        staffPos: Number(ans.staffPos),
+        beatIndex: Number(ans.beatIndex),
+        type: ans.type as 'beat',
+        feedback: ans.feedback
+      }));
+      console.log("Correct answers:", currentCorrectAnswers);
+      
+      let feedback: string[] = [];
+      let allCorrect = true;
+      const plural = currentCorrectAnswers.length === 1 ? " is " : " are ";
+      
+      feedback.push(
+        `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`
+      );
+      
+      // Check for missing correct answers (both notes and beats)
+      currentCorrectAnswers.forEach((corr) => {
+        let found = false;
+        
+        if (corr.type === "beat") {
+          // Check if this beat was selected
+          found = combinedSelections.some(s => 
+            s.type === "beat" && 
+            Number(s.measurePos) === Number(corr.measurePos) && 
+            Number(s.beatIndex) === Number(corr.beatIndex)
+          );
+          
+          if (!found) {
+            allCorrect = false;
+            console.log(`Missing beat: measure ${corr.measurePos}, beat ${corr.beatIndex}, staff ${corr.staffPos}`);
+            
+            if (!isNaN(corr.staffPos) && instruments[Number(corr.staffPos)] !== undefined) {
+              feedback.push(
+                `\nMissing correct beat in Measure ${Number(corr.measurePos) + 1} on the ${instruments[Number(corr.staffPos)]} staff.`
+              );
+            } else {
+              feedback.push(`\nMissing correct beat in Measure ${Number(corr.measurePos) + 1}.`);
+            }
+          }
+        } 
+      });
+      
+      // Check for extra (incorrect) selections
+      combinedSelections.forEach((sel) => {
+        let found = false;
+        
+        if (sel.type === "beat") {
+          // Check if this beat is correct
+          found = currentCorrectAnswers.some(c => 
+            c.type === "beat" && 
+            Number(c.measurePos) === Number(sel.measurePos) && 
+            Number(c.beatIndex) === Number(sel.beatIndex)
+          );
+          
+          if (!found) {
+            allCorrect = false;
+            console.log(`Extra beat: measure ${sel.measurePos}, beat ${sel.beatIndex}, staff ${sel.staffPos}`);
+            
+            if (!isNaN(sel.staffPos) && instruments[Number(sel.staffPos)] !== undefined) {
+              feedback.push(
+                `\nIncorrect beat selected in Measure ${Number(sel.measurePos) + 1} on the ${instruments[Number(sel.staffPos)]} staff (Beat ${sel.beatIndex}).`
+              );
+            } else {
+              feedback.push(
+                `\nIncorrect beat selected in Measure ${Number(sel.measurePos) + 1}, Beat ${sel.beatIndex}.`
+              );
+            }
+          }
+        } 
+      });
+      
+      if (allCorrect && combinedSelections.length > 0) {
+        feedback = ["Great job!"];
+      }
+      
+      setCustomFeedback(feedback);
       return;
     }
 
-    // Existing logic for non-rhythm exercises:
+    
+    // Non-Rhythm branch (existing logic, unchanged)
     var tmpSelected = [...selAnswers];
     var tmpCorrect = [...correctAnswers];
     var feedback: string[] = [];
-
+   
     tmpSelected.sort((i1, i2) => {
-      if (
-        (i1.abselem.elemset[0].getAttribute("index") as number) >
-        (i2.abselem.elemset[0].getAttribute("index") as number)
-      )
-        return 1;
-      if (
-        (i1.abselem.elemset[0].getAttribute("index") as number) <
-        (i2.abselem.elemset[0].getAttribute("index") as number)
-      )
-        return -1;
-      return 0;
+      const idx1 = Number(i1.abselem.elemset[0].getAttribute("index"));
+      const idx2 = Number(i2.abselem.elemset[0].getAttribute("index"));
+      return idx1 - idx2;
     });
-
-    let closeList: Number[] = [];
-    let wrongList = [];
-
-    for (
-      var i = 0, j = 0;
-      i < correctAnswers.length &&
-      j < selAnswers.length &&
-      tmpCorrect[i] !== undefined;
-    ) {
+   
+    let closeList: number[] = [];
+    let wrongList: any[] = [];
+   
+    for (var i = 0, j = 0; i < tmpCorrect.length && j < tmpSelected.length;) {
       let noteElems = tmpSelected[j].abselem.elemset[0];
-      if (noteElems.getAttribute("index") === tmpCorrect[i]["index"]) {
-        if (
-          noteElems.getAttribute("selectedTimes") ===
-          tmpCorrect[i]["selectedTimes"]
-        )
-          tmpCorrect = tmpCorrect.filter(function (ans) {
-            return ans["index"] !== tmpCorrect[i]["index"];
-          });
-        else closeList.push(Number(tmpCorrect[i]["index"]));
+      const indexSelected = Number(noteElems.getAttribute("index"));
+      const indexCorrect = Number(tmpCorrect[i]["index"]);
+      if (indexSelected === indexCorrect) {
+        if (noteElems.getAttribute("selectedTimes") === tmpCorrect[i]["selectedTimes"]) {
+          tmpCorrect = tmpCorrect.filter((ans) => Number(ans["index"]) !== indexCorrect);
+        } else {
+          closeList.push(indexCorrect);
+        }
         j++;
-      } else if (noteElems.getAttribute("index") > tmpCorrect[i]["index"]) i++;
-      else if (noteElems.getAttribute("index") < tmpCorrect[i]["index"]) {
+      } else if (indexSelected > indexCorrect) {
+        i++;
+      } else if (indexSelected < indexCorrect) {
         wrongList.push(noteElems);
         j++;
       }
     }
-
-    if (
-      tmpCorrect.length === 0 &&
-      tmpSelected.length === correctAnswers.length
-    ) {
+   
+    if (tmpCorrect.length === 0 && tmpSelected.length === correctAnswers.length) {
       feedback = ["Great job identifying the errors in this passage!"];
     } else if (tmpSelected.length !== correctAnswers.length) {
-      var plural = " are ";
-      if (correctAnswers.length === 1) plural = " is ";
-      feedback = [`\nYou selected ${selAnswers.length} answer(s). There  ${plural} ${correctAnswers.length} correct answer(s).`];
-
+      var pluralText = correctAnswers.length === 1 ? " is " : " are ";
+      feedback = [
+        `\nYou selected ${selAnswers.length} answer(s). There${pluralText}${correctAnswers.length} correct answer(s). Here are some specific places to look at and listen to more closely:`
+      ];
+   
       for (let i = 0; i < tmpCorrect.length; i++) {
-        feedback = [
-          ...feedback,
-          `\nTry checking Measure ${Number(tmpCorrect[i]["measurePos"]) + 1} in the ${instruments[Number(tmpCorrect[i]["staffPos"])]} staff more carefully!`
-        ];
+        feedback.push(
+          `\nMeasure ${Number(tmpCorrect[i]["measurePos"]) + 1}, Staff ${Number(tmpCorrect[i]["staffPos"]) + 1}`
+        );
         highlightMeasure(wrongList, tmpCorrect);
       }
       for (let i = 0; i < wrongList.length; i++) {
-        feedback = [
-          ...feedback,
-          `\nWrong answer selected at Measure ${Number(wrongList[i].getAttribute("measurePos")) + 1} in the ${instruments[Number(wrongList[i].getAttribute("staffPos"))]} staff!`
-        ];
+        feedback.push(
+          `\nWrong answer selected at: Measure ${Number(wrongList[i].getAttribute("measurePos")) + 1}, Staff ${Number(wrongList[i].getAttribute("staffPos")) + 1}`
+        );
         highlightMeasure(wrongList, tmpCorrect);
       }
     } else if (tmpCorrect.length === correctAnswers.length) {
       feedback = [
-        "Keep trying; the more you practice the better you will get.",
+        "Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:"
       ];
       for (let i = 0; i < tmpCorrect.length; i++) {
-        feedback = [
-          ...feedback,
-          `\nTry checking Measure ${Number(tmpCorrect[i]["measurePos"]) + 1} in the ${instruments[Number(tmpCorrect[i]["staffPos"])]} staff more carefully!`
-        ];
+        feedback.push(
+          `\nMeasure ${Number(tmpCorrect[i]["measurePos"]) + 1}, Staff ${Number(tmpCorrect[i]["staffPos"]) + 1}`
+        );
         highlightMeasure(wrongList, tmpCorrect);
         let addtlFeedback = tmpCorrect[i]["feedback"];
         if (
           closeList.includes(Number(tmpCorrect[i]["index"])) &&
           !tmpCorrect[i]["feedback"]
             .toString()
-            .startsWith(
-              "You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). "
-            )
-        )
+            .startsWith("You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). ")
+        ) {
           addtlFeedback =
             "You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). " +
             tmpCorrect[i]["feedback"];
+        }
         if (addtlFeedback !== "") {
           let add = feedback.pop();
-          feedback = [
-            ...feedback,
-            add + ". Additional feedback: " + addtlFeedback,
-          ];
+          feedback.push(add + ". Additional feedback: " + addtlFeedback);
           highlightMeasure(wrongList, tmpCorrect);
         }
       }
     } else if (tmpCorrect.length < correctAnswers.length) {
       feedback = [
-        "Good work – you've found some of the errors, but here are some specific places to look at and listen to more closely:",
+        "Good work – you've found some of the errors, but here are some specific places to look at and listen to more closely:"
       ];
       for (let i = 0; i < tmpCorrect.length; i++) {
-        feedback = [
-          ...feedback,
-          `\nTry checking Measure ${Number(tmpCorrect[i]["measurePos"]) + 1} in the ${instruments[Number(tmpCorrect[i]["staffPos"])]} staff more carefully!`
-        ];
+        feedback.push(
+          `\nMeasure ${Number(tmpCorrect[i]["measurePos"]) + 1}, Staff ${Number(tmpCorrect[i]["staffPos"]) + 1}`
+        );
         highlightMeasure(wrongList, tmpCorrect);
         let addtlFeedback = tmpCorrect[i]["feedback"];
         if (
           closeList.includes(Number(tmpCorrect[i]["index"])) &&
           !tmpCorrect[i]["feedback"]
             .toString()
-            .startsWith(
-              "You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). "
-            )
-        )
+            .startsWith("You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). ")
+        ) {
           addtlFeedback =
             "You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). " +
             tmpCorrect[i]["feedback"];
+        }
         if (addtlFeedback !== "") {
           let add = feedback.pop();
-          feedback = [
-            ...feedback,
-            add + ". Additional feedback: " + addtlFeedback,
-          ];
+          feedback.push(add + ". Additional feedback: " + addtlFeedback);
           highlightMeasure(wrongList, tmpCorrect);
         }
       }
     }
-
-    setCustomFeedback([...feedback]);
+   
+    setCustomFeedback(feedback);
   };
+  
 
   const saveFeedback = function (e: React.ChangeEvent<HTMLTextAreaElement>) {
     var feedBox = document.getElementById("note-feedback-" + exIndex);
@@ -1349,6 +1507,14 @@ export function Exercise({
     }
   };
 
+  const handleCancelExercise = (exIndex: number) => {
+    const updatedExercises = allExData.filter(
+      (exercise) => exercise && exercise.exIndex !== exIndex
+    );
+    setAllExData(updatedExercises);
+  };
+  
+
   return (
     <div
       style={{
@@ -1370,6 +1536,15 @@ export function Exercise({
       )}
       {teacherMode ? (
         <span>
+          {ExData.isNew && (
+            <Button 
+              variant="danger" 
+              onClick={() => handleCancelExercise(exIndex)}
+              style={{ marginBottom: "10px" }}
+            >
+              Cancel Exercise Creation
+            </Button>
+          )}
           <div id="forms" style={{ display: "inline-flex", padding: "4px" }}>
             <form id="tags">
               Tags:
@@ -1536,6 +1711,15 @@ export function Exercise({
           <Button variant="success" onClick={save}>
             Save Exercise
           </Button>
+          {teacherMode && exerciseData?.isNew && (
+            <Button
+              variant="secondary"
+              onClick={() => handleCancelExercise(exInd)}
+              style={{ marginLeft: "10px", marginTop: "10px" }}
+            >
+              Cancel
+            </Button>
+          )}
           <Button
             onClick={() => handleExerciseDelete(exIndex)}
             style={{ marginLeft: "10px", marginTop: "10px" }}
@@ -1550,18 +1734,22 @@ export function Exercise({
             <div id={"target" + exIndex} style={score}></div>
           </div>
           <br />
-          <img
-            alt="note-color-key"
-            src={noteKey}
-            width="14%"
-            height="7%"
-            style={{
-              display: "inline-flex",
-              marginRight: "1vw",
-              marginTop: "-2.5vh",
-              borderRadius: "1px",
-            }}
-          />
+          {!rhythmOnly && (
+            <img
+              alt="note-color-key"
+              src={noteKey}
+              width="14%"
+              height="7%"
+              style={{
+                display: "inline-flex",
+                marginRight: "1vw",
+                marginTop: "-2.5vh",
+                borderRadius: "1px",
+              }}
+            
+            />
+          )}
+          
           <div style={{ display: "inline-flex", marginTop: "-2vh" }}>
             {mp3 !== undefined ? (
               <div style={{ marginTop: "2vh" }}>
