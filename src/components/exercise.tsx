@@ -112,6 +112,8 @@ export function Exercise({
   const [mp3File, setMp3File] = useState<File>(mp3);
   const [abcFile, setAbcFile] = useState<string>(abc);
 
+  const [customId, setCustomId] = useState<string>(exerciseData?.customId || "");
+
   //for disabling ui elements
   const rhythmOnly = tags.length === 1 && tags.includes("Rhythm");
 
@@ -596,7 +598,9 @@ export function Exercise({
           tags,
           types,
           meter,
-          transpos
+          transpos,
+          false,
+          customId
         );
 
         data.isNew = false;
@@ -611,12 +615,20 @@ export function Exercise({
 
         const snapshot = await get(dbDataRef);
         if (snapshot.exists()) {
-          await set(dbDataRef, new DBData(data, mp3File.name));
+          // Update existing exercise
+          const existingData = snapshot.val();
+          const updatedData = {
+            ...existingData,
+            customId: customId // Ensure customId is included in the update
+          };
+          await set(dbDataRef, updatedData);
           console.log("Exercise data was updated!");
           alert("exercise data was updated!");
         } else {
-          console.log("Exercise with exIndex does not exist, adding it");
-          await set(dbDataRef, new DBData(data, mp3File.name));
+          // Create new exercise
+          const newData = new DBData(data, mp3File.name);
+          newData.customId = customId; // Ensure customId is included in new data
+          await set(dbDataRef, newData);
           console.log("New exercise added!");
           alert("new exercise added!");
         }
@@ -1532,7 +1544,14 @@ export function Exercise({
           <button onClick={saveTitle}>Save Title</button>
         </span>
       ) : (
-        <h3 onClick={() => setEditingTitle(!editingTitle)}>{customTitle}</h3>
+        <h3 onClick={() => setEditingTitle(!editingTitle)}>
+          {customTitle}
+          {teacherMode && customId && (
+            <span style={{ fontSize: "0.8em", color: "#666", marginLeft: "10px" }}>
+              (ID: {customId})
+            </span>
+          )}
+        </h3>
       )}
       {teacherMode ? (
         <span>
@@ -1546,6 +1565,17 @@ export function Exercise({
             </Button>
           )}
           <div id="forms" style={{ display: "inline-flex", padding: "4px" }}>
+            <form id="customId">
+              Custom ID:
+              <br />
+              <input
+                type="text"
+                value={customId}
+                onChange={(e) => setCustomId(e.target.value)}
+                placeholder="Enter custom ID"
+                style={{ margin: "4px" }}
+              />
+            </form>
             <form id="tags">
               Tags:
               <br />
