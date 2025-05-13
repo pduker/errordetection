@@ -17,6 +17,7 @@ class DBData {
     types: string
     meter: string
     transpos: boolean
+    customId?: string
     constructor(data:ExerciseData | undefined,sound:string){
         //define variables
         if(data !== undefined){
@@ -33,6 +34,7 @@ class DBData {
             this.types = data.types;
             this.meter = data.meter;
             this.transpos = data.transpos;
+            this.customId = data.customId;
         }
         //set to empty otherwise
         else{
@@ -49,6 +51,7 @@ class DBData {
             this.types = "None";
             this.meter = "Anything";
             this.transpos = false;
+            this.customId = "";
         }
     }
     

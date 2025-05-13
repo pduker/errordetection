@@ -32,6 +32,8 @@ export function ExerciseManagementPage({
 
     const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
 
+    const [customId, setCustomId] = useState<string>("");
+
     /* previously used when add/edit mode were separate, keeping for now for posterity
     const modeChange = function () {
         setMode(!mode);
@@ -57,8 +59,8 @@ export function ExerciseManagementPage({
     const createExercise = function () {
         var last = allExData[allExData.sort(indexSort).length-1];
         var newEx: ExerciseData;
-        if(last !== undefined) newEx = new ExerciseData("", undefined, [], "", (last.exIndex) + 1, true,"Exercise " + (allExData.length+1), 1, 1, [], "None", "Anything", false, true);
-        else newEx = new ExerciseData("", undefined, [], "", 0, true,"Exercise " + (allExData.length+1), 1, 1, [], "None", "Anything", false, true);
+        if(last !== undefined) newEx = new ExerciseData("", undefined, [], "", (last.exIndex) + 1, true,"Exercise " + (allExData.length+1), 1, 1, [], "None", "Anything", false, true, customId);
+        else newEx = new ExerciseData("", undefined, [], "", 0, true,"Exercise " + (allExData.length+1), 1, 1, [], "None", "Anything", false, true, customId);
         newEx.isNew = true;
         setAllExData([newEx, ...allExData]);
         setExList([newEx, ...allExData]);
@@ -384,6 +386,16 @@ export function ExerciseManagementPage({
                                         <option value="Ensemble Parts">Ensemble Parts</option>
                                         <option value="Both">Drone & Ensemble Parts</option>
                                     </select>
+                                </form>
+                                <form id="customIdForm" style={{marginLeft: "10px"}}>
+                                    Custom ID:
+                                    <br></br>
+                                    <input 
+                                        type="text" 
+                                        value={customId}
+                                        onChange={(e) => setCustomId(e.target.value)}
+                                        placeholder="Enter custom ID"
+                                    />
                                 </form>
                                 {/*reset sort*/}
                                 <Button variant="danger" onClick={resetSort} style={{marginLeft: "10px"}}>Reset Sort</Button>
