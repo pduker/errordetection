@@ -1508,7 +1508,6 @@ export function Exercise({
         });
         setAllExData(updatedExercises);
         alert("exercise " + exTitle + " deleted!");
-        window.location.reload();
       } else {
         console.log("exercise with" + exIndex + " not found!");
         alert("exercise not found.");
