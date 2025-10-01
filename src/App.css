@@ -24,6 +24,11 @@
   align-items: center;
 }
 
+.Home-title {
+  margin: 0;
+  padding: 0;
+}
+
 .Home-nav {
   align-items: center;
   display: inline;
@@ -32,7 +37,6 @@
 .Home-nav-right {
   margin-left: auto;
 }
-
 
 a {
   color: #114b96; /*Blue that matches UD logo */
@@ -410,11 +414,11 @@ nav ul li a:hover::after {
   overflow: hidden;
   cursor: pointer;
 }
-h2{
+h2 {
   text-align: left;
 }
 
-h5{
+h5 {
   text-align: left;
 }
 .work img {
@@ -731,7 +735,7 @@ nav .fas {
   stroke-width: 2;
 }
 .error-highlight {
-  fill: rgba(255, 0, 0, 0,6);
+  fill: rgba(255, 0, 0, 0, 6);
   stroke: red;
   stroke-width: 2;
 }
