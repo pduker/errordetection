@@ -86,12 +86,12 @@ export function HelpPage({
                 justifyContent: "center",
                 margin: "12px 0"
             }}>
-                <CardLink to="/help/exercises" title="Exercises" subtitle="Browse practice exercises" img={execPage} borderColor="#1aa654" />
-                <CardLink to="/help/filters" title="Filters" subtitle="Sorting and finding exercises" img={filterSec} borderColor="#2b78d8" />
-                <CardLink to="/help/example" title="Exercise Example" subtitle="Score + audio example" img={exExample} borderColor="#f59e42" />
-                <CardLink to="/help/clicking-notes" title="Clicking Notes" subtitle="How to mark errors" img={click} borderColor="#1fb6a8" />
-                <CardLink to="/help/key" title="Color Key" subtitle="What each color means" img={noteKey} borderColor="#9b5fd3" />
-                <CardLink to="/help/check-answers" title="Check Answers" subtitle="Feedback & hints" img={check} borderColor="#e34a4a" />
+                <CardLink to="/help/exercises" title="Exercises" subtitle="Browse practice exercises" borderColor="#1aa654" />
+                <CardLink to="/help/filters" title="Filters" subtitle="Sorting and finding exercises" borderColor="#2b78d8" />
+                <CardLink to="/help/example" title="Exercise Example" subtitle="Score + audio example" borderColor="#f59e42" />
+                <CardLink to="/help/clicking-notes" title="Clicking Notes" subtitle="How to mark errors" borderColor="#1fb6a8" />
+                <CardLink to="/help/key" title="Color Key" subtitle="What each color means" borderColor="#9b5fd3" />
+                <CardLink to="/help/check-answers" title="Check Answers" subtitle="Feedback & hints" borderColor="#e34a4a" />
             </div>
 
             <div style={{textAlign: "center", marginTop: 8}}>
