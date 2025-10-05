@@ -21,7 +21,7 @@ export function HelpPage({
 }) {
     const [error, setError] = useState<boolean>(false);
 
-    const CardLink = ({ to, title, subtitle, img }: { to: string; title: string; subtitle?: string; img?: string }) => {
+    const CardLink = ({ to, title, subtitle, img, borderColor }: { to: string; title: string; subtitle?: string; img?: string; borderColor?: string }) => {
         return (
             <Link to={to} style={{ textDecoration: "none", color: "inherit" }}>
                 <div style={{
@@ -35,7 +35,9 @@ export function HelpPage({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
-                    cursor: "pointer"
+                    cursor: "pointer",
+                    border: `3px solid ${borderColor ?? "transparent"}`,
+                    transition: "transform 120ms ease, box-shadow 120ms ease"
                 }}>
                     <div style={{ textAlign: "left" }}>
                         <div style={{ fontWeight: 700 }}>{title}</div>
@@ -84,12 +86,12 @@ export function HelpPage({
                 justifyContent: "center",
                 margin: "12px 0"
             }}>
-                <CardLink to="/help/exercises" title="Exercises" subtitle="Browse practice exercises" img={execPage} />
-                <CardLink to="/help/filters" title="Filters" subtitle="Sorting and finding exercises" img={filterSec} />
-                <CardLink to="/help/example" title="Exercise Example" subtitle="Score + audio example" img={exExample} />
-                <CardLink to="/help/clicking-notes" title="Clicking Notes" subtitle="How to mark errors" img={click} />
-                <CardLink to="/help/key" title="Color Key" subtitle="What each color means" img={noteKey} />
-                <CardLink to="/help/check-answers" title="Check Answers" subtitle="Feedback & hints" img={check} />
+                <CardLink to="/help/exercises" title="Exercises" subtitle="Browse practice exercises" img={execPage} borderColor="#1aa654" />
+                <CardLink to="/help/filters" title="Filters" subtitle="Sorting and finding exercises" img={filterSec} borderColor="#2b78d8" />
+                <CardLink to="/help/example" title="Exercise Example" subtitle="Score + audio example" img={exExample} borderColor="#f59e42" />
+                <CardLink to="/help/clicking-notes" title="Clicking Notes" subtitle="How to mark errors" img={click} borderColor="#1fb6a8" />
+                <CardLink to="/help/key" title="Color Key" subtitle="What each color means" img={noteKey} borderColor="#9b5fd3" />
+                <CardLink to="/help/check-answers" title="Check Answers" subtitle="Feedback & hints" img={check} borderColor="#e34a4a" />
             </div>
 
             <div style={{textAlign: "center", marginTop: 8}}>
