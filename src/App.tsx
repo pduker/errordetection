@@ -7,6 +7,11 @@ import './App.css';
 //import BoopButton from "./components/audiohander"
 //import { HomePage } from './components/homepage';
 import { HelpPage } from './components/helppage';
+import ExercisesOverview from './components/helpSections/ExercisesOverview';
+import FiltersInfo from './components/helpSections/FiltersInfo';
+import NoteClicking from './components/helpSections/NoteClicking';
+import NoteKey from './components/helpSections/NoteKey';
+import CheckAnswers from './components/helpSections/CheckAnswers';
 import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
@@ -163,7 +168,13 @@ function App() {
             </Routes>
 
             <Routes>
-              <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>} />
+              <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized} />} />
+              <Route path="/help/exercises" element={<ExercisesOverview />} />
+              <Route path="/help/filters" element={<FiltersInfo />} />
+              <Route path="/help/example" element={<ExercisesOverview />} /> {/* or separate Example component */}
+              <Route path="/help/clicking-notes" element={<NoteClicking />} />
+              <Route path="/help/key" element={<NoteKey />} />
+              <Route path="/help/check-answers" element={<CheckAnswers />} />
             </Routes>
           </div>
         </div>
