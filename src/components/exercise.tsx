@@ -10,7 +10,7 @@ import { Button } from "react-bootstrap";
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import noteKey from "../assets/note-color-key.png";
-import path from "path";
+// import path from "path";
 
 const firebaseConfig = {
   apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
@@ -153,7 +153,7 @@ export function Exercise({
     }
   };
 
-  // highlighting function with guard added to avoid accessing undefined properties
+  // highlighting function with guard to avoid accessing undefined properties
   const highlight = function (note: any, klass: any, clicked: boolean): number {
     if (
       !note ||
@@ -276,8 +276,8 @@ export function Exercise({
         staff < staffArray.length;
         i++, j++
       ) {
-        var note = staffArray[staff].voices[0][j];
-        var noteElems = staffArray[staff].voices[0][j].abselem.elemset[0];
+        const note = staffArray[staff].voices[0][j];
+        const noteElems = staffArray[staff].voices[0][j].abselem.elemset[0];
         if (note.el_type === "bar") {
           measure++;
           i--;
@@ -328,7 +328,8 @@ export function Exercise({
             x: number,
             y: number,
             width: number,
-            height: number
+            height: number,
+            beatIndexForOverlay: number
           ) => {
             const bar = document.createElementNS(svgNS, "rect");
             const coverBox = document.createElementNS(svgNS, "rect");
@@ -378,8 +379,7 @@ export function Exercise({
             coverBox.setAttribute("clip-path", staffArray[staff].clipPath);
             coverBox.style.pointerEvents = "none";
 
-            // Add metadata and beat index
-            const beatIndexForOverlay = currentBeatIndex;
+            // Add metadata and beat index (passed in to avoid closing over mutable loop var)
             bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
             bar.setAttribute("data-measure-pos", measure.toString());
             bar.setAttribute("data-staff-pos", staff.toString());
@@ -400,9 +400,9 @@ export function Exercise({
                 const index = selAnswers.findIndex(
                   (item) =>
                     item.type === "beat" &&
-                    item.measurePos == measure &&
-                    item.staffPos == staff &&
-                    item.beatIndex == beatIndexForOverlay
+                    item.measurePos === measure &&
+                    item.staffPos === staff &&
+                    item.beatIndex === beatIndexForOverlay
                 );
                 if (index !== -1) selAnswers.splice(index, 1);
               } else {
@@ -468,7 +468,7 @@ export function Exercise({
               remainLen = ((noteRightPt.x - noteLeftPt.x) * 1) / 3;
             }
 
-            addRects(barStartPt.x, barTopY, barWidth, 5);
+            addRects(barStartPt.x, barTopY, barWidth, 5, currentBeatIndex);
 
             totalSum = beatSum;
             beatSum -= visualObjs[0].getBeatLength();
@@ -526,7 +526,7 @@ export function Exercise({
               barWidth = noteRightPt.x - barStartPt.x - 5;
             }
 
-            addRects(barX, barTopY, barWidth, 5);
+            addRects(barX, barTopY, barWidth, 5, currentBeatIndex);
 
             beatSum = 0;
             noteCount = 0;
@@ -702,12 +702,10 @@ export function Exercise({
         if (fetch !== undefined) fetch(false);
       } else {
         console.log("Incomplete exercise - not saving to database");
-        alert(
-          "Something went wrong - make sure you: \n \
-            -uploaded both a musicxml AND an mp3 file\n \
-            -marked any applicable tags, voice #, and difficulty\n \
-            -selected at least one correct answer"
-        );
+        alert(`Something went wrong - make sure you:
+  - uploaded both a musicxml AND an mp3 file
+  - marked any applicable tags, voice #, and difficulty
+  - selected at least one correct answer`);
       }
     } catch (error) {
       console.error("Error", error);
@@ -754,7 +752,7 @@ export function Exercise({
 
     // Non-rhythm exercise handling (unchanged)
     for (let i = 0; i < selNotes.length; i++) {
-      var noteElems = selNotes[i].abselem.elemset[0];
+      noteElems = selNotes[i].abselem.elemset[0];
       const dict2: { [label: string]: number | string } = {
         index: noteElems.getAttribute("index"),
         staffPos: noteElems.getAttribute("staffPos"),
@@ -1094,7 +1092,7 @@ export function Exercise({
       ).map((elem) => ({
         type: "note" as const,
         measurePos: Number(elem.getAttribute("measurePos")),
-        staffPos: Number(elem.getAttribute("staffPos")),
+        staffPos: Number(elem.getAttribute("StaffPos")),
         index: Number(elem.getAttribute("index")),
         selectedTimes: Number(elem.getAttribute("selectedTimes")),
       }));
@@ -1276,7 +1274,7 @@ export function Exercise({
 
       setCustomFeedback(feedback);
       return;
-    } else if (tags.includes("Rhythm") && tags.length == 1) {
+    } else if (tags.includes("Rhythm") && tags.length === 1) {
       const instruments = getInstrumentList(exerciseData.score);
 
       // Define proper types for beat and note selections
