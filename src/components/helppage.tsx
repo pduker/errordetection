@@ -130,42 +130,47 @@ export function HelpPage({
     }
 
     //rendering page with help information
+    // NOTE: content is scrollable and the admin area is fixed to the viewport bottom
+    // The content area has extra bottom padding so it won't be hidden behind the fixed footer.
     return (
-        <div>
-            <h2 style={{textAlign: "center"}}>Welcome to the Help Page!</h2>
+        <div style={{ height: "100vh", display: "flex", flexDirection: "column"}}>
+            <div style={{ flex: "1 1 auto", overflowY: "auto", padding: 16}}>
+                <h2 style={{textAlign: "center"}}>Welcome to the Help Page!</h2>
 
-            {/* Top grid of clickable cards that navigate to subpages (2-column) */}
-            <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(3, minmax(260px, 360px))",
-                gap: 16,
-                justifyContent: "center",
-                margin: "12px 0"
-            }}>
-                <CardLink to="/help/exercises" title="Exercises" subtitle="Browse practice exercises" borderColor="#1aa654" />
-                <CardLink to="/help/filters" title="Filters" subtitle="Sorting and finding exercises" borderColor="#2b78d8" />
-                <CardLink to="/help/example" title="Exercise Example" subtitle="Score + audio example" borderColor="#f59e42" />
-                <CardLink to="/help/clicking-notes" title="Clicking Notes" subtitle="How to mark errors" borderColor="#1fb6a8" />
-                <CardLink to="/help/key" title="Color Key" subtitle="What each color means" borderColor="#9b5fd3" />
-                <CardLink to="/help/check-answers" title="Check Answers" subtitle="Feedback & hints" borderColor="#e34a4a" />
+                <div style={{textAlign: "center", marginTop: 8}}>
+                    Click a card to open a dedicated help page for that topic.
+                </div>
+
+                {/* Top grid of clickable cards that navigate to subpages (2-column) */}
+                <div style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, minmax(260px, 360px))",
+                    gap: 16,
+                    justifyContent: "center",
+                    margin: "12px 0"
+                }}>
+                    <CardLink to="/help/exercises" title="Exercises" subtitle="Browse practice exercises" borderColor="#1aa654" />
+                    <CardLink to="/help/filters" title="Filters" subtitle="Sorting and finding exercises" borderColor="#2b78d8" />
+                    <CardLink to="/help/example" title="Exercise Example" subtitle="Score + audio example" borderColor="#f59e42" />
+                    <CardLink to="/help/clicking-notes" title="Clicking Notes" subtitle="How to mark errors" borderColor="#1fb6a8" />
+                    <CardLink to="/help/key" title="Color Key" subtitle="What each color means" borderColor="#9b5fd3" />
+                    <CardLink to="/help/check-answers" title="Check Answers" subtitle="Feedback & hints" borderColor="#e34a4a" />
+                </div>
             </div>
 
-            <div style={{textAlign: "center", marginTop: 8}}>
-                Click a card to open a dedicated help page for that topic.
-            </div>
-
-            {/* admin login kept for toggling admin UI elsewhere */}
-            {/* NOTE: Inputs below are currently uncontrolled and lack labels / password masking.
-                Recommended: convert to controlled inputs (useState), add labels, and set
-                password input to type="password" for improved security and UX. */}
-            <div style={{margin: "6px", display: "flex", alignItems: "center", justifyContent: "center"}}>
-                <input id="mng-email" placeholder="Enter admin email..."></input>
-                <span style={{padding: "10px"}}></span>
-                <input id="mng-pwd" placeholder="Enter admin password..."></input>
-                <span style={{padding: "10px"}}></span>
-                <button onClick={checkAuth}>Submit</button>
-            </div>
-            {error ? <div style={{color: "red", textAlign: "center"}}>Incorrect password.</div> : null}
+            {/* Admin footer fixed to viewport bottom (not part of the scrollable content) */}
+            <footer style={{ position: "fixed", left: 0, right: 0, bottom: 0, padding: 15, borderTop: "1px solid #eee", background: "#fafafa", textAlign: "center", zIndex: 10 }}>
+                {/* admin login kept for toggling admin UI elsewhere */}
+                {/* NOTE: Inputs below are currently uncontrolled and lack labels / password masking.
+                    Recommended: convert to controlled inputs (useState), add labels, and set
+                    password input to type="password" for improved security and UX. */}
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 10, flexWrap: "wrap" }}>
+                    <input id="mng-email" placeholder="Enter admin email..."></input>
+                    <input id="mng-pwd" placeholder="Enter admin password..."></input>
+                    <button onClick={checkAuth}>Submit</button>
+                </div>
+                {error ? <div style={{color: "red", marginTop: 8}}>Incorrect password.</div> : null}
+            </footer>
         </div>
     );
 }
