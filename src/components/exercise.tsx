@@ -1528,13 +1528,16 @@ export function Exercise({
 
   return (
     <div
-      style={{
+      style={{  //exercise example box
         margin: "10px",
         padding: "10px",
         backgroundColor: "#fcfcd2",
         borderRadius: "10px",
-        marginLeft: "100px",
-        marginTop: "20px",
+        marginLeft: "180px", // SIR: used to be 100
+        marginTop: "60px", // SIR: changed to not overlap top
+        display: "flex", // SIR: added flex to box
+        flexDirection: "column", // SIR
+        alignItems: "flex-start" // SIR
       }}
     >
       {editingTitle && teacherMode ? (
@@ -1720,7 +1723,7 @@ export function Exercise({
               <Button
                 variant="danger"
                 onClick={reload}
-                style={{ marginLeft: "1vw", float: "right" }}
+                style={{ marginLeft: "1vw", float: "right"}}
               >
                 Reset Answers
               </Button>

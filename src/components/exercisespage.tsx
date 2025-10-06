@@ -444,7 +444,7 @@ export function ExercisesPage({
                     
                 </div> : <></>}
             
-            <div style={{display:"flex", justifyContent: "center"}}>
+            <div style={{display:"flex", justifyContent: "center", marginLeft: "160px"}}> {/* SIR: added marginLeft to back/next button */}
                 <button  className= "btnback" id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
                 <button className= "btnback" id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
             </div>
