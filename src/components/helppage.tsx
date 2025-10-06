@@ -67,15 +67,15 @@ export function HelpPage({
                     width: 260,
                     height: 130,
                     margin: 10,
-                    padding: 12,
-                    backgroundColor: "white",
-                    borderRadius: 8,
+                    padding: 8,
+                    backgroundColor: "rgb(252, 252, 211)", // changed to requested rgb color
+                    borderRadius: 20,
                     boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "space-between",
                     cursor: "pointer",
-                    border: `3px solid ${borderColor ?? "transparent"}`,
+                    border: `4px solid ${borderColor ?? "transparent"}`,
                     transition: "transform 120ms ease, box-shadow 120ms ease"
                 }}>
                     <div style={{ textAlign: "left" }}>
