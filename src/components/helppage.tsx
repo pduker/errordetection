@@ -1,17 +1,44 @@
-//imports
-import { useState } from "react";
+/**
+ * Help Page component
+ *
+ * Purpose:
+ *  - Render a help landing page with topic cards that navigate to subpages.
+ *  - Provide a simple admin login control used to toggle an authorization flag
+ *    elsewhere in the app (backed by Firebase auth).
+ *
+ * Public API:
+ *  - export function HelpPage({ authorized, setAuthorized })
+ *      - authorized: boolean — current authorization state (read-only here)
+ *      - setAuthorized: (authorized: boolean) => void — called to update auth state
+ */
+
+// Un-used imports, but could be used later
 // import { sha256 } from 'js-sha256';
-import noteKey from "../assets/note-color-key.png"
-import exExample from "../assets/excersie-example.png"
-import execPage from "../assets/exc-page.png";
-import filterSec from "../assets/filterPage.png";
-import click from "../assets/noteClick.png";
-import check from "../assets/check-answer.png";
+// import noteKey from "../assets/note-color-key.png"
+// import exExample from "../assets/excersie-example.png"
+// import execPage from "../assets/exc-page.png";
+// import filterSec from "../assets/filterPage.png";
+// import click from "../assets/noteClick.png";
+// import check from "../assets/check-answer.png";
+
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./database"
 
+
 //function for creating the help page, for authorized users
+/**
+ * HelpPage component
+ *
+ * Renders:
+ *  - Header and grid of CardLink items linking to help subpages.
+ *  - An admin login area (email + password + submit) used to toggle the
+ *    authorized state via setAuthorized.
+ *
+ * Note: Inputs in the admin area are currently uncontrolled DOM elements
+ * accessed with document.getElementById. See the file header for recommended changes.
+ */
 export function HelpPage({
     authorized,
     setAuthorized
@@ -21,6 +48,18 @@ export function HelpPage({
 }) {
     const [error, setError] = useState<boolean>(false);
 
+    /**
+     * CardLink
+     *
+     * Small presentational component that renders a clickable card linking to a route.
+     *
+     * Props:
+     *  - to: string         (route to navigate to)
+     *  - title: string      (card title)
+     *  - subtitle?: string  (optional subtitle)
+     *  - img?: string       (optional image src)
+     *  - borderColor?: string (optional border color)
+     */
     const CardLink = ({ to, title, subtitle, img, borderColor }: { to: string; title: string; subtitle?: string; img?: string; borderColor?: string }) => {
         return (
             <Link to={to} style={{ textDecoration: "none", color: "inherit" }}>
@@ -49,7 +88,14 @@ export function HelpPage({
         );
     };
 
-    //checking user with login functionality
+    /**
+     * login
+     *
+     * Sign in using Firebase auth. On success, call setAuthorized(true) and clear errors.
+     * On failure, set the error flag which triggers a simple UI message.
+     *
+     * Note: Avoid logging sensitive data. Only the authenticated user's email is logged here.
+     */
     const login = async (email: string, password: string) => {
         try {
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
@@ -58,11 +104,21 @@ export function HelpPage({
           setAuthorized(true);
           setError(false);
         } catch (error) {
+          // In production, surface a user-friendly message and log error details securely.
           console.error("Login failed");
           setError(true);
         }
     };
     
+    /**
+     * checkAuth
+     *
+     * Read values from the DOM inputs and call `login`.
+     *
+     * Implementation detail:
+     *  - This is using uncontrolled inputs (document.getElementById). Prefer converting
+     *    to controlled inputs with useState or using refs for a cleaner React approach.
+     */
     const checkAuth = function() {
         var box1 = document.getElementById("mng-email");
         var box2 = document.getElementById("mng-pwd");
@@ -99,6 +155,9 @@ export function HelpPage({
             </div>
 
             {/* admin login kept for toggling admin UI elsewhere */}
+            {/* NOTE: Inputs below are currently uncontrolled and lack labels / password masking.
+                Recommended: convert to controlled inputs (useState), add labels, and set
+                password input to type="password" for improved security and UX. */}
             <div style={{margin: "6px", display: "flex", alignItems: "center", justifyContent: "center"}}>
                 <input id="mng-email" placeholder="Enter admin email..."></input>
                 <span style={{padding: "10px"}}></span>
