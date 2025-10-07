@@ -22,6 +22,8 @@
 // import check from "../assets/check-answer.png";
 
 import { useState } from "react";
+import keyIcon from "../assets/helpSectionGlyphs/key-icon.png"
+import excersizesIcon from "../assets/helpSectionGlyphs/excersizes-icon.png"
 import { Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./database"
@@ -59,13 +61,13 @@ export function HelpPage({
      *  - img?: string       (optional image src)
      *  - borderColor?: string (optional border color)
      */
-    const CardLink = ({ to, title, subtitle, img, borderColor }: { to: string; title: string; subtitle?: string; img?: string; borderColor?: string }) => {
+    const CardLink = ({ to, title, subtitle, img, borderColor, icon }: { to: string; title: string; subtitle?: string; img?: string; borderColor?: string; icon?: string }) => {
         return (
             <Link to={to} style={{ textDecoration: "none", color: "inherit", display: "inline-block" }}>
                 <div style={{
-                    width: 260,
+                    width: 280,
                     height: 130,
-                    margin: 0,               // <- removed margin so clickable area matches the Link
+                    margin: 0,
                     padding: 8,
                     backgroundColor: "rgb(252, 252, 211)",
                     borderRadius: 20,
@@ -78,10 +80,15 @@ export function HelpPage({
                     transition: "transform 120ms ease, box-shadow 120ms ease",
                     boxSizing: "border-box"
                 }}>
-                    <div style={{ textAlign: "left" }}>
-                        <div style={{ fontWeight: 700 }}>{title}</div>
-                        {subtitle ? <div style={{ fontSize: 12, marginTop: 6 }}>{subtitle}</div> : null}
+                    <div style={{ textAlign: "left", display: "flex", flexDirection: "column"
+                }}>
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                        {/* icon aligned with the header */}
+                        {icon ? <img src={icon} alt="" style={{ width: 28, height: 28, marginRight: 8, flex: "0 0 auto" }} /> : null}
+                        <div style={{ fontWeight: 600, fontSize:22 }}>{title}</div>
                     </div>
+                    {subtitle ? <div style={{ fontSize: 15, marginTop: 6 }}>{subtitle}</div> : null}
+                 </div>
                     {img ? <img alt={title} src={img} style={{ width: 66, height: 66, objectFit: "cover", borderRadius: 6 }} /> : null}
                 </div>
             </Link>
@@ -147,13 +154,13 @@ export function HelpPage({
                     gridTemplateColumns: "repeat(3, minmax(260px, 360px))",
                     gap: 60,
                     justifyContent: "center",
-                    justifyItems: "center", // center contents inside each grid cell
+                    justifyItems: "center",
                     margin: "30px 0"
                 }}>
-                    <CardLink to="/help/exercises" title="Exercises" subtitle="Browse practice exercises" borderColor="#1aa654" />
+                    <CardLink to="/help/exercises" title="Exercises" subtitle="Browse practice exercises" borderColor="#1aa654" icon={excersizesIcon}/>
                     <CardLink to="/help/filters" title="Filters" subtitle="Sorting and finding exercises" borderColor="#2b78d8" />
                     <CardLink to="/help/example" title="Exercise Example" subtitle="Score + audio example" borderColor="#f59e42" />
-                    <CardLink to="/help/clicking-notes" title="Clicking Notes" subtitle="How to mark errors" borderColor="#1fb6a8" />
+                    <CardLink to="/help/clicking-notes" title="Clicking Notes" subtitle="How to mark errors" borderColor="#1fb6a8" icon={keyIcon} />
                     <CardLink to="/help/key" title="Color Key" subtitle="What each color means" borderColor="#9b5fd3" />
                     <CardLink to="/help/check-answers" title="Check Answers" subtitle="Feedback & hints" borderColor="#e34a4a" />
                 </div>
