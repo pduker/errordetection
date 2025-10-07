@@ -3,7 +3,18 @@ import { Link } from "react-router-dom";
 
 export default function NoteKey() {
     return (
-        <div style={{padding: 20, display: "flex", flexDirection: "column", alignItems: "stretch", width: "100%", minHeight: "100%", boxSizing: "border-box", flex: 1}}>
+        <div style={{
+            padding: 20,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "stretch",
+            width: "90vw",
+            maxWidth: "100%",
+            minWidth: 0,
+            height: "100vh",
+            boxSizing: "border-box",
+            alignSelf: "stretch"
+        }}>
             <div style={{marginBottom: 12}}>
                 <Link to="/help">← Back to Help</Link>
             </div>
