@@ -62,13 +62,13 @@ export function HelpPage({
      */
     const CardLink = ({ to, title, subtitle, img, borderColor }: { to: string; title: string; subtitle?: string; img?: string; borderColor?: string }) => {
         return (
-            <Link to={to} style={{ textDecoration: "none", color: "inherit" }}>
+            <Link to={to} style={{ textDecoration: "none", color: "inherit", display: "inline-block" }}>
                 <div style={{
                     width: 260,
                     height: 130,
-                    margin: 10,
+                    margin: 0,               // <- removed margin so clickable area matches the Link
                     padding: 8,
-                    backgroundColor: "rgb(252, 252, 211)", // changed to requested rgb color
+                    backgroundColor: "rgb(252, 252, 211)",
                     borderRadius: 20,
                     boxShadow: "0 2px 6px rgba(0,0,0,0.12)",
                     display: "flex",
@@ -76,7 +76,8 @@ export function HelpPage({
                     justifyContent: "space-between",
                     cursor: "pointer",
                     border: `4px solid ${borderColor ?? "transparent"}`,
-                    transition: "transform 120ms ease, box-shadow 120ms ease"
+                    transition: "transform 120ms ease, box-shadow 120ms ease",
+                    boxSizing: "border-box"
                 }}>
                     <div style={{ textAlign: "left" }}>
                         <div style={{ fontWeight: 700 }}>{title}</div>
@@ -147,6 +148,7 @@ export function HelpPage({
                     gridTemplateColumns: "repeat(3, minmax(260px, 360px))",
                     gap: 16,
                     justifyContent: "center",
+                    justifyItems: "center", // center contents inside each grid cell
                     margin: "12px 0"
                 }}>
                     <CardLink to="/help/exercises" title="Exercises" subtitle="Browse practice exercises" borderColor="#1aa654" />
