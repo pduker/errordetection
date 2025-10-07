@@ -40,7 +40,6 @@ import { auth } from "./database"
  * accessed with document.getElementById. See the file header for recommended changes.
  */
 export function HelpPage({
-    authorized,
     setAuthorized
 }: {
     authorized: boolean;
@@ -138,7 +137,7 @@ export function HelpPage({
             <div style={{ flex: "1 1 auto", overflowY: "auto", padding: 16 }}>
                 <h2 style={{ textAlign: "center" }}>Welcome to the Help Page!</h2>
 
-                <div style={{ textAlign: "center", marginTop: 8 }}>
+                <div style={{ textAlign: "center", marginTop: 15 }}>
                     Click a card to open a dedicated help page for that topic.
                 </div>
 
@@ -146,10 +145,10 @@ export function HelpPage({
                 <div style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(3, minmax(260px, 360px))",
-                    gap: 16,
+                    gap: 60,
                     justifyContent: "center",
                     justifyItems: "center", // center contents inside each grid cell
-                    margin: "12px 0"
+                    margin: "30px 0"
                 }}>
                     <CardLink to="/help/exercises" title="Exercises" subtitle="Browse practice exercises" borderColor="#1aa654" />
                     <CardLink to="/help/filters" title="Filters" subtitle="Sorting and finding exercises" borderColor="#2b78d8" />
