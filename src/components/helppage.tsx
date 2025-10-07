@@ -22,8 +22,14 @@
 // import check from "../assets/check-answer.png";
 
 import { useState } from "react";
+
 import keyIcon from "../assets/helpSectionGlyphs/key-icon.png"
 import excersizesIcon from "../assets/helpSectionGlyphs/excersizes-icon.png"
+import checkboxIcon from "../assets/helpSectionGlyphs/checkbox.png"
+import tuning from "../assets/helpSectionGlyphs/tuning.png"
+import example from "../assets/helpSectionGlyphs/example.png"
+import checklist from "../assets/helpSectionGlyphs/checklist.png"
+
 import { Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./database"
@@ -157,17 +163,17 @@ export function HelpPage({
                     justifyItems: "center",
                     margin: "30px 0"
                 }}>
-                    <CardLink to="/help/exercises" title="Exercises" subtitle="Browse practice exercises" borderColor="#1aa654" icon={excersizesIcon}/>
-                    <CardLink to="/help/filters" title="Filters" subtitle="Sorting and finding exercises" borderColor="#2b78d8" />
-                    <CardLink to="/help/example" title="Exercise Example" subtitle="Score + audio example" borderColor="#f59e42" />
+                    <CardLink to="/help/exercises" title="Exercises" subtitle="Browse practice exercises" borderColor="#1aa654" icon={excersizesIcon} />
+                    <CardLink to="/help/filters" title="Filters" subtitle="Sorting and finding exercises" borderColor="#2b78d8" icon={checkboxIcon} />
+                    <CardLink to="/help/example" title="Exercise Example" subtitle="Score + audio example" borderColor="#f59e42" icon={example} />
                     <CardLink to="/help/clicking-notes" title="Clicking Notes" subtitle="How to mark errors" borderColor="#1fb6a8" icon={keyIcon} />
-                    <CardLink to="/help/key" title="Color Key" subtitle="What each color means" borderColor="#9b5fd3" />
-                    <CardLink to="/help/check-answers" title="Check Answers" subtitle="Feedback & hints" borderColor="#e34a4a" />
+                    <CardLink to="/help/key" title="Color Key" subtitle="What each color means" borderColor="#9b5fd3" icon={tuning} />
+                    <CardLink to="/help/check-answers" title="Check Answers" subtitle="Feedback & hints" borderColor="#e34a4a" icon={checklist} />
                 </div>
             </div>
 
             {/* Admin footer fixed to viewport bottom (not part of the scrollable content) */}
-            <footer style={{ position: "fixed", left: 0, right: 0, bottom: 0, padding: 15, borderTop: "1px solid #eee", background: "#fafafa", textAlign: "center", zIndex: 10 }}>
+            <footer style={{ position: "fixed", left: 0, right: 0, bottom: 0, padding: 15, borderTop: "1px solid #eee", background: "rgb(78, 129, 179)", textAlign: "center", zIndex: 10 }}>
                 {/* admin login kept for toggling admin UI elsewhere */}
                 {/* NOTE: Inputs below are currently uncontrolled and lack labels / password masking.
                     Recommended: convert to controlled inputs (useState), add labels, and set
