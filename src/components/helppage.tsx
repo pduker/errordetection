@@ -134,7 +134,7 @@ export function HelpPage({
     // NOTE: content is scrollable and the admin area is fixed to the viewport bottom
     // The content area has extra bottom padding so it won't be hidden behind the fixed footer.
     return (
-        <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+        <div style={{ height: "100vh", width: "90vw", display: "flex", flexDirection: "column" }}>
             <div style={{ flex: "1 1 auto", overflowY: "auto", padding: 16 }}>
                 <h2 style={{ textAlign: "center" }}>Welcome to the Help Page!</h2>
 
