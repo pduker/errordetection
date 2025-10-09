@@ -14,7 +14,7 @@ export function AboutPage() {
                     This website is an error detection practice tool! Choose a category of exercises above to get started, or visit the Help page to learn more. See a problem? Please get in touch with Phil Duker.
                 </div>
                 <br />
-<div style={{ textAlign: 'left' }}>
+                <div style={{ textAlign: 'left' }}>
                     This project was led by Phil Duker with the help of the following wonderful UD students:
                     <ul>
                         <li>Alex Daley</li>
