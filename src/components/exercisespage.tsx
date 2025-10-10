@@ -296,12 +296,10 @@ export function ExercisesPage({
 
     //html to render page
     return (
-        <div style={{ width: "90vw", marginTop: "10px" }}>
-            <div>
-            <h2>Welcome to the Exercises Page!</h2>
-            </div>
-            <h5 style={{fontStyle: "italic"}}>Sort by any of the given fields, then click an exercise to get started.</h5>
-            <div style={{float:'left', width: "30%"}}>
+        <div style={{ width: "100%", marginTop: "10px", display: "flex", flexDirection: "row", minHeight: "350px" }}> {/* SIR: added minHeight to prevent jitter */}
+            <div style={{ paddingRight: "2vw", flexWrap: "wrap",width: "35%", minHeight: "700px", display: "flex", flexDirection: "column"}}> {/* SIR: left column div */}
+            <h2 style={{display: "flex", alignItems: "left"}}>Welcome to the Exercises Page!</h2>
+            <h5 style={{fontStyle: "italic", flexDirection: "column"}}>Sort by any of the given fields, then click an exercise to get started.</h5>
                 <span>
                 <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
                     <form id="tags" style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>
@@ -382,6 +380,7 @@ export function ExercisesPage({
                     </div>
                     
                 </span>
+                <div style={{flex: "1", display: "flex", flexDirection: "column", minWidth:"200px"}}> {/* SIR: listed exercises, added minHeight to prevent jitter */}
                 {/* pull from paginated exercises */}
                 {pageExercises.map(function(exercise){
                     if(exercise !== undefined) {
@@ -392,8 +391,9 @@ export function ExercisesPage({
                         )}
                     else return <></>;
                 })}
+                <div style={{marginTop: "auto"}}>
                 {/* add page navigation buttons, call newly defined functions */}
-                <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                
                         <Button
                             onClick={prevPage}
                             disabled={currentPage === 1}
@@ -423,13 +423,14 @@ export function ExercisesPage({
                         >
                             ›
                         </Button>
+                    </div>
                 </div>
                 {exList.length === 0 ? 
                     !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
                 <div>No exercises with those criteria found!</div> : <></>}
             </div>
-            <div style={{float:'right',width:'65%', marginRight: "2vw"}}>
-                {selExercise !== undefined ? <div>
+            <div style={{ width:'65%', marginLeft: "2vw", flexWrap: "wrap",}}> 
+                {selExercise !== undefined ? <div> {/*SIR: DIV tag for the loaded exercise*/}
                     <Exercise 
                         key={selExercise.exIndex} 
                         teacherMode={false} 

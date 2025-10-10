@@ -1784,7 +1784,7 @@ export function Exercise({
           
           <div style={{ display: "inline-flex", marginTop: "-2vh" }}>
             {mp3 !== undefined ? (
-              <div style={{ marginTop: "2vh", width: "100px"}}>
+              <div style={{ marginTop: "2vh"}}>
                 <AudioHandler file={mp3}></AudioHandler>
               </div>
             ) : (

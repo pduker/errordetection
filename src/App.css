@@ -470,18 +470,17 @@ h5{
 }
 
 .exercise-box { /* SIR: to fix positioning */
-  border: solid black 8px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .responsive-element {
-  display: "inline-flex"
+  display: "inline-flex";
 }
 
 audio {
-  width: 50px;
+  width: 300px;
 }
 
 .btn {
@@ -664,7 +663,7 @@ form {
 nav .fas {
   display: none;
 }
-@media only screen and (max-width: 1000px) {
+@media only screen and (max-width: 1100px) {
   #header {
     background-image: url(assets/musicbg1.jpg);
   }
@@ -734,8 +733,10 @@ nav .fas {
     font-size: 15px;
   }
   .responsive-element { /*edit button so that it shrinks*/
-    width: 50px;
     height: 50px;
+  }
+  audio {
+    width: 150px;
   }
 }
 #msg {
