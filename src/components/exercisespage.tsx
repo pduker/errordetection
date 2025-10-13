@@ -301,7 +301,7 @@ export function ExercisesPage({
             <h2>Welcome to the Exercises Page!</h2>
             </div>
             <h5 style={{fontStyle: "italic"}}>Sort by any of the given fields, then click an exercise to get started.</h5>
-            <div style={{float:'left', width: "30%"}}>
+            <div style={{float:'left', width: "30%", display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start'}}>
                 <span>
                 <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
                     <form id="tags" style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>

@@ -96,10 +96,9 @@ body {
   height: 86.5vh;
   width: 95vw;
   display: flex;
-  box-shadow: inset 0 0 5px grey;
+  justify-content: flex-start;
+  align-items: stretch;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   text-align: center;
   padding: 1vh 1vw 1vh 1vw;
   margin-top: 0px;
