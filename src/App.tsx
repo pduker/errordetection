@@ -17,6 +17,7 @@ import DBData from './interfaces/DBData';
 import { getDatabase } from 'firebase/database';
 import { ref, onValue, DataSnapshot } from 'firebase/database';
 import { getBlob, getStorage, ref as storageRef } from 'firebase/storage';
+import { ExercisesPageWrapper } from './components/exercisepagewrapper';
 
 //import Navbar from "./components/navbar"
 
@@ -137,25 +138,20 @@ function App() {
           <Routes>
               <Route path="/" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>}/>
             </Routes>
-
             <Routes>
-              <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>} />
+              <Route 
+                path="/exercises" 
+                element={
+                <ExercisesPageWrapper
+                  allExData={allExData}
+                  setAllExData={setAllExData}
+                  scoresRet={scoresRetrieved}/>
+                } 
+              />
             </Routes>
             <Routes>
               <Route path="/about" element={<AboutPage/>} />
             </Routes>
-            <Routes>
-              <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>} />
-            </Routes>
-
-            <Routes>
-              <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}/>} />
-            </Routes>
-
-            {/* <Routes>
-              <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]}></ExercisesPage>} />
-            </Routes> */}
-
             <Routes>
               <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase} authorized={authorized}/>} />
             </Routes>
