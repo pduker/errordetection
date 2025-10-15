@@ -18,7 +18,7 @@ export function ExercisesPageWrapper({ allExData, setAllExData, scoresRet }: Exe
   const meter = searchParams.get('meter');
   const transpos = searchParams.get('transpos');
 
-  //Filter the data based on 
+  //Filter the data based on the URL parameters
   const filteredData = allExData.filter((ex) => {
     if (!ex) return false;
 
