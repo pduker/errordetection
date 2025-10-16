@@ -22,14 +22,6 @@
 // import check from "../assets/check-answer.png";
 
 import { useState } from "react";
-
-import keyIcon from "../assets/helpSectionGlyphs/key-icon.png"
-import excersizesIcon from "../assets/helpSectionGlyphs/excersizes-icon.png"
-import checkboxIcon from "../assets/helpSectionGlyphs/checkbox.png"
-import tuning from "../assets/helpSectionGlyphs/tuning.png"
-import example from "../assets/helpSectionGlyphs/example.png"
-import checklist from "../assets/helpSectionGlyphs/checklist.png"
-
 import { Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./database"
@@ -48,6 +40,7 @@ import { auth } from "./database"
  * accessed with document.getElementById. See the file header for recommended changes.
  */
 export function HelpPage({
+    authorized,
     setAuthorized
 }: {
     authorized: boolean;
@@ -67,13 +60,13 @@ export function HelpPage({
      *  - img?: string       (optional image src)
      *  - borderColor?: string (optional border color)
      */
-    const CardLink = ({ to, title, subtitle, img, borderColor, icon }: { to: string; title: string; subtitle?: string; img?: string; borderColor?: string; icon?: string }) => {
+    const CardLink = ({ to, title, subtitle, img, borderColor }: { to: string; title: string; subtitle?: string; img?: string; borderColor?: string }) => {
         return (
             <Link to={to} style={{ textDecoration: "none", color: "inherit", display: "inline-block" }}>
                 <div style={{
-                    width: 280,
+                    width: 260,
                     height: 130,
-                    margin: 0,
+                    margin: 0,               // <- removed margin so clickable area matches the Link
                     padding: 8,
                     backgroundColor: "rgb(252, 252, 211)",
                     borderRadius: 20,
@@ -86,15 +79,10 @@ export function HelpPage({
                     transition: "transform 120ms ease, box-shadow 120ms ease",
                     boxSizing: "border-box"
                 }}>
-                    <div style={{ textAlign: "left", display: "flex", flexDirection: "column"
-                }}>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                        {/* icon aligned with the header */}
-                        {icon ? <img src={icon} alt="" style={{ width: 28, height: 28, marginRight: 8, flex: "0 0 auto" }} /> : null}
-                        <div style={{ fontWeight: 600, fontSize:22 }}>{title}</div>
+                    <div style={{ textAlign: "left" }}>
+                        <div style={{ fontWeight: 700 }}>{title}</div>
+                        {subtitle ? <div style={{ fontSize: 12, marginTop: 6 }}>{subtitle}</div> : null}
                     </div>
-                    {subtitle ? <div style={{ fontSize: 15, marginTop: 6 }}>{subtitle}</div> : null}
-                 </div>
                     {img ? <img alt={title} src={img} style={{ width: 66, height: 66, objectFit: "cover", borderRadius: 6 }} /> : null}
                 </div>
             </Link>
@@ -146,11 +134,11 @@ export function HelpPage({
     // NOTE: content is scrollable and the admin area is fixed to the viewport bottom
     // The content area has extra bottom padding so it won't be hidden behind the fixed footer.
     return (
-        <div style={{ height: "100vh", width: "90vw", display: "flex", flexDirection: "column" }}>
+        <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
             <div style={{ flex: "1 1 auto", overflowY: "auto", padding: 16 }}>
                 <h2 style={{ textAlign: "center" }}>Welcome to the Help Page!</h2>
 
-                <div style={{ textAlign: "center", marginTop: 15 }}>
+                <div style={{ textAlign: "center", marginTop: 8 }}>
                     Click a card to open a dedicated help page for that topic.
                 </div>
 
@@ -158,22 +146,22 @@ export function HelpPage({
                 <div style={{
                     display: "grid",
                     gridTemplateColumns: "repeat(3, minmax(260px, 360px))",
-                    gap: 60,
+                    gap: 16,
                     justifyContent: "center",
-                    justifyItems: "center",
-                    margin: "30px 0"
+                    justifyItems: "center", // center contents inside each grid cell
+                    margin: "12px 0"
                 }}>
-                    <CardLink to="/help/exercises" title="Exercises" subtitle="Browse practice exercises" borderColor="#1aa654" icon={excersizesIcon} />
-                    <CardLink to="/help/filters" title="Filters" subtitle="Sorting and finding exercises" borderColor="#2b78d8" icon={checkboxIcon} />
-                    <CardLink to="/help/example" title="Exercise Example" subtitle="Score + audio example" borderColor="#f59e42" icon={example} />
-                    <CardLink to="/help/clicking-notes" title="Clicking Notes" subtitle="How to mark errors" borderColor="#1fb6a8" icon={keyIcon} />
-                    <CardLink to="/help/key" title="Color Key" subtitle="What each color means" borderColor="#9b5fd3" icon={tuning} />
-                    <CardLink to="/help/check-answers" title="Check Answers" subtitle="Feedback & hints" borderColor="#e34a4a" icon={checklist} />
+                    <CardLink to="/help/exercises" title="Exercises" subtitle="Browse practice exercises" borderColor="#1aa654" />
+                    <CardLink to="/help/filters" title="Filters" subtitle="Sorting and finding exercises" borderColor="#2b78d8" />
+                    <CardLink to="/help/example" title="Exercise Example" subtitle="Score + audio example" borderColor="#f59e42" />
+                    <CardLink to="/help/clicking-notes" title="Clicking Notes" subtitle="How to mark errors" borderColor="#1fb6a8" />
+                    <CardLink to="/help/key" title="Color Key" subtitle="What each color means" borderColor="#9b5fd3" />
+                    <CardLink to="/help/check-answers" title="Check Answers" subtitle="Feedback & hints" borderColor="#e34a4a" />
                 </div>
             </div>
 
             {/* Admin footer fixed to viewport bottom (not part of the scrollable content) */}
-            <footer style={{ position: "fixed", left: 0, right: 0, bottom: 0, padding: 15, borderTop: "1px solid #eee", background: "rgb(78, 129, 179)", textAlign: "center", zIndex: 10 }}>
+            <footer style={{ position: "fixed", left: 0, right: 0, bottom: 0, padding: 15, borderTop: "1px solid #eee", background: "#fafafa", textAlign: "center", zIndex: 10 }}>
                 {/* admin login kept for toggling admin UI elsewhere */}
                 {/* NOTE: Inputs below are currently uncontrolled and lack labels / password masking.
                     Recommended: convert to controlled inputs (useState), add labels, and set
