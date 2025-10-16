@@ -10,7 +10,7 @@ import { Button } from "react-bootstrap";
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import noteKey from "../assets/note-color-key.png";
-import path from "path";
+// import path from "path";
 
 const firebaseConfig = {
   apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
@@ -153,7 +153,7 @@ export function Exercise({
     }
   };
 
-  // highlighting function with guard added to avoid accessing undefined properties
+  // highlighting function with guard to avoid accessing undefined properties
   const highlight = function (note: any, klass: any, clicked: boolean): number {
     if (
       !note ||
@@ -276,8 +276,8 @@ export function Exercise({
         staff < staffArray.length;
         i++, j++
       ) {
-        var note = staffArray[staff].voices[0][j];
-        var noteElems = staffArray[staff].voices[0][j].abselem.elemset[0];
+        const note = staffArray[staff].voices[0][j];
+        const noteElems = staffArray[staff].voices[0][j].abselem.elemset[0];
         if (note.el_type === "bar") {
           measure++;
           i--;
@@ -322,48 +322,103 @@ export function Exercise({
           noteCount++;
         }
 
-        const topLines = svgElement?.querySelectorAll(".abcjs-top-line");
-        let totalSum = 0;
+          const topLines = svgElement?.querySelectorAll(".abcjs-top-line");
+          let totalSum = 0;
 
-        // Helper function to create both the beat bar and invisible cover box
-        const addRects = (
-          x: number,
-          y: number,
-          width: number,
-          height: number
-        ) => {
-          const bar = document.createElementNS(svgNS, "rect");
-          const coverBox = document.createElementNS(svgNS, "rect");
+          // Helper function to create both the beat bar and invisible cover box
+          const addRects = (
+            x: number,
+            y: number,
+            width: number,
+            height: number,
+            beatIndexForOverlay: number
+          ) => {
+            const bar = document.createElementNS(svgNS, "rect");
+            const coverBox = document.createElementNS(svgNS, "rect");
 
-          // Set visual styles and coordinates for the beat bar
-          bar.classList.add("bar");
-          bar.setAttribute("x", x.toString());
-          bar.setAttribute("y", y.toString());
-          bar.setAttribute("width", width.toString());
-          bar.setAttribute("height", "7");
-          if (tags.includes("Rhythm")) {
+            // Set visual styles and coordinates for the beat bar
+            bar.classList.add("bar");
+            bar.setAttribute("x", x.toString());
+            bar.setAttribute("y", y.toString());
+            bar.setAttribute("width", width.toString());
+            bar.setAttribute("height", "7");
             bar.setAttribute("fill", "purple");
             bar.setAttribute("opacity", "0.2");
-          } else {
-            bar.setAttribute("fill", "none");
-            bar.setAttribute("opacity", "0");
-          }
-          bar.setAttribute("stroke", "none");
+            bar.setAttribute("stroke", "none");
 
-          const noteBox = noteElems.getBoundingClientRect();
-          const noteTop = toSvgCoords(svgElement, 0, noteBox.top).y;
-          const noteBottom = toSvgCoords(svgElement, 0, noteBox.bottom).y;
+            const noteBox = noteElems.getBoundingClientRect();
+            const noteTop = toSvgCoords(svgElement, 0, noteBox.top).y;
+            const noteBottom = toSvgCoords(svgElement, 0, noteBox.bottom).y;
 
-          const bars = document.querySelectorAll('[data-name="bar"]');
-          const paths = Array.from(bars)
-            .filter((path) => path.tagName === "path")
-            .filter((path, index, self) => {
-              const bottom = path.getBoundingClientRect().bottom;
-              return (
-                self.findIndex(
-                  (p) => p.getBoundingClientRect().bottom === bottom
-                ) === index
-              );
+            const bars = document.querySelectorAll('[data-name="bar"]');
+            const paths = Array.from(bars)
+              .filter((path) => path.tagName === "path")
+              .filter((path, index, self) => {
+                const bottom = path.getBoundingClientRect().bottom;
+                return (
+                  self.findIndex(
+                    (p) => p.getBoundingClientRect().bottom === bottom
+                  ) === index
+                );
+              });
+            const pathBottom = toSvgCoords(
+              svgElement,
+              0,
+              paths[staff].getBoundingClientRect().bottom
+            ).y;
+            const pathHeight = paths[staff].getBoundingClientRect().height;
+            const noteHeight = pathBottom - y + pathHeight / 4;
+
+            // Set styles for invisible cover box used for highlighting
+            coverBox.classList.add("cover-box");
+            coverBox.setAttribute("x", x.toString());
+            coverBox.setAttribute("y", y.toString());
+            coverBox.setAttribute("width", width.toString());
+            coverBox.setAttribute("height", noteHeight.toString());
+            coverBox.setAttribute("fill", "purple");
+            coverBox.setAttribute("opacity", "0");
+            coverBox.setAttribute("stroke", "none");
+            coverBox.setAttribute("clip-path", staffArray[staff].clipPath);
+            coverBox.style.pointerEvents = "none";
+
+            // Add metadata and beat index (passed in to avoid closing over mutable loop var)
+            bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
+            bar.setAttribute("data-measure-pos", measure.toString());
+            bar.setAttribute("data-staff-pos", staff.toString());
+
+            coverBox.setAttribute(
+              "data-beatIndex",
+              beatIndexForOverlay.toString()
+            );
+            coverBox.setAttribute("data-measure-pos", measure.toString());
+            coverBox.setAttribute("data-staff-pos", staff.toString());
+
+            // Handle click event to toggle selection
+            bar.addEventListener("click", () => {
+              if (bar.getAttribute("data-selected") === "true") {
+                bar.setAttribute("data-selected", "false");
+                bar.setAttribute("opacity", "0.2");
+                coverBox.setAttribute("opacity", "0");
+                const index = selAnswers.findIndex(
+                  (item) =>
+                    item.type === "beat" &&
+                    item.measurePos === measure &&
+                    item.staffPos === staff &&
+                    item.beatIndex === beatIndexForOverlay
+                );
+                if (index !== -1) selAnswers.splice(index, 1);
+              } else {
+                bar.setAttribute("data-selected", "true");
+                bar.setAttribute("opacity", "1");
+                coverBox.setAttribute("opacity", "0.5");
+                selAnswers.push({
+                  measurePos: measure,
+                  staffPos: staff,
+                  beatIndex: beatIndexForOverlay,
+                  type: "beat",
+                });
+              }
+              if (teacherMode) multiAnswer();
             });
           const pathBottom = toSvgCoords(
             svgElement,
@@ -426,13 +481,7 @@ export function Exercise({
             if (teacherMode) multiAnswer();
           });
 
-          // Append rect elements to SVG <g> group
-          const svgGroup = svgElement.querySelector("g");
-          if (svgGroup) {
-            svgGroup.appendChild(bar);
-            svgGroup.appendChild(coverBox);
-          }
-        };
+            addRects(barStartPt.x, barTopY, barWidth, 5, currentBeatIndex);
 
         // --- First beat bar creation: beatSum exceeds one full beat ---
         if (beatSum > visualObjs[0].getBeatLength()) {
@@ -531,7 +580,7 @@ export function Exercise({
             barWidth = noteRightPt.x - barStartPt.x - 5;
           }
 
-          addRects(barX, barTopY, barWidth, 5);
+            addRects(barX, barTopY, barWidth, 5, currentBeatIndex);
 
           beatSum = 0;
           noteCount = 0;
@@ -706,12 +755,10 @@ export function Exercise({
         if (fetch !== undefined) fetch(false);
       } else {
         console.log("Incomplete exercise - not saving to database");
-        alert(
-          "Something went wrong - make sure you: \n \
-            -uploaded both a musicxml AND an mp3 file\n \
-            -marked any applicable tags, voice #, and difficulty\n \
-            -selected at least one correct answer"
-        );
+        alert(`Something went wrong - make sure you:
+  - uploaded both a musicxml AND an mp3 file
+  - marked any applicable tags, voice #, and difficulty
+  - selected at least one correct answer`);
       }
     } catch (error) {
       console.error("Error", error);
@@ -758,7 +805,7 @@ export function Exercise({
 
     // Non-rhythm exercise handling (unchanged)
     for (let i = 0; i < selNotes.length; i++) {
-      var noteElems = selNotes[i].abselem.elemset[0];
+      noteElems = selNotes[i].abselem.elemset[0];
       const dict2: { [label: string]: number | string } = {
         index: noteElems.getAttribute("index"),
         staffPos: noteElems.getAttribute("staffPos"),
@@ -992,7 +1039,7 @@ export function Exercise({
       ).map((elem) => ({
         type: "note" as const,
         measurePos: Number(elem.getAttribute("measurePos")),
-        staffPos: Number(elem.getAttribute("staffPos")),
+        staffPos: Number(elem.getAttribute("StaffPos")),
         index: Number(elem.getAttribute("index")),
         selectedTimes: Number(elem.getAttribute("selectedTimes")),
       }));
@@ -1174,7 +1221,7 @@ export function Exercise({
 
       setCustomFeedback(feedback);
       return;
-    } else if (tags.includes("Rhythm") && tags.length == 1) {
+    } else if (tags.includes("Rhythm") && tags.length === 1) {
       const instruments = getInstrumentList(exerciseData.score);
 
       // Define proper types for beat and note selections
