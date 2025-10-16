@@ -1,8 +1,16 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext", "ES2023.Array"],
-    "typeRoots": ["node_modules/@types", "custom_typings/"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext",
+      "ES2023.Array"
+    ],
+    "typeRoots": [
+      "node_modules/@types",
+      "custom_typings/"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -17,5 +25,9 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "custom_typings/*"]
+  "include": [
+    "src",
+    "custom_typings/*"
+
+  ]
 }
