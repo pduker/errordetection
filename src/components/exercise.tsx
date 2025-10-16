@@ -281,10 +281,8 @@ export function Exercise({
         if (note.el_type === "bar") {
           measure++;
           i--;
-          // Reset beat index at new measure in Rhythm exercises
-          if (tags.includes("Rhythm")) {
-            currentBeatIndex = 1;
-          }
+          // Reset beat index
+          currentBeatIndex = 1;
         } else {
           if (!noteElems.getAttribute("staffPos"))
             noteElems.setAttribute("staffPos", staff);
@@ -296,6 +294,11 @@ export function Exercise({
             noteElems.setAttribute("index", i);
           if (!noteElems.getAttribute("selectedTimes"))
             noteElems.setAttribute("selectedTimes", 0);
+          if (!noteElems.getAttribute("beatIndex")) {
+            noteElems.setAttribute("beatIndex", currentBeatIndex);
+            noteElems.setAttribute("measurePos", measure);
+            noteElems.setAttribute("staffPos", staff);
+          }
         }
 
         if (j + 1 === staffArray[staff].voices[0].length) {
@@ -304,234 +307,235 @@ export function Exercise({
           measure = 0;
         }
 
-        if (tags.includes("Rhythm")) {
-          const svgNS = "http://www.w3.org/2000/svg";
+        const svgNS = "http://www.w3.org/2000/svg";
 
-          if (!boundingBox) return;
+        if (!boundingBox) return;
 
-          // Store the start X position of the bar
-          if (beatSum === 0) {
-            barStartX = noteElems.getBoundingClientRect().left;
-          }
+        // Store the start X position of the bar
+        if (beatSum === 0) {
+          barStartX = noteElems.getBoundingClientRect().left;
+        }
 
-          // Accumulate beat duration
-          if (typeof note.duration === "number" && !isNaN(note.duration)) {
-            beatSum += note.duration;
-            noteCount++;
-          }
+        // Accumulate beat duration
+        if (typeof note.duration === "number" && !isNaN(note.duration)) {
+          beatSum += note.duration;
+          noteCount++;
+        }
 
-          const topLines = svgElement?.querySelectorAll(".abcjs-top-line");
-          let totalSum = 0;
+        const topLines = svgElement?.querySelectorAll(".abcjs-top-line");
+        let totalSum = 0;
 
-          // Helper function to create both the beat bar and invisible cover box
-          const addRects = (
-            x: number,
-            y: number,
-            width: number,
-            height: number
-          ) => {
-            const bar = document.createElementNS(svgNS, "rect");
-            const coverBox = document.createElementNS(svgNS, "rect");
+        // Helper function to create both the beat bar and invisible cover box
+        const addRects = (
+          x: number,
+          y: number,
+          width: number,
+          height: number
+        ) => {
+          const bar = document.createElementNS(svgNS, "rect");
+          const coverBox = document.createElementNS(svgNS, "rect");
 
-            // Set visual styles and coordinates for the beat bar
-            bar.classList.add("bar");
-            bar.setAttribute("x", x.toString());
-            bar.setAttribute("y", y.toString());
-            bar.setAttribute("width", width.toString());
-            bar.setAttribute("height", "7");
+          // Set visual styles and coordinates for the beat bar
+          bar.classList.add("bar");
+          bar.setAttribute("x", x.toString());
+          bar.setAttribute("y", y.toString());
+          bar.setAttribute("width", width.toString());
+          bar.setAttribute("height", "7");
+          if (tags.includes("Rhythm")) {
             bar.setAttribute("fill", "purple");
             bar.setAttribute("opacity", "0.2");
-            bar.setAttribute("stroke", "none");
+          } else {
+            bar.setAttribute("fill", "none");
+            bar.setAttribute("opacity", "0");
+          }
+          bar.setAttribute("stroke", "none");
 
-            const noteBox = noteElems.getBoundingClientRect();
-            const noteTop = toSvgCoords(svgElement, 0, noteBox.top).y;
-            const noteBottom = toSvgCoords(svgElement, 0, noteBox.bottom).y;
+          const noteBox = noteElems.getBoundingClientRect();
+          const noteTop = toSvgCoords(svgElement, 0, noteBox.top).y;
+          const noteBottom = toSvgCoords(svgElement, 0, noteBox.bottom).y;
 
-            const bars = document.querySelectorAll('[data-name="bar"]');
-            const paths = Array.from(bars)
-              .filter((path) => path.tagName === "path")
-              .filter((path, index, self) => {
-                const bottom = path.getBoundingClientRect().bottom;
-                return (
-                  self.findIndex(
-                    (p) => p.getBoundingClientRect().bottom === bottom
-                  ) === index
-                );
-              });
-            const pathBottom = toSvgCoords(
-              svgElement,
-              0,
-              paths[staff].getBoundingClientRect().bottom
-            ).y;
-            const pathHeight = paths[staff].getBoundingClientRect().height;
-            const noteHeight = pathBottom - y + pathHeight / 4;
-
-            // Set styles for invisible cover box used for highlighting
-            coverBox.classList.add("cover-box");
-            coverBox.setAttribute("x", x.toString());
-            coverBox.setAttribute("y", y.toString());
-            coverBox.setAttribute("width", width.toString());
-            coverBox.setAttribute("height", noteHeight.toString());
-            coverBox.setAttribute("fill", "purple");
-            coverBox.setAttribute("opacity", "0");
-            coverBox.setAttribute("stroke", "none");
-            coverBox.setAttribute("clip-path", staffArray[staff].clipPath);
-            coverBox.style.pointerEvents = "none";
-
-            // Add metadata and beat index
-            const beatIndexForOverlay = currentBeatIndex;
-            bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
-            bar.setAttribute("data-measure-pos", measure.toString());
-            bar.setAttribute("data-staff-pos", staff.toString());
-
-            coverBox.setAttribute(
-              "data-beatIndex",
-              beatIndexForOverlay.toString()
-            );
-            coverBox.setAttribute("data-measure-pos", measure.toString());
-            coverBox.setAttribute("data-staff-pos", staff.toString());
-
-            // Handle click event to toggle selection
-            bar.addEventListener("click", () => {
-              if (bar.getAttribute("data-selected") === "true") {
-                bar.setAttribute("data-selected", "false");
-                bar.setAttribute("opacity", "0.2");
-                coverBox.setAttribute("opacity", "0");
-                const index = selAnswers.findIndex(
-                  (item) =>
-                    item.type === "beat" &&
-                    item.measurePos == measure &&
-                    item.staffPos == staff &&
-                    item.beatIndex == beatIndexForOverlay
-                );
-                if (index !== -1) selAnswers.splice(index, 1);
-              } else {
-                bar.setAttribute("data-selected", "true");
-                bar.setAttribute("opacity", "1");
-                coverBox.setAttribute("opacity", "0.5");
-                selAnswers.push({
-                  measurePos: measure,
-                  staffPos: staff,
-                  beatIndex: beatIndexForOverlay,
-                  type: "beat",
-                });
-              }
-              if (teacherMode) multiAnswer();
+          const bars = document.querySelectorAll('[data-name="bar"]');
+          const paths = Array.from(bars)
+            .filter((path) => path.tagName === "path")
+            .filter((path, index, self) => {
+              const bottom = path.getBoundingClientRect().bottom;
+              return (
+                self.findIndex(
+                  (p) => p.getBoundingClientRect().bottom === bottom
+                ) === index
+              );
             });
+          const pathBottom = toSvgCoords(
+            svgElement,
+            0,
+            paths[staff].getBoundingClientRect().bottom
+          ).y;
+          const pathHeight = paths[staff].getBoundingClientRect().height;
+          const noteHeight = pathBottom - y + pathHeight / 4;
 
-            // Append rect elements to SVG <g> group
-            const svgGroup = svgElement.querySelector("g");
-            if (svgGroup) {
-              svgGroup.appendChild(bar);
-              svgGroup.appendChild(coverBox);
+          // Set styles for invisible cover box used for highlighting
+          coverBox.classList.add("cover-box");
+          coverBox.setAttribute("x", x.toString());
+          coverBox.setAttribute("y", y.toString());
+          coverBox.setAttribute("width", width.toString());
+          coverBox.setAttribute("height", noteHeight.toString());
+          coverBox.setAttribute("fill", "purple");
+          coverBox.setAttribute("opacity", "0");
+          coverBox.setAttribute("stroke", "none");
+          coverBox.setAttribute("clip-path", staffArray[staff].clipPath);
+          coverBox.style.pointerEvents = "none";
+
+          // Add metadata and beat index
+          const beatIndexForOverlay = currentBeatIndex;
+          bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
+          bar.setAttribute("data-measure-pos", measure.toString());
+          bar.setAttribute("data-staff-pos", staff.toString());
+
+          coverBox.setAttribute(
+            "data-beatIndex",
+            beatIndexForOverlay.toString()
+          );
+          coverBox.setAttribute("data-measure-pos", measure.toString());
+          coverBox.setAttribute("data-staff-pos", staff.toString());
+
+          // Handle click event to toggle selection
+          bar.addEventListener("click", () => {
+            if (bar.getAttribute("data-selected") === "true") {
+              bar.setAttribute("data-selected", "false");
+              bar.setAttribute("opacity", "0.2");
+              coverBox.setAttribute("opacity", "0");
+              const index = selAnswers.findIndex(
+                (item) =>
+                  item.type === "beat" &&
+                  item.measurePos == measure &&
+                  item.staffPos == staff &&
+                  item.beatIndex == beatIndexForOverlay
+              );
+              if (index !== -1) selAnswers.splice(index, 1);
+            } else {
+              bar.setAttribute("data-selected", "true");
+              bar.setAttribute("opacity", "1");
+              coverBox.setAttribute("opacity", "0.5");
+              selAnswers.push({
+                measurePos: measure,
+                staffPos: staff,
+                beatIndex: beatIndexForOverlay,
+                type: "beat",
+              });
             }
-          };
+            if (teacherMode) multiAnswer();
+          });
 
-          // --- First beat bar creation: beatSum exceeds one full beat ---
-          if (beatSum > visualObjs[0].getBeatLength()) {
-            const barStartPt = toSvgCoords(svgElement, barStartX, 0);
-            const noteLeft = noteElems.getBoundingClientRect().left;
-            const noteRight =
-              noteElems.nextSibling.getBoundingClientRect().left;
-            const noteRightPt = toSvgCoords(svgElement, noteRight, 0);
-            const noteLeftPt = toSvgCoords(svgElement, noteLeft, 0);
+          // Append rect elements to SVG <g> group
+          const svgGroup = svgElement.querySelector("g");
+          if (svgGroup) {
+            svgGroup.appendChild(bar);
+            svgGroup.appendChild(coverBox);
+          }
+        };
 
-            const noteTopPt = toSvgCoords(
-              svgElement,
-              0,
-              noteElems.getBoundingClientRect().top
-            );
-            const topLinePt =
-              topLines && topLines[staff]
-                ? toSvgCoords(
-                    svgElement,
-                    0,
-                    topLines[staff].getBoundingClientRect().top
-                  )
-                : noteTopPt;
+        // --- First beat bar creation: beatSum exceeds one full beat ---
+        if (beatSum > visualObjs[0].getBeatLength()) {
+          const barStartPt = toSvgCoords(svgElement, barStartX, 0);
+          const noteLeft = noteElems.getBoundingClientRect().left;
+          const noteRight = noteElems.nextSibling.getBoundingClientRect().left;
+          const noteRightPt = toSvgCoords(svgElement, noteRight, 0);
+          const noteLeftPt = toSvgCoords(svgElement, noteLeft, 0);
 
-            const barTopY = Math.min(noteTopPt.y, topLinePt.y) - 15;
+          const noteTopPt = toSvgCoords(
+            svgElement,
+            0,
+            noteElems.getBoundingClientRect().top
+          );
+          const topLinePt =
+            topLines && topLines[staff]
+              ? toSvgCoords(
+                  svgElement,
+                  0,
+                  topLines[staff].getBoundingClientRect().top
+                )
+              : noteTopPt;
 
-            let barWidth: number;
-            if (
-              Math.floor(beatSum / visualObjs[0].getBeatLength()) ===
-              beatSum / visualObjs[0].getBeatLength()
-            ) {
-              // Full beat division
+          const barTopY = Math.min(noteTopPt.y, topLinePt.y) - 15;
+
+          let barWidth: number;
+          if (
+            Math.floor(beatSum / visualObjs[0].getBeatLength()) ===
+            beatSum / visualObjs[0].getBeatLength()
+          ) {
+            // Full beat division
+            barWidth =
+              (noteRightPt.x - barStartPt.x) *
+                (1 / (beatSum / visualObjs[0].getBeatLength())) -
+              5;
+          } else {
+            // Partial beat division
+            barWidth = ((noteRightPt.x - noteLeftPt.x) * 2) / 3;
+            remainLen = ((noteRightPt.x - noteLeftPt.x) * 1) / 3;
+          }
+
+          addRects(barStartPt.x, barTopY, barWidth, 5);
+
+          totalSum = beatSum;
+          beatSum -= visualObjs[0].getBeatLength();
+          noteCount = 0;
+          created = true;
+          currentBeatIndex++;
+        }
+
+        // --- Second beat bar creation: beatSum matches full beat exactly ---
+        if (beatSum === visualObjs[0].getBeatLength()) {
+          const barStartPt = toSvgCoords(svgElement, barStartX, 0);
+          const noteLeft = noteElems.getBoundingClientRect().left;
+          const noteRight = noteElems.nextSibling.getBoundingClientRect().left;
+          const noteRightPt = toSvgCoords(svgElement, noteRight, 0);
+          const noteLeftPt = toSvgCoords(svgElement, noteLeft, 0);
+
+          const noteTopPt = toSvgCoords(
+            svgElement,
+            0,
+            noteElems.getBoundingClientRect().top
+          );
+          const topLinePt =
+            topLines && topLines[staff]
+              ? toSvgCoords(
+                  svgElement,
+                  0,
+                  topLines[staff].getBoundingClientRect().top
+                )
+              : noteTopPt;
+
+          const barTopY = Math.min(noteTopPt.y, topLinePt.y) - 15;
+          let barX = barStartPt.x;
+          let barWidth: number;
+
+          if (created) {
+            if (note.duration < beatSum) {
+              // Partial leftover note
+              barX = toSvgCoords(svgElement, noteLeft - remainLen + 5, 0).x;
+              barWidth = noteRightPt.x - noteLeftPt.x + remainLen - 5;
+            } else {
+              // Continuing bar from previous segment
               barWidth =
-                (noteRightPt.x - barStartPt.x) *
-                  (1 / (beatSum / visualObjs[0].getBeatLength())) -
+                (noteRightPt.x - barStartPt.x) /
+                  Math.round(totalSum / visualObjs[0].getBeatLength()) -
                 5;
-            } else {
-              // Partial beat division
-              barWidth = ((noteRightPt.x - noteLeftPt.x) * 2) / 3;
-              remainLen = ((noteRightPt.x - noteLeftPt.x) * 1) / 3;
+              barX =
+                barStartPt.x +
+                (noteRightPt.x - barStartPt.x) /
+                  (totalSum / visualObjs[0].getBeatLength());
             }
-
-            addRects(barStartPt.x, barTopY, barWidth, 5);
-
-            totalSum = beatSum;
-            beatSum -= visualObjs[0].getBeatLength();
-            noteCount = 0;
-            created = true;
-            currentBeatIndex++;
+            created = false;
+          } else {
+            // Simple full beat bar
+            barWidth = noteRightPt.x - barStartPt.x - 5;
           }
 
-          // --- Second beat bar creation: beatSum matches full beat exactly ---
-          if (beatSum === visualObjs[0].getBeatLength()) {
-            const barStartPt = toSvgCoords(svgElement, barStartX, 0);
-            const noteLeft = noteElems.getBoundingClientRect().left;
-            const noteRight =
-              noteElems.nextSibling.getBoundingClientRect().left;
-            const noteRightPt = toSvgCoords(svgElement, noteRight, 0);
-            const noteLeftPt = toSvgCoords(svgElement, noteLeft, 0);
+          addRects(barX, barTopY, barWidth, 5);
 
-            const noteTopPt = toSvgCoords(
-              svgElement,
-              0,
-              noteElems.getBoundingClientRect().top
-            );
-            const topLinePt =
-              topLines && topLines[staff]
-                ? toSvgCoords(
-                    svgElement,
-                    0,
-                    topLines[staff].getBoundingClientRect().top
-                  )
-                : noteTopPt;
-
-            const barTopY = Math.min(noteTopPt.y, topLinePt.y) - 15;
-            let barX = barStartPt.x;
-            let barWidth: number;
-
-            if (created) {
-              if (note.duration < beatSum) {
-                // Partial leftover note
-                barX = toSvgCoords(svgElement, noteLeft - remainLen + 5, 0).x;
-                barWidth = noteRightPt.x - noteLeftPt.x + remainLen - 5;
-              } else {
-                // Continuing bar from previous segment
-                barWidth =
-                  (noteRightPt.x - barStartPt.x) /
-                    Math.round(totalSum / visualObjs[0].getBeatLength()) -
-                  5;
-                barX =
-                  barStartPt.x +
-                  (noteRightPt.x - barStartPt.x) /
-                    (totalSum / visualObjs[0].getBeatLength());
-              }
-              created = false;
-            } else {
-              // Simple full beat bar
-              barWidth = noteRightPt.x - barStartPt.x - 5;
-            }
-
-            addRects(barX, barTopY, barWidth, 5);
-
-            beatSum = 0;
-            noteCount = 0;
-            currentBeatIndex++;
-          }
+          beatSum = 0;
+          noteCount = 0;
+          currentBeatIndex++;
         }
 
         if (teacherMode) {
@@ -869,163 +873,57 @@ export function Exercise({
     });
   };
 
-  // Added highlightMeasure function to resolve missing name error.
-  // This function creates SVG overlays to highlight measures for non-rhythm exercises.
   const highlightMeasure = function (
     selectedNotes: Element[],
     correctAnswers: any[]
   ) {
-    const measurePositionsSel = new Set<number>();
-    const measurePositionsCorr = new Set<number>();
-
-    selectedNotes.forEach((noteElem) => {
-      const measurePos = Number(noteElem.getAttribute("measurePos"));
-      if (!isNaN(measurePos)) {
-        measurePositionsSel.add(measurePos);
-      }
-    });
-
-    correctAnswers.forEach((note) => {
-      const corrPos = Number(note.measurePos);
-      if (!isNaN(corrPos)) {
-        measurePositionsCorr.add(corrPos);
-      }
-    });
-
-    const errorMeasures = new Set<number>(
-      Array.from(measurePositionsSel).filter(
-        (pos) => !measurePositionsCorr.has(pos)
-      )
+    // Remove any previous overlays
+    const overlays = document.querySelectorAll(
+      ".hint-highlight, .error-highlight"
     );
+    overlays.forEach((overlay) => overlay.remove());
 
-    console.log("selected measures: ", measurePositionsSel);
-    console.log("correct measures: ", measurePositionsCorr);
-    console.log("wrong measures", errorMeasures);
+    // Helper to highlight a beat rect for a note
+    function highlightBeatOfNote(noteElem: Element, color: string) {
+      const beatIndex = noteElem.getAttribute("beatIndex");
+      const measurePos = noteElem.getAttribute("measurePos");
+      const staffPos = noteElem.getAttribute("staffPos");
+      if (!beatIndex || !measurePos || !staffPos) return;
 
-    if (errorMeasures.size > 0) {
-      console.log(
-        "there are incorrect measures selected, running through overlay functionality"
+      const coverBox = document.querySelector(
+        `.cover-box[data-beatIndex='${beatIndex}'][data-measure-pos='${measurePos}'][data-staff-pos='${staffPos}']`
       );
-      measurePositionsCorr.forEach((corrPos) => {
-        const existingOverlay = document.querySelector(
-          `rect[data-measurePos='${corrPos}']`
-        );
-        if (existingOverlay) {
-          console.log("overlay exists, no need to add on top");
-          return;
-        }
-        const measure = document.querySelectorAll(`[measurePos='${corrPos}']`);
-        let minX = Infinity,
-          minY = Infinity,
-          maxX = -Infinity,
-          maxY = -Infinity;
-        measure.forEach((pos) => {
-          const bbox = (pos as SVGAElement).getBBox();
-          minX = Math.min(minX, bbox.x);
-          minY = Math.min(minY, bbox.y);
-          maxX = Math.max(maxX, bbox.x + bbox.width);
-          maxY = Math.max(maxY, bbox.y + bbox.height);
-        });
-        const overlay = document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "rect"
-        );
-        overlay.setAttribute("x", minX.toString());
-        overlay.setAttribute("y", minY.toString());
-        overlay.setAttribute("width", (maxX - minX).toString());
-        overlay.setAttribute("height", (maxY - minY).toString());
-        overlay.setAttribute("fill", "rgba(61, 245, 39, 0.6)");
-        overlay.setAttribute("class", "hint-highlight");
-        overlay.setAttribute("data-measurePos", corrPos.toString());
-        const svgElement = document.querySelector("svg");
-        if (svgElement) {
-          svgElement.appendChild(overlay);
-        } else {
-          console.error("SVG element not found!");
-        }
-      });
+      if (coverBox) {
+        coverBox.setAttribute("fill", color);
+        coverBox.setAttribute("opacity", "0.5");
+      }
 
-      measurePositionsSel.forEach((selPos) => {
-        const existingOverlay = document.querySelector(
-          `rect[data-measurePos='${selPos}']`
-        );
-        if (existingOverlay) {
-          console.log("overlay exists, no need to add on top");
-          return;
-        }
-        const measure = document.querySelectorAll(`[measurePos='${selPos}']`);
-        let minX = Infinity,
-          minY = Infinity,
-          maxX = -Infinity,
-          maxY = -Infinity;
-        measure.forEach((pos) => {
-          const bbox = (pos as SVGAElement).getBBox();
-          minX = Math.min(minX, bbox.x);
-          minY = Math.min(minY, bbox.y);
-          maxX = Math.max(maxX, bbox.x + bbox.width);
-          maxY = Math.max(maxY, bbox.y + bbox.height);
+      console.log("Highlighting:", { beatIndex, measurePos, staffPos });
+      const coverBoxes = document.querySelectorAll(".cover-box");
+      coverBoxes.forEach((cb) => {
+        console.log("CoverBox:", {
+          beatIndex: cb.getAttribute("data-beatIndex"),
+          measurePos: cb.getAttribute("data-measure-pos"),
+          staffPos: cb.getAttribute("data-staff-pos"),
         });
-        const overlay = document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "rect"
-        );
-        overlay.setAttribute("x", minX.toString());
-        overlay.setAttribute("y", minY.toString());
-        overlay.setAttribute("width", (maxX - minX).toString());
-        overlay.setAttribute("height", (maxY - minY).toString());
-        overlay.setAttribute("fill", "rgba(255, 0, 0, 0.6)");
-        overlay.setAttribute("class", "error-highlight");
-        overlay.setAttribute("data-measurePos", selPos.toString());
-        const svgElement = document.querySelector("svg");
-        if (svgElement) {
-          svgElement.appendChild(overlay);
-        } else {
-          console.error("SVG element not found!");
-        }
-      });
-    } else {
-      console.log(
-        "in correct measure checking if correct note was selected, otherwise highlight correct measure"
-      );
-      correctAnswers.forEach((corrNote) => {
-        const existingOverlay = document.querySelector(
-          `rect[data-measurePos='${corrNote.measurePos}']`
-        );
-        if (existingOverlay) {
-          console.log("overlay exists, no need to add on top");
-          return;
-        }
-        const measure = document.querySelectorAll(
-          `[measurePos='${corrNote.measurePos}']`
-        );
-        let minX = Infinity,
-          minY = Infinity,
-          maxX = -Infinity,
-          maxY = -Infinity;
-        measure.forEach((elem) => {
-          const bbox = (elem as SVGAElement).getBBox();
-          minX = Math.min(minX, bbox.x);
-          minY = Math.min(minY, bbox.y);
-          maxX = Math.max(maxX, bbox.x + bbox.width);
-          maxY = Math.max(maxY, bbox.y + bbox.height);
-        });
-        const overlay = document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "rect"
-        );
-        overlay.setAttribute("x", minX.toString());
-        overlay.setAttribute("y", minY.toString());
-        overlay.setAttribute("width", (maxX - minX).toString());
-        overlay.setAttribute("height", (maxY - minY).toString());
-        overlay.setAttribute("fill", "rgba(61, 245, 39, 0.6)");
-        overlay.setAttribute("class", "hint-highlight");
-        overlay.setAttribute("data-measurePos", corrNote.measurePos.toString());
-        const svgElement = document.querySelector("svg");
-        if (svgElement) {
-          svgElement.appendChild(overlay);
-        }
       });
     }
+
+    // Find which selected notes are correct
+    const correctNoteIndices = new Set(
+      correctAnswers.map((ans) => String(ans.index))
+    );
+
+    selectedNotes.forEach((noteElem) => {
+      const noteIndex = noteElem.getAttribute("index");
+      if (noteIndex != null && correctNoteIndices.has(noteIndex)) {
+        // Correct selection: highlight beat green
+        highlightBeatOfNote(noteElem, "rgba(61, 245, 39, 0.6)");
+      } else {
+        // Incorrect selection: highlight beat red
+        highlightBeatOfNote(noteElem, "rgba(255, 0, 0, 0.6)");
+      }
+    });
   };
 
   // function to get instrument list from abc score
@@ -1421,10 +1319,10 @@ export function Exercise({
       return;
     }
 
-    // Non-Rhythm branch (existing logic, unchanged)
-    var tmpSelected = [...selAnswers];
-    var tmpCorrect = [...correctAnswers];
-    var feedback: string[] = [];
+    // --- Non-Rhythm branch ---
+    const tmpSelected = [...selAnswers];
+    let tmpCorrect = [...correctAnswers];
+    let feedback: string[] = [];
 
     tmpSelected.sort((i1, i2) => {
       const idx1 = Number(i1.abselem.elemset[0].getAttribute("index"));
@@ -1435,7 +1333,7 @@ export function Exercise({
     let closeList: number[] = [];
     let wrongList: any[] = [];
 
-    for (var i = 0, j = 0; i < tmpCorrect.length && j < tmpSelected.length; ) {
+    for (let i = 0, j = 0; i < tmpCorrect.length && j < tmpSelected.length; ) {
       let noteElems = tmpSelected[j].abselem.elemset[0];
       const indexSelected = Number(noteElems.getAttribute("index"));
       const indexCorrect = Number(tmpCorrect[i]["index"]);
@@ -1459,24 +1357,28 @@ export function Exercise({
       }
     }
 
+    // Always highlight all selected notes, passing SVG elements
+    highlightMeasure(
+      selAnswers.map((note) => note.abselem.elemset[0]),
+      correctAnswers
+    );
+
     if (
       tmpCorrect.length === 0 &&
       tmpSelected.length === correctAnswers.length
     ) {
       feedback = ["Great job identifying the errors in this passage!"];
     } else if (tmpSelected.length !== correctAnswers.length) {
-      var pluralText = correctAnswers.length === 1 ? " is " : " are ";
+      const pluralText = correctAnswers.length === 1 ? " is " : " are ";
       feedback = [
         `\nYou selected ${selAnswers.length} answer(s). There${pluralText}${correctAnswers.length} correct answer(s). Here are some specific places to look at and listen to more closely:`,
       ];
-
       for (let i = 0; i < tmpCorrect.length; i++) {
         feedback.push(
           `\nMeasure ${Number(tmpCorrect[i]["measurePos"]) + 1}, Staff ${
             Number(tmpCorrect[i]["staffPos"]) + 1
           }`
         );
-        highlightMeasure(wrongList, tmpCorrect);
       }
       for (let i = 0; i < wrongList.length; i++) {
         feedback.push(
@@ -1484,7 +1386,6 @@ export function Exercise({
             Number(wrongList[i].getAttribute("measurePos")) + 1
           }, Staff ${Number(wrongList[i].getAttribute("staffPos")) + 1}`
         );
-        highlightMeasure(wrongList, tmpCorrect);
       }
     } else if (tmpCorrect.length === correctAnswers.length) {
       feedback = [
@@ -1496,7 +1397,6 @@ export function Exercise({
             Number(tmpCorrect[i]["staffPos"]) + 1
           }`
         );
-        highlightMeasure(wrongList, tmpCorrect);
         let addtlFeedback = tmpCorrect[i]["feedback"];
         if (
           closeList.includes(Number(tmpCorrect[i]["index"])) &&
@@ -1513,7 +1413,6 @@ export function Exercise({
         if (addtlFeedback !== "") {
           let add = feedback.pop();
           feedback.push(add + ". Additional feedback: " + addtlFeedback);
-          highlightMeasure(wrongList, tmpCorrect);
         }
       }
     } else if (tmpCorrect.length < correctAnswers.length) {
@@ -1526,7 +1425,6 @@ export function Exercise({
             Number(tmpCorrect[i]["staffPos"]) + 1
           }`
         );
-        highlightMeasure(wrongList, tmpCorrect);
         let addtlFeedback = tmpCorrect[i]["feedback"];
         if (
           closeList.includes(Number(tmpCorrect[i]["index"])) &&
@@ -1543,7 +1441,6 @@ export function Exercise({
         if (addtlFeedback !== "") {
           let add = feedback.pop();
           feedback.push(add + ". Additional feedback: " + addtlFeedback);
-          highlightMeasure(wrongList, tmpCorrect);
         }
       }
     }
