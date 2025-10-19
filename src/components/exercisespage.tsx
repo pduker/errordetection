@@ -296,36 +296,38 @@ export function ExercisesPage({
 
     //html to render page
     return (
-        <div style={{ width: "100%", marginTop: "10px", display: "flex", flexDirection: "row", minHeight: "350px" }}> {/* SIR: added minHeight to prevent jitter */}
-            <div style={{ paddingRight: "2vw", flexWrap: "wrap",width: "35%", minHeight: "700px", display: "flex", flexDirection: "column"}}> {/* SIR: left column div */}
-            <h2 style={{display: "flex", alignItems: "left"}}>Welcome to the Exercises Page!</h2>
-            <h5 style={{fontStyle: "italic", flexDirection: "column"}}>Sort by any of the given fields, then click an exercise to get started.</h5>
+        <div className="ex-page-container"> {/* SIR: added minHeight to prevent jitter */}
+            <div className="ex-left"> {/* SIR: left column div */}
+            <h2 style={{margin: "0 0 6px 0", fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> {/*SIR: changed fontSize for consistency*/}
+            <h5 style={{fontStyle: "italic", margin: "0 0 8px 0", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5> {/*SIR: changed fontSize for consistency*/}
                 <span>
-                <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
-                    <form id="tags" style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>
-                        <div style={{ fontSize: "16px", marginRight: "8px" }}>Tags:</div>
-                        <label style={{ display: "flex", alignItems: "center", marginRight: "12px" }}>
-                            <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{ marginRight: "4px" }} />
+                <div id="boxes" style={{ display: "inline-flex", padding: "4px", gap: "8px", alignItems: "center" }}> {/*SIR: added gap and alignItems to center*/}
+                    <form id="tags" style={{ display: "flex", alignItems: "center", gap: "8px" }}> {/*SIR: changed to flex and added gap*/}
+                        <div style={{ fontSize: "16px" }}>Tags:</div> {/*SIR: added fontSize for consistency*/}
+                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}> {/*SIR: added marginRight for spacing*/}
+                            <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{ marginRight: "6px" }} />
                             Pitch
                         </label>
-                        <label style={{ display: "flex", alignItems: "center", marginRight: "12px"}}>
-                            <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{ marginRight: "4px" }} />
+                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}> {/*SIR: added marginRight for spacing*/}
+                            <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{ marginRight: "6px" }} />
                             Intonation
                         </label>
-                        <label style={{ display: "flex", alignItems: "center" }}>
-                            <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange} style={{ marginRight: "4px" }} />
+                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}> {/*SIR: added marginRight for spacing*/}
+                            <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange} style={{ marginRight: "6px" }} />
                             Rhythm
                         </label>
+                        <label style={{ display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
+                            <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "6px" }} />
+                                Transposing Instruments
+                        </label>
                     </form>
-                    <form id="transpos" style={{ display: "flex", alignItems: "center", marginLeft: "-20px" }}>
-                        <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "4px" }} />
-                        <div style={{ fontSize: "16px", whiteSpace: "nowrap" }}>Transposing Instruments</div>
-                    </form>
+                        {/*<input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "4px" }} />
+                        <div style={{ fontSize: "16px", whiteSpace: "nowrap" }}>Transposing Instruments</div>*/} {/*SIR: moved into label above for better alignment*/}
                 </div>
 
 
 
-                    <div id="dropdowns" style={{display: "inline-flex", padding: "4px"}}>
+                    <div id="dropdowns" style={{display: "inline-flex", padding: "4px", gap: "8px", alignItems: "center"}}> {/*SIR: added gap and alignItems to center*/}
                         <form id="difficulty">
                             <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>
                             <br></br>
@@ -364,8 +366,8 @@ export function ExercisesPage({
                         
                     </div>
                     
-                    <div style={{display: "inline-flex", padding: "4px"}}>
-                        <form id='typesForm'>
+                    <div style={{display: "inline-flex", padding: "4px", gap: "8px", alignItems: "center"}}>
+                        <form id='typesForm' style={{margin: 0}}>
                             Textural Factors:
                             <br></br>
                             <select name="types" onChange={typesChange}>
@@ -376,22 +378,11 @@ export function ExercisesPage({
                             </select>
                         </form>
 
-                        <Button variant="danger" onClick={resetSort} style={{marginLeft: "8px"}}>Reset Sort</Button>
+                        <Button variant="danger" onClick={resetSort} style={{marginLeft: "6px", padding: "6px 10px"}}>Reset Sort</Button>
                     </div>
                     
                 </span>
-                <div style={{flex: "1", display: "flex", flexDirection: "column", minWidth:"200px"}}> {/* SIR: listed exercises, added minHeight to prevent jitter */}
-                {/* pull from paginated exercises */}
-                {pageExercises.map(function(exercise){
-                    if(exercise !== undefined) {
-                        return (
-                        <div key = {exercise.title} id = {exercise.title} onClick={exChange} style={{margin: "8px", padding: "6px", cursor: "pointer", backgroundColor: "#fcfcd2", borderRadius: "2px"}}>
-                            {exercise.title}
-                        </div>
-                        )}
-                    else return <></>;
-                })}
-                <div style={{marginTop: "auto"}}>
+                <div style={{marginTop: "8px", display: "flex", alignItems: "center", gap: "8px"}}>
                 {/* add page navigation buttons, call newly defined functions */}
                 
                         <Button
@@ -424,13 +415,24 @@ export function ExercisesPage({
                             ›
                         </Button>
                     </div>
+                <div style={{flex: "1", display: "flex", flexDirection: "column", minWidth:"200px"}}> {/* SIR: listed exercises, added minHeight to prevent jitter */}
+                {/* pull from paginated exercises */}
+                {pageExercises.map(function(exercise){
+                    if(exercise !== undefined) {
+                        return (
+                        <div key = {exercise.title} id = {exercise.title} onClick={exChange} style={{margin: "4px 0", padding: "10px", cursor: "pointer", backgroundColor: "#fcfcd2", borderRadius: "4px", fontSize: "1.05rem"}}>
+                            {exercise.title}
+                        </div>
+                        )}
+                    else return <></>;
+                })}
                 </div>
                 {exList.length === 0 ? 
                     !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
                 <div>No exercises with those criteria found!</div> : <></>}
             </div>
-            <div style={{ width:'65%', marginLeft: "2vw", flexWrap: "wrap",}}> 
-                {selExercise !== undefined ? <div> {/*SIR: DIV tag for the loaded exercise*/}
+            <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
+                {selExercise !== undefined ? <div> 
                     <Exercise 
                         key={selExercise.exIndex} 
                         teacherMode={false} 
