@@ -323,8 +323,7 @@ export function ExercisesPage({
                     </form>
                         {/*<input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "4px" }} />
                         <div style={{ fontSize: "16px", whiteSpace: "nowrap" }}>Transposing Instruments</div>*/} {/*SIR: moved into label above for better alignment*/}
-                </div>
-
+                  </div>
 
 
                     <div id="dropdowns" style={{display: "inline-flex", padding: "4px",  alignItems: "center"}}> {/*SIR: added gap and alignItems to center*/}
@@ -381,6 +380,22 @@ export function ExercisesPage({
                         <Button variant="danger" onClick={resetSort} style={{marginLeft: "6px", padding: "6px 10px"}}>Reset Sort</Button>
                     </div>
                     
+                </div>
+                
+                <div style={{display: "inline-flex", padding: "4px"}}>
+                    <form id='typesForm'>
+                        Textural Factors:
+                        <br></br>
+                        <select name="types" onChange={typesChange}>
+                            <option value="None">None</option>
+                            <option value="Drone">Drone</option>
+                            <option value="Ensemble Parts">Ensemble Parts</option>
+                            <option value="Both">Drone & Ensemble Parts</option>
+                        </select>
+                    </form>
+
+                    <Button variant="danger" onClick={resetSort} style={{marginLeft: "8px"}}>Reset Sort</Button>
+                </div>
                 </span>
                 <div style={{marginTop: "8px", display: "flex", alignItems: "center", gap: "8px"}}>
                 {/* add page navigation buttons, call newly defined functions */}
