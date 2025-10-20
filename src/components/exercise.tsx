@@ -1699,14 +1699,18 @@ export function Exercise({
   };
 
   return (
-    <div
-      style={{
+    <div className = "exercise-box" // SIR added exercise box
+      style={{  //exercise example box
         margin: "10px",
         padding: "10px",
         backgroundColor: "#fcfcd2",
         borderRadius: "10px",
-        marginLeft: "100px",
-        marginTop: "20px",
+        marginLeft: "180px", // SIR: used to be 100
+        marginTop: "60px", // SIR: changed to not overlap top
+        display: "flex", // SIR: added flex to box
+        flexDirection: "column", // SIR
+        alignItems: "stretch", // SIR
+        boxSizing: "border-box"
       }}
     >
       {editingTitle && teacherMode ? (
@@ -1898,8 +1902,7 @@ export function Exercise({
               <Button
                 variant="danger"
                 onClick={reload}
-                style={{ marginLeft: "1vw", float: "right" }}
-              >
+                style={{ marginLeft: "1vw", float: "right"}}>
                 Reset Answers
               </Button>
             </div>
@@ -1958,22 +1961,23 @@ export function Exercise({
 
           <div style={{ display: "inline-flex", marginTop: "-2vh" }}>
             {mp3 !== undefined ? (
-              <div style={{ marginTop: "2vh" }}>
+              <div style={{ marginTop: "2vh"}}>
                 <AudioHandler file={mp3}></AudioHandler>
               </div>
             ) : (
               <></>
             )}
             <Button
+              className = "responsive-element"
               variant="danger"
               onClick={exReload}
-              style={{
+              style={{ /*SIR: the actual reset answers button*/
                 position: "relative",
                 marginLeft: "1vw",
                 marginBottom: "2vh",
               }}
-            >
-              Reset Answers
+            > 
+              Reset Answers 
             </Button>
           </div>
           {abcFile !== undefined && abcFile !== "" && loaded ? (
