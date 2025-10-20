@@ -300,7 +300,6 @@ export function ExercisesPage({
         try {
             const parsed = JSON.parse(savedProgress);
             console.log("Loaded saved progress:", parsed);
-            // Optionally, update UI here to show completed ones differently
         } catch (err) {
             console.error("Error parsing saved progress:", err);
         }

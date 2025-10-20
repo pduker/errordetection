@@ -1069,9 +1069,17 @@ export function Exercise({
       }
       
       setCustomFeedback(feedback);
+      // progress tracking
+      const isCorrect = allCorrect && combinedSelections.length > 0;
+      const scoreValue = isCorrect ? 1 : 0;
+
+      updateProgress?.(ExData.title, { completed: true, score: scoreValue });
+      setIsCompleted(true);
+      console.log(`Progress saved for ${ExData.title}: correct=${isCorrect}`);
       return;
     }
     
+    // Branch for Rhythm exercises with only Rhythm tag
     else if (tags.includes("Rhythm") && tags.length == 1){
       const instruments = getInstrumentList(exerciseData.score);
       
@@ -1291,6 +1299,15 @@ export function Exercise({
     }
    
     setCustomFeedback(feedback);
+    // progress tracking
+    const isCorrect = feedback.some(line =>
+    line.toLowerCase().includes("great job")
+    );
+    const scoreValue = isCorrect ? 1 : 0;
+
+    updateProgress?.(ExData.title, { completed: true, score: scoreValue });
+    setIsCompleted(true);
+    console.log(`Progress saved for ${ExData.title}: correct=${isCorrect}`);
   };
   
 
@@ -1564,6 +1581,11 @@ export function Exercise({
       ) : (
         <h3 onClick={() => setEditingTitle(!editingTitle)}>
           {customTitle}
+          {isCompleted && (
+            <div style={{ color: "green", fontWeight: "bold", marginBottom: "10px" }}>
+              Exercise Completed
+            </div>
+          )}
           {teacherMode && customId && (
             <span style={{ fontSize: "0.8em", color: "#666", marginLeft: "10px" }}>
               (ID: {customId})
