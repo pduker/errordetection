@@ -298,11 +298,11 @@ export function ExercisesPage({
     return (
         <div className="ex-page-container"> {/* SIR: added minHeight to prevent jitter */}
             <div className="ex-left"> {/* SIR: left column div */}
-            <h2 style={{margin: "0 0 6px 0", fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> {/*SIR: changed fontSize for consistency*/}
-            <h5 style={{fontStyle: "italic", margin: "0 0 8px 0", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5> {/*SIR: changed fontSize for consistency*/}
+            <h2 style={{fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> {/*SIR: changed fontSize for consistency*/}
+            <h5 style={{fontStyle: "italic", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5> {/*SIR: changed fontSize for consistency*/}
                 <span>
-                <div id="boxes" style={{ display: "inline-flex", padding: "4px", gap: "8px", alignItems: "center" }}> {/*SIR: added gap and alignItems to center*/}
-                    <form id="tags" style={{ display: "flex", alignItems: "center", gap: "8px" }}> {/*SIR: changed to flex and added gap*/}
+                <div id="boxes" style={{ display: "inline-flex", alignItems: "center" }}> {/*SIR: div tag for filter checkboxes*/}
+                    <form id="tags" style={{ display: "flex", alignItems: "center", gap: "8px"}}> {/*SIR: added gap and alignItems to center*/}
                         <div style={{ fontSize: "16px" }}>Tags:</div> {/*SIR: added fontSize for consistency*/}
                         <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}> {/*SIR: added marginRight for spacing*/}
                             <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{ marginRight: "6px" }} />
@@ -327,7 +327,7 @@ export function ExercisesPage({
 
 
 
-                    <div id="dropdowns" style={{display: "inline-flex", padding: "4px", gap: "8px", alignItems: "center"}}> {/*SIR: added gap and alignItems to center*/}
+                    <div id="dropdowns" style={{display: "inline-flex", padding: "4px",  alignItems: "center"}}> {/*SIR: added gap and alignItems to center*/}
                         <form id="difficulty">
                             <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>
                             <br></br>
@@ -432,7 +432,8 @@ export function ExercisesPage({
                 <div>No exercises with those criteria found!</div> : <></>}
             </div>
             <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
-                {selExercise !== undefined ? <div> 
+                {selExercise !== undefined ? (
+                <div> 
                     <Exercise 
                         key={selExercise.exIndex} 
                         teacherMode={false} 
@@ -444,8 +445,13 @@ export function ExercisesPage({
                         isSelected={undefined}
                         fetch={undefined}
                     />
-                    
-                </div> : <></>}
+                </div> 
+                ) : (
+                    <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
+                        <h3>No exercise loaded</h3>
+                        <p>Select an exercise from the left to begin.</p>
+                    </div>
+            )}
             
             <div style={{display:"flex", justifyContent: "center", marginLeft: "160px"}}> {/* SIR: added marginLeft to back/next button */}
                 <button  className= "btnback" id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
