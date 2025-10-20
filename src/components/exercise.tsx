@@ -31,6 +31,7 @@ export function Exercise({
   teacherMode,
   ExData,
   allExData,
+  updateProgress,
   setAllExData,
   handleSelectExercise,
   isSelected,
@@ -111,6 +112,24 @@ export function Exercise({
   const [xmlFile, setXmlFile] = useState<File>();
   const [mp3File, setMp3File] = useState<File>(mp3);
   const [abcFile, setAbcFile] = useState<string>(abc);
+
+  // check if an exercise has been completed
+  const [isCompleted, setIsCompleted] = useState(false);
+
+  // Check localStorage to see if this exercise was previously completed
+  useEffect(() => {
+  const saved = localStorage.getItem("userProgress");
+  if (saved) {
+    try {
+      const progress = JSON.parse(saved);
+      if (progress[ExData.title]?.completed) {
+        setIsCompleted(true);
+      }
+    } catch (err) {
+      console.error("Error reading localStorage progress:", err);
+    }
+  }
+}, [ExData.title]);
 
   const [customId, setCustomId] = useState<string>(exerciseData?.customId || "");
 

@@ -292,7 +292,29 @@ export function ExercisesPage({
         
         setTranspos(false);
 
+        
     }
+    useEffect(() => {
+        const savedProgress = localStorage.getItem("userProgress");
+        if (savedProgress) {
+        try {
+            const parsed = JSON.parse(savedProgress);
+            console.log("Loaded saved progress:", parsed);
+            // Optionally, update UI here to show completed ones differently
+        } catch (err) {
+            console.error("Error parsing saved progress:", err);
+        }
+        }
+    }, []);
+
+    const updateProgress = (title: string | number, data: any) => {
+        const current = JSON.parse(localStorage.getItem("userProgress") || "{}");
+        current[title] = { ...current[title], ...data };
+        localStorage.setItem("userProgress", JSON.stringify(current));
+        console.log("Updated progress:", current); // check updates in console
+    };
+
+
 
     //html to render page
     return (
