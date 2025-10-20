@@ -324,63 +324,59 @@ export function ExercisesPage({
                         <div style={{ fontSize: "16px", whiteSpace: "nowrap" }}>Transposing Instruments</div>
                     </form>
                 </div>
-
-
-
-                    <div id="dropdowns" style={{display: "inline-flex", padding: "4px"}}>
-                        <form id="difficulty">
-                            <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>
-                            <br></br>
-                            <select name="difficulty" onChange={diffChange}>
-                                <option value="All">All</option>
-                                <option value="1">1</option>
-                                <option value="2">2</option>
-                                <option value="3">3</option>
-                                <option value="4">4</option>
-                                <option value="5">5</option>
-                            </select>
-                        </form>
-                        <form id="voiceCt">
-                            Voices:
-                            <br></br>
-                            <select name="voices" onChange={voiceChange}>
-                                <option value={0}>Any</option>
-                                <option value={1}>1</option>
-                                <option value={2}>2</option>
-                                <option value={3}>3</option>
-                                <option value={4}>4</option>
-                                <option value={5}>5</option>
-                            </select>
-                        </form>
-                        <form id="meterForm">
-                            Meter:
-                            <br></br>
-                            <select name='meter' defaultValue={types} onChange={meterChange}>
-                                    <option value="Anything">Anything</option>
-                                    <option value="Simple">Simple</option>
-                                    <option value="Compound">Compound</option>
-                                    
-                            </select>
-                        </form>
-                        
-                        
-                    </div>
+                <div id="dropdowns" style={{display: "inline-flex", padding: "4px"}}>
+                    <form id="difficulty">
+                        <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>
+                        <br></br>
+                        <select name="difficulty" onChange={diffChange}>
+                            <option value="All">All</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </form>
+                    <form id="voiceCt">
+                        Voices:
+                        <br></br>
+                        <select name="voices" onChange={voiceChange}>
+                            <option value={0}>Any</option>
+                            <option value={1}>1</option>
+                            <option value={2}>2</option>
+                            <option value={3}>3</option>
+                            <option value={4}>4</option>
+                            <option value={5}>5</option>
+                        </select>
+                    </form>
+                    <form id="meterForm">
+                        Meter:
+                        <br></br>
+                        <select name='meter' defaultValue={types} onChange={meterChange}>
+                                <option value="Anything">Anything</option>
+                                <option value="Simple">Simple</option>
+                                <option value="Compound">Compound</option>
+                                
+                        </select>
+                    </form>
                     
-                    <div style={{display: "inline-flex", padding: "4px"}}>
-                        <form id='typesForm'>
-                            Textural Factors:
-                            <br></br>
-                            <select name="types" onChange={typesChange}>
-                                <option value="None">None</option>
-                                <option value="Drone">Drone</option>
-                                <option value="Ensemble Parts">Ensemble Parts</option>
-                                <option value="Both">Drone & Ensemble Parts</option>
-                            </select>
-                        </form>
-
-                        <Button variant="danger" onClick={resetSort} style={{marginLeft: "8px"}}>Reset Sort</Button>
-                    </div>
                     
+                </div>
+                
+                <div style={{display: "inline-flex", padding: "4px"}}>
+                    <form id='typesForm'>
+                        Textural Factors:
+                        <br></br>
+                        <select name="types" onChange={typesChange}>
+                            <option value="None">None</option>
+                            <option value="Drone">Drone</option>
+                            <option value="Ensemble Parts">Ensemble Parts</option>
+                            <option value="Both">Drone & Ensemble Parts</option>
+                        </select>
+                    </form>
+
+                    <Button variant="danger" onClick={resetSort} style={{marginLeft: "8px"}}>Reset Sort</Button>
+                </div>
                 </span>
                 {/* pull from paginated exercises */}
                 {pageExercises.map(function(exercise){
