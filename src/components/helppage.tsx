@@ -3,8 +3,7 @@
 
 //imports
 import { useState } from "react";
-import noteKey from "../assets/note-color-key.png"
-import exExample from "../assets/excersie-example.png"
+import { Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./database"
 import execPage from "../assets/exc-page.png";

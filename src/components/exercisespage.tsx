@@ -296,70 +296,89 @@ export function ExercisesPage({
 
     //html to render page
     return (
-        <div style={{ width: "90vw", marginTop: "10px" }}>
-            <div>
-            <h2>Welcome to the Exercises Page!</h2>
-            </div>
-            <h5 style={{fontStyle: "italic"}}>Sort by any of the given fields, then click an exercise to get started.</h5>
-            <div style={{float:'left', width: "30%", display: 'flex', flexDirection: 'column', alignItems: 'flex-start', justifyContent: 'flex-start'}}>
+        <div className="ex-page-container"> {/* SIR: added minHeight to prevent jitter */}
+            <div className="ex-left"> {/* SIR: left column div */}
+            <h2 style={{fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> {/*SIR: changed fontSize for consistency*/}
+            <h5 style={{fontStyle: "italic", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5> {/*SIR: changed fontSize for consistency*/}
                 <span>
-                <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
-                    <form id="tags" style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>
-                        <div style={{ fontSize: "16px", marginRight: "8px" }}>Tags:</div>
-                        <label style={{ display: "flex", alignItems: "center", marginRight: "12px" }}>
-                            <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{ marginRight: "4px" }} />
+                <div id="boxes" style={{ display: "inline-flex", alignItems: "center" }}> {/*SIR: div tag for filter checkboxes*/}
+                    <form id="tags" style={{ display: "flex", alignItems: "center", gap: "8px"}}> {/*SIR: added gap and alignItems to center*/}
+                        <div style={{ fontSize: "16px" }}>Tags:</div> {/*SIR: added fontSize for consistency*/}
+                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}> {/*SIR: added marginRight for spacing*/}
+                            <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{ marginRight: "6px" }} />
                             Pitch
                         </label>
-                        <label style={{ display: "flex", alignItems: "center", marginRight: "12px"}}>
-                            <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{ marginRight: "4px" }} />
+                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}> {/*SIR: added marginRight for spacing*/}
+                            <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{ marginRight: "6px" }} />
                             Intonation
                         </label>
-                        <label style={{ display: "flex", alignItems: "center" }}>
-                            <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange} style={{ marginRight: "4px" }} />
+                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}> {/*SIR: added marginRight for spacing*/}
+                            <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange} style={{ marginRight: "6px" }} />
                             Rhythm
                         </label>
+                        <label style={{ display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
+                            <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "6px" }} />
+                                Transposing Instruments
+                        </label>
                     </form>
-                    <form id="transpos" style={{ display: "flex", alignItems: "center", marginLeft: "-20px" }}>
-                        <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "4px" }} />
-                        <div style={{ fontSize: "16px", whiteSpace: "nowrap" }}>Transposing Instruments</div>
-                    </form>
-                </div>
-                <div id="dropdowns" style={{display: "inline-flex", padding: "4px"}}>
-                    <form id="difficulty">
-                        <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>
-                        <br></br>
-                        <select name="difficulty" onChange={diffChange}>
-                            <option value="All">All</option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
-                    </form>
-                    <form id="voiceCt">
-                        Voices:
-                        <br></br>
-                        <select name="voices" onChange={voiceChange}>
-                            <option value={0}>Any</option>
-                            <option value={1}>1</option>
-                            <option value={2}>2</option>
-                            <option value={3}>3</option>
-                            <option value={4}>4</option>
-                            <option value={5}>5</option>
-                        </select>
-                    </form>
-                    <form id="meterForm">
-                        Meter:
-                        <br></br>
-                        <select name='meter' defaultValue={types} onChange={meterChange}>
-                                <option value="Anything">Anything</option>
-                                <option value="Simple">Simple</option>
-                                <option value="Compound">Compound</option>
-                                
-                        </select>
-                    </form>
+                        {/*<input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "4px" }} />
+                        <div style={{ fontSize: "16px", whiteSpace: "nowrap" }}>Transposing Instruments</div>*/} {/*SIR: moved into label above for better alignment*/}
+                  </div>
+
+
+                    <div id="dropdowns" style={{display: "inline-flex", padding: "4px",  alignItems: "center"}}> {/*SIR: added gap and alignItems to center*/}
+                        <form id="difficulty">
+                            <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>
+                            <br></br>
+                            <select name="difficulty" onChange={diffChange}>
+                                <option value="All">All</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </form>
+                        <form id="voiceCt">
+                            Voices:
+                            <br></br>
+                            <select name="voices" onChange={voiceChange}>
+                                <option value={0}>Any</option>
+                                <option value={1}>1</option>
+                                <option value={2}>2</option>
+                                <option value={3}>3</option>
+                                <option value={4}>4</option>
+                                <option value={5}>5</option>
+                            </select>
+                        </form>
+                        <form id="meterForm">
+                            Meter:
+                            <br></br>
+                            <select name='meter' defaultValue={types} onChange={meterChange}>
+                                    <option value="Anything">Anything</option>
+                                    <option value="Simple">Simple</option>
+                                    <option value="Compound">Compound</option>
+                                    
+                            </select>
+                        </form>
+                        
+                        
+                    </div>
                     
+                    <div style={{display: "inline-flex", padding: "4px", gap: "8px", alignItems: "center"}}>
+                        <form id='typesForm' style={{margin: 0}}>
+                            Textural Factors:
+                            <br></br>
+                            <select name="types" onChange={typesChange}>
+                                <option value="None">None</option>
+                                <option value="Drone">Drone</option>
+                                <option value="Ensemble Parts">Ensemble Parts</option>
+                                <option value="Both">Drone & Ensemble Parts</option>
+                            </select>
+                        </form>
+
+                        <Button variant="danger" onClick={resetSort} style={{marginLeft: "6px", padding: "6px 10px"}}>Reset Sort</Button>
+                    </div>
                     
                 </div>
                 
@@ -378,18 +397,9 @@ export function ExercisesPage({
                     <Button variant="danger" onClick={resetSort} style={{marginLeft: "8px"}}>Reset Sort</Button>
                 </div>
                 </span>
-                {/* pull from paginated exercises */}
-                {pageExercises.map(function(exercise){
-                    if(exercise !== undefined) {
-                        return (
-                        <div key = {exercise.title} id = {exercise.title} onClick={exChange} style={{margin: "8px", padding: "6px", cursor: "pointer", backgroundColor: "#fcfcd2", borderRadius: "2px"}}>
-                            {exercise.title}
-                        </div>
-                        )}
-                    else return <></>;
-                })}
+                <div style={{marginTop: "8px", display: "flex", alignItems: "center", gap: "8px"}}>
                 {/* add page navigation buttons, call newly defined functions */}
-                <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                
                         <Button
                             onClick={prevPage}
                             disabled={currentPage === 1}
@@ -419,13 +429,26 @@ export function ExercisesPage({
                         >
                             ›
                         </Button>
+                    </div>
+                <div style={{flex: "1", display: "flex", flexDirection: "column", minWidth:"200px"}}> {/* SIR: listed exercises, added minHeight to prevent jitter */}
+                {/* pull from paginated exercises */}
+                {pageExercises.map(function(exercise){
+                    if(exercise !== undefined) {
+                        return (
+                        <div key = {exercise.title} id = {exercise.title} onClick={exChange} style={{margin: "4px 0", padding: "10px", cursor: "pointer", backgroundColor: "#fcfcd2", borderRadius: "4px", fontSize: "1.05rem"}}>
+                            {exercise.title}
+                        </div>
+                        )}
+                    else return <></>;
+                })}
                 </div>
                 {exList.length === 0 ? 
                     !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
                 <div>No exercises with those criteria found!</div> : <></>}
             </div>
-            <div style={{float:'right',width:'65%', marginRight: "2vw"}}>
-                {selExercise !== undefined ? <div>
+            <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
+                {selExercise !== undefined ? (
+                <div> 
                     <Exercise 
                         key={selExercise.exIndex} 
                         teacherMode={false} 
@@ -437,10 +460,15 @@ export function ExercisesPage({
                         isSelected={undefined}
                         fetch={undefined}
                     />
-                    
-                </div> : <></>}
+                </div> 
+                ) : (
+                    <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
+                        <h3>No exercise loaded</h3>
+                        <p>Select an exercise from the left to begin.</p>
+                    </div>
+            )}
             
-            <div style={{display:"flex", justifyContent: "center"}}>
+            <div style={{display:"flex", justifyContent: "center", marginLeft: "160px"}}> {/* SIR: added marginLeft to back/next button */}
                 <button  className= "btnback" id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
                 <button className= "btnback" id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
             </div>

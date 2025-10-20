@@ -14,6 +14,11 @@
   color: #dc582a; /*Dark Orange 1*/
 }
 
+.Home-title {
+  margin: 0;
+  padding: 0;
+}
+
 .Home-bar {
   display: flex;
   padding-left: 1vw;
@@ -99,6 +104,7 @@ body {
   justify-content: flex-start;
   align-items: stretch;
   flex-direction: column;
+  align-items: center; /*SIR: removed justifyContent: center*/
   text-align: center;
   padding: 1vh 1vw 1vh 1vw;
   margin-top: 0px;
@@ -356,6 +362,80 @@ nav ul li a:hover::after {
 }
 .tab-contents.active-tab {
   display: block;
+}
+
+/* Exercises page responsive layout */
+.ex-page-container {
+  width: 100%;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  min-height: 350px;
+}
+.ex-left {
+  padding-right: 2vw;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  flex: 0 1 35%; /* don't grow beyond 35%, can shrink down to its min-width */
+  min-width: 600px;
+  max-width: 45%;
+}
+.ex-right {
+  flex: 1; /* grow to fill remaining space, can shrink */
+  margin-left: 2vw;
+  display: flex;
+  flex-direction: column;
+  min-width: 260px;
+}
+
+/* Make forms and lists inside the left column wrap and shrink nicely */
+.ex-left form, .ex-left #boxes, .ex-left #dropdowns {
+  width: 100%;
+}
+
+/*No loaded exercise placeholder styling*/
+.exercise-placeholder {
+  flex: 1;
+  display: flex;
+  margin: 3vw;
+  margin-left: 12vw;
+  min-width: 260px;
+  flex-direction: column;
+  align-items: right;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  padding: 100px;
+  background-color: #f9f9f9;
+  color: #666;
+} 
+
+/* Responsive breakpoint: stack columns on small screens */
+@media (max-width: 1400px) {
+  .ex-page-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .ex-left, .ex-right, .exercise-placeholder {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+  }
+  .ex-right {
+    order: 2;
+  }
+  .ex-left {
+    order: 1;
+  }
+}
+
+/* Small tweaks for very small screens */
+@media (max-width: 480px) {
+  .ex-left { padding-right: 0.5rem; }
+  .ex-right { padding-left: 0.5rem; }
+  .ex-left form { font-size: 0.95rem; }
 }
 
 /* -----------------------------services---------------------- */
@@ -652,7 +732,7 @@ form {
 nav .fas {
   display: none;
 }
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 1100px) {
   #header {
     background-image: url(assets/musicbg1.jpg);
   }
@@ -720,6 +800,12 @@ nav .fas {
   }
   .copyright {
     font-size: 15px;
+  }
+  .responsive-element { /*edit button so that it shrinks*/
+    height: 50px;
+  }
+  audio {
+    width: 150px;
   }
 }
 #msg {
