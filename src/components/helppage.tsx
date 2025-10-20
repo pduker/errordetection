@@ -1,44 +1,14 @@
-/**
- * Help Page component
- *
- * Purpose:
- *  - Render a help landing page with topic cards that navigate to subpages.
- *  - Provide a simple admin login control used to toggle an authorization flag
- *    elsewhere in the app (backed by Firebase auth).
- *
- * Public API:
- *  - export function HelpPage({ authorized, setAuthorized })
- *      - authorized: boolean — current authorization state (read-only here)
- *      - setAuthorized: (authorized: boolean) => void — called to update auth state
- */
-
-// Un-used imports, but could be used later
-// import { sha256 } from 'js-sha256';
-// import noteKey from "../assets/note-color-key.png"
-// import exExample from "../assets/excersie-example.png"
-// import execPage from "../assets/exc-page.png";
-// import filterSec from "../assets/filterPage.png";
-// import click from "../assets/noteClick.png";
-// import check from "../assets/check-answer.png";
-
+//imports
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./database"
-
+import execPage from "../assets/exc-page.png";
+import filterSec from "../assets/filterPage.png";
+import click from "../assets/noteClick.png";
+import check from "../assets/check-answer.png";
 
 //function for creating the help page, for authorized users
-/**
- * HelpPage component
- *
- * Renders:
- *  - Header and grid of CardLink items linking to help subpages.
- *  - An admin login area (email + password + submit) used to toggle the
- *    authorized state via setAuthorized.
- *
- * Note: Inputs in the admin area are currently uncontrolled DOM elements
- * accessed with document.getElementById. See the file header for recommended changes.
- */
 export function HelpPage({
     authorized,
     setAuthorized
@@ -46,6 +16,7 @@ export function HelpPage({
     authorized: boolean;
     setAuthorized: ((authorized: boolean) => void);
 }) {
+    //setting state
     const [error, setError] = useState<boolean>(false);
 
     /**
@@ -89,50 +60,30 @@ export function HelpPage({
         );
     };
 
-    /**
-     * login
-     *
-     * Sign in using Firebase auth. On success, call setAuthorized(true) and clear errors.
-     * On failure, set the error flag which triggers a simple UI message.
-     *
-     * Note: Avoid logging sensitive data. Only the authenticated user's email is logged here.
-     */
     const login = async (email: string, password: string) => {
         try {
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            console.log("Logged in as:", userCredential.user.email);
-            // Set admin privileges based on login
-            setAuthorized(true);
-            setError(false);
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
+          console.log("Logged in as:", userCredential.user.email);
+          // Set admin privileges based on login
+          setAuthorized(true);
+          setError(false);
         } catch (error) {
-            // In production, surface a user-friendly message and log error details securely.
-            console.error("Login failed");
-            setError(true);
+          console.error("Login failed");
+          setError(true);
         }
     };
-
-    /**
-     * checkAuth
-     *
-     * Read values from the DOM inputs and call `login`.
-     *
-     * Implementation detail:
-     *  - This is using uncontrolled inputs (document.getElementById). Prefer converting
-     *    to controlled inputs with useState or using refs for a cleaner React approach.
-     */
-    const checkAuth = function () {
+    
+    const checkAuth = function() {
         var box1 = document.getElementById("mng-email");
         var box2 = document.getElementById("mng-pwd");
-        if (box2 !== null && "value" in box2 && box1 !== null && "value" in box1) {
+        if(box2 !== null && "value" in box2 && box1 !== null && "value" in box1) {
             var email = box1.value as string;
             var password = box2.value as string;
-            login(email, password);
+            login(email,password);
         }
     }
 
     //rendering page with help information
-    // NOTE: content is scrollable and the admin area is fixed to the viewport bottom
-    // The content area has extra bottom padding so it won't be hidden behind the fixed footer.
     return (
         <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
             <div style={{ flex: "1 1 auto", overflowY: "auto", padding: 16 }}>
