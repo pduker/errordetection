@@ -14,6 +14,11 @@
   color: #dc582a; /*Dark Orange 1*/
 }
 
+.Home-title {
+  margin: 0;
+  padding: 0;
+}
+
 .Home-bar {
   display: flex;
   padding-left: 1vw;
@@ -42,7 +47,7 @@ a {
 }
 
 a:hover {
-  color: #add8e6;
+  color: #4782d0;
 }
 
 @keyframes App-logo-spin {
@@ -369,7 +374,7 @@ nav ul li a:hover::after {
   justify-content: flex-start;
   flex-direction: column;
   flex: 0 1 35%; /* don't grow beyond 35%, can shrink down to its min-width */
-  min-width: 220px;
+  min-width: 600px;
   max-width: 45%;
 }
 .ex-right {

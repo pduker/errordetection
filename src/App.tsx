@@ -115,12 +115,14 @@ function App() {
         </Nav>
 
         <div style={{ position: 'absolute', right: '50%', transform: 'translateX(50%)', textAlign: 'center' }}>
-        <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginBottom: '5px' }}>
-        University of Delaware
-        </Navbar.Brand>
-        <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block' }}>
-        Aural Skills Error Detection Practice Site
-        </Navbar.Brand>
+          <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0}}>
+            <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', fontSize: '30px', lineHeight: 1, marginBottom: '6px' }}>
+              University of Delaware
+            </Navbar.Brand>
+            <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block' }}>
+              Aural Skills Error Detection Practice Site
+            </Navbar.Brand>
+          </div>
         </div>
 
 
