@@ -9,17 +9,7 @@ export default function NoteClicking() {
             </div>
              <h2>Clicking Notes</h2>
              <p style={{ textAlign: "left" }}>Your job is to click on the notes where you hear something different from the score. Click a note multiple times to cycle error types.</p>
-             <img
-                alt="note click"
-                src={click}
-                style={{
-                  width: "100%",
-                  maxWidth: "100%",
-                  height: "auto",
-                  display: "block",
-                  transform: "translateY(-20px)"
-                }}
-             />
+             <img alt="note click" src={click} style={{width: "100%", maxWidth: "100%", height: "auto", display: "block"}} />
          </div>
      );
  }

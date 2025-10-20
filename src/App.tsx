@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+//imports
+import React, { useEffect, useState } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
-
-import { getDatabase } from 'firebase/database';
-import { ref, get, DataSnapshot, orderByKey, query } from 'firebase/database';
-
-import ExerciseData from './interfaces/exerciseData';
+import logo from './assets/UD-circle-logo-email.png';
+import './App.css';
+//import BoopButton from "./components/audiohander"
+//import { HomePage } from './components/homepage';
 import { HelpPage } from './components/helppage';
 import ExercisesOverview from './components/helpSections/ExercisesOverview';
 import FiltersInfo from './components/helpSections/FiltersInfo';
@@ -16,65 +15,84 @@ import CheckAnswers from './components/helpSections/CheckAnswers';
 import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+//import { Interface } from 'readline';
+import ExerciseData from './interfaces/exerciseData';
+import DBData from './interfaces/DBData';
+import { getDatabase } from 'firebase/database';
+import { ref, onValue, DataSnapshot } from 'firebase/database';
+import { getBlob, getStorage, ref as storageRef } from 'firebase/storage';
 
-import './App.css';
-import logo from './assets/UD-circle-logo-email.png';
+//import Navbar from "./components/navbar"
 
-// app function to initialize site
+//app function to initlize site
 function App() {
+  //state initialization
   const [allExData,setAllExData] = useState<(ExerciseData | undefined)[]>([]);
-  const [scoresRetrieved, setScoresRetrieved] = useState<boolean>(false); // track whether scores are retrieved
+  const [scoresRetrieved, setScoresRetrieved] = useState<boolean>(false); // Track whether scores are retrieved
   const [authorized, setAuthorized] = useState<boolean>(false); // has the user put in the admin pwd on help page?
-
-  // get data from the database
-  const fetchScoresFromDatabase = async () => {
-    if(scoresRetrieved) return;
-
-    console.log("Retrieving scores...");
-
-    try {
-      const database = getDatabase();
-
-      const exerciseList: ExerciseData[] = [];
-      // fetch all scores from the database
-      // we have a relatively low amount of scores, so this operation is very quick
-      // if the scope of this application is larger in the future, look into pagination
-      const scores = await get(query(ref(database, 'scores'), orderByKey()));
-      scores.forEach((scoreSnapshot: DataSnapshot) => { // for every score fetched,
-        const score = scoreSnapshot.val(); // get the data fetched
-        if(!score || !score.sound) return; // if these values aren't populated, something has gone seriously wrong!
-
-        exerciseList.push(new ExerciseData( // add it to the list of exercises
-          score.score,
-          score.sound,
-          score.correctAnswers,
-          score.feedback,
-          score.exIndex,
-          score.empty,
-          score.title,
-          score.difficulty,
-          score.voices,
-          score.tags,
-          score.types,
-          score.meter,
-          score.transpos,
-          undefined,
-          score.customId
-        ));
-      });
-
-      setAllExData(exerciseList); // once we've fetched and filled out our list, commit it to React state
-      setScoresRetrieved(true); // all done!
-
-      console.log("Loaded exercise list");
-    } catch (error) {
-      console.error('Error fetching scores:', error);
+  
+  //get data from the database
+  const fetchScoresFromDatabase = async (scoresRet: boolean) => {
+    if(!scoresRet) {
+      console.log("Retrieving scores");
+      try {
+        const database = getDatabase();
+        const scoresRef = ref(database, 'scores');
+        onValue(scoresRef, (snapshot) => {
+          const scoresData: DBData[] = [];
+          snapshot.forEach((childSnapshot: DataSnapshot) => {
+            const score = childSnapshot.val();
+            if (score) {
+              scoresData.push(score);
+            }
+          });
+          // Update state with scores retrieved from the database
+          const scoresData2: ExerciseData[] = [];
+          const storage = getStorage();
+          //const audioref = storageRef(storage, "mp3Files");
+          scoresData.forEach(async function (value) {
+            if(value.sound){
+            const blob = await getBlob(storageRef(storage, value.sound));
+            //console.log(blob);
+            //let response = await fetch(blob);
+            //let data = await response.blob();
+            var file = new File([blob], value.sound, {type: "audio/mpeg"})
+            var thing = new ExerciseData(
+                value.score,
+                file,
+                value.correctAnswers,
+                value.feedback,
+                value.exIndex,
+                value.empty,
+                value.title,
+                value.difficulty,
+                value.voices,
+                value.tags,
+                value.types,
+                value.meter,
+                value.transpos,
+                undefined,
+                value.customId
+            );
+            scoresData2.push(thing);
+            //console.log(thing);
+            }
+        });
+        // After timed delay: set scoresRetrieved to true after retrieving scores
+          if(scoresData.length < 80) setTimeout(function(){setAllExData(scoresData2); setScoresRetrieved(true);}, 2000 + (100*scoresData.length));
+          else setTimeout(function(){setAllExData(scoresData2); setScoresRetrieved(true);}, 10000);
+           
+        });
+      } catch (error) {
+        console.error('Error fetching scores:', error);
+        // Add additional error handling if necessary
+      }
     }
+    console.log(allExData);
   };
 
-  useEffect(() => {
-    fetchScoresFromDatabase(); // fetch from the database on component creation
-  }, [allExData, setAllExData, scoresRetrieved, setScoresRetrieved]);
+  useEffect(()=>{fetchScoresFromDatabase(scoresRetrieved)});
   
   //return fucntion for rendering app
   return (
