@@ -4,7 +4,6 @@
 
 This website helps music students improve their **listening skills** by practicing how to hear mistakes in music. Users go through exercises where they listen to a recording and follow along with a music score. They try to find the wrong notes and get feedback to help them learn and improve.
 
-
 ## Features
 
 - Upload and interact with music-based exercises
