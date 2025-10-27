@@ -6,7 +6,7 @@ export function AboutPage() {
     return (
         <div>
             {/* header for page */}
-            <h2>About</h2>
+             <h2 style={{ marginLeft: '1rem' }}>About</h2>
             
             {/* class for about text */}
             <div className="about">
