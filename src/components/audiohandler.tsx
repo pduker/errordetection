@@ -11,7 +11,7 @@ export default function AudioHandler({ file }: { file: string | File }): JSX.Ele
 
     if(typeof file === "string") { // file is a URL to a file
       // get the audio data as a binary blob
-      getBlob(StorageRef(Storage, file)).then((blob: BlobPart) => {
+      getBlob(storageRef(Storage, file)).then((blob: BlobPart) => {
         const fileObject = new File([blob], file, {type: "audio/mpeg"}); // make a file out of the binary data
         const objectURL = URL.createObjectURL(fileObject); // create a URL to link it to an audio element
         if(audioRef.current) audioRef.current.src = objectURL; // set audio element's URL to the URL we just made
