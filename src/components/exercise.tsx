@@ -386,7 +386,9 @@ export function Exercise({
           coverBox.setAttribute("fill", "purple");
           coverBox.setAttribute("opacity", "0");
           coverBox.setAttribute("stroke", "none");
-          coverBox.setAttribute("clip-path", staffArray[staff].clipPath);
+          if (staffArray[staff]?.clipPath) {
+            coverBox.setAttribute("clip-path", staffArray[staff].clipPath);
+          }
           coverBox.style.pointerEvents = "none";
 
           // Add metadata and beat index
