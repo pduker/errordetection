@@ -4,6 +4,10 @@ import ExerciseData from '../interfaces/exerciseData';
 import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
 import { isDisabled } from '@testing-library/user-event/dist/utils';
+// import {AppSidebar} from './sidebar'
+
+import { AppSidebar } from './sidebar';
+import { FaBars } from 'react-icons/fa'; // <-- Import an icon for the toggle
 
 //function to create the exercise page, takes exercise data and renders a page
 export function ExercisesPage({
@@ -36,6 +40,9 @@ export function ExercisesPage({
     //showing exercises for the current page
     const startIndex = (currentPage -1) * pageSize;
     const pageExercises = exList.slice(startIndex, startIndex + pageSize);
+
+    // state for sidebar
+    const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     //pagination functions, navigate between functions
     const nextPage = () =>{
@@ -294,9 +301,16 @@ export function ExercisesPage({
 
     }
 
+    const toggleSidebar = () => {
+      setSidebarCollapsed(!isSidebarCollapsed);
+    };
+
     //html to render page
     return (
-        <div className="ex-page-container"> {/* SIR: added minHeight to prevent jitter */}
+        <div style={{ display: 'flex', minHeight: '100vh' }}>
+            <AppSidebar isCollapsed={isSidebarCollapsed} />
+            <div className="ex-page-container"> {/* SIR: added minHeight to prevent jitter */}
+        
             <div className="ex-left"> {/* SIR: left column div */}
             <h2 style={{fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> {/*SIR: changed fontSize for consistency*/}
             <h5 style={{fontStyle: "italic", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5> {/*SIR: changed fontSize for consistency*/}
@@ -470,6 +484,6 @@ export function ExercisesPage({
 
             <Exercise teacherMode ={false} allExData = {allExData} setAllExData = {setAllExData} files ={files} setFiles={setFiles} exIndex={1}></Exercise> */}
         </div>
-
+        </div>
     );
 }
