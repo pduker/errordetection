@@ -378,7 +378,11 @@ export function Exercise({
           coverBox.setAttribute("x", x.toString());
           coverBox.setAttribute("y", y.toString());
           coverBox.setAttribute("width", width.toString());
+          if (noteHeight < 0) {
+            coverBox.setAttribute("height", Math.abs(noteBottom - y).toString())
+          } else {
           coverBox.setAttribute("height", noteHeight.toString());
+          }
           coverBox.setAttribute("fill", "purple");
           coverBox.setAttribute("opacity", "0");
           coverBox.setAttribute("stroke", "none");
@@ -898,15 +902,15 @@ export function Exercise({
         coverBox.setAttribute("opacity", "0.5");
       }
 
-      console.log("Highlighting:", { beatIndex, measurePos, staffPos });
-      const coverBoxes = document.querySelectorAll(".cover-box");
-      coverBoxes.forEach((cb) => {
-        console.log("CoverBox:", {
-          beatIndex: cb.getAttribute("data-beatIndex"),
-          measurePos: cb.getAttribute("data-measure-pos"),
-          staffPos: cb.getAttribute("data-staff-pos"),
-        });
-      });
+      // console.log("Highlighting:", { beatIndex, measurePos, staffPos });
+      // const coverBoxes = document.querySelectorAll(".cover-box");
+      // coverBoxes.forEach((cb) => {
+      //   console.log("CoverBox:", {
+      //     beatIndex: cb.getAttribute("data-beatIndex"),
+      //     measurePos: cb.getAttribute("data-measure-pos"),
+      //     staffPos: cb.getAttribute("data-staff-pos"),
+      //   });
+      // });
     }
 
     // Find which selected notes are correct
@@ -943,6 +947,7 @@ export function Exercise({
   useEffect(() => {
     selAnswersRef.current = selAnswers;
   }, [selAnswers]);
+  
   // Updated checkAnswers: branch for rhythm exercises
   const checkAnswers = function () {
     if (tags.includes("Rhythm") && tags.length > 1) {
@@ -1022,6 +1027,15 @@ export function Exercise({
 
       feedback.push(
         `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`
+      );
+
+      highlightBeat(
+        selectedBeatElements as unknown as Element[],
+        currentCorrectAnswers
+      );
+      highlightMeasure(
+        selectedNoteElements as unknown as Element[],
+        currentCorrectAnswers
       );
 
       // Check for missing correct answers (both notes and beats)
