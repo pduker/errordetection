@@ -4,6 +4,7 @@ import ExerciseData from '../interfaces/exerciseData';
 import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
 import { isDisabled } from '@testing-library/user-event/dist/utils';
+import { useSearchParams } from 'react-router-dom';
 
 //function to create the exercise page, takes exercise data and renders a page
 export function ExercisesPage({
@@ -28,6 +29,9 @@ export function ExercisesPage({
     const [upd, setUpd] = useState<boolean>(false);
     const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
     const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
+
+    //state init for search params in the URL
+    const [searchParams, setSearchParams] = useSearchParams();
 
     //adding in state for pagination
     const [currentPage, setCurrentPage] = useState(1);
@@ -68,52 +72,60 @@ export function ExercisesPage({
                 if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
                     return tempTags.every((element) => exercise.tags.includes(element))
                 }
-                else return false;})
+                else return false;
+            })
         }
         if (tempDiff !== "All") {
             list = list.filter(function(exercise) {
                 if (exercise !== undefined) 
                     return tempDiff === String(exercise.difficulty) 
-                else return false;})
+                else return false;
+            })
         }
         if (tempVoices !== 0) {
             list = list.filter(function(exercise) {
                 if (exercise !== undefined) 
                     return tempVoices === exercise.voices
-                else return false;})
+                else return false;
+            })
         }
         if (tempTypes !== "None") {
             list = list.filter(function(exercise) {
                 if (exercise !== undefined){
                     return (tempTypes === exercise.types)}
-                else return false;})
+                else return false;
+            })
         }
         if (tempMeter !== "Anything") {
             list = list.filter(function(exercise) {
                 if (exercise !== undefined) 
                     return tempMeter === String(exercise.meter)
-                else return false;})
+                else return false;
+            })
         }
         if (tempTranspos === true) {
             list = list.filter(function(exercise) {
                 if (exercise !== undefined) 
                     return tempTranspos === exercise.transpos;
-                else return false;})
+                else return false;
+            })
         }
         list = list.sort(exSortFunc);
         setExList(list);
     } 
 
-    //loads the sorted exercises
+    //update URL search params when any of the sort attributes change
     useEffect(() => {
-        if(exList.length === 0) {
-            if(tags.length === 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos) setExList(allExData.sort(exSortFunc));
-            else if(tags.length > 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos && !upd) {
-                sortExercises(tags,"tags");
-                setUpd(true);
-            }
-        }
-    }, [exList.length, tags, diff, voices, types, meter, transpos, allExData, upd, sortExercises]);
+        const newParams = new URLSearchParams();
+        if (tags.length > 0) newParams.set('tags', tags.join(','));
+        if (diff !== "All") newParams.set('difficulty', diff);
+        if (voices !== 0) newParams.set('voices', voices.toString());
+        if (types !== "None") newParams.set('types', types);
+        if (meter !== "Anything") newParams.set('meter', meter);
+        if (transpos) newParams.set('transpos', 'true');
+        setSearchParams(newParams);
+    }, [tags, diff, voices, types, meter, transpos, setSearchParams]);
+
 
     //exercise sort function for comparing exercises against each other
     const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
@@ -292,6 +304,18 @@ export function ExercisesPage({
         
         setTranspos(false);
 
+    }
+
+    // Write a function to update allExData based on changes to state attributes as well as update URL params accordingly (maybe return new params?)
+    const updateFromURLParams = function () {
+        const newParams = new URLSearchParams();
+        if (tags.length > 0) newParams.set('tags', tags.join(','));
+        if (diff !== "All") newParams.set('difficulty', diff);
+        if (voices !== 0) newParams.set('voices', voices.toString());
+        if (types !== "None") newParams.set('types', types);
+        if (meter !== "Anything") newParams.set('meter', meter);
+        if (transpos) newParams.set('transpos', 'true');
+        setSearchParams(newParams);
     }
 
     //html to render page
