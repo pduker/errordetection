@@ -407,9 +407,9 @@ export function Exercise({
               const index = selAnswers.findIndex(
                 (item) =>
                   item.type === "beat" &&
-                  item.measurePos == measure &&
-                  item.staffPos == staff &&
-                  item.beatIndex == beatIndexForOverlay
+                  item.measurePos === measure &&
+                  item.staffPos === staff &&
+                  item.beatIndex === beatIndexForOverlay
               );
               if (index !== -1) selAnswers.splice(index, 1);
             } else {
@@ -758,7 +758,7 @@ export function Exercise({
 
     // Non-rhythm exercise handling (unchanged)
     for (let i = 0; i < selNotes.length; i++) {
-      var noteElems = selNotes[i].abselem.elemset[0];
+      noteElems = selNotes[i].abselem.elemset[0];
       const dict2: { [label: string]: number | string } = {
         index: noteElems.getAttribute("index"),
         staffPos: noteElems.getAttribute("staffPos"),
@@ -1174,7 +1174,7 @@ export function Exercise({
 
       setCustomFeedback(feedback);
       return;
-    } else if (tags.includes("Rhythm") && tags.length == 1) {
+    } else if (tags.includes("Rhythm") && tags.length === 1) {
       const instruments = getInstrumentList(exerciseData.score);
 
       // Define proper types for beat and note selections
