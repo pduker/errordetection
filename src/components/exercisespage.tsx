@@ -801,9 +801,6 @@ export function ExercisesPage({
     return (
         <div style={{ display: 'flex', minHeight: '100vh' }}>
             <AppSidebar isCollapsed={isSidebarCollapsed} />
-            
-            {/* This container uses the CSS class from App.css */}
-            {/* It will automatically use 'flex: 1' to fill remaining space */}
             <div className="ex-page-container"> 
 
                 {/* --- This new wrapper holds the button AND your two columns --- */}

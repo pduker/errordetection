@@ -1,7 +1,5 @@
 import React from 'react';
-// Make sure SubMenu is imported
 import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
-import { NavLink } from 'react-router-dom';
 
 // 1. Define the props interface
 interface AppSidebarProps {
@@ -23,27 +21,22 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
       // -----------------------
     >
       <Menu
-        menuItemStyles={{
-          button: {
-            // The active class will be added by NavLink
-            [`&.active`]: {
-              backgroundColor: '#13395e',
-              color: '#b6c8d9',
+          style={{
+            width: '100%',
+            maxWidth: '250px',
+            overflow: 'hidden',
+            transition: 'width 0.3s ease',
+          }}
+          menuItemStyles={{
+            button: {
+              // The active class will be added by NavLink
+              [`&.active`]: {
+                backgroundColor: '#13395e',
+                color: '#b6c8d9',
+              },
             },
-          },
-        }}
+          }}
       >
-        {/* <MenuItem component={<NavLink to="/documentation" />}> Documentation</MenuItem>
-        <MenuItem component={<NavLink to="/calendar" />}> Calendar</MenuItem>
-        <MenuItem component={<NavLink to="/e-commerce" />}> E-commerce</MenuItem> */}
-        
-        {/* <SubMenu label="Charts">
-          <MenuItem component={<NavLink to="/charts/pie" />}> Pie charts </MenuItem>
-          <MenuItem component={<NavLink to="/charts/line" />}> Line charts </MenuItem>
-          <MenuItem component={<NavLink to="/charts/bar" />}> Bar charts </MenuItem>
-        </SubMenu> */}
-
-        {/* --- I've added extra items below to demonstrate the scrolling --- */}
         <MenuItem> Tags </MenuItem>
         <MenuItem> Pitch </MenuItem>
         <MenuItem> Intonation </MenuItem>
@@ -53,7 +46,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
           <MenuItem> Text </MenuItem>
           <MenuItem> Text </MenuItem>
         </SubMenu>
-        {/* --------------------------------------------------------------- */}
       </Menu>
     </Sidebar>
   );
