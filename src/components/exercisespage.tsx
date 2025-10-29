@@ -8,14 +8,14 @@ import { isDisabled } from '@testing-library/user-event/dist/utils';
 //function to create the exercise page, takes exercise data and renders a page
 export function ExercisesPage({
     allExData,
-    setAllExData,
-    defaultTags,
-    scoresRet
+    defaultTags = [],
+    scoresRet = true,
+    setAllExData = () => {}
 }:{
     allExData: (ExerciseData | undefined)[];
-    setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
-    defaultTags: string[];
-    scoresRet: boolean;
+    setAllExData?: ((newData: (ExerciseData | undefined)[]) => void);
+    defaultTags?: string[];
+    scoresRet?: boolean;
 }){
     //state init for the differnt attributes
     const [diff, setDiff] = useState<string>("All");
