@@ -13,9 +13,9 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
       collapsed={isCollapsed}
       // --- ADD THESE STYLES ---
       rootStyles={{
-        height: '100vh',    // Set the height to 100% of the viewport
-        position: 'absolute', // Make it stick to the top
-        top: 0,             // Anchor it to the top
+        height: '100vh',
+        position: 'absolute',
+        top: 0,
         left: 0,
         zIndex: 10,
       }}
