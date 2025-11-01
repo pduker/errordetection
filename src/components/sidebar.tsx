@@ -9,17 +9,21 @@ interface AppSidebarProps {
 // 2. Update the component to accept and use the props
 export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
   return (
-    <Sidebar 
+    <Sidebar
       collapsed={isCollapsed}
-      // --- ADD THESE STYLES ---
+      // width="260px"
+      collapsedWidth="0px"
+      className="app-sidebar"
       rootStyles={{
-        height: '100vh',
         position: 'absolute',
         top: 0,
         left: 0,
+        height: '100vh',
         zIndex: 10,
+        overflow: 'hidden',
+        borderRight: 'none',
+        boxShadow: 'none',
       }}
-      // -----------------------
     >
       <Menu
           style={{

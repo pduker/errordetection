@@ -358,6 +358,10 @@ nav ul li a:hover::after {
   display: block;
 }
 
+.app-sidebar .ps-menu-root {
+  margin-top: 100px;
+}
+
 /* Exercises page responsive layout */
 .ex-page-container {
   width: 100%;
