@@ -15,6 +15,23 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
   );
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
+  const sidebarRootStyles = useMemo(() => {
+    const baseStyles = {
+      position: 'absolute' as const,
+      top: 0,
+      left: 0,
+      height: '100vh',
+      zIndex: 10,
+      overflow: 'hidden',
+      borderRight: 'none',
+      boxShadow: 'none',
+    };
+
+    return isCollapsed
+      ? { ...baseStyles, pointerEvents: 'none' as const }
+      : { ...baseStyles, pointerEvents: 'auto' as const };
+  }, [isCollapsed]);
+
   const toggleTag = (tag: string) => {
     setSelectedTags((prev) =>
       prev.includes(tag) ? prev.filter((item) => item !== tag) : [...prev, tag]
@@ -24,19 +41,9 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
   return (
     <Sidebar
       collapsed={isCollapsed}
-      // width="260px"
-      collapsedWidth="0"
+      collapsedWidth="0px"
       className="app-sidebar"
-      rootStyles={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        height: '100vh',
-        zIndex: 10,
-        overflow: 'hidden',
-        borderRight: 'none',
-        boxShadow: 'none',
-      }}
+      rootStyles={sidebarRootStyles}
     >
       <Menu
           style={{

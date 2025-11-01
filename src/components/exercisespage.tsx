@@ -41,7 +41,7 @@ export function ExercisesPage({
     const pageExercises = exList.slice(startIndex, startIndex + pageSize);
 
     // state for sidebar
-    const [isSidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [isSidebarCollapsed, setSidebarCollapsed] = useState(true);
 
     //pagination functions, navigate between functions
     const nextPage = () =>{
