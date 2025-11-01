@@ -312,7 +312,7 @@ export function ExercisesPage({
 
     //html to render page
     return (
-        <div style={{ display: 'flex', minHeight: '100vh' }}>
+        <div className="fullpage" style={{ display: 'flex', minHeight: '100vh', position: 'relative' }}>
             <AppSidebar isCollapsed={isSidebarCollapsed} />
             <div className="ex-page-container"> 
 

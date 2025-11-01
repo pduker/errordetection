@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
+import { FaCheck } from 'react-icons/fa';
 
 // 1. Define the props interface
 interface AppSidebarProps {
@@ -8,17 +9,34 @@ interface AppSidebarProps {
 
 // 2. Update the component to accept and use the props
 export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
+  const tagItems = useMemo(
+    () => ['Pitch', 'Intonation', 'Rhythm', 'Transposing Instruments'],
+    []
+  );
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags((prev) =>
+      prev.includes(tag) ? prev.filter((item) => item !== tag) : [...prev, tag]
+    );
+  };
+
   return (
-    <Sidebar 
+    <Sidebar
       collapsed={isCollapsed}
-      // --- ADD THESE STYLES ---
+      // width="260px"
+      collapsedWidth="0"
+      className="app-sidebar"
       rootStyles={{
-        height: '100vh',    // Set the height to 100% of the viewport
-        position: 'sticky', // Make it stick to the top
-        top: 0,             // Anchor it to the top
-        width: '250px',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        height: '100vh',
+        zIndex: 10,
+        overflow: 'hidden',
+        borderRight: 'none',
+        boxShadow: 'none',
       }}
-      // -----------------------
     >
       <Menu
           style={{
@@ -37,10 +55,16 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
             },
           }}
       >
-        <MenuItem> Tags </MenuItem>
-        <MenuItem> Pitch </MenuItem>
-        <MenuItem> Intonation </MenuItem>
-        <MenuItem> Rhythm </MenuItem>
+        {tagItems.map((tag) => (
+          <MenuItem
+            key={tag}
+            active={selectedTags.includes(tag)}
+            onClick={() => toggleTag(tag)}
+            suffix={selectedTags.includes(tag) ? <FaCheck size={12} /> : null}
+          >
+            {tag}
+          </MenuItem>
+        ))}
         <SubMenu label="Advanced">
           <MenuItem> Text </MenuItem>
           <MenuItem> Text </MenuItem>
