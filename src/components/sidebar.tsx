@@ -12,7 +12,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
     <Sidebar
       collapsed={isCollapsed}
       // width="260px"
-      collapsedWidth="0px"
+      collapsedWidth="0"
       className="app-sidebar"
       rootStyles={{
         position: 'absolute',

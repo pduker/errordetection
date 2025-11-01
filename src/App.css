@@ -354,12 +354,26 @@ nav ul li a:hover::after {
   color: #1f0545;
   font-size: 14px;
 }
+
 .tab-contents.active-tab {
   display: block;
 }
 
 .app-sidebar .ps-menu-root {
   margin-top: 100px;
+}
+
+.app-sidebar .ps-menuitem-root {
+  margin: 0;
+  padding: 0;
+}
+
+.app-sidebar .ps-menu-button {
+  width: 100%;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  justify-content: flex-start;
 }
 
 /* Exercises page responsive layout */
