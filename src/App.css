@@ -359,8 +359,10 @@ nav ul li a:hover::after {
   display: block;
 }
 
+/* Sidebar styling */
 .app-sidebar .ps-menu-root {
   margin-top: 100px;
+  background: #4e81b3;
 }
 
 .app-sidebar .ps-menuitem-root {
@@ -374,6 +376,10 @@ nav ul li a:hover::after {
   padding: 0.75rem 1rem;
   border-radius: 8px;
   justify-content: flex-start;
+}
+
+.app-sidebar .ps-menu-button::after {
+  content: none !important;
 }
 
 /* Exercises page responsive layout */
