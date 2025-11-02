@@ -1,19 +1,28 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import { FaCheck } from 'react-icons/fa';
 
 // 1. Define the props interface
 interface AppSidebarProps {
   isCollapsed: boolean;
+  selectedTags: string[];
+  onToggleTag: (tag: string) => void;
+  transposing: boolean;
+  onToggleTransposing: () => void;
 }
 
 // 2. Update the component to accept and use the props
-export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
+export const AppSidebar: React.FC<AppSidebarProps> = ({
+  isCollapsed,
+  selectedTags,
+  onToggleTag,
+  transposing,
+  onToggleTransposing,
+}) => {
   const tagItems = useMemo(
-    () => ['Pitch', 'Intonation', 'Rhythm', 'Transposing Instruments'],
+    () => ['Pitch', 'Intonation', 'Rhythm'],
     []
   );
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const sidebarRootStyles = useMemo(() => {
     const baseStyles = {
@@ -31,12 +40,6 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
       ? { ...baseStyles, pointerEvents: 'none' as const }
       : { ...baseStyles, pointerEvents: 'auto' as const };
   }, [isCollapsed]);
-
-  const toggleTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((item) => item !== tag) : [...prev, tag]
-    );
-  };
 
   return (
     <Sidebar
@@ -66,12 +69,19 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({ isCollapsed }) => {
           <MenuItem
             key={tag}
             active={selectedTags.includes(tag)}
-            onClick={() => toggleTag(tag)}
+            onClick={() => onToggleTag(tag)}
             suffix={selectedTags.includes(tag) ? <FaCheck size={12} /> : null}
           >
             {tag}
           </MenuItem>
         ))}
+        <MenuItem
+          active={transposing}
+          onClick={onToggleTransposing}
+          suffix={transposing ? <FaCheck size={12} /> : null}
+        >
+          Transposing Instruments
+        </MenuItem>
         <SubMenu label="Advanced">
           <MenuItem> Text </MenuItem>
           <MenuItem> Text </MenuItem>

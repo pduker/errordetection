@@ -198,6 +198,21 @@ export function ExercisesPage({
         setSelExercise(ex);
     }
 
+    const handleTagToggle = React.useCallback((tag: string) => {
+        const hasTag = tags.includes(tag);
+        const updated = hasTag ? tags.filter((item) => item !== tag) : [...tags, tag];
+        setTags(updated);
+        setCurrentPage(1);
+        sortExercises(updated, "tags");
+    }, [tags, sortExercises]);
+
+    const handleTransposToggle = React.useCallback(() => {
+        const next = !transpos;
+        setTranspos(next);
+        setCurrentPage(1);
+        sortExercises(next, "transpos");
+    }, [transpos, sortExercises]);
+
     //all the onClick functions for when a sorting field is changed
     const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setDiff((e.target.value));
@@ -205,17 +220,7 @@ export function ExercisesPage({
         sortExercises(e.target.value,"diff");
     }
     const tagsChange = function (e: React.ChangeEvent<HTMLInputElement>) {
-        let val = e.target.value;
-        if(tags.includes(val)) {
-            tags.splice(tags.indexOf(val), 1);
-            setTags([...tags]);
-            setCurrentPage(1);
-            sortExercises([...tags],"tags");
-        } else {
-            setTags([...tags, val]);
-            setCurrentPage(1);
-            sortExercises([...tags, val],"tags");
-        } 
+        handleTagToggle(e.target.value);
     }
     const voiceChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
         setVoices(Number(e.target.value));
@@ -233,9 +238,7 @@ export function ExercisesPage({
         sortExercises(e.target.value, "meter");
     }
     const transposChange = function(e: React.ChangeEvent<HTMLInputElement>) {
-        setTranspos(!transpos);
-        setCurrentPage(1);
-        sortExercises(!transpos, "transpos");
+        handleTransposToggle();
     }
 
     //onClick function for when Back button is pushed under exercise
@@ -313,7 +316,13 @@ export function ExercisesPage({
     //html to render page
     return (
         <div className="fullpage" style={{ display: 'flex', minHeight: '100vh', position: 'relative' }}>
-            <AppSidebar isCollapsed={isSidebarCollapsed} />
+            <AppSidebar
+                isCollapsed={isSidebarCollapsed}
+                selectedTags={tags}
+                onToggleTag={handleTagToggle}
+                transposing={transpos}
+                onToggleTransposing={handleTransposToggle}
+            />
             <div className="ex-page-container"> 
 
                 {/* --- This new wrapper holds the button AND your two columns --- */}
