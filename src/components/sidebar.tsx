@@ -30,6 +30,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       top: 0,
       left: 0,
       height: '100vh',
+      width: '280px',
       zIndex: 10,
       overflow: 'hidden',
       borderRight: 'none',
@@ -51,17 +52,37 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       <Menu
           style={{
             width: '100%',
-            maxWidth: '250px',
+            maxWidth: '280px',
             overflow: 'hidden',
             transition: 'width 0.3s ease',
           }}
           menuItemStyles={{
             button: {
+              display: 'flex',
+              alignItems: 'center',
+              paddingRight: '12px',
               // The active class will be added by NavLink
               [`&.active`]: {
                 backgroundColor: '#13395e',
                 color: '#b6c8d9',
               },
+            },
+            suffix: {
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              marginLeft: 'auto',
+              minWidth: '20px',
+            },
+            label: {
+              flexGrow: 1,
+            },
+            SubMenuExpandIcon: {
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              marginLeft: 'auto',
+              minWidth: '20px',
             },
           }}
       >
