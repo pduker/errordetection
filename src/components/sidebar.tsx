@@ -76,7 +76,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
       height: '100vh',
       width: '280px',
       zIndex: 10,
-      overflow: 'hidden',
+      overflowX: 'hidden' as const,
+      overflowY: 'auto' as const,
       borderRight: 'none',
       boxShadow: 'none',
     };
@@ -97,7 +98,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           style={{
             width: '100%',
             maxWidth: '280px',
-            overflow: 'hidden',
+            overflowY: 'auto',
+            overflowX: 'hidden',
             transition: 'width 0.3s ease',
           }}
           menuItemStyles={{
