@@ -365,6 +365,12 @@ nav ul li a:hover::after {
   background: #4e81b3;
 }
 
+.app-sidebar .ps-sidebar-container {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .app-sidebar .ps-menuitem-root {
   margin: 0;
   padding: 0;
