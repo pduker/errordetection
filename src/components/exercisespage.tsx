@@ -213,29 +213,45 @@ export function ExercisesPage({
         sortExercises(next, "transpos");
     }, [transpos, sortExercises]);
 
+    const handleDifficultySelect = React.useCallback((value: string) => {
+        setDiff(value);
+        setCurrentPage(1);
+        sortExercises(value, "diff");
+    }, [sortExercises]);
+
+    const handleVoicesSelect = React.useCallback((value: number) => {
+        setVoices(value);
+        setCurrentPage(1);
+        sortExercises(value, "voices");
+    }, [sortExercises]);
+
+    const handleMeterSelect = React.useCallback((value: string) => {
+        setMeter(value);
+        setCurrentPage(1);
+        sortExercises(value, "meter");
+    }, [sortExercises]);
+
+    const handleTexturalFactorSelect = React.useCallback((value: string) => {
+        setTypes(value);
+        setCurrentPage(1);
+        sortExercises(value, "types");
+    }, [sortExercises]);
+
     //all the onClick functions for when a sorting field is changed
     const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
-        setDiff((e.target.value));
-        setCurrentPage(1);
-        sortExercises(e.target.value,"diff");
+        handleDifficultySelect(e.target.value);
     }
     const tagsChange = function (e: React.ChangeEvent<HTMLInputElement>) {
         handleTagToggle(e.target.value);
     }
     const voiceChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
-        setVoices(Number(e.target.value));
-        setCurrentPage(1);
-        sortExercises(Number(e.target.value),"voices");
+        handleVoicesSelect(Number(e.target.value));
     }
     const typesChange = function (e: React.ChangeEvent<HTMLSelectElement>){
-        setTypes(e.target.value);
-        setCurrentPage(1);
-        sortExercises(e.target.value,"types");
+        handleTexturalFactorSelect(e.target.value);
     }
     const meterChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
-        setMeter(e.target.value);
-        setCurrentPage(1);
-        sortExercises(e.target.value, "meter");
+        handleMeterSelect(e.target.value);
     }
     const transposChange = function(e: React.ChangeEvent<HTMLInputElement>) {
         handleTransposToggle();
@@ -322,6 +338,14 @@ export function ExercisesPage({
                 onToggleTag={handleTagToggle}
                 transposing={transpos}
                 onToggleTransposing={handleTransposToggle}
+                difficulty={diff}
+                onSelectDifficulty={handleDifficultySelect}
+                voices={voices}
+                onSelectVoices={handleVoicesSelect}
+                meter={meter}
+                onSelectMeter={handleMeterSelect}
+                texturalFactor={types}
+                onSelectTexturalFactor={handleTexturalFactorSelect}
             />
             <div className="ex-page-container"> 
 
@@ -370,7 +394,7 @@ export function ExercisesPage({
                                     <form id="difficulty">
                                         <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>
                                         <br></br>
-                                        <select name="difficulty" onChange={diffChange}>
+                                        <select name="difficulty" value={diff} onChange={diffChange}>
                                             <option value="All">All</option>
                                             <option value="1">1</option>
                                             <option value="2">2</option>
@@ -382,7 +406,7 @@ export function ExercisesPage({
                                     <form id="voiceCt">
                                         Voices:
                                         <br></br>
-                                        <select name="voices" onChange={voiceChange}>
+                                        <select name="voices" value={voices} onChange={voiceChange}>
                                             <option value={0}>Any</option>
                                             <option value={1}>1</option>
                                             <option value={2}>2</option>
@@ -394,7 +418,7 @@ export function ExercisesPage({
                                     <form id="meterForm">
                                         Meter:
                                         <br></br>
-                                        <select name='meter' defaultValue={types} onChange={meterChange}>
+                                        <select name='meter' value={meter} onChange={meterChange}>
                                                 <option value="Anything">Anything</option>
                                                 <option value="Simple">Simple</option>
                                                 <option value="Compound">Compound</option>
@@ -406,7 +430,7 @@ export function ExercisesPage({
                                     <form id='typesForm' style={{margin: 0}}>
                                         Textural Factors:
                                         <br></br>
-                                        <select name="types" onChange={typesChange}>
+                                        <select name="types" value={types} onChange={typesChange}>
                                             <option value="None">None</option>
                                             <option value="Drone">Drone</option>
                                             <option value="Ensemble Parts">Ensemble Parts</option>

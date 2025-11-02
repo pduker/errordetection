@@ -9,6 +9,14 @@ interface AppSidebarProps {
   onToggleTag: (tag: string) => void;
   transposing: boolean;
   onToggleTransposing: () => void;
+  difficulty: string;
+  onSelectDifficulty: (value: string) => void;
+  voices: number;
+  onSelectVoices: (value: number) => void;
+  meter: string;
+  onSelectMeter: (value: string) => void;
+  texturalFactor: string;
+  onSelectTexturalFactor: (value: string) => void;
 }
 
 // 2. Update the component to accept and use the props
@@ -18,9 +26,45 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   onToggleTag,
   transposing,
   onToggleTransposing,
+  difficulty,
+  onSelectDifficulty,
+  voices,
+  onSelectVoices,
+  meter,
+  onSelectMeter,
+  texturalFactor,
+  onSelectTexturalFactor,
 }) => {
   const tagItems = useMemo(
     () => ['Pitch', 'Intonation', 'Rhythm'],
+    []
+  );
+  const difficultyItems = useMemo(
+    () => ['All', '1', '2', '3', '4', '5'],
+    []
+  );
+  const voiceItems = useMemo(
+    () => [
+      { value: 0, label: 'Any' },
+      { value: 1, label: '1' },
+      { value: 2, label: '2' },
+      { value: 3, label: '3' },
+      { value: 4, label: '4' },
+      { value: 5, label: '5' },
+    ],
+    []
+  );
+  const meterItems = useMemo(
+    () => ['Anything', 'Simple', 'Compound'],
+    []
+  );
+  const texturalItems = useMemo(
+    () => [
+      { value: 'None', label: 'None' },
+      { value: 'Drone', label: 'Drone' },
+      { value: 'Ensemble Parts', label: 'Ensemble Parts' },
+      { value: 'Both', label: 'Drone & Ensemble Parts' },
+    ],
     []
   );
 
@@ -104,9 +148,54 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
           Transposing Instruments
         </MenuItem>
         <SubMenu label="Advanced">
-          <MenuItem> Text </MenuItem>
-          <MenuItem> Text </MenuItem>
-          <MenuItem> Text </MenuItem>
+          <SubMenu label="Difficulty">
+            {difficultyItems.map((item) => (
+              <MenuItem
+                key={item}
+                active={difficulty === item}
+                onClick={() => onSelectDifficulty(item)}
+                suffix={difficulty === item ? <FaCheck size={12} /> : null}
+              >
+                {item}
+              </MenuItem>
+            ))}
+          </SubMenu>
+          <SubMenu label="Voices">
+            {voiceItems.map(({ value, label }) => (
+              <MenuItem
+                key={value}
+                active={voices === value}
+                onClick={() => onSelectVoices(value)}
+                suffix={voices === value ? <FaCheck size={12} /> : null}
+              >
+                {label}
+              </MenuItem>
+            ))}
+          </SubMenu>
+          <SubMenu label="Meter">
+            {meterItems.map((item) => (
+              <MenuItem
+                key={item}
+                active={meter === item}
+                onClick={() => onSelectMeter(item)}
+                suffix={meter === item ? <FaCheck size={12} /> : null}
+              >
+                {item}
+              </MenuItem>
+            ))}
+          </SubMenu>
+          <SubMenu label="Textural Factors">
+            {texturalItems.map(({ value, label }) => (
+              <MenuItem
+                key={value}
+                active={texturalFactor === value}
+                onClick={() => onSelectTexturalFactor(value)}
+                suffix={texturalFactor === value ? <FaCheck size={12} /> : null}
+              >
+                {label}
+              </MenuItem>
+            ))}
+          </SubMenu>
         </SubMenu>
       </Menu>
     </Sidebar>
