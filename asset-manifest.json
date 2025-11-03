@@ -1,19 +1,19 @@
 {
   "files": {
-    "main.css": "/static/css/main.4e931596.css",
-    "main.js": "/static/js/main.b0c477fb.js",
-    "static/media/excersie-example.png": "/static/media/excersie-example.4e8ebf0a4840c2997302.png",
-    "static/media/exc-page.png": "/static/media/exc-page.a6ffec773734287a7df0.png",
-    "static/media/filterPage.png": "/static/media/filterPage.9908d0af97c73ef6c895.png",
-    "static/media/check-answer.png": "/static/media/check-answer.97e3dacbb5e38a1506ce.png",
-    "static/media/noteClick.png": "/static/media/noteClick.f0fe78aebdccd9f9d5b7.png",
-    "static/media/note-color-key.png": "/static/media/note-color-key.ac2ee696deb3cc7f1940.png",
-    "index.html": "/index.html",
-    "main.4e931596.css.map": "/static/css/main.4e931596.css.map",
-    "main.b0c477fb.js.map": "/static/js/main.b0c477fb.js.map"
+    "main.css": "/errordetection/static/css/main.4e931596.css",
+    "main.js": "/errordetection/static/js/main.b42bc321.js",
+    "static/media/excersie-example.png": "/errordetection/static/media/excersie-example.4e8ebf0a4840c2997302.png",
+    "static/media/exc-page.png": "/errordetection/static/media/exc-page.a6ffec773734287a7df0.png",
+    "static/media/filterPage.png": "/errordetection/static/media/filterPage.9908d0af97c73ef6c895.png",
+    "static/media/check-answer.png": "/errordetection/static/media/check-answer.97e3dacbb5e38a1506ce.png",
+    "static/media/noteClick.png": "/errordetection/static/media/noteClick.f0fe78aebdccd9f9d5b7.png",
+    "static/media/note-color-key.png": "/errordetection/static/media/note-color-key.ac2ee696deb3cc7f1940.png",
+    "index.html": "/errordetection/index.html",
+    "main.4e931596.css.map": "/errordetection/static/css/main.4e931596.css.map",
+    "main.b42bc321.js.map": "/errordetection/static/js/main.b42bc321.js.map"
   },
   "entrypoints": [
     "static/css/main.4e931596.css",
-    "static/js/main.b0c477fb.js"
+    "static/js/main.b42bc321.js"
   ]
 }
