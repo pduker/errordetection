@@ -377,12 +377,25 @@ export function Exercise({
           coverBox.classList.add("cover-box");
           coverBox.setAttribute("x", x.toString());
           coverBox.setAttribute("y", y.toString());
-          coverBox.setAttribute("width", width.toString());
-          coverBox.setAttribute("height", noteHeight.toString());
+          if (width < 0) {
+            coverBox.setAttribute("width", Math.abs(width).toString());
+          } else {
+            coverBox.setAttribute("width", width.toString());
+          }
+          if (noteHeight < 0) {
+            coverBox.setAttribute(
+              "height",
+              Math.abs(noteBottom - y).toString()
+            );
+          } else {
+            coverBox.setAttribute("height", noteHeight.toString());
+          }
           coverBox.setAttribute("fill", "purple");
           coverBox.setAttribute("opacity", "0");
           coverBox.setAttribute("stroke", "none");
-          coverBox.setAttribute("clip-path", staffArray[staff].clipPath);
+          if (staffArray[staff]?.clipPath) {
+            coverBox.setAttribute("clip-path", staffArray[staff].clipPath);
+          }
           coverBox.style.pointerEvents = "none";
 
           // Add metadata and beat index
@@ -434,6 +447,63 @@ export function Exercise({
           }
         };
 
+        if (note.duration >= visualObjs[0].getBeatLength() * 4) {
+          // This note spans 2 or more beats - create multiple beat bars
+          const noteBox = noteElems.getBoundingClientRect();
+          let nextNoteElem = noteElems.nextSibling;
+          while (
+            nextNoteElem &&
+            (!nextNoteElem.getBoundingClientRect ||
+              nextNoteElem.getAttribute("data-name") === "bar")
+          ) {
+            nextNoteElem = nextNoteElem.nextSibling;
+          }
+          const noteRight = nextNoteElem
+            ? nextNoteElem.getBoundingClientRect().left
+            : noteBox.right;
+
+          const noteLeft = noteBox.left;
+          const totalNoteWidth = noteRight - noteLeft;
+          const numBeats = Math.floor(
+            note.duration / visualObjs[0].getBeatLength()
+          );
+          const beatWidth = totalNoteWidth / numBeats - 5;
+
+          const noteTopPt = toSvgCoords(svgElement, 0, noteBox.top);
+          const topLinePt =
+            topLines && topLines[staff]
+              ? toSvgCoords(
+                  svgElement,
+                  0,
+                  topLines[staff].getBoundingClientRect().top
+                )
+              : noteTopPt;
+          const barTopY = Math.min(noteTopPt.y, topLinePt.y) - 15;
+
+          // Create a beat bar for each beat this note spans
+          for (let b = 0; b < numBeats; b++) {
+            const barX = toSvgCoords(
+              svgElement,
+              noteLeft + b * (beatWidth + 5),
+              0
+            ).x;
+            addRects(barX, barTopY, beatWidth, 5);
+            currentBeatIndex++;
+          }
+
+          // Adjust beatSum to account for the beats we just processed
+          beatSum -= numBeats * visualObjs[0].getBeatLength();
+
+          // Reset barStartX for any remaining partial beat
+          if (beatSum > 0) {
+            barStartX = noteLeft + numBeats * (beatWidth + 5);
+          } else {
+            barStartX = 0;
+          }
+
+          // Skip the normal beat bar creation for this note
+          continue;
+        }
         // --- First beat bar creation: beatSum exceeds one full beat ---
         if (beatSum > visualObjs[0].getBeatLength()) {
           const barStartPt = toSvgCoords(svgElement, barStartX, 0);
@@ -897,16 +967,6 @@ export function Exercise({
         coverBox.setAttribute("fill", color);
         coverBox.setAttribute("opacity", "0.5");
       }
-
-      console.log("Highlighting:", { beatIndex, measurePos, staffPos });
-      const coverBoxes = document.querySelectorAll(".cover-box");
-      coverBoxes.forEach((cb) => {
-        console.log("CoverBox:", {
-          beatIndex: cb.getAttribute("data-beatIndex"),
-          measurePos: cb.getAttribute("data-measure-pos"),
-          staffPos: cb.getAttribute("data-staff-pos"),
-        });
-      });
     }
 
     // Find which selected notes are correct
@@ -1022,6 +1082,15 @@ export function Exercise({
 
       feedback.push(
         `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`
+      );
+
+      highlightBeat(
+        selectedBeatElements as unknown as Element[],
+        currentCorrectAnswers
+      );
+      highlightMeasure(
+        selectedNoteElements as unknown as Element[],
+        currentCorrectAnswers
       );
 
       // Check for missing correct answers (both notes and beats)
@@ -1699,8 +1768,10 @@ export function Exercise({
   };
 
   return (
-    <div className = "exercise-box" // SIR added exercise box
-      style={{  //exercise example box
+    <div
+      className="exercise-box" // SIR added exercise box
+      style={{
+        //exercise example box
         margin: "10px",
         padding: "10px",
         backgroundColor: "#fcfcd2",
@@ -1710,7 +1781,7 @@ export function Exercise({
         display: "flex", // SIR: added flex to box
         flexDirection: "column", // SIR
         alignItems: "stretch", // SIR
-        boxSizing: "border-box"
+        boxSizing: "border-box",
       }}
     >
       {editingTitle && teacherMode ? (
@@ -1902,7 +1973,8 @@ export function Exercise({
               <Button
                 variant="danger"
                 onClick={reload}
-                style={{ marginLeft: "1vw", float: "right"}}>
+                style={{ marginLeft: "1vw", float: "right" }}
+              >
                 Reset Answers
               </Button>
             </div>
@@ -1961,23 +2033,23 @@ export function Exercise({
 
           <div style={{ display: "inline-flex", marginTop: "-2vh" }}>
             {mp3 !== undefined ? (
-              <div style={{ marginTop: "2vh"}}>
+              <div style={{ marginTop: "2vh" }}>
                 <AudioHandler file={mp3}></AudioHandler>
               </div>
             ) : (
               <></>
             )}
             <Button
-              className = "responsive-element"
+              className="responsive-element"
               variant="danger"
               onClick={exReload}
-              style={{ /*SIR: the actual reset answers button*/
-                position: "relative",
+              style={{
+                /*SIR: the actual reset answers button*/ position: "relative",
                 marginLeft: "1vw",
                 marginBottom: "2vh",
               }}
-            > 
-              Reset Answers 
+            >
+              Reset Answers
             </Button>
           </div>
           {abcFile !== undefined && abcFile !== "" && loaded ? (
