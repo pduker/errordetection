@@ -133,14 +133,14 @@ body {
 /* Handle */
 ::-webkit-scrollbar-thumb {
   box-shadow: inset 0 0 5px grey;
-  background: #add8e6;
+  background: #4e81b3;
   border-radius: 10px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   box-shadow: inset 0 0 5px grey;
-  background: #114b96;
+  background: #add8e6;
 }
 .container {
   box-shadow: inset 0 0 5px grey;
@@ -883,5 +883,5 @@ nav .fas {
 .sidebar-toggle-button:hover,
 .sidebar-toggle-button:focus {
   color: #fff;
-  background-color: #185789;
+  background-color: #4e81b3;
 }
