@@ -140,7 +140,7 @@ body {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   box-shadow: inset 0 0 5px grey;
-  background: #add8e6;
+  background: #114b96;
 }
 .container {
   box-shadow: inset 0 0 5px grey;
