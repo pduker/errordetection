@@ -361,7 +361,7 @@ nav ul li a:hover::after {
 
 /* Sidebar styling */
 .app-sidebar .ps-menu-root {
-  margin-top: 100px;
+  margin-top: -20px;
   background: #4e81b3;
 }
 
@@ -441,7 +441,8 @@ nav ul li a:hover::after {
 /* Responsive breakpoint: stack columns on small screens */
 @media (max-width: 1400px) {
   .ex-page-container,
-  .two-column-wrapper { /*SR: added class for two-column-wrapped so it shrinks nicely*/
+  .two-column-wrapper {
+    /*SR: added class for two-column-wrapped so it shrinks nicely*/
     flex-direction: column;
     gap: 1rem;
   }
@@ -867,5 +868,15 @@ nav .fas {
 #1858f8 -back blue
 #02113f -
 #ababab 
-
 */
+
+.sidebar-toggle-button {
+  color: #000;
+  transition: color 0.2s ease;
+}
+
+.sidebar-toggle-button:hover,
+.sidebar-toggle-button:focus {
+  color: #fff;
+  background-color: #185789;
+}
