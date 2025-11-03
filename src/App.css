@@ -360,6 +360,11 @@ nav ul li a:hover::after {
 }
 
 /* Sidebar styling */
+
+.app-sidebar {
+  border-radius: 10px;
+}
+
 .app-sidebar .ps-menu-root {
   margin-top: -20px;
   background: #4e81b3;
