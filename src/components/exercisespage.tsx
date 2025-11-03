@@ -356,13 +356,14 @@ export function ExercisesPage({
                     <Button
                         onClick={toggleSidebar}
                         variant="light"
-                        style={{ marginBottom: "1rem", width: "fit-content" }}
+                        className="sidebar-toggle-button"
+                        style={{ marginBottom: "1rem", width: "fit-content", position: "relative" }}
                     >
                         <FaBars />
                     </Button>
 
-                    {/* --- 2. This wrapper holds your two columns side-by-side --- */}
-                    <div style={{ display: 'flex', flex: 1, gap: '20px' }}>
+                    {/* --- 2. This wrapper holds your two columns side-by-side --- */} 
+                    <div className = "two-column-wrapper" style={{ display: 'flex', flex: 1, gap: '20px' }}> 
             
                         {/* --- COLUMN 1: Your original 'ex-left' --- */}
                         <div className="ex-left"> {/* SIR: left column div */}

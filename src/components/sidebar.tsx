@@ -83,9 +83,9 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     };
 
     return isCollapsed
-      ? { ...baseStyles, pointerEvents: 'none' as const }
-      : { ...baseStyles, pointerEvents: 'auto' as const };
-  }, [isCollapsed]);
+    ? { ...baseStyles, transform: 'translateX(-100%)' /*SR:Edited so tags would slide back in*/ } 
+    : { ...baseStyles, transform: 'translateX(0)' /*SR: Same edit as above*/};
+}, [isCollapsed]);
 
   return (
     <Sidebar
