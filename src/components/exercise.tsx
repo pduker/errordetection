@@ -41,6 +41,7 @@ export function Exercise({
   teacherMode: boolean;
   ExData: ExerciseData;
   allExData: (ExerciseData | undefined)[];
+  updateProgress?: (title: string, data: { completed?: boolean; score?: number }) => void;
   setAllExData: (newData: (ExerciseData | undefined)[]) => void;
   handleSelectExercise: ((exIndex: number) => void) | undefined;
   isSelected: boolean | undefined;
@@ -1187,6 +1188,13 @@ export function Exercise({
       }
       
       setCustomFeedback(feedback);
+      // progress tracking
+      const isCorrect = allCorrect && combinedSelections.length > 0;
+      const scoreValue = isCorrect ? 1 : 0;
+
+      updateProgress?.(ExData.title, { completed: true, score: scoreValue });
+      setIsCompleted(true);
+      console.log(`Progress saved for ${ExData.title}: correct=${isCorrect}`);
       return;
     }
 
@@ -1307,7 +1315,7 @@ export function Exercise({
 
     updateProgress?.(ExData.title, { completed: true, score: scoreValue });
     setIsCompleted(true);
-    console.log(`Progress saved for ${ExData.title}: correct=${isCorrect}`);
+    console.log(`Progress saved YES for ${ExData.title}: correct=${isCorrect}`);
   };
   
 

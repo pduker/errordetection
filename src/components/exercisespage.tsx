@@ -461,6 +461,7 @@ export function ExercisesPage({
                         handleSelectExercise={undefined} 
                         isSelected={undefined}
                         fetch={undefined}
+                        updateProgress={updateProgress}
                     />
                     
                 </div> : <></>}
