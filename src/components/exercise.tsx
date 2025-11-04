@@ -31,6 +31,7 @@ export function Exercise({
   teacherMode,
   ExData,
   allExData,
+  updateProgress,
   setAllExData,
   handleSelectExercise,
   isSelected,
@@ -40,6 +41,7 @@ export function Exercise({
   teacherMode: boolean;
   ExData: ExerciseData;
   allExData: (ExerciseData | undefined)[];
+  updateProgress?: (title: string, data: { completed?: boolean; score?: number }) => void;
   setAllExData: (newData: (ExerciseData | undefined)[]) => void;
   handleSelectExercise: ((exIndex: number) => void) | undefined;
   isSelected: boolean | undefined;
@@ -111,6 +113,24 @@ export function Exercise({
   const [xmlFile, setXmlFile] = useState<File>();
   const [mp3File, setMp3File] = useState<File>(mp3);
   const [abcFile, setAbcFile] = useState<string>(abc);
+
+  // check if an exercise has been completed
+  const [isCompleted, setIsCompleted] = useState(false);
+
+  // Check localStorage to see if this exercise was previously completed
+  useEffect(() => {
+  const saved = localStorage.getItem("userProgress");
+  if (saved) {
+    try {
+      const progress = JSON.parse(saved);
+      if (progress[ExData.title]?.completed) {
+        setIsCompleted(true);
+      }
+    } catch (err) {
+      console.error("Error reading localStorage progress:", err);
+    }
+  }
+}, [ExData.title]);
 
   const [customId, setCustomId] = useState<string>(exerciseData?.customId || "");
 
@@ -1050,9 +1070,17 @@ export function Exercise({
       }
       
       setCustomFeedback(feedback);
+      // progress tracking
+      const isCorrect = allCorrect && combinedSelections.length > 0;
+      const scoreValue = isCorrect ? 1 : 0;
+
+      updateProgress?.(ExData.title, { completed: true, score: scoreValue });
+      setIsCompleted(true);
+      console.log(`Progress saved for ${ExData.title}: correct=${isCorrect}`);
       return;
     }
     
+    // Branch for Rhythm exercises with only Rhythm tag
     else if (tags.includes("Rhythm") && tags.length == 1){
       const instruments = getInstrumentList(exerciseData.score);
       
@@ -1160,6 +1188,13 @@ export function Exercise({
       }
       
       setCustomFeedback(feedback);
+      // progress tracking
+      const isCorrect = allCorrect && combinedSelections.length > 0;
+      const scoreValue = isCorrect ? 1 : 0;
+
+      updateProgress?.(ExData.title, { completed: true, score: scoreValue });
+      setIsCompleted(true);
+      console.log(`Progress saved for ${ExData.title}: correct=${isCorrect}`);
       return;
     }
 
@@ -1272,6 +1307,15 @@ export function Exercise({
     }
    
     setCustomFeedback(feedback);
+    // progress tracking
+    const isCorrect = feedback.some(line =>
+    line.toLowerCase().includes("great job")
+    );
+    const scoreValue = isCorrect ? 1 : 0;
+
+    updateProgress?.(ExData.title, { completed: true, score: scoreValue });
+    setIsCompleted(true);
+    console.log(`Progress saved YES for ${ExData.title}: correct=${isCorrect}`);
   };
   
 
@@ -1545,6 +1589,11 @@ export function Exercise({
       ) : (
         <h3 onClick={() => setEditingTitle(!editingTitle)}>
           {customTitle}
+          {isCompleted && (
+            <div style={{ color: "green", fontWeight: "bold", marginBottom: "10px" }}>
+              Exercise Completed
+            </div>
+          )}
           {teacherMode && customId && (
             <span style={{ fontSize: "0.8em", color: "#666", marginLeft: "10px" }}>
               (ID: {customId})
