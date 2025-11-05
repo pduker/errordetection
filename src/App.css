@@ -133,7 +133,7 @@ body {
 /* Handle */
 ::-webkit-scrollbar-thumb {
   box-shadow: inset 0 0 5px grey;
-  background: #add8e6;
+  background: #4e81b3;
   border-radius: 10px;
 }
 
@@ -354,8 +354,50 @@ nav ul li a:hover::after {
   color: #1f0545;
   font-size: 14px;
 }
+
 .tab-contents.active-tab {
   display: block;
+}
+
+/* Sidebar styling */
+
+.app-sidebar {
+  border-radius: 10px;
+  overflow-y: scroll;
+  direction: rtl;
+}
+
+.app-sidebar::-webkit-scrollbar-track {
+  background-color: white;
+  border-radius: 10px 0 0 10px;
+}
+
+.app-sidebar .ps-menu-root {
+  margin-top: -20px;
+  background: #4e81b3;
+}
+
+.app-sidebar .ps-sidebar-container {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.app-sidebar .ps-menuitem-root {
+  margin: 0;
+  padding: 0;
+}
+
+.app-sidebar .ps-menu-button {
+  width: 100%;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  justify-content: flex-start;
+}
+
+.app-sidebar .ps-menu-button::after {
+  content: none !important;
 }
 
 /* Exercises page responsive layout */
@@ -398,6 +440,7 @@ nav ul li a:hover::after {
   margin: 3vw;
   margin-left: 12vw;
   min-width: 260px;
+  max-height: 300px; /* SR: Added so that the loaded page doesn't extend to bottom*/
   flex-direction: column;
   align-items: right;
   border: 2px dashed #ccc;
@@ -409,7 +452,9 @@ nav ul li a:hover::after {
 
 /* Responsive breakpoint: stack columns on small screens */
 @media (max-width: 1400px) {
-  .ex-page-container {
+  .ex-page-container,
+  .two-column-wrapper {
+    /*SR: added class for two-column-wrapped so it shrinks nicely*/
     flex-direction: column;
     gap: 1rem;
   }
@@ -835,5 +880,15 @@ nav .fas {
 #1858f8 -back blue
 #02113f -
 #ababab 
-
 */
+
+.sidebar-toggle-button {
+  color: #000;
+  transition: color 0.2s ease;
+}
+
+.sidebar-toggle-button:hover,
+.sidebar-toggle-button:focus {
+  color: #fff;
+  background-color: #4e81b3;
+}
