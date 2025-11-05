@@ -1080,9 +1080,9 @@ export function Exercise({
       let allCorrect = true;
       const plural = currentCorrectAnswers.length === 1 ? " is " : " are ";
 
-      feedback.push(
-        `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`
-      );
+      // feedback.push(
+      //   `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`
+      // );
 
       highlightBeat(
         selectedBeatElements as unknown as Element[],
@@ -1111,23 +1111,6 @@ export function Exercise({
             console.log(
               `Missing beat: measure ${corr.measurePos}, beat ${corr.beatIndex}, staff ${corr.staffPos}`
             );
-
-            if (
-              !isNaN(corr.staffPos) &&
-              instruments[Number(corr.staffPos)] !== undefined
-            ) {
-              feedback.push(
-                `\nMissing correct beat in Measure ${
-                  Number(corr.measurePos) + 1
-                } on the ${instruments[Number(corr.staffPos)]} staff.`
-              );
-            } else {
-              feedback.push(
-                `\nMissing correct beat in Measure ${
-                  Number(corr.measurePos) + 1
-                }.`
-              );
-            }
           }
         } else if (corr.type === "note") {
           // Check if this note was selected
@@ -1206,7 +1189,7 @@ export function Exercise({
           // Check if this note is correct
           found = currentCorrectAnswers.some(
             (c) =>
-              c.type === "note" &&
+              // c.type === "note" &&
               Number(c.measurePos) === Number(sel.measurePos) &&
               Number(c.index) === Number(sel.index)
           );
@@ -1221,24 +1204,26 @@ export function Exercise({
               !isNaN(sel.staffPos) &&
               instruments[Number(sel.staffPos)] !== undefined
             ) {
-              feedback.push(
-                `\nIncorrect note selected in Measure ${
-                  Number(sel.measurePos) + 1
-                } on the ${instruments[Number(sel.staffPos)]} staff.`
-              );
+              feedback.push(`\nNot quite - try again!`);
             } else {
-              feedback.push(
-                `\nIncorrect note selected in Measure ${
-                  Number(sel.measurePos) + 1
-                }.`
-              );
+              feedback.push(`\nNot quite - try again!`);
             }
           }
         }
       });
 
-      if (allCorrect && combinedSelections.length > 0) {
+      if (
+        allCorrect &&
+        combinedSelections.length === currentCorrectAnswers.length
+      ) {
         feedback = ["Great job!"];
+      } else if (
+        allCorrect &&
+        combinedSelections.length < currentCorrectAnswers.length
+      ) {
+        feedback.push(
+          `Very close! There${plural}${currentCorrectAnswers.length} correct answer(s).`
+        );
       }
 
       setCustomFeedback(feedback);
@@ -1291,9 +1276,11 @@ export function Exercise({
       let allCorrect = true;
       const plural = currentCorrectAnswers.length === 1 ? " is " : " are ";
 
-      feedback.push(
-        `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`
-      );
+      if (!allCorrect) {
+        feedback.push(
+          `Try again - there${plural}${currentCorrectAnswers.length} correct answer(s).`
+        );
+      }
 
       // Check for missing correct answers (both notes and beats)
       currentCorrectAnswers.forEach((corr) => {
@@ -1313,23 +1300,6 @@ export function Exercise({
             console.log(
               `Missing beat: measure ${corr.measurePos}, beat ${corr.beatIndex}, staff ${corr.staffPos}`
             );
-
-            if (
-              !isNaN(corr.staffPos) &&
-              instruments[Number(corr.staffPos)] !== undefined
-            ) {
-              feedback.push(
-                `\nMissing correct beat in Measure ${
-                  Number(corr.measurePos) + 1
-                } on the ${instruments[Number(corr.staffPos)]} staff.`
-              );
-            } else {
-              feedback.push(
-                `\nMissing correct beat in Measure ${
-                  Number(corr.measurePos) + 1
-                }.`
-              );
-            }
           }
         }
       });
@@ -1362,26 +1332,26 @@ export function Exercise({
               !isNaN(sel.staffPos) &&
               instruments[Number(sel.staffPos)] !== undefined
             ) {
-              feedback.push(
-                `\nIncorrect beat selected in Measure ${
-                  Number(sel.measurePos) + 1
-                } on the ${instruments[Number(sel.staffPos)]} staff (Beat ${
-                  sel.beatIndex
-                }).`
-              );
+              feedback.push(`\nNot quite - try again!`);
             } else {
-              feedback.push(
-                `\nIncorrect beat selected in Measure ${
-                  Number(sel.measurePos) + 1
-                }, Beat ${sel.beatIndex}.`
-              );
+              feedback.push(`\nNot quite - try again!`);
             }
           }
         }
       });
 
-      if (allCorrect && combinedSelections.length > 0) {
+      if (
+        allCorrect &&
+        combinedSelections.length === currentCorrectAnswers.length
+      ) {
         feedback = ["Great job!"];
+      } else if (
+        allCorrect &&
+        combinedSelections.length < currentCorrectAnswers.length
+      ) {
+        feedback.push(
+          `Very close! There${plural}${currentCorrectAnswers.length} correct answer(s).`
+        );
       }
 
       setCustomFeedback(feedback);
@@ -1457,15 +1427,8 @@ export function Exercise({
         );
       }
     } else if (tmpCorrect.length === correctAnswers.length) {
-      feedback = [
-        "Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:",
-      ];
+      feedback = ["Not quite - try again!"];
       for (let i = 0; i < tmpCorrect.length; i++) {
-        feedback.push(
-          `\nMeasure ${Number(tmpCorrect[i]["measurePos"]) + 1}, Staff ${
-            Number(tmpCorrect[i]["staffPos"]) + 1
-          }`
-        );
         let addtlFeedback = tmpCorrect[i]["feedback"];
         if (
           closeList.includes(Number(tmpCorrect[i]["index"])) &&
@@ -1486,7 +1449,7 @@ export function Exercise({
       }
     } else if (tmpCorrect.length < correctAnswers.length) {
       feedback = [
-        "Good work – you've found some of the errors, but here are some specific places to look at and listen to more closely:",
+        "Good work – you've found some of the errors. Try again to find all of them!",
       ];
       for (let i = 0; i < tmpCorrect.length; i++) {
         feedback.push(
@@ -2058,7 +2021,6 @@ export function Exercise({
                 Check Answer
               </button>
               <div>
-                Next step(s):
                 {customFeedback.map(function (feedback) {
                   return (
                     <li
