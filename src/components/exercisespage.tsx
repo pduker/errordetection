@@ -26,7 +26,6 @@ export function ExercisesPage({
     const [tags, setTags] = useState<string[]>(defaultTags);
     const [transpos, setTranspos] = useState<boolean>(false);
 
-    const [upd, setUpd] = useState<boolean>(false);
     const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
     const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
 
@@ -126,7 +125,6 @@ export function ExercisesPage({
         setSearchParams(newParams);
     }, [tags, diff, voices, types, meter, transpos, setSearchParams]);
 
-
     //exercise sort function for comparing exercises against each other
     const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
         if (e1 !== undefined && e2 !== undefined) {
@@ -166,6 +164,63 @@ export function ExercisesPage({
             };
         } else return 0;
     }
+
+    // ensure the exercise list is populated when exercise data or any filter changes
+    useEffect(() => {
+        if (!allExData || allExData.length === 0) {
+            setExList([]);
+            return;
+        }
+
+        // Build filtered list based on current filter state
+        let list: (ExerciseData | undefined)[] = [...allExData];
+        if (tags.length > 0) {
+            list = list.filter(function(exercise) {
+                if (exercise !== undefined && tags !== undefined && exercise.tags !== undefined){
+                    return tags.every((element) => exercise.tags.includes(element))
+                }
+                else return false;
+            })
+        }
+        if (diff !== "All") {
+            list = list.filter(function(exercise) {
+                if (exercise !== undefined) 
+                    return diff === String(exercise.difficulty) 
+                else return false;
+            })
+        }
+        if (voices !== 0) {
+            list = list.filter(function(exercise) {
+                if (exercise !== undefined) 
+                    return voices === exercise.voices
+                else return false;
+            })
+        }
+        if (types !== "None") {
+            list = list.filter(function(exercise) {
+                if (exercise !== undefined){
+                    return (types === exercise.types)}
+                else return false;
+            })
+        }
+        if (meter !== "Anything") {
+            list = list.filter(function(exercise) {
+                if (exercise !== undefined) 
+                    return meter === String(exercise.meter)
+                else return false;
+            })
+        }
+        if (transpos === true) {
+            list = list.filter(function(exercise) {
+                if (exercise !== undefined) 
+                    return transpos === exercise.transpos;
+                else return false;
+            })
+        }
+
+        list = list.sort(exSortFunc);
+        setExList(list);
+    }, [allExData, tags, diff, voices, types, meter, transpos]);
 
     //exercise change function for when you want to move from one exercise to the next
     const exChange = function (e:React.MouseEvent<HTMLSpanElement>){
@@ -306,17 +361,7 @@ export function ExercisesPage({
 
     }
 
-    // Write a function to update allExData based on changes to state attributes as well as update URL params accordingly (maybe return new params?)
-    const updateFromURLParams = function () {
-        const newParams = new URLSearchParams();
-        if (tags.length > 0) newParams.set('tags', tags.join(','));
-        if (diff !== "All") newParams.set('difficulty', diff);
-        if (voices !== 0) newParams.set('voices', voices.toString());
-        if (types !== "None") newParams.set('types', types);
-        if (meter !== "Anything") newParams.set('meter', meter);
-        if (transpos) newParams.set('transpos', 'true');
-        setSearchParams(newParams);
-    }
+    
 
     //html to render page
     return (
