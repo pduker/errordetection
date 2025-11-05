@@ -363,6 +363,8 @@ nav ul li a:hover::after {
 
 .app-sidebar {
   border-radius: 10px;
+  overflow-y: scroll;
+  direction: rtl;
 }
 
 .app-sidebar .ps-menu-root {
