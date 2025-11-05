@@ -199,6 +199,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             ))}
           </SubMenu>
         </SubMenu>
+        <button>Reset Button Here</button>
       </Menu>
     </Sidebar>
   );
