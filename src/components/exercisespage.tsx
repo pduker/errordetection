@@ -346,6 +346,7 @@ export function ExercisesPage({
                 onSelectMeter={handleMeterSelect}
                 texturalFactor={types}
                 onSelectTexturalFactor={handleTexturalFactorSelect}
+                onResetSort={resetSort}
             />
             <div className="ex-page-container"> 
 
