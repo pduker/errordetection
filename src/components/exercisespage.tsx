@@ -303,25 +303,13 @@ export function ExercisesPage({
     //onClick to reset all exercise sort fields
     const resetSort = function () {
         setTags([]);
-
         setDiff("All");
-        var diffBox = document.getElementsByName("difficulty")[0] as HTMLSelectElement;
-        if (diffBox !== null) diffBox.options[0].selected = true;
-
         setVoices(0);
-        var voiceBox = document.getElementsByName("voices")[0] as HTMLSelectElement;
-        if (voiceBox !== null) voiceBox.options[0].selected = true;
-
         setTypes("None");
-        var typesBox = document.getElementsByName("types")[0] as HTMLSelectElement;
-        if(typesBox !== null) typesBox.options[0].selected = true;
-
         setMeter("Anything");
-        var meterBox = document.getElementsByName("meter")[0] as HTMLSelectElement;
-        if(meterBox !== null) meterBox.options[0].selected = true;
-        
         setTranspos(false);
-
+        setCurrentPage(1);
+        setExList([...allExData].sort(exSortFunc));
     }
 
     // Toggle function for the sidebar
