@@ -17,6 +17,7 @@ interface AppSidebarProps {
   onSelectMeter: (value: string) => void;
   texturalFactor: string;
   onSelectTexturalFactor: (value: string) => void;
+  onResetSort: () => void;
 }
 
 // 2. Update the component to accept and use the props
@@ -34,6 +35,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   onSelectMeter,
   texturalFactor,
   onSelectTexturalFactor,
+  onResetSort,
 }) => {
   const tagItems = useMemo(
     () => ['Pitch', 'Intonation', 'Rhythm'],
@@ -199,7 +201,9 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             ))}
           </SubMenu>
         </SubMenu>
-        <button>Reset Button Here</button>
+        <MenuItem onClick={onResetSort} className="sidebar-reset-button">
+          Reset Sort
+        </MenuItem>
       </Menu>
     </Sidebar>
   );
