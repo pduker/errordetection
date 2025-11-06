@@ -370,19 +370,21 @@ export function ExercisesPage({
                         <div className="ex-left"> {/* SIR: left column div */}
                             <h2 style={{fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> {/*SIR: changed fontSize for consistency*/}
                             <h5 style={{fontStyle: "italic", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5> {/*SIR: changed fontSize for consistency*/}
+                            
+                            {/*                             
                             <span>
-                                <div id="boxes" style={{ display: "inline-flex", alignItems: "center" }}> {/*SIR: div tag for filter checkboxes*/}
-                                    <form id="tags" style={{ display: "flex", alignItems: "center", gap: "8px"}}> {/*SIR: added gap and alignItems to center*/}
-                                        <div style={{ fontSize: "16px" }}>Tags:</div> {/*SIR: added fontSize for consistency*/}
-                                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}> {/*SIR: added marginRight for spacing*/}
+                                <div id="boxes" style={{ display: "inline-flex", alignItems: "center" }}>
+                                    <form id="tags" style={{ display: "flex", alignItems: "center", gap: "8px"}}>
+                                        <div style={{ fontSize: "16px" }}>Tags:</div>
+                                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}>
                                             <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{ marginRight: "6px" }} />
                                             Pitch
                                         </label>
-                                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}> {/*SIR: added marginRight for spacing*/}
+                                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}>
                                             <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{ marginRight: "6px" }} />
                                             Intonation
                                         </label>
-                                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}> {/*SIR: added marginRight for spacing*/}
+                                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}>
                                             <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange} style={{ marginRight: "6px" }} />
                                             Rhythm
                                         </label>
@@ -392,7 +394,7 @@ export function ExercisesPage({
                                         </label>
                                     </form>
                                 </div>
-                                <div id="dropdowns" style={{display: "inline-flex", padding: "4px",  alignItems: "center"}}> {/*SIR: added gap and alignItems to center*/}
+                                <div id="dropdowns" style={{display: "inline-flex", padding: "4px",  alignItems: "center"}}>
                                     <form id="difficulty">
                                         <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>
                                         <br></br>
@@ -442,7 +444,11 @@ export function ExercisesPage({
 
                                     <Button variant="danger" onClick={resetSort} style={{marginLeft: "6px", padding: "6px 10px"}}>Reset Sort</Button>
                                 </div>
-                            </span>
+                            </span> */
+                            }
+
+
+
                             <div style={{marginTop: "8px", display: "flex", alignItems: "center", gap: "8px"}}>
                             {/* add page navigation buttons, call newly defined functions */}
                                     <Button
