@@ -448,7 +448,10 @@ export function ExercisesPage({
                             }
 
 
-
+                            {exList.length === 0 ? 
+                                !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. <br /> If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
+                            <div>No exercises with those criteria found!</div> : <></>}
+                            
                             <div style={{marginTop: "8px", display: "flex", alignItems: "center", gap: "8px"}}>
                             {/* add page navigation buttons, call newly defined functions */}
                                     <Button
@@ -493,9 +496,6 @@ export function ExercisesPage({
                                 else return <></>;
                             })}
                             </div>
-                            {exList.length === 0 ? 
-                                !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
-                            <div>No exercises with those criteria found!</div> : <></>}
                         </div>
 
                         {/* --- COLUMN 2: Your original 'ex-right' --- */}
