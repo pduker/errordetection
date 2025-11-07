@@ -39,6 +39,8 @@ export function ExercisesPage({
     //showing exercises for the current page
     const startIndex = (currentPage -1) * pageSize;
     const pageExercises = exList.slice(startIndex, startIndex + pageSize);
+    const totalPages = Math.ceil(exList.length / pageSize);
+    const paginationStatus = totalPages === 0 ? "Loading..." : `Page ${currentPage} of ${totalPages}`;
 
     // state for sidebar
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(true);
@@ -380,7 +382,7 @@ export function ExercisesPage({
                                     >
                                         ‹
                                     </Button>
-                                    <span> Page {currentPage} of {Math.ceil(exList.length / pageSize)} </span>
+                                    <span>{paginationStatus}</span>
                                     <Button
                                         onClick={nextPage}
                                         disabled={currentPage >= Math.ceil(exList.length / pageSize)}
