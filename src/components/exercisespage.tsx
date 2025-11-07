@@ -39,6 +39,8 @@ export function ExercisesPage({
     //showing exercises for the current page
     const startIndex = (currentPage -1) * pageSize;
     const pageExercises = exList.slice(startIndex, startIndex + pageSize);
+    const totalPages = Math.ceil(exList.length / pageSize);
+    const paginationStatus = totalPages === 0 ? "Loading..." : `Page ${currentPage} of ${totalPages}`;
 
     // state for sidebar
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(true);
@@ -259,44 +261,60 @@ export function ExercisesPage({
 
     //onClick function for when Back button is pushed under exercise
     const prevEx = function () {
-        var exPos = exList.indexOf(selExercise);
-        var bBtn = document.getElementById("back-btn");
-        var nBtn = document.getElementById("next-btn");
-        if(exPos !== -1) {
-            setSelExercise(exList[exPos-1]);
-            if (exPos-1 > 0) {
-                if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = false;
-            }
-            else {
-                if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = true;
-            }
-        } else {
-            setSelExercise(exList[0]);
-            if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = true;
+        const exPos = exList.indexOf(selExercise);
+        const bBtn = document.getElementById("back-btn");
+        const nBtn = document.getElementById("next-btn");
+
+        if (exList.length === 0) return;
+
+        let targetIndex = 0;
+        if (exPos > 0) {
+            targetIndex = exPos - 1;
+        } else if (exPos >= exList.length) {
+            targetIndex = exList.length - 1;
         }
-        if (exList.length < 2) {
-            if (nBtn !== null && "disabled" in nBtn) nBtn.disabled = true;
-        } else {
-            if (nBtn !== null && "disabled" in nBtn) nBtn.disabled = false;
+
+        const targetExercise = exList[targetIndex];
+        if (targetExercise !== undefined) {
+            setSelExercise(targetExercise);
+            setCurrentPage(Math.floor(targetIndex / pageSize) + 1);
+        }
+
+        if (bBtn !== null && "disabled" in bBtn) {
+            bBtn.disabled = targetIndex <= 0;
+        }
+        if (nBtn !== null && "disabled" in nBtn) {
+            nBtn.disabled = exList.length < 2 || targetIndex >= exList.length - 1;
         }
     }
 
     //onClick function for when Next button is pushed under exercise
     const nextEx = function () {
-        var bBtn = document.getElementById("back-btn");
-        var nBtn = document.getElementById("next-btn");
-        var exPos = exList.indexOf(selExercise);
-        setSelExercise(exList[exPos+1]);
-        if (exPos+1 >= (exList.length - 1)) {
-            if (nBtn !== null && "disabled" in nBtn && exPos !== -1) nBtn.disabled = true;
-        }
-        else {
-            if (nBtn !== null && "disabled" in nBtn) nBtn.disabled = false;
-        }
-        if (exList.length < 2 || exPos === -1) {
-            if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = true;
+        const bBtn = document.getElementById("back-btn");
+        const nBtn = document.getElementById("next-btn");
+        const exPos = exList.indexOf(selExercise);
+        if (exList.length === 0) return;
+
+        let targetIndex = exPos;
+        if (exPos === -1) {
+            targetIndex = 0;
+        } else if (exPos < exList.length - 1) {
+            targetIndex = exPos + 1;
         } else {
-            if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = false;
+            targetIndex = exList.length - 1;
+        }
+
+        const targetExercise = exList[targetIndex];
+        if (targetExercise !== undefined) {
+            setSelExercise(targetExercise);
+            setCurrentPage(Math.floor(targetIndex / pageSize) + 1);
+        }
+
+        if (bBtn !== null && "disabled" in bBtn) {
+            bBtn.disabled = targetIndex <= 0;
+        }
+        if (nBtn !== null && "disabled" in nBtn) {
+            nBtn.disabled = targetIndex >= exList.length - 1;
         }
     }
 
@@ -380,7 +398,7 @@ export function ExercisesPage({
                                     >
                                         ‹
                                     </Button>
-                                    <span> Page {currentPage} of {Math.ceil(exList.length / pageSize)} </span>
+                                    <span>{paginationStatus}</span>
                                     <Button
                                         onClick={nextPage}
                                         disabled={currentPage >= Math.ceil(exList.length / pageSize)}
