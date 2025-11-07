@@ -3,7 +3,6 @@ import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
 import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
-import { isDisabled } from '@testing-library/user-event/dist/utils';
 
 //function to create the exercise page, takes exercise data and renders a page
 export function ExercisesPage({

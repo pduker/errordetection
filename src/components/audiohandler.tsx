@@ -28,9 +28,9 @@ export default function AudioHandler({ file }: { file: string | File }): JSX.Ele
 
   return (
     <div>
-            <audio ref={audioRef} controls>
-            </audio>
-            <p>{msgContent}</p>
-        </div>
+      <audio ref={audioRef} controls>
+      </audio>
+      <p>{msgContent}</p>
+    </div>
   );
 }

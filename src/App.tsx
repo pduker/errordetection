@@ -15,61 +15,61 @@ import { ExerciseManagementPage} from './components/exercise-managementpage';
 import './App.css';
 import logo from './assets/UD-circle-logo-email.png';
 
+async function fetchScoresFromDatabase(): Promise<ExerciseData[]> {
+  console.log("Retrieving scores...");
+
+  try {
+    const database = getDatabase();
+
+    const exerciseList: ExerciseData[] = [];
+    // fetch all scores from the database
+    // we have a relatively low amount of scores, so this operation is very quick
+    // if the scope of this application is larger in the future, look into pagination
+    const scores = await get(query(ref(database, 'scores'), orderByKey()));
+    scores.forEach((scoreSnapshot: DataSnapshot) => { // for every score fetched,
+      const score = scoreSnapshot.val(); // get the data fetched
+      if(!score || !score.sound) return; // if these values aren't populated, something has gone seriously wrong!
+
+      exerciseList.push(new ExerciseData( // add it to the list of exercises
+        score.score,
+        score.sound,
+        score.correctAnswers,
+        score.feedback,
+        score.exIndex,
+        score.empty,
+        score.title,
+        score.difficulty,
+        score.voices,
+        score.tags,
+        score.types,
+        score.meter,
+        score.transpos,
+        undefined,
+        score.customId
+      ));
+    });
+
+    console.log("Got exercise list");
+    return exerciseList;
+  } catch (error) {
+    console.error('Error fetching scores:', error);
+    return [];
+  }
+}
+
 // app function to initialize site
 function App() {
   const [allExData,setAllExData] = useState<ExerciseData[]>([]);
   const [scoresRetrieved, setScoresRetrieved] = useState<boolean>(false); // track whether scores are retrieved
   const [authorized, setAuthorized] = useState<boolean>(false); // has the user put in the admin pwd on help page?
 
-  // get data from the database
-  const fetchScoresFromDatabase = async () => {
-    if(scoresRetrieved) return;
-
-    console.log("Retrieving scores...");
-
-    try {
-      const database = getDatabase();
-
-      const exerciseList: ExerciseData[] = [];
-      // fetch all scores from the database
-      // we have a relatively low amount of scores, so this operation is very quick
-      // if the scope of this application is larger in the future, look into pagination
-      const scores = await get(query(ref(database, 'scores'), orderByKey()));
-      scores.forEach((scoreSnapshot: DataSnapshot) => { // for every score fetched,
-        const score = scoreSnapshot.val(); // get the data fetched
-        if(!score || !score.sound) return; // if these values aren't populated, something has gone seriously wrong!
-
-        exerciseList.push(new ExerciseData( // add it to the list of exercises
-          score.score,
-          score.sound,
-          score.correctAnswers,
-          score.feedback,
-          score.exIndex,
-          score.empty,
-          score.title,
-          score.difficulty,
-          score.voices,
-          score.tags,
-          score.types,
-          score.meter,
-          score.transpos,
-          undefined,
-          score.customId
-        ));
-      });
-
-      setAllExData(exerciseList); // once we've fetched and filled out our list, commit it to React state
-      setScoresRetrieved(true); // all done!
-
-      console.log("Loaded exercise list");
-    } catch (error) {
-      console.error('Error fetching scores:', error);
-    }
-  };
-
   useEffect(() => {
-    fetchScoresFromDatabase(); // fetch from the database on component creation
-  }, [allExData, setAllExData, scoresRetrieved, setScoresRetrieved]);
+    if(scoresRetrieved) return;
+    fetchScoresFromDatabase().then(exerciseData => {
+      setAllExData(exerciseData);
+      setScoresRetrieved(true);
+    }); // fetch from the database on component creation
+  }, [setAllExData, scoresRetrieved, setScoresRetrieved]);
   
   return (
     <Router>
@@ -115,8 +115,9 @@ function App() {
           <div  style={{overflowY: "scroll",margin: "10px"}}>
             <Routes>
               <Route path="/" element={<Navigate to="/exercises"/>}/>
+              <Route path="/errordetection" element={<Navigate to="/exercises"/>}/>
 
-              <Route path="/exercises" element={<ExercisesPage allExData={allExData}/>}/>
+              <Route path="/exercises" element={<ExercisesPage allExData={allExData} setAllExData={setAllExData}/>}/>
               <Route path="/exercises/intonation" element={<ExercisesPage allExData={allExData} defaultTags={["Intonation"]}/>}/>
               <Route path="/exercises/pitch" element={<ExercisesPage allExData={allExData} defaultTags={["Pitch"]}/>}/>
 
@@ -130,7 +131,6 @@ function App() {
       </div>
     </Router>
   );
-
 }
 
 export default App;
