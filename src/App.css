@@ -107,6 +107,63 @@ body {
   margin-left: 2.5vw;
 }
 
+.pagediv-landing {
+  width: min(92vw, 1100px);
+  height: calc(100vh - 140px);
+  margin: 0 auto;
+  border-radius: 12px;
+  background: #ffdb63;
+  box-shadow: none;
+  padding: 0;
+}
+
+.landing-page {
+  width: 100%;
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+}
+
+.landing-card {
+  max-width: 750px;
+  text-align: center;
+  background: #ffffff;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.landing-card h1 {
+  color: #114b96;
+  margin-bottom: 1rem;
+}
+
+.landing-card p {
+  color: #333;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.landing-button {
+  display: inline-block;
+  background: #114b96;
+  color: #fff;
+  padding: 0.75rem 1.75rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.landing-button:hover {
+  background: #0d3b78;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(17, 75, 150, 0.3);
+}
+
 .about {
   margin: 10px;
   padding: 10px;
