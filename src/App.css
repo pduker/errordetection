@@ -650,7 +650,7 @@ h5 {
   text-decoration: none;
   justify-content: center;
   color: #ffffff;
-  background: #add8e6;
+  background: #4e81b3;
   transition: background 0.5s;
 }
 .btn-list {
@@ -666,7 +666,7 @@ h5 {
 }
 
 .btnback:hover {
-  background: #ffdb63; /*lighter orange*/
+  background: #114b96; /*lighter orange*/
   /* border: 3px solid #dc582a; */
 }
 
