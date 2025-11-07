@@ -112,7 +112,7 @@ body {
   height: calc(100vh - 140px);
   margin: 0 auto;
   border-radius: 12px;
-  background: #ffdb63;
+  background: #ffffff;
   box-shadow: none;
   padding: 0;
 }
@@ -162,6 +162,101 @@ body {
   background: #0d3b78;
   transform: translateY(-1px);
   box-shadow: 0 8px 20px rgba(17, 75, 150, 0.3);
+}
+
+.help-page {
+  text-align: left;
+  margin: 10px;
+  padding: 30px 20px;
+  background-color: #fcfcd2;
+  border-radius: 12px;
+}
+
+.help-page h2 {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.help-section {
+  margin: 20px auto;
+  padding: 24px;
+  border-radius: 14px;
+  background-color: #8ecbe1;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.help-section--split {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
+  align-items: center;
+}
+
+.help-section--admin {
+  text-align: center;
+}
+
+.help-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 18px 22px;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  flex: 1 1 220px;
+}
+
+.help-card--wide {
+  max-width: 900px;
+  text-align: left;
+  margin: 0 auto;
+}
+
+.help-card--medium {
+  max-width: 320px;
+}
+
+.help-image img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  display: block;
+}
+
+.help-login {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin: 12px 0;
+}
+
+.help-login input {
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #c7d8e5;
+  min-width: 220px;
+}
+
+.help-login button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  background: #114b96;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.help-login button:hover {
+  background: #0d3b78;
+}
+
+.help-error {
+  color: #a80000;
+  font-weight: 600;
+  margin-bottom: 12px;
 }
 
 .about {
