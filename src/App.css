@@ -14,6 +14,11 @@
   color: #dc582a; /*Dark Orange 1*/
 }
 
+.Home-title {
+  margin: 0;
+  padding: 0;
+}
+
 .Home-bar {
   display: flex;
   padding-left: 1vw;
@@ -33,7 +38,6 @@
   margin-left: auto;
 }
 
-
 a {
   color: #114b96; /*Blue that matches UD logo */
   font-size: calc(10px + 2vmin);
@@ -42,7 +46,7 @@ a {
 }
 
 a:hover {
-  color: #add8e6;
+  color: #4782d0;
 }
 
 @keyframes App-logo-spin {
@@ -66,7 +70,7 @@ html {
 body {
   background: #185789;
   color: #000;
-  background-image: url(assets/background.jpg);
+  background-image: url(assets/background-1.jpg);
   background-attachment: fixed;
   background-size: cover;
   background-repeat: no-repeat;
@@ -94,8 +98,7 @@ body {
   display: flex;
   box-shadow: inset 0 0 5px grey;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  align-items: center; /*SIR: removed justifyContent: center*/
   text-align: center;
   padding: 1vh 1vw 1vh 1vw;
   margin-top: 0px;
@@ -130,7 +133,7 @@ body {
 /* Handle */
 ::-webkit-scrollbar-thumb {
   box-shadow: inset 0 0 5px grey;
-  background: #add8e6;
+  background: #4e81b3;
   border-radius: 10px;
 }
 
@@ -351,8 +354,152 @@ nav ul li a:hover::after {
   color: #1f0545;
   font-size: 14px;
 }
+
 .tab-contents.active-tab {
   display: block;
+}
+
+/* Sidebar styling */
+
+.app-sidebar {
+  border-radius: 10px;
+  overflow-y: scroll;
+  direction: rtl;
+}
+
+.app-sidebar::-webkit-scrollbar-track {
+  background-color: white;
+  border-radius: 10px 0 0 10px;
+}
+
+.app-sidebar .ps-menu-root {
+  margin-top: -20px;
+  background: #4e81b3;
+}
+
+.app-sidebar .ps-sidebar-container {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.app-sidebar .ps-menuitem-root {
+  margin: 0;
+  padding: 0;
+}
+
+.app-sidebar .ps-menu-button {
+  width: 100%;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  justify-content: flex-start;
+}
+
+.app-sidebar .ps-menu-button::after {
+  content: none !important;
+}
+
+.app-sidebar .sidebar-reset-button .ps-menu-button {
+  background-color: #dc3545;
+  border: 1px solid #dc3545;
+  border-radius: 0.375rem;
+  color: #fff;
+  justify-content: center;
+}
+
+.app-sidebar .sidebar-reset-button .ps-menu-button:hover,
+.app-sidebar .sidebar-reset-button .ps-menu-button:focus {
+  background-color: #bb2d3b;
+  border-color: #bb2d3b;
+  color: #fff;
+}
+
+/* Exercises page responsive layout */
+.ex-page-container {
+  width: 100%;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  min-height: 350px;
+}
+.ex-left {
+  padding-right: 2vw;
+  display: flex;
+  justify-content: flex-start;
+  flex-direction: column;
+  flex: 0 1 35%; /* don't grow beyond 35%, can shrink down to its min-width */
+  min-width: 600px;
+  max-width: 45%;
+}
+.ex-right {
+  flex: 1; /* grow to fill remaining space, can shrink */
+  margin-left: 2vw;
+  display: flex;
+  flex-direction: column;
+  min-width: 260px;
+}
+
+/* Make forms and lists inside the left column wrap and shrink nicely */
+.ex-left form,
+.ex-left #boxes,
+.ex-left #dropdowns {
+  width: 100%;
+}
+
+/*No loaded exercise placeholder styling*/
+.exercise-placeholder {
+  flex: 1;
+  display: flex;
+  margin: 3vw;
+  margin-left: 12vw;
+  min-width: 260px;
+  max-height: 300px; /* SR: Added so that the loaded page doesn't extend to bottom*/
+  flex-direction: column;
+  align-items: right;
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  padding: 100px;
+  background-color: #f9f9f9;
+  color: #666;
+}
+
+/* Responsive breakpoint: stack columns on small screens */
+@media (max-width: 1400px) {
+  .ex-page-container,
+  .two-column-wrapper {
+    /*SR: added class for two-column-wrapped so it shrinks nicely*/
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .ex-left,
+  .ex-right,
+  .exercise-placeholder {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+  }
+  .ex-right {
+    order: 2;
+  }
+  .ex-left {
+    order: 1;
+  }
+}
+
+/* Small tweaks for very small screens */
+@media (max-width: 480px) {
+  .ex-left {
+    padding-right: 0.5rem;
+  }
+  .ex-right {
+    padding-left: 0.5rem;
+  }
+  .ex-left form {
+    font-size: 0.95rem;
+  }
 }
 
 /* -----------------------------services---------------------- */
@@ -410,11 +557,11 @@ nav ul li a:hover::after {
   overflow: hidden;
   cursor: pointer;
 }
-h2{
+h2 {
   text-align: left;
 }
 
-h5{
+h5 {
   text-align: left;
 }
 .work img {
@@ -503,7 +650,7 @@ h5{
   text-decoration: none;
   justify-content: center;
   color: #ffffff;
-  background: #add8e6;
+  background: #4e81b3;
   transition: background 0.5s;
 }
 .btn-list {
@@ -519,7 +666,7 @@ h5{
 }
 
 .btnback:hover {
-  background: #ffdb63; /*lighter orange*/
+  background: #114b96; /*lighter orange*/
   /* border: 3px solid #dc582a; */
 }
 
@@ -649,7 +796,7 @@ form {
 nav .fas {
   display: none;
 }
-@media only screen and (max-width: 600px) {
+@media only screen and (max-width: 1100px) {
   #header {
     background-image: url(assets/musicbg1.jpg);
   }
@@ -718,6 +865,13 @@ nav .fas {
   .copyright {
     font-size: 15px;
   }
+  .responsive-element {
+    /*edit button so that it shrinks*/
+    height: 50px;
+  }
+  audio {
+    width: 150px;
+  }
 }
 #msg {
   color: #51b752;
@@ -731,7 +885,7 @@ nav .fas {
   stroke-width: 2;
 }
 .error-highlight {
-  fill: rgba(255, 0, 0, 0,6);
+  fill: rgba(255, 0, 0, 0, 6);
   stroke: red;
   stroke-width: 2;
 }
@@ -741,5 +895,15 @@ nav .fas {
 #1858f8 -back blue
 #02113f -
 #ababab 
-
 */
+
+.sidebar-toggle-button {
+  color: #000;
+  transition: color 0.2s ease;
+}
+
+.sidebar-toggle-button:hover,
+.sidebar-toggle-button:focus {
+  color: #fff;
+  background-color: #4e81b3;
+}

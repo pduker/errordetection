@@ -2,7 +2,7 @@
 class ExerciseData {
     //exercise attribute
     score: string
-    sound: File | string | undefined
+    sound: File | undefined
     correctAnswers: {[label: string]: (number | string)}[]
     feedback: string
     exIndex: number
