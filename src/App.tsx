@@ -118,8 +118,8 @@ function App() {
               <Route path="/errordetection" element={<Navigate to="/exercises"/>}/>
 
               <Route path="/exercises" element={<ExercisesPage allExData={allExData} setAllExData={setAllExData}/>}/>
-              <Route path="/exercises/intonation" element={<ExercisesPage allExData={allExData} defaultTags={["Intonation"]}/>}/>
-              <Route path="/exercises/pitch" element={<ExercisesPage allExData={allExData} defaultTags={["Pitch"]}/>}/>
+              <Route path="/exercises/intonation" element={<ExercisesPage allExData={allExData} setAllExData={setAllExData} defaultTags={["Intonation"]}/>}/>
+              <Route path="/exercises/pitch" element={<ExercisesPage allExData={allExData} setAllExData={setAllExData} defaultTags={["Pitch"]}/>}/>
 
               <Route path="/exercise-management" element={<ExerciseManagementPage allExData={allExData} setAllExData={setAllExData} fetch={fetchScoresFromDatabase} authorized={authorized}/>}/>
 
