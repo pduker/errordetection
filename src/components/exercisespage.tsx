@@ -303,25 +303,13 @@ export function ExercisesPage({
     //onClick to reset all exercise sort fields
     const resetSort = function () {
         setTags([]);
-
         setDiff("All");
-        var diffBox = document.getElementsByName("difficulty")[0] as HTMLSelectElement;
-        if (diffBox !== null) diffBox.options[0].selected = true;
-
         setVoices(0);
-        var voiceBox = document.getElementsByName("voices")[0] as HTMLSelectElement;
-        if (voiceBox !== null) voiceBox.options[0].selected = true;
-
         setTypes("None");
-        var typesBox = document.getElementsByName("types")[0] as HTMLSelectElement;
-        if(typesBox !== null) typesBox.options[0].selected = true;
-
         setMeter("Anything");
-        var meterBox = document.getElementsByName("meter")[0] as HTMLSelectElement;
-        if(meterBox !== null) meterBox.options[0].selected = true;
-        
         setTranspos(false);
-
+        setCurrentPage(1);
+        setExList([...allExData].sort(exSortFunc));
     }
 
     // Toggle function for the sidebar
@@ -346,6 +334,7 @@ export function ExercisesPage({
                 onSelectMeter={handleMeterSelect}
                 texturalFactor={types}
                 onSelectTexturalFactor={handleTexturalFactorSelect}
+                onResetSort={resetSort}
             />
             <div className="ex-page-container"> 
 
@@ -369,79 +358,11 @@ export function ExercisesPage({
                         <div className="ex-left"> {/* SIR: left column div */}
                             <h2 style={{fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> {/*SIR: changed fontSize for consistency*/}
                             <h5 style={{fontStyle: "italic", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5> {/*SIR: changed fontSize for consistency*/}
-                            <span>
-                                <div id="boxes" style={{ display: "inline-flex", alignItems: "center" }}> {/*SIR: div tag for filter checkboxes*/}
-                                    <form id="tags" style={{ display: "flex", alignItems: "center", gap: "8px"}}> {/*SIR: added gap and alignItems to center*/}
-                                        <div style={{ fontSize: "16px" }}>Tags:</div> {/*SIR: added fontSize for consistency*/}
-                                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}> {/*SIR: added marginRight for spacing*/}
-                                            <input type="checkbox" name="tags" value="Pitch" checked={tags.includes("Pitch")} onChange={tagsChange} style={{ marginRight: "6px" }} />
-                                            Pitch
-                                        </label>
-                                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}> {/*SIR: added marginRight for spacing*/}
-                                            <input type="checkbox" name="tags" value="Intonation" checked={tags.includes("Intonation")} onChange={tagsChange} style={{ marginRight: "6px" }} />
-                                            Intonation
-                                        </label>
-                                        <label style={{ marginRight: "6px", display: "flex", alignItems: "center" }}> {/*SIR: added marginRight for spacing*/}
-                                            <input type="checkbox" name="tags" value="Rhythm" checked={tags.includes("Rhythm")} onChange={tagsChange} style={{ marginRight: "6px" }} />
-                                            Rhythm
-                                        </label>
-                                        <label style={{ display: "flex", alignItems: "center", whiteSpace: "nowrap" }}>
-                                            <input type="checkbox" name="transpos" value="buh" checked={transpos} onChange={transposChange} style={{ marginRight: "6px" }} />
-                                                Transposing Instruments
-                                        </label>
-                                    </form>
-                                </div>
-                                <div id="dropdowns" style={{display: "inline-flex", padding: "4px",  alignItems: "center"}}> {/*SIR: added gap and alignItems to center*/}
-                                    <form id="difficulty">
-                                        <div style={{fontSize:"16px", display:"inline"}}>Difficulty:</div>
-                                        <br></br>
-                                        <select name="difficulty" value={diff} onChange={diffChange}>
-                                            <option value="All">All</option>
-                                            <option value="1">1</option>
-                                            <option value="2">2</option>
-                                            <option value="3">3</option>
-                                            <option value="4">4</option>
-                                            <option value="5">5</option>
-                                        </select>
-                                    </form>
-                                    <form id="voiceCt">
-                                        Voices:
-                                        <br></br>
-                                        <select name="voices" value={voices} onChange={voiceChange}>
-                                            <option value={0}>Any</option>
-                                            <option value={1}>1</option>
-                                            <option value={2}>2</option>
-                                            <option value={3}>3</option>
-                                            <option value={4}>4</option>
-                                            <option value={5}>5</option>
-                                        </select>
-                                    </form>
-                                    <form id="meterForm">
-                                        Meter:
-                                        <br></br>
-                                        <select name='meter' value={meter} onChange={meterChange}>
-                                                <option value="Anything">Anything</option>
-                                                <option value="Simple">Simple</option>
-                                                <option value="Compound">Compound</option>
-                                                
-                                        </select>
-                                    </form>
-                                </div>
-                                <div style={{display: "inline-flex", padding: "4px", gap: "8px", alignItems: "center"}}>
-                                    <form id='typesForm' style={{margin: 0}}>
-                                        Textural Factors:
-                                        <br></br>
-                                        <select name="types" value={types} onChange={typesChange}>
-                                            <option value="None">None</option>
-                                            <option value="Drone">Drone</option>
-                                            <option value="Ensemble Parts">Ensemble Parts</option>
-                                            <option value="Both">Drone & Ensemble Parts</option>
-                                        </select>
-                                    </form>
 
-                                    <Button variant="danger" onClick={resetSort} style={{marginLeft: "6px", padding: "6px 10px"}}>Reset Sort</Button>
-                                </div>
-                            </span>
+                            {exList.length === 0 ? 
+                                !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. <br /> If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
+                            <div>No exercises with those criteria found!</div> : <></>}
+                            
                             <div style={{marginTop: "8px", display: "flex", alignItems: "center", gap: "8px"}}>
                             {/* add page navigation buttons, call newly defined functions */}
                                     <Button
@@ -486,9 +407,6 @@ export function ExercisesPage({
                                 else return <></>;
                             })}
                             </div>
-                            {exList.length === 0 ? 
-                                !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
-                            <div>No exercises with those criteria found!</div> : <></>}
                         </div>
 
                         {/* --- COLUMN 2: Your original 'ex-right' --- */}
