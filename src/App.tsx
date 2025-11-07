@@ -10,6 +10,7 @@ import { HelpPage } from './components/helppage';
 import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
+import { LandingPage } from './components/landingpage';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 //import { Interface } from 'readline';
 import ExerciseData from './interfaces/exerciseData';
@@ -137,7 +138,7 @@ function App() {
         <div className='pagediv'>
         <div  style={{overflowY: "scroll",margin: "10px"}}>
           <Routes>
-              <Route path="/" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>}/>
+              <Route path="/" element={<LandingPage />}/>
             </Routes>
 
             <Routes>
@@ -174,5 +175,4 @@ function App() {
 }
 
 export default App;
-
 
