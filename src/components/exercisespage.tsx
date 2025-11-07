@@ -399,8 +399,26 @@ export function ExercisesPage({
                             {/* pull from paginated exercises */}
                             {pageExercises.map(function(exercise){
                                 if(exercise !== undefined) {
+                                    const isActive = selExercise?.exIndex === exercise.exIndex;
                                     return (
-                                    <div key = {exercise.title} id = {exercise.title} onClick={exChange} style={{margin: "4px 0", padding: "10px", cursor: "pointer", backgroundColor: "#fcfcd2", borderRadius: "4px", fontSize: "1.05rem"}}>
+                                    <div
+                                        key = {exercise.title}
+                                        id = {exercise.title}
+                                        onClick={exChange}
+                                        role="button"
+                                        aria-pressed={isActive}
+                                        style={{
+                                            margin: "4px 0",
+                                            padding: "10px",
+                                            cursor: "pointer",
+                                            backgroundColor: isActive ? "#e4f1ff" : "#fcfcd2",
+                                            borderRadius: "4px",
+                                            fontSize: "1.05rem",
+                                            border: isActive ? "2px solid #0d6efd" : "2px solid transparent",
+                                            boxShadow: isActive ? "0 0 0 2px rgba(13, 110, 253, 0.15)" : "none",
+                                            fontWeight: isActive ? 600 : 400,
+                                            transition: "background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease"
+                                        }}>
                                         {exercise.title}
                                     </div>
                                     )}
