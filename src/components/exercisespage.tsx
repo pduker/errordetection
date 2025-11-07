@@ -399,8 +399,15 @@ export function ExercisesPage({
                             {/* pull from paginated exercises */}
                             {pageExercises.map(function(exercise){
                                 if(exercise !== undefined) {
+                                    const isActive = selExercise?.exIndex === exercise.exIndex;
                                     return (
-                                    <div key = {exercise.title} id = {exercise.title} onClick={exChange} style={{margin: "4px 0", padding: "10px", cursor: "pointer", backgroundColor: "#fcfcd2", borderRadius: "4px", fontSize: "1.05rem"}}>
+                                    <div
+                                        key = {exercise.title}
+                                        id = {exercise.title}
+                                        onClick={exChange}
+                                        role="button"
+                                        aria-pressed={isActive}
+                                        className={`exercise-list-item${isActive ? " active" : ""}`}>
                                         {exercise.title}
                                     </div>
                                     )}
