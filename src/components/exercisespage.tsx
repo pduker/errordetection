@@ -436,6 +436,10 @@ export function ExercisesPage({
 
                         {/* --- COLUMN 2: Your original 'ex-right' --- */}
                         <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
+                            <div style={{display:"flex", justifyContent: "center", marginLeft: "160px"}}> {/* SIR: added marginLeft to back/next button */}
+                                <button  className= "btnback" id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
+                                <button className= "btnback" id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
+                            </div>
                             {selExercise !== undefined ? (
                             <div> 
                                 <Exercise 
@@ -456,13 +460,7 @@ export function ExercisesPage({
                                     <p>Select an exercise from the left to begin.</p>
                                 </div>
                         )}
-                        
-                        <div style={{display:"flex", justifyContent: "center", marginLeft: "160px"}}> {/* SIR: added marginLeft to back/next button */}
-                            <button  className= "btnback" id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
-                            <button className= "btnback" id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
-                        </div>
-                        
-                            
+                          
                         </div>
                     
                     </div> {/* --- End of two-column wrapper --- */}
