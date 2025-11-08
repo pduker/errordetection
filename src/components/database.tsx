@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { FirebaseApp, initializeApp } from 'firebase/app';
-import { getDatabase, ref as dbRef, push, set } from 'firebase/database';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+// import React, { useState } from 'react';
+// import { FirebaseApp } from 'firebase/app';
+// import { getDatabase, ref as dbRef, push, set } from 'firebase/database';
+// import { signInWithEmailAndPassword } from "firebase/auth";
 
+import { initializeApp } from 'firebase/app';
+import { getAuth } from "firebase/auth";
 
 // Initialize Firebase
 const firebaseConfig = {

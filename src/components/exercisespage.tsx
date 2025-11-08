@@ -239,26 +239,6 @@ export function ExercisesPage({
         sortExercises(value, "types");
     }, [sortExercises]);
 
-    //all the onClick functions for when a sorting field is changed
-    const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
-        handleDifficultySelect(e.target.value);
-    }
-    const tagsChange = function (e: React.ChangeEvent<HTMLInputElement>) {
-        handleTagToggle(e.target.value);
-    }
-    const voiceChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
-        handleVoicesSelect(Number(e.target.value));
-    }
-    const typesChange = function (e: React.ChangeEvent<HTMLSelectElement>){
-        handleTexturalFactorSelect(e.target.value);
-    }
-    const meterChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
-        handleMeterSelect(e.target.value);
-    }
-    const transposChange = function(e: React.ChangeEvent<HTMLInputElement>) {
-        handleTransposToggle();
-    }
-
     //onClick function for when Back button is pushed under exercise
     const prevEx = function () {
         const exPos = exList.indexOf(selExercise);

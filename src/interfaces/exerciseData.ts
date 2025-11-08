@@ -31,7 +31,7 @@ class ExerciseData {
         this.types = types;
         this.meter = meter;
         this.transpos = transpos;
-        this.isNew = this.isNew;
+        this.isNew = isNew;
         this.customId = customId;
     }
     

@@ -1,6 +1,8 @@
 //imports
+
+// import { sha256 } from 'js-sha256';
+
 import { useState } from "react";
-import { sha256 } from 'js-sha256';
 import noteKey from "../assets/note-color-key.png"
 import exExample from "../assets/excersie-example.png"
 import { signInWithEmailAndPassword } from "firebase/auth";
