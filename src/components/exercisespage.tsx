@@ -358,17 +358,6 @@ export function ExercisesPage({
 
                 {/* --- This new wrapper holds the button AND your two columns --- */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-
-                    {/* --- 1. The Toggle Button --- */}
-                    <Button
-                        onClick={toggleSidebar}
-                        variant="light"
-                        className="sidebar-toggle-button"
-                        style={{ marginBottom: "1rem", width: "fit-content", position: "relative" }}
-                    >
-                        <FaBars />
-                    </Button>
-
                     {/* --- 2. This wrapper holds your two columns side-by-side --- */} 
                     <div className = "two-column-wrapper" style={{ display: 'flex', flex: 1, gap: '20px' }}> 
             
@@ -381,7 +370,7 @@ export function ExercisesPage({
                                 !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. <br /> If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
                             <div>No exercises with those criteria found!</div> : <></>}
                             
-                            <div style={{marginTop: "8px", display: "flex", alignItems: "center", gap: "8px"}}>
+                            <div style={{marginTop: "8px", alignItems: "center", gap: "8px"}}>
                             {/* add page navigation buttons, call newly defined functions */}
                                     <Button
                                         onClick={prevPage}
@@ -411,6 +400,16 @@ export function ExercisesPage({
                                             lineHeight: "1"}}
                                     >
                                         ›
+                                    </Button>
+                                    
+                                    {/* --- 1. The Toggle Button --- */}
+                                    <Button
+                                        onClick={toggleSidebar}
+                                        variant="light"
+                                        className="sidebar-toggle-button"
+                                        style={{ marginBottom: "1rem", width: "fit-content", position: "relative" }}
+                                    >
+                                        <FaBars />
                                     </Button>
                                 </div>
                             <div style={{flex: "1", display: "flex", flexDirection: "column", minWidth:"200px"}}> {/* SIR: listed exercises, added minHeight to prevent jitter */}
