@@ -5,12 +5,11 @@ import Nav from 'react-bootstrap/Nav';
 import logo from './assets/UD-circle-logo-email.png';
 import './App.css';
 //import BoopButton from "./components/audiohander"
-//import { HomePage } from './components/homepage';
+import { HomePage } from './components/homepage';
 import { HelpPage } from './components/helppage';
 import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
-import { LandingPage } from './components/landingpage';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 //import { Interface } from 'readline';
 import ExerciseData from './interfaces/exerciseData';
@@ -174,10 +173,14 @@ function AppLayout({
         style={{
           overflowY: isLanding ? "hidden" : "scroll",
           margin: isLanding ? "0" : "10px",
-          height: "100%"
+          height: "100%",
+          width: "100%",
+          display: isLanding ? "flex" : "block",
+          alignItems: isLanding ? "center" : undefined,
+          justifyContent: isLanding ? "center" : undefined
         }}>
         <Routes>
-            <Route path="/" element={<LandingPage />}/>
+            <Route path="/" element={<HomePage />}/>
             <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>} />
             <Route path="/about" element={<AboutPage/>} />
             <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>} />

@@ -1,8 +1,6 @@
 //imports
 import '../App.css';
 import musicnote from "../assets/musicnote.jpg";
-import othernote from "../assets/othernote.png";
-import logo from '../assets/doof.png';
 import { Link } from 'react-router-dom';
 
 //function for creating the home page
@@ -22,10 +20,10 @@ export function HomePage() {
   } */
   //return for rendering home page
     return (
-        <div className="container ">
-          
-          <center><h1>University of Delaware </h1></center>
-          <center><h1>Aural Skills Error Detection Practice Site</h1></center>
+        <div className="home-page">
+          <div className="home-card">
+          <h1>University of Delaware </h1>
+          <h1>Aural Skills Error Detection Practice Site</h1>
           <div className="work-list">
 
             <div className="work" onClick={pitchLink}>
@@ -52,6 +50,7 @@ export function HomePage() {
             <Link id="intLink" to="/exercises/intonation" hidden={true}></Link>
             <Link id="pitchLink" to="/exercises/pitch" hidden={true}></Link>
             {/* <Link id="rhyLink" to="/exercises/rhythm" hidden={true}></Link> */}
+          </div>
           </div>
 
       </div>
