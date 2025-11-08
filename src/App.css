@@ -592,6 +592,59 @@ nav ul li a:hover::after {
   flex-direction: column;
   min-width: 260px;
 }
+.exercise-viewer {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  min-height: 360px;
+}
+.exercise-nav-row {
+  display: flex;
+  gap: 0.75rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+.exercise-content {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+}
+.exercise-nav-button {
+  margin: 0;
+  min-height: 48px;
+  min-width: 0;
+  padding: 0 1.25rem;
+  border-radius: 12px;
+  border: none;
+  background: #4e81b3;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  transition: background-color 0.2s ease, transform 0.15s ease;
+  flex: 1 1 50%;
+}
+.exercise-nav-button:not(:disabled):hover,
+.exercise-nav-button:not(:disabled):focus-visible {
+  background: #114b96;
+}
+.exercise-nav-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+  transform: none;
+}
 
 /* Make forms and lists inside the left column wrap and shrink nicely */
 .ex-left form,
@@ -664,6 +717,25 @@ nav ul li a:hover::after {
   }
   .ex-left {
     order: 1;
+  }
+  .exercise-viewer {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .exercise-viewer {
+    padding: 0;
+  }
+  .exercise-nav-row {
+    flex-direction: column;
+  }
+  .exercise-nav-button {
+    width: 100%;
+    max-width: none;
+  }
+  .exercise-content {
+    width: 100%;
   }
 }
 

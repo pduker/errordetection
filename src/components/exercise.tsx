@@ -10,7 +10,9 @@ import { Button } from "react-bootstrap";
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import noteKey from "../assets/note-color-key.png";
-import path from "path";
+// import path from "path";
+
+const SVG_NS = "http://www.w3.org/2000/svg";
 
 const firebaseConfig = {
   apiKey: "AIzaSyClKDKGi72jLfbtgWF1957XHWZghwSM0YI",
@@ -56,7 +58,7 @@ export function Exercise({
 
   // lots of variable initialization
   var abc = "",
-    feed = "",
+    // feed = "",
     color: string;
   var ans: any[] = [];
   var visualObjs: any;
@@ -307,8 +309,6 @@ export function Exercise({
           measure = 0;
         }
 
-        const svgNS = "http://www.w3.org/2000/svg";
-
         if (!boundingBox) return;
 
         // Store the start X position of the bar
@@ -324,128 +324,6 @@ export function Exercise({
 
         const topLines = svgElement?.querySelectorAll(".abcjs-top-line");
         let totalSum = 0;
-
-        // Helper function to create both the beat bar and invisible cover box
-        const addRects = (
-          x: number,
-          y: number,
-          width: number,
-          height: number
-        ) => {
-          const bar = document.createElementNS(svgNS, "rect");
-          const coverBox = document.createElementNS(svgNS, "rect");
-
-          // Set visual styles and coordinates for the beat bar
-          bar.classList.add("bar");
-          bar.setAttribute("x", x.toString());
-          bar.setAttribute("y", y.toString());
-          bar.setAttribute("width", width.toString());
-          bar.setAttribute("height", "7");
-          if (tags.includes("Rhythm")) {
-            bar.setAttribute("fill", "purple");
-            bar.setAttribute("opacity", "0.2");
-          } else {
-            bar.setAttribute("fill", "none");
-            bar.setAttribute("opacity", "0");
-          }
-          bar.setAttribute("stroke", "none");
-
-          const noteBox = noteElems.getBoundingClientRect();
-          const noteTop = toSvgCoords(svgElement, 0, noteBox.top).y;
-          const noteBottom = toSvgCoords(svgElement, 0, noteBox.bottom).y;
-
-          const bars = document.querySelectorAll('[data-name="bar"]');
-          const paths = Array.from(bars)
-            .filter((path) => path.tagName === "path")
-            .filter((path, index, self) => {
-              const bottom = path.getBoundingClientRect().bottom;
-              return (
-                self.findIndex(
-                  (p) => p.getBoundingClientRect().bottom === bottom
-                ) === index
-              );
-            });
-          const pathBottom = toSvgCoords(
-            svgElement,
-            0,
-            paths[staff].getBoundingClientRect().bottom
-          ).y;
-          const pathHeight = paths[staff].getBoundingClientRect().height;
-          const noteHeight = pathBottom - y + pathHeight / 4;
-
-          // Set styles for invisible cover box used for highlighting
-          coverBox.classList.add("cover-box");
-          coverBox.setAttribute("x", x.toString());
-          coverBox.setAttribute("y", y.toString());
-          if (width < 0) {
-            coverBox.setAttribute("width", Math.abs(width).toString());
-          } else {
-            coverBox.setAttribute("width", width.toString());
-          }
-          if (noteHeight < 0) {
-            coverBox.setAttribute(
-              "height",
-              Math.abs(noteBottom - y).toString()
-            );
-          } else {
-            coverBox.setAttribute("height", noteHeight.toString());
-          }
-          coverBox.setAttribute("fill", "purple");
-          coverBox.setAttribute("opacity", "0");
-          coverBox.setAttribute("stroke", "none");
-          if (staffArray[staff]?.clipPath) {
-            coverBox.setAttribute("clip-path", staffArray[staff].clipPath);
-          }
-          coverBox.style.pointerEvents = "none";
-
-          // Add metadata and beat index
-          const beatIndexForOverlay = currentBeatIndex;
-          bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
-          bar.setAttribute("data-measure-pos", measure.toString());
-          bar.setAttribute("data-staff-pos", staff.toString());
-
-          coverBox.setAttribute(
-            "data-beatIndex",
-            beatIndexForOverlay.toString()
-          );
-          coverBox.setAttribute("data-measure-pos", measure.toString());
-          coverBox.setAttribute("data-staff-pos", staff.toString());
-
-          // Handle click event to toggle selection
-          bar.addEventListener("click", () => {
-            if (bar.getAttribute("data-selected") === "true") {
-              bar.setAttribute("data-selected", "false");
-              bar.setAttribute("opacity", "0.2");
-              coverBox.setAttribute("opacity", "0");
-              const index = selAnswers.findIndex(
-                (item) =>
-                  item.type === "beat" &&
-                  item.measurePos === measure &&
-                  item.staffPos === staff &&
-                  item.beatIndex === beatIndexForOverlay
-              );
-              if (index !== -1) selAnswers.splice(index, 1);
-            } else {
-              bar.setAttribute("data-selected", "true");
-              bar.setAttribute("opacity", "1");
-              coverBox.setAttribute("opacity", "0.5");
-              selAnswers.push({
-                measurePos: measure,
-                staffPos: staff,
-                beatIndex: beatIndexForOverlay,
-                type: "beat",
-              });
-            }
-            if (teacherMode) multiAnswer();
-          });
-
-          // Append rect elements to SVG <g> group
-          const svgGroup = svgElement.querySelector("g");
-          if (svgGroup) {
-            svgGroup.appendChild(bar);
-            svgGroup.appendChild(coverBox);
-          }
-        };
 
         if (note.duration >= visualObjs[0].getBeatLength() * 4) {
           // This note spans 2 or more beats - create multiple beat bars
@@ -487,7 +365,21 @@ export function Exercise({
               noteLeft + b * (beatWidth + 5),
               0
             ).x;
-            addRects(barX, barTopY, beatWidth, 5);
+            createBeatRect({
+              x: barX,
+              y: barTopY,
+              width: beatWidth,
+              svgElement,
+              noteElement: noteElems,
+              tags,
+              staffArray,
+              staff,
+              measure,
+              beatIndex: currentBeatIndex,
+              selAnswers,
+              teacherMode,
+              multiAnswer,
+            });
             currentBeatIndex++;
           }
 
@@ -544,7 +436,21 @@ export function Exercise({
             remainLen = ((noteRightPt.x - noteLeftPt.x) * 1) / 3;
           }
 
-          addRects(barStartPt.x, barTopY, barWidth, 5);
+          createBeatRect({
+            x: barStartPt.x,
+            y: barTopY,
+            width: barWidth,
+            svgElement,
+            noteElement: noteElems,
+            tags,
+            staffArray,
+            staff,
+            measure,
+            beatIndex: currentBeatIndex,
+            selAnswers,
+            teacherMode,
+            multiAnswer,
+          });
 
           totalSum = beatSum;
           beatSum -= visualObjs[0].getBeatLength();
@@ -601,7 +507,21 @@ export function Exercise({
             barWidth = noteRightPt.x - barStartPt.x - 5;
           }
 
-          addRects(barX, barTopY, barWidth, 5);
+          createBeatRect({
+            x: barX,
+            y: barTopY,
+            width: barWidth,
+            svgElement,
+            noteElement: noteElems,
+            tags,
+            staffArray,
+            staff,
+            measure,
+            beatIndex: currentBeatIndex,
+            selAnswers,
+            teacherMode,
+            multiAnswer,
+          });
 
           beatSum = 0;
           noteCount = 0;
@@ -609,33 +529,43 @@ export function Exercise({
         }
 
         if (teacherMode) {
-          var ansSearch = correctAnswers.findIndex(
-            (answer: { [label: string]: string | number }) =>
-              answer.index === noteElems.getAttribute("index") &&
-              note.el_type !== "bar"
-          );
+          const noteIndexAttr = noteElems.getAttribute("index");
+          const isBarNote = note.el_type === "bar";
+          let ansSearch = -1;
+          for (let i = 0; i < correctAnswers.length; i++) {
+            const answer = correctAnswers[i];
+            if (answer.index === noteIndexAttr && !isBarNote) {
+              ansSearch = i;
+              break;
+            }
+          }
           if (ansSearch !== -1) {
-            noteElems.setAttribute(
-              "selectedTimes",
-              correctAnswers[ansSearch].selectedTimes
-            );
-            noteElems.setAttribute(
-              "feedback",
-              correctAnswers[ansSearch].feedback
-            );
+            const answerData = correctAnswers[ansSearch];
+            noteElems.setAttribute("selectedTimes", answerData.selectedTimes);
+            noteElems.setAttribute("feedback", answerData.feedback);
 
-            if (
-              selNotes.findIndex((val) => val.startChar === note.startChar) ===
-              -1
-            )
+            const currentStartChar = note.startChar;
+            let existingNoteIndex = -1;
+            for (let i = 0; i < selNotes.length; i++) {
+              if (selNotes[i].startChar === currentStartChar) {
+                existingNoteIndex = i;
+                break;
+              }
+            }
+
+            if (existingNoteIndex === -1) {
               selNotes.push(note);
-            else
-              selNotes[
-                selNotes.findIndex((val) => val.startChar === note.startChar)
-              ] = note;
+            } else {
+              selNotes[existingNoteIndex] = note;
+            }
 
-            for (let q = 0; q < noteElems.getAttribute("selectedTimes"); q++)
+            const selectedTimesAttr = noteElems.getAttribute("selectedTimes");
+            const selectedTimes = selectedTimesAttr
+              ? Number(selectedTimesAttr)
+              : 0;
+            for (let q = 0; q < selectedTimes; q++) {
               highlight(note, undefined, false);
+            }
           }
         }
       }
@@ -654,6 +584,135 @@ export function Exercise({
       throw new Error("SVG not rendered yet. Cannot compute coordinates.");
     }
     return pt.matrixTransform(ctm.inverse());
+  }
+
+  interface BeatRectParams {
+    x: number;
+    y: number;
+    width: number;
+    svgElement: SVGSVGElement;
+    noteElement: Element;
+    tags: string[];
+    staffArray: any[];
+    staff: number;
+    measure: number;
+    beatIndex: number;
+    selAnswers: any[];
+    teacherMode: boolean;
+    multiAnswer: (() => void) | undefined;
+  }
+
+  function createBeatRect({
+    x,
+    y,
+    width,
+    svgElement,
+    noteElement,
+    tags,
+    staffArray,
+    staff,
+    measure,
+    beatIndex,
+    selAnswers,
+    teacherMode,
+    multiAnswer,
+  }: BeatRectParams) {
+    const bar = document.createElementNS(SVG_NS, "rect");
+    const coverBox = document.createElementNS(SVG_NS, "rect");
+
+    bar.classList.add("bar");
+    bar.setAttribute("x", x.toString());
+    bar.setAttribute("y", y.toString());
+    bar.setAttribute("width", width.toString());
+    bar.setAttribute("height", "7");
+    if (tags.includes("Rhythm")) {
+      bar.setAttribute("fill", "purple");
+      bar.setAttribute("opacity", "0.2");
+    } else {
+      bar.setAttribute("fill", "none");
+      bar.setAttribute("opacity", "0");
+    }
+    bar.setAttribute("stroke", "none");
+
+    const noteBox = noteElement.getBoundingClientRect();
+    const noteBottom = toSvgCoords(svgElement, 0, noteBox.bottom).y;
+
+    const bars = document.querySelectorAll('[data-name="bar"]');
+    const paths = Array.from(bars)
+      .filter((path) => path.tagName === "path")
+      .filter((path, index, self) => {
+        const bottom = path.getBoundingClientRect().bottom;
+        return (
+          self.findIndex((p) => p.getBoundingClientRect().bottom === bottom) ===
+          index
+        );
+      });
+    const pathBottom = toSvgCoords(
+      svgElement,
+      0,
+      paths[staff].getBoundingClientRect().bottom
+    ).y;
+    const pathHeight = paths[staff].getBoundingClientRect().height;
+    const noteHeight = pathBottom - y + pathHeight / 4;
+
+    coverBox.classList.add("cover-box");
+    coverBox.setAttribute("x", x.toString());
+    coverBox.setAttribute("y", y.toString());
+    coverBox.setAttribute("width", Math.abs(width).toString());
+    if (noteHeight < 0) {
+      coverBox.setAttribute("height", Math.abs(noteBottom - y).toString());
+    } else {
+      coverBox.setAttribute("height", noteHeight.toString());
+    }
+    coverBox.setAttribute("fill", "purple");
+    coverBox.setAttribute("opacity", "0");
+    coverBox.setAttribute("stroke", "none");
+    if (staffArray[staff]?.clipPath) {
+      coverBox.setAttribute("clip-path", staffArray[staff].clipPath);
+    }
+    coverBox.style.pointerEvents = "none";
+
+    const beatIndexForOverlay = beatIndex;
+    bar.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
+    bar.setAttribute("data-measure-pos", measure.toString());
+    bar.setAttribute("data-staff-pos", staff.toString());
+
+    coverBox.setAttribute("data-beatIndex", beatIndexForOverlay.toString());
+    coverBox.setAttribute("data-measure-pos", measure.toString());
+    coverBox.setAttribute("data-staff-pos", staff.toString());
+
+    bar.addEventListener("click", () => {
+      if (bar.getAttribute("data-selected") === "true") {
+        bar.setAttribute("data-selected", "false");
+        bar.setAttribute("opacity", "0.2");
+        coverBox.setAttribute("opacity", "0");
+        const index = selAnswers.findIndex(
+          (item) =>
+            item.type === "beat" &&
+            item.measurePos === measure &&
+            item.staffPos === staff &&
+            item.beatIndex === beatIndexForOverlay
+        );
+        if (index !== -1) selAnswers.splice(index, 1);
+      } else {
+        bar.setAttribute("data-selected", "true");
+        bar.setAttribute("opacity", "1");
+        coverBox.setAttribute("opacity", "0.5");
+        selAnswers.push({
+          measurePos: measure,
+          staffPos: staff,
+          beatIndex: beatIndexForOverlay,
+          type: "beat",
+        });
+      }
+      if (teacherMode && multiAnswer) multiAnswer();
+    });
+
+    const svgGroup = svgElement.querySelector("g");
+    if (svgGroup) {
+      svgGroup.appendChild(bar);
+      svgGroup.appendChild(coverBox);
+    }
   }
 
   const reload = function () {
@@ -777,10 +836,12 @@ export function Exercise({
       } else {
         console.log("Incomplete exercise - not saving to database");
         alert(
-          "Something went wrong - make sure you: \n \
-            -uploaded both a musicxml AND an mp3 file\n \
-            -marked any applicable tags, voice #, and difficulty\n \
-            -selected at least one correct answer"
+          [
+            "Something went wrong - make sure you:",
+            "- uploaded both a musicxml AND an mp3 file",
+            "- marked any applicable tags, voice #, and difficulty",
+            "- selected at least one correct answer",
+          ].join("\n")
         );
       }
     } catch (error) {
@@ -1772,11 +1833,9 @@ export function Exercise({
       className="exercise-box" // SIR added exercise box
       style={{
         //exercise example box
-        margin: "10px",
         padding: "10px",
         backgroundColor: "#fcfcd2",
         borderRadius: "10px",
-        marginLeft: "180px", // SIR: used to be 100
         marginTop: "60px", // SIR: changed to not overlap top
         display: "flex", // SIR: added flex to box
         flexDirection: "column", // SIR

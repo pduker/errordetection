@@ -239,26 +239,6 @@ export function ExercisesPage({
         sortExercises(value, "types");
     }, [sortExercises]);
 
-    //all the onClick functions for when a sorting field is changed
-    const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
-        handleDifficultySelect(e.target.value);
-    }
-    const tagsChange = function (e: React.ChangeEvent<HTMLInputElement>) {
-        handleTagToggle(e.target.value);
-    }
-    const voiceChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
-        handleVoicesSelect(Number(e.target.value));
-    }
-    const typesChange = function (e: React.ChangeEvent<HTMLSelectElement>){
-        handleTexturalFactorSelect(e.target.value);
-    }
-    const meterChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
-        handleMeterSelect(e.target.value);
-    }
-    const transposChange = function(e: React.ChangeEvent<HTMLInputElement>) {
-        handleTransposToggle();
-    }
-
     //onClick function for when Back button is pushed under exercise
     const prevEx = function () {
         const exPos = exList.indexOf(selExercise);
@@ -435,31 +415,51 @@ export function ExercisesPage({
 
                         {/* --- COLUMN 2: Your original 'ex-right' --- */}
                         <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
-                            <div style={{display:"flex", justifyContent: "center", marginLeft: "160px"}}> {/* SIR: added marginLeft to back/next button */}
-                                <button  className= "btnback" id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
-                                <button className= "btnback" id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
-                            </div>
-                            {selExercise !== undefined ? (
-                            <div> 
-                                <Exercise 
-                                    key={selExercise.exIndex} 
-                                    teacherMode={false} 
-                                    ExData={selExercise} 
-                                    allExData={allExData} 
-                                    setAllExData={setAllExData} 
-                                    exIndex={selExercise.exIndex} 
-                                    handleSelectExercise={undefined} 
-                                    isSelected={undefined}
-                                    fetch={undefined}
-                                />
-                            </div> 
-                            ) : (
-                                <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
-                                    <h3>No exercise loaded</h3>
-                                    <p>Select an exercise from the left to begin.</p>
+                            <div className="exercise-viewer">
+                                <div className="exercise-nav-row">
+                                    <button
+                                        className="exercise-nav-button exercise-nav-button--prev"
+                                        id="back-btn"
+                                        hidden={true}
+                                        disabled={false}
+                                        onClick={prevEx}
+                                    >
+                                        Back
+                                    </button>
+                                    <button
+                                        className="exercise-nav-button exercise-nav-button--next"
+                                        id="next-btn"
+                                        hidden={true}
+                                        disabled={false}
+                                        onClick={nextEx}
+                                    >
+                                        Next
+                                    </button>
                                 </div>
-                        )}
-                          
+
+                                <div className="exercise-content">
+                                    {selExercise !== undefined ? (
+                                        <div> 
+                                            <Exercise 
+                                                key={selExercise.exIndex} 
+                                                teacherMode={false} 
+                                                ExData={selExercise} 
+                                                allExData={allExData} 
+                                                setAllExData={setAllExData} 
+                                                exIndex={selExercise.exIndex} 
+                                                handleSelectExercise={undefined} 
+                                                isSelected={undefined}
+                                                fetch={undefined}
+                                            />
+                                        </div> 
+                                    ) : (
+                                        <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
+                                            <h3>No exercise loaded</h3>
+                                            <p>Select an exercise from the left to begin.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     
                     </div> {/* --- End of two-column wrapper --- */}
