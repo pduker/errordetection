@@ -1,12 +1,12 @@
 //imports
+
+// import { isDisabled } from '@testing-library/user-event/dist/utils';
+
 import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
 import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
-// import { isDisabled } from '@testing-library/user-event/dist/utils';
-
 import { AppSidebar } from './sidebar';
-import { FaBars } from 'react-icons/fa'; // <-- Import an icon for the toggle
 
 //function to create the exercise page, takes exercise data and renders a page
 export function ExercisesPage({
@@ -388,8 +388,7 @@ export function ExercisesPage({
                                         variant="light"
                                         className="sidebar-toggle-button"
                                         style={{ marginBottom: "1rem", width: "fit-content", position: "relative" }}
-                                    >
-                                        <FaBars />
+                                    >Filters
                                     </Button>
                                 </div>
                             <div style={{flex: "1", display: "flex", flexDirection: "column", minWidth:"200px"}}> {/* SIR: listed exercises, added minHeight to prevent jitter */}
