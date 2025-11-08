@@ -436,17 +436,28 @@ export function ExercisesPage({
                         {/* --- COLUMN 2: Your original 'ex-right' --- */}
                         <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
                             <div className="exercise-viewer">
+                                <div className="exercise-nav-row">
+                                    <button
+                                        className="exercise-nav-button exercise-nav-button--prev"
+                                        id="back-btn"
+                                        hidden={true}
+                                        disabled={false}
+                                        onClick={prevEx}
+                                    >
+                                        Back
+                                    </button>
+                                    <button
+                                        className="exercise-nav-button exercise-nav-button--next"
+                                        id="next-btn"
+                                        hidden={true}
+                                        disabled={false}
+                                        onClick={nextEx}
+                                    >
+                                        Next
+                                    </button>
+                                </div>
 
                                 <div className="exercise-content">
-                                                                    <button
-                                    className="btnback exercise-nav-button exercise-nav-button--prev"
-                                    id="back-btn"
-                                    hidden={true}
-                                    disabled={false}
-                                    onClick={prevEx}
-                                >
-                                    Back
-                                </button>
                                     {selExercise !== undefined ? (
                                         <div> 
                                             <Exercise 
@@ -467,18 +478,7 @@ export function ExercisesPage({
                                             <p>Select an exercise from the left to begin.</p>
                                         </div>
                                     )}
-
-                                <button
-                                    className="btnback exercise-nav-button exercise-nav-button--next"
-                                    id="next-btn"
-                                    hidden={true}
-                                    disabled={false}
-                                    onClick={nextEx}
-                                >
-                                    Next
-                                </button>
                                 </div>
-
                             </div>
                         </div>
                     
