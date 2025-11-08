@@ -1772,11 +1772,9 @@ export function Exercise({
       className="exercise-box" // SIR added exercise box
       style={{
         //exercise example box
-        margin: "10px",
         padding: "10px",
         backgroundColor: "#fcfcd2",
         borderRadius: "10px",
-        marginLeft: "180px", // SIR: used to be 100
         marginTop: "60px", // SIR: changed to not overlap top
         display: "flex", // SIR: added flex to box
         flexDirection: "column", // SIR

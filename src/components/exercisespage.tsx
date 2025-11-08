@@ -435,31 +435,51 @@ export function ExercisesPage({
 
                         {/* --- COLUMN 2: Your original 'ex-right' --- */}
                         <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
-                            <div style={{display:"flex", justifyContent: "center", marginLeft: "160px"}}> {/* SIR: added marginLeft to back/next button */}
-                                <button  className= "btnback" id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
-                                <button className= "btnback" id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
-                            </div>
-                            {selExercise !== undefined ? (
-                            <div> 
-                                <Exercise 
-                                    key={selExercise.exIndex} 
-                                    teacherMode={false} 
-                                    ExData={selExercise} 
-                                    allExData={allExData} 
-                                    setAllExData={setAllExData} 
-                                    exIndex={selExercise.exIndex} 
-                                    handleSelectExercise={undefined} 
-                                    isSelected={undefined}
-                                    fetch={undefined}
-                                />
-                            </div> 
-                            ) : (
-                                <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
-                                    <h3>No exercise loaded</h3>
-                                    <p>Select an exercise from the left to begin.</p>
+                            <div className="exercise-viewer">
+
+                                <div className="exercise-content">
+                                                                    <button
+                                    className="btnback exercise-nav-button exercise-nav-button--prev"
+                                    id="back-btn"
+                                    hidden={true}
+                                    disabled={false}
+                                    onClick={prevEx}
+                                >
+                                    Back
+                                </button>
+                                    {selExercise !== undefined ? (
+                                        <div> 
+                                            <Exercise 
+                                                key={selExercise.exIndex} 
+                                                teacherMode={false} 
+                                                ExData={selExercise} 
+                                                allExData={allExData} 
+                                                setAllExData={setAllExData} 
+                                                exIndex={selExercise.exIndex} 
+                                                handleSelectExercise={undefined} 
+                                                isSelected={undefined}
+                                                fetch={undefined}
+                                            />
+                                        </div> 
+                                    ) : (
+                                        <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
+                                            <h3>No exercise loaded</h3>
+                                            <p>Select an exercise from the left to begin.</p>
+                                        </div>
+                                    )}
+
+                                <button
+                                    className="btnback exercise-nav-button exercise-nav-button--next"
+                                    id="next-btn"
+                                    hidden={true}
+                                    disabled={false}
+                                    onClick={nextEx}
+                                >
+                                    Next
+                                </button>
                                 </div>
-                        )}
-                          
+
+                            </div>
                         </div>
                     
                     </div> {/* --- End of two-column wrapper --- */}

@@ -592,6 +592,41 @@ nav ul li a:hover::after {
   flex-direction: column;
   min-width: 260px;
 }
+.exercise-viewer {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  justify-content: center;
+  column-gap: 1rem;
+  width: 100%;
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+  min-height: 360px;
+}
+.exercise-content {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  justify-content: center;
+}
+.exercise-nav-button {
+  margin: 0;
+  min-width: 48px;
+  min-height: 48px;
+  border-radius: 50%;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+.exercise-nav-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
 
 /* Make forms and lists inside the left column wrap and shrink nicely */
 .ex-left form,
@@ -664,6 +699,26 @@ nav ul li a:hover::after {
   }
   .ex-left {
     order: 1;
+  }
+  .exercise-viewer {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .exercise-viewer {
+    grid-template-columns: 1fr;
+    row-gap: 0.75rem;
+    padding: 0;
+  }
+  .exercise-nav-button {
+    width: 100%;
+    max-width: 220px;
+    margin-bottom: 0.75rem;
+    justify-self: center;
+  }
+  .exercise-content {
+    width: 100%;
   }
 }
 
