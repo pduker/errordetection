@@ -2,7 +2,7 @@ const contributors = [
     "Alex Daley",
     "Weldin Dunn",
     "Benjamin McMonagle",
-    "Sean O’Sullivan",
+    "Sean O'Sullivan",
     "Sonika Sharma",
     "Colin Stetler",
     "Victor Umoren-Udo",
