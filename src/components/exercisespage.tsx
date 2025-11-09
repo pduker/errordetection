@@ -274,13 +274,22 @@ export function ExercisesPage({
                                 !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. <br /> If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
                             <div>No exercises with those criteria found!</div> : <></>}
                             
-                            <div style={{marginTop: "8px", alignItems: "center", gap: "8px", display: "flex", flexWrap: "wrap"}}>
-                            {/* add page navigation buttons, call newly defined functions */}
+                            <div
+                                style={{
+                                    marginTop: "8px",
+                                    alignItems: "center",
+                                    gap: "8px",
+                                    display: "flex",
+                                    flexWrap: "wrap",
+                                    justifyContent: "space-between"
+                                }}
+                            >
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                    {/* add page navigation buttons, call newly defined functions */}
                                     <Button
                                         onClick={prevPage}
                                         disabled={currentPage === 1}
                                         style={{
-                                            marginRight: "8px",
                                             fontSize: "2.5rem",
                                             background: "none",
                                             border:"none",
@@ -295,7 +304,7 @@ export function ExercisesPage({
                                     <Button
                                         onClick={nextPage}
                                         disabled={totalPages === 0 || currentPage >= totalPages}
-                                        style={{marginLeft: "8px",fontSize: "2.5rem",
+                                        style={{fontSize: "2.5rem",
                                             background: "none",
                                             border:"none",
                                             color: totalPages === 0 || currentPage >= totalPages ? "gray" : "black",
@@ -305,8 +314,9 @@ export function ExercisesPage({
                                     >
                                         ›
                                     </Button>
-                                    
-                                    {/* --- 1. The Toggle Button --- */}
+                                </div>
+
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" }}>
                                     <Button
                                         onClick={toggleSidebar}
                                         variant="light"
@@ -318,11 +328,11 @@ export function ExercisesPage({
                                         onClick={clearSelection}
                                         variant="outline-secondary"
                                         disabled={!selExercise}
-                                        style={{ marginLeft: "8px" }}
                                     >
                                         Clear selection
                                     </Button>
                                 </div>
+                            </div>
                             <div style={{flex: "1", display: "flex", flexDirection: "column", minWidth:"200px"}}> {/* SIR: listed exercises, added minHeight to prevent jitter */}
                             {/* pull from paginated exercises */}
                             {pageExercises.map(function(exercise, idx){
