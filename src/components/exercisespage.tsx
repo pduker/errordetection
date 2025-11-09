@@ -321,7 +321,7 @@ export function ExercisesPage({
                                         onClick={toggleSidebar}
                                         variant="light"
                                         className="sidebar-toggle-button"
-                                        style={{ marginBottom: "1rem", width: "fit-content", position: "relative" }}
+                                        style={{width: "fit-content", position: "relative" }}
                                     >Filters
                                     </Button>
                                     <Button
