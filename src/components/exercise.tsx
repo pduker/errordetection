@@ -1836,7 +1836,6 @@ export function Exercise({
         padding: "10px",
         backgroundColor: "#fcfcd2",
         borderRadius: "10px",
-        marginTop: "60px", // SIR: changed to not overlap top
         display: "flex", // SIR: added flex to box
         flexDirection: "column", // SIR
         alignItems: "stretch", // SIR
