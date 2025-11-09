@@ -44,6 +44,8 @@ const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | un
     } else return 0;
 }
 
+const LAST_SELECTED_STORAGE_KEY = "exercisesPage.lastSelectedExIndex";
+
 //function to create the exercise page, takes exercise data and renders a page
 export function ExercisesPage({
     allExData,
@@ -126,8 +128,8 @@ export function ExercisesPage({
             if (selExercise !== undefined) setSelExercise(undefined);
             return;
         }
-        if (currentExerciseIndex === -1) {
-            setSelExercise(filteredExercises[0]);
+        if (selExercise !== undefined && currentExerciseIndex === -1) {
+            setSelExercise(undefined);
         }
     }, [filteredExercises, selExercise, currentExerciseIndex]);
 
@@ -141,6 +143,38 @@ export function ExercisesPage({
         setSelExercise(targetExercise);
         setCurrentPage(Math.floor(targetIndex / pageSize) + 1);
     }, [filteredExercises, pageSize]);
+
+    const clearStoredSelection = React.useCallback(() => {
+        if (typeof window === "undefined") return;
+        window.localStorage.removeItem(LAST_SELECTED_STORAGE_KEY);
+    }, []);
+
+    const clearSelection = React.useCallback(() => {
+        clearStoredSelection();
+        setSelExercise(undefined);
+    }, [clearStoredSelection]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (selExercise === undefined) return;
+        window.localStorage.setItem(LAST_SELECTED_STORAGE_KEY, String(selExercise.exIndex));
+    }, [selExercise]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (selExercise !== undefined) return;
+        const storedIndex = window.localStorage.getItem(LAST_SELECTED_STORAGE_KEY);
+        if (storedIndex === null) return;
+        const parsedIndex = Number(storedIndex);
+        if (Number.isNaN(parsedIndex)) {
+            window.localStorage.removeItem(LAST_SELECTED_STORAGE_KEY);
+            return;
+        }
+        const targetIndex = filteredExercises.findIndex((exercise) => exercise.exIndex === parsedIndex);
+        if (targetIndex !== -1) {
+            selectExerciseAtIndex(targetIndex);
+        }
+    }, [filteredExercises, selExercise, selectExerciseAtIndex]);
 
     const handleTagToggle = React.useCallback((tag: string) => {
         setTags((prev) => {
@@ -197,7 +231,7 @@ export function ExercisesPage({
         setMeter("Anything");
         setTranspos(false);
         setCurrentPage(1);
-        setSelExercise(undefined);
+        clearSelection();
     }
 
     // Toggle function for the sidebar
@@ -240,7 +274,7 @@ export function ExercisesPage({
                                 !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. <br /> If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
                             <div>No exercises with those criteria found!</div> : <></>}
                             
-                            <div style={{marginTop: "8px", alignItems: "center", gap: "8px"}}>
+                            <div style={{marginTop: "8px", alignItems: "center", gap: "8px", display: "flex", flexWrap: "wrap"}}>
                             {/* add page navigation buttons, call newly defined functions */}
                                     <Button
                                         onClick={prevPage}
@@ -279,6 +313,14 @@ export function ExercisesPage({
                                         className="sidebar-toggle-button"
                                         style={{ marginBottom: "1rem", width: "fit-content", position: "relative" }}
                                     >Filters
+                                    </Button>
+                                    <Button
+                                        onClick={clearSelection}
+                                        variant="outline-secondary"
+                                        disabled={!selExercise}
+                                        style={{ marginLeft: "8px" }}
+                                    >
+                                        Clear selection
                                     </Button>
                                 </div>
                             <div style={{flex: "1", display: "flex", flexDirection: "column", minWidth:"200px"}}> {/* SIR: listed exercises, added minHeight to prevent jitter */}
