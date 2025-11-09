@@ -637,9 +637,6 @@ nav ul li a:hover::after {
 }
 .exercise-content {
   width: 100%;
-  max-width: 640px;
-  display: flex;
-  justify-content: center;
   align-items: center;
   margin: 0 auto;
 }
@@ -710,7 +707,7 @@ nav ul li a:hover::after {
   flex: 1;
   display: flex;
   margin: 3vw;
-  margin-left: 12vw;
+  /* margin-left: 12vw; */
   min-width: 260px;
   max-height: 300px; /* SR: Added so that the loaded page doesn't extend to bottom*/
   flex-direction: column;
