@@ -124,14 +124,10 @@ export function ExercisesPage({
     }, [filteredExercises, selExercise]);
 
     useEffect(() => {
-        if (filteredExercises.length === 0) {
-            if (selExercise !== undefined) setSelExercise(undefined);
-            return;
-        }
-        if (selExercise !== undefined && currentExerciseIndex === -1) {
-            setSelExercise(undefined);
-        }
-    }, [filteredExercises, selExercise, currentExerciseIndex]);
+        if (!selExercise) return;
+        const stillExists = allExData.some((exercise) => exercise?.exIndex === selExercise.exIndex);
+        if (!stillExists) setSelExercise(undefined);
+    }, [allExData, selExercise]);
 
     const navButtonsVisible = filteredExercises.length > 0 && selExercise !== undefined;
     const disablePrevNav = currentExerciseIndex <= 0;
