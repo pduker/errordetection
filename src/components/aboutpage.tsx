@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const contributors = [
     "Alex Daley",
     "Weldin Dunn",
@@ -15,11 +17,11 @@ const contributors = [
     "Sydni Wright",
     "Jared Miller",
     "Sophia Romero",
-    "Trevor ___",
-    "Aaron ___",
-    "Olivia ____",
-    "Matt ___",
-    "Roger ___"
+    "Trevor Brennan",
+    "Aaron Riley",
+    "Olivia Bouvier",
+    "Matthew Nadar",
+    "Roger Cronin"
 ];
 
 const supporters = [
@@ -36,12 +38,12 @@ export function AboutPage() {
                 <p className="eyebrow">About the project</p>
                 <h1>Practice error detection with confidence</h1>
                 <p>
-                    This site was built to give future engineers, scientists, and problem solvers
-                    a safe place to practice tracking down errors. Choose a category of exercises above,
-                    or visit the Help page to learn how the activities work.
+                    This is an error detection practice tool for musicians. Choose a category of exercises to get started or 
+                    visit the <Link to="/help" className="inline-link">help</Link> page to learn more.
                 </p>
                 <div className="about-highlight">
-                    See an issue or have an idea? Reach out to Phil Duker and we will keep improving.
+                    Have a suggestion, spot an error, or want to collaborate?
+                    Email Phil Duker and let us know how we can help.
                 </div>
             </section>
 
@@ -49,8 +51,9 @@ export function AboutPage() {
                 <article className="about-panel">
                     <h2>What you&apos;ll find</h2>
                     <p>
-                        Guided, bite-sized scenarios that teach stronger debugging habits. Each activity
-                        focuses on identifying why something failed—not just memorizing the right answer.
+                        Guided, bite-sized aural drills that sharpen listening accuracy. Each activity
+                        focuses on identifying where the musical passage went wrong—not just memorizing
+                        the correct version.
                     </p>
                 </article>
                 <article className="about-panel">
@@ -85,18 +88,10 @@ export function AboutPage() {
 
             <section className="about-support">
                 <div className="section-heading">
-                    <h2>Support + Contact</h2>
+                    <h2>Supporters</h2>
                     <p>Academic Technology Services partners who made implementation possible.</p>
                 </div>
                 <div className="contact-card">
-                    <div>
-                        <p>
-                            Supported by Erin Sicuranza, Colleen Kelemen, Racine Lewis, and Jessica Schroeder.
-                        </p>
-                        <p>
-                            Have a suggestion, spot an error, or want to collaborate? Email Phil Duker and let us know how we can help.
-                        </p>
-                    </div>
                     <div className="support-list" aria-label="Support team">
                         {supporters.map((name) => (
                             <span className="support-pill" key={name}>

@@ -38,8 +38,8 @@
   margin-left: auto;
 }
 
-a {
-  color: #114b96; /*Blue that matches UD logo */
+a:not(.inline-link) {
+  color: #114b96;
   font-size: calc(10px + 2vmin);
   padding-left: 1vw;
   text-decoration: none;
@@ -313,6 +313,16 @@ body {
   gap: 18px;
 }
 
+.inline-link {
+  color: inherit;
+  font-weight: 500;
+  text-decoration: underline;
+}
+
+.inline-link:hover {
+  text-decoration: none;
+}
+
 .about-panel {
   background: #fff;
   border-radius: 18px;
@@ -335,8 +345,12 @@ body {
   box-shadow: inset 0 0 0 1px rgba(17, 75, 150, 0.04);
 }
 
+.section-heading {
+  text-align: left;
+}
+
 .section-heading h2 {
-  margin-bottom: 6px;
+  margin-bottom: 10px;
   color: #0d3b78;
 }
 
