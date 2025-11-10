@@ -802,6 +802,7 @@ nav ul li a:hover::after {
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
   transition: background-color 0.2s ease, transform 0.15s ease;
   flex: 1 1 50%;
+  letter-spacing: 3px;
 }
 .exercise-nav-button:not(:disabled):hover,
 .exercise-nav-button:not(:disabled):focus-visible {
@@ -880,10 +881,10 @@ nav ul li a:hover::after {
     margin-left: 0;
   }
   .ex-right {
-    order: 2;
+    order: 1;
   }
   .ex-left {
-    order: 1;
+    order: 2;
   }
   .exercise-viewer {
     padding: 0 1.5rem;
@@ -894,11 +895,14 @@ nav ul li a:hover::after {
   .exercise-viewer {
     padding: 0;
   }
+  /*
   .exercise-nav-row {
     flex-direction: column;
-  }
+  }*/
   .exercise-nav-button {
-    width: 100%;
+    width: 50%;
+    min-height: 35px;
+    letter-spacing: 3px;
     max-width: none;
   }
   .exercise-content {

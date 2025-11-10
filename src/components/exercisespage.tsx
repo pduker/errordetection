@@ -259,16 +259,16 @@ export function ExercisesPage({
                 {/* --- This new wrapper holds the button AND your two columns --- */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
                     {/* --- 2. This wrapper holds your two columns side-by-side --- */} 
+                    <h2 style={{fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> {/*SIR: changed fontSize for consistency*/}
+                    <h5 style={{fontStyle: "italic", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5> {/*SIR: changed fontSize for consistency*/}
+                    {filteredExercises.length === 0 ? 
+                        !scoresRet ? <div style={{textAlign: "left"}}>Loading scores... this process should take 2-10 seconds. <br /> If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
+                    <div>No exercises with those criteria found!</div> : <></>}
                     <div className = "two-column-wrapper"> 
-            
+                        
                         {/* --- COLUMN 1: Your original 'ex-left' --- */}
                         <div className="ex-left"> {/* SIR: left column div */}
-                            <h2 style={{fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> {/*SIR: changed fontSize for consistency*/}
-                            <h5 style={{fontStyle: "italic", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5> {/*SIR: changed fontSize for consistency*/}
-
-                            {filteredExercises.length === 0 ? 
-                                !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. <br /> If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
-                            <div>No exercises with those criteria found!</div> : <></>}
+                        
                             
                             <div
                                 style={{
