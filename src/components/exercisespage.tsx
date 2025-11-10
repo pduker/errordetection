@@ -1,12 +1,50 @@
 //imports
+
+// import { isDisabled } from '@testing-library/user-event/dist/utils';
+
 import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
 import React, { useState, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
-// import { isDisabled } from '@testing-library/user-event/dist/utils';
-
 import { AppSidebar } from './sidebar';
-import { FaBars } from 'react-icons/fa'; // <-- Import an icon for the toggle
+
+const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
+    if (e1 !== undefined && e2 !== undefined) {
+        try {
+            if (e1.title.startsWith("Exercise ") && e2.title.startsWith("Exercise ")) {
+                if (e1.title > e2.title) return 1;
+                else if (e1.title < e2.title) return -1;
+                else return 0;
+            } else if (e1.title.startsWith("Exercise ")) return 1;
+            else if (e2.title.startsWith("Exercise ")) return -1;
+
+            const e1TagCount = Array.isArray(e1.tags) ? e1.tags.length : 0;
+            const e2TagCount = Array.isArray(e2.tags) ? e2.tags.length : 0;
+            if (e1TagCount > e2TagCount) return 1;
+            else if (e1TagCount < e2TagCount) return -1;
+            else {
+                if (Number(e1.difficulty) > Number(e2.difficulty)) return 1;
+                else if (Number(e1.difficulty) < Number(e2.difficulty)) return -1;
+                else {
+                    let e1Split = e1.title.split(":"), e2Split = e2.title.split(":");
+                    if (Number(e1Split[e1Split.length-1]) > Number(e2Split[e2Split.length-1])) return 1;
+                    else if (Number(e1Split[e1Split.length-1]) < Number(e2Split[e2Split.length-1])) return -1;
+                    else {
+                        if (e1.title > e2.title) return 1;
+                        else if (e1.title < e2.title) return -1;
+                        else return 0;
+                    }
+                }
+            }
+        } catch {
+            if(e1.title > e2.title) return 1;
+            else if(e1.title < e2.title) return -1;
+            else return 0;
+        }
+    } else return 0;
+}
+
+const LAST_SELECTED_STORAGE_KEY = "exercisesPage.lastSelectedExIndex";
 
 //function to create the exercise page, takes exercise data and renders a page
 export function ExercisesPage({
@@ -28,277 +66,157 @@ export function ExercisesPage({
     const [tags, setTags] = useState<string[]>(defaultTags);
     const [transpos, setTranspos] = useState<boolean>(false);
 
-    const [upd, setUpd] = useState<boolean>(false);
     const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
-    const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
+
+    const filteredExercises = React.useMemo(() => {
+        const baseList = allExData.filter((exercise): exercise is ExerciseData => exercise !== undefined);
+        const filtered = baseList.filter((exercise) => {
+            if (tags.length > 0) {
+                if (!exercise.tags) return false;
+                if (!tags.every((tag) => exercise.tags?.includes(tag))) return false;
+            }
+            if (diff !== "All" && String(exercise.difficulty) !== diff) return false;
+            if (voices !== 0 && exercise.voices !== voices) return false;
+            if (types !== "None" && exercise.types !== types) return false;
+            if (meter !== "Anything" && String(exercise.meter) !== meter) return false;
+            if (transpos && exercise.transpos !== true) return false;
+            return true;
+        });
+        return filtered.sort(exSortFunc);
+    }, [allExData, tags, diff, voices, types, meter, transpos]);
 
     //adding in state for pagination
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 5; //show 5 exercises at a time
-
-    //showing exercises for the current page
-    const startIndex = (currentPage -1) * pageSize;
-    const pageExercises = exList.slice(startIndex, startIndex + pageSize);
+    const totalPages = Math.ceil(filteredExercises.length / pageSize);
+    const safePage = Math.max(currentPage, 1);
+    const startIndex = (safePage -1) * pageSize;
+    const pageExercises = React.useMemo(
+        () => filteredExercises.slice(startIndex, startIndex + pageSize),
+        [filteredExercises, startIndex, pageSize]
+    );
+    const paginationStatus = totalPages === 0 ? "Loading..." : `Page ${safePage} of ${totalPages}`;
 
     // state for sidebar
     const [isSidebarCollapsed, setSidebarCollapsed] = useState(true);
 
     //pagination functions, navigate between functions
-    const nextPage = () =>{
-        if (currentPage < Math.ceil(exList.length /pageSize)){
-            setCurrentPage(currentPage + 1);
-        }
-    }
+    const nextPage = React.useCallback(() =>{
+        if (totalPages === 0) return;
+        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+    }, [totalPages]);
 
-    const prevPage = () => {
-        if (currentPage > 1){
-            setCurrentPage(currentPage - 1);
-        }
-    }
+    const prevPage = React.useCallback(() => {
+        setCurrentPage((prev) => Math.max(1, prev - 1));
+    }, []);
 
-    const sortExercises = React.useCallback((input: string | string[] | number | boolean, inputType: string) => {
-        var tempTags = tags, tempDiff = diff, tempVoices = voices, tempTypes = types, tempMeter = meter, tempTranspos = transpos;
-        // what parameter to filter by
-        if (inputType === "tags") tempTags = input as string[];
-        else if (inputType === "diff") tempDiff = input as string;
-        else if (inputType === "voices") tempVoices = input as number;
-        else if (inputType === "types") tempTypes = input as string;
-        else if (inputType === "meter") tempMeter = input as string;
-        else if (inputType === "transpos") tempTranspos = input as boolean;
-        
-        var list: (ExerciseData | undefined)[] = [...allExData];
-        if (tempTags.length > 0) {
-        list = list.filter(function(exercise) {
-            if (exercise !== undefined && tempTags !== undefined && exercise.tags !== undefined){
-            return tempTags.every((element) => exercise.tags.includes(element));
-            } else return false;
-        });
-        }
-        if (tempDiff !== "All") {
-        list = list.filter(function(exercise) {
-            if (exercise !== undefined) 
-            return tempDiff === String(exercise.difficulty);
-            else return false;
-        });
-        }
-        if (tempVoices !== 0) {
-        list = list.filter(function(exercise) {
-            if (exercise !== undefined) 
-            return tempVoices === exercise.voices;
-            else return false;
-        });
-        }
-        if (tempTypes !== "None") {
-        list = list.filter(function(exercise) {
-            if (exercise !== undefined){
-            return (tempTypes === exercise.types);
-            } else return false;
-        });
-        }
-        if (tempMeter !== "Anything") {
-        list = list.filter(function(exercise) {
-            if (exercise !== undefined) 
-            return tempMeter === String(exercise.meter);
-            else return false;
-        });
-        }
-        if (tempTranspos === true) {
-        list = list.filter(function(exercise) {
-            if (exercise !== undefined) 
-            return tempTranspos === exercise.transpos;
-            else return false;
-        });
-        }
-        list = list.sort(exSortFunc);
-        setExList(list);
-    },
-    [tags, diff, voices, types, meter, transpos, allExData] // dependencies
-    );
-
-    //loads the sorted exercises
     useEffect(() => {
-        if(exList.length === 0) {
-            if(tags.length === 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos) setExList(allExData.sort(exSortFunc));
-            else if(tags.length > 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos && !upd) {
-                sortExercises(tags,"tags");
-                setUpd(true);
-            }
+        if (totalPages === 0) {
+            setCurrentPage(1);
+        } else {
+            setCurrentPage((prev) => Math.min(prev, totalPages));
         }
-    }, [exList.length, tags, diff, voices, types, meter, transpos, allExData, upd, sortExercises]);
+    }, [totalPages]);
 
-    //exercise sort function for comparing exercises against each other
-    const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
-        if (e1 !== undefined && e2 !== undefined) {
-            try {
-                //alphabetical comparison?
-                if(e1.title.startsWith("Exercise ") && e2.title.startsWith("Exercise ")) {
-                    if (e1.title > e2.title) return 1;
-                    else if (e1.title < e2.title) return -1;
-                    else return 0;
-                }
-                //tags sort?
-                else if(e1.title.startsWith("Exercise ")) return 1;
-                else if(e2.title.startsWith("Exercise ")) return -1;
-                var e1Sorted = e1.tags.sort().length;
-                var e2Sorted = e2.tags.sort().length;
-                if (e1Sorted > e2Sorted) return 1;
-                else if (e1Sorted < e2Sorted) return -1;
-                else {
-                    //difficulty sort
-                    if(Number(e1.difficulty) > Number(e2.difficulty)) return 1;
-                    else if(Number(e1.difficulty) < Number(e2.difficulty)) return -1;
-                    else {
-                        let e1Split = e1.title.split(":"), e2Split = e2.title.split(":");
-                        if(Number(e1Split[e1Split.length-1]) > Number(e2Split[e2Split.length-1])) return 1;
-                        else if(Number(e1Split[e1Split.length-1]) < Number(e2Split[e2Split.length-1])) return -1;
-                        else {
-                            if (e1.title > e2.title) return 1;
-                            else if (e1.title < e2.title) return -1;
-                            else return 0;
-                        }
-                    }
-                }
-            } catch {
-                if(e1.title > e2.title) return 1;
-                else if(e1.title < e2.title) return -1;
-                else return 0;
-            };
-        } else return 0;
-    }
+    const currentExerciseIndex = React.useMemo(() => {
+        if (!selExercise) return -1;
+        return filteredExercises.findIndex((exercise) => exercise.exIndex === selExercise.exIndex);
+    }, [filteredExercises, selExercise]);
 
-    //exercise change function for when you want to move from one exercise to the next
-    const exChange = function (e:React.MouseEvent<HTMLSpanElement>){
-        var ex = allExData.find((exercise: ExerciseData | undefined) => {if (exercise !== undefined && exercise.title === (e.target as Element).id){return exercise} else {return undefined}})
-        var nBtn = document.getElementById("next-btn");
-        var bBtn = document.getElementById("back-btn");
-        if(exList.indexOf(ex) === (exList.length - 1)) {
-            if (nBtn !== null && "disabled" in nBtn) {
-                nBtn.disabled = true;
-                nBtn.hidden = false;
-            }
+    useEffect(() => {
+        if (!selExercise) return;
+        const stillExists = allExData.some((exercise) => exercise?.exIndex === selExercise.exIndex);
+        if (!stillExists) setSelExercise(undefined);
+    }, [allExData, selExercise]);
+
+    const navButtonsVisible = filteredExercises.length > 0 && selExercise !== undefined;
+    const disablePrevNav = currentExerciseIndex <= 0;
+    const disableNextNav = currentExerciseIndex === -1 || currentExerciseIndex >= filteredExercises.length - 1;
+
+    const selectExerciseAtIndex = React.useCallback((targetIndex: number) => {
+        const targetExercise = filteredExercises[targetIndex];
+        if (!targetExercise) return;
+        setSelExercise(targetExercise);
+        setCurrentPage(Math.floor(targetIndex / pageSize) + 1);
+    }, [filteredExercises, pageSize]);
+
+    const clearStoredSelection = React.useCallback(() => {
+        if (typeof window === "undefined") return;
+        window.localStorage.removeItem(LAST_SELECTED_STORAGE_KEY);
+    }, []);
+
+    const clearSelection = React.useCallback(() => {
+        clearStoredSelection();
+        setSelExercise(undefined);
+    }, [clearStoredSelection]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (selExercise === undefined) return;
+        window.localStorage.setItem(LAST_SELECTED_STORAGE_KEY, String(selExercise.exIndex));
+    }, [selExercise]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (selExercise !== undefined) return;
+        const storedIndex = window.localStorage.getItem(LAST_SELECTED_STORAGE_KEY);
+        if (storedIndex === null) return;
+        const parsedIndex = Number(storedIndex);
+        if (Number.isNaN(parsedIndex)) {
+            window.localStorage.removeItem(LAST_SELECTED_STORAGE_KEY);
+            return;
         }
-        else {
-            if (nBtn !== null && "disabled" in nBtn) {
-                nBtn.disabled = false;
-                nBtn.hidden = false;
-            }
+        const targetIndex = filteredExercises.findIndex((exercise) => exercise.exIndex === parsedIndex);
+        if (targetIndex !== -1) {
+            selectExerciseAtIndex(targetIndex);
         }
-        if(exList.indexOf(ex) === 0) {
-            if (bBtn !== null && "disabled" in bBtn) {
-                bBtn.disabled = true;
-                bBtn.hidden = false;
-            }
-        }
-        else {
-            if (bBtn !== null && "disabled" in bBtn) {
-                bBtn.disabled = false;
-                bBtn.hidden = false;
-            }
-        }
-        setSelExercise(ex);
-    }
+    }, [filteredExercises, selExercise, selectExerciseAtIndex]);
 
     const handleTagToggle = React.useCallback((tag: string) => {
-        const hasTag = tags.includes(tag);
-        const updated = hasTag ? tags.filter((item) => item !== tag) : [...tags, tag];
-        setTags(updated);
+        setTags((prev) => {
+            const hasTag = prev.includes(tag);
+            return hasTag ? prev.filter((item) => item !== tag) : [...prev, tag];
+        });
         setCurrentPage(1);
-        sortExercises(updated, "tags");
-    }, [tags, sortExercises]);
+    }, []);
 
     const handleTransposToggle = React.useCallback(() => {
-        const next = !transpos;
-        setTranspos(next);
+        setTranspos((prev) => !prev);
         setCurrentPage(1);
-        sortExercises(next, "transpos");
-    }, [transpos, sortExercises]);
+    }, []);
 
     const handleDifficultySelect = React.useCallback((value: string) => {
         setDiff(value);
         setCurrentPage(1);
-        sortExercises(value, "diff");
-    }, [sortExercises]);
+    }, []);
 
     const handleVoicesSelect = React.useCallback((value: number) => {
         setVoices(value);
         setCurrentPage(1);
-        sortExercises(value, "voices");
-    }, [sortExercises]);
+    }, []);
 
     const handleMeterSelect = React.useCallback((value: string) => {
         setMeter(value);
         setCurrentPage(1);
-        sortExercises(value, "meter");
-    }, [sortExercises]);
+    }, []);
 
     const handleTexturalFactorSelect = React.useCallback((value: string) => {
         setTypes(value);
         setCurrentPage(1);
-        sortExercises(value, "types");
-    }, [sortExercises]);
-
-    //all the onClick functions for when a sorting field is changed
-    const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
-        handleDifficultySelect(e.target.value);
-    }
-    const tagsChange = function (e: React.ChangeEvent<HTMLInputElement>) {
-        handleTagToggle(e.target.value);
-    }
-    const voiceChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
-        handleVoicesSelect(Number(e.target.value));
-    }
-    const typesChange = function (e: React.ChangeEvent<HTMLSelectElement>){
-        handleTexturalFactorSelect(e.target.value);
-    }
-    const meterChange = function(e: React.ChangeEvent<HTMLSelectElement>) {
-        handleMeterSelect(e.target.value);
-    }
-    const transposChange = function(e: React.ChangeEvent<HTMLInputElement>) {
-        handleTransposToggle();
-    }
+    }, []);
 
     //onClick function for when Back button is pushed under exercise
-    const prevEx = function () {
-        var exPos = exList.indexOf(selExercise);
-        var bBtn = document.getElementById("back-btn");
-        var nBtn = document.getElementById("next-btn");
-        if(exPos !== -1) {
-            setSelExercise(exList[exPos-1]);
-            if (exPos-1 > 0) {
-                if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = false;
-            }
-            else {
-                if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = true;
-            }
-        } else {
-            setSelExercise(exList[0]);
-            if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = true;
-        }
-        if (exList.length < 2) {
-            if (nBtn !== null && "disabled" in nBtn) nBtn.disabled = true;
-        } else {
-            if (nBtn !== null && "disabled" in nBtn) nBtn.disabled = false;
-        }
-    }
+    const prevEx = React.useCallback(() => {
+        if (currentExerciseIndex <= 0) return;
+        selectExerciseAtIndex(currentExerciseIndex - 1);
+    }, [currentExerciseIndex, selectExerciseAtIndex]);
 
     //onClick function for when Next button is pushed under exercise
-    const nextEx = function () {
-        var bBtn = document.getElementById("back-btn");
-        var nBtn = document.getElementById("next-btn");
-        var exPos = exList.indexOf(selExercise);
-        setSelExercise(exList[exPos+1]);
-        if (exPos+1 >= (exList.length - 1)) {
-            if (nBtn !== null && "disabled" in nBtn && exPos !== -1) nBtn.disabled = true;
-        }
-        else {
-            if (nBtn !== null && "disabled" in nBtn) nBtn.disabled = false;
-        }
-        if (exList.length < 2 || exPos === -1) {
-            if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = true;
-        } else {
-            if (bBtn !== null && "disabled" in bBtn) bBtn.disabled = false;
-        }
-    }
+    const nextEx = React.useCallback(() => {
+        if (currentExerciseIndex === -1) return;
+        if (currentExerciseIndex >= filteredExercises.length - 1) return;
+        selectExerciseAtIndex(currentExerciseIndex + 1);
+    }, [currentExerciseIndex, filteredExercises.length, selectExerciseAtIndex]);
 
     //onClick to reset all exercise sort fields
     const resetSort = function () {
@@ -309,7 +227,7 @@ export function ExercisesPage({
         setMeter("Anything");
         setTranspos(false);
         setCurrentPage(1);
-        setExList([...allExData].sort(exSortFunc));
+        clearSelection();
     }
 
     // Toggle function for the sidebar
@@ -319,7 +237,7 @@ export function ExercisesPage({
 
     //html to render page
     return (
-        <div className="fullpage" style={{ display: 'flex', minHeight: '100vh', position: 'relative' }}>
+        <div className="fullpage" style={{ display: 'flex', height: '100%', minHeight: 0, position: 'relative' }}>
             <AppSidebar
                 isCollapsed={isSidebarCollapsed}
                 selectedTags={tags}
@@ -339,37 +257,35 @@ export function ExercisesPage({
             <div className="ex-page-container"> 
 
                 {/* --- This new wrapper holds the button AND your two columns --- */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-
-                    {/* --- 1. The Toggle Button --- */}
-                    <Button
-                        onClick={toggleSidebar}
-                        variant="light"
-                        className="sidebar-toggle-button"
-                        style={{ marginBottom: "1rem", width: "fit-content", position: "relative" }}
-                    >
-                        <FaBars />
-                    </Button>
-
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
                     {/* --- 2. This wrapper holds your two columns side-by-side --- */} 
-                    <div className = "two-column-wrapper" style={{ display: 'flex', flex: 1, gap: '20px' }}> 
-            
+                    <h2 style={{fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> {/*SIR: changed fontSize for consistency*/}
+                    <h5 style={{fontStyle: "italic", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5> {/*SIR: changed fontSize for consistency*/}
+                    {filteredExercises.length === 0 ? 
+                        !scoresRet ? <div style={{textAlign: "left"}}>Loading scores... this process should take 2-10 seconds. <br /> If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
+                    <div>No exercises with those criteria found!</div> : <></>}
+                    <div className = "two-column-wrapper"> 
+                        
                         {/* --- COLUMN 1: Your original 'ex-left' --- */}
                         <div className="ex-left"> {/* SIR: left column div */}
-                            <h2 style={{fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> {/*SIR: changed fontSize for consistency*/}
-                            <h5 style={{fontStyle: "italic", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5> {/*SIR: changed fontSize for consistency*/}
-
-                            {exList.length === 0 ? 
-                                !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. <br /> If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
-                            <div>No exercises with those criteria found!</div> : <></>}
+                        
                             
-                            <div style={{marginTop: "8px", display: "flex", alignItems: "center", gap: "8px"}}>
-                            {/* add page navigation buttons, call newly defined functions */}
+                            <div
+                                style={{
+                                    marginTop: "8px",
+                                    alignItems: "center",
+                                    gap: "8px",
+                                    display: "flex",
+                                    flexWrap: "wrap",
+                                    justifyContent: "space-between"
+                                }}
+                            >
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                    {/* add page navigation buttons, call newly defined functions */}
                                     <Button
                                         onClick={prevPage}
                                         disabled={currentPage === 1}
                                         style={{
-                                            marginRight: "8px",
                                             fontSize: "2.5rem",
                                             background: "none",
                                             border:"none",
@@ -380,14 +296,14 @@ export function ExercisesPage({
                                     >
                                         ‹
                                     </Button>
-                                    <span> Page {currentPage} of {Math.ceil(exList.length / pageSize)} </span>
+                                    <span>{paginationStatus}</span>
                                     <Button
                                         onClick={nextPage}
-                                        disabled={currentPage >= Math.ceil(exList.length / pageSize)}
-                                        style={{marginLeft: "8px",fontSize: "2.5rem",
+                                        disabled={totalPages === 0 || currentPage >= totalPages}
+                                        style={{fontSize: "2.5rem",
                                             background: "none",
                                             border:"none",
-                                            color: currentPage >= Math.ceil(exList.length / pageSize) ? "gray" : "black",
+                                            color: totalPages === 0 || currentPage >= totalPages ? "gray" : "black",
                                             padding: "0 8px",
                                             fontWeight: "bold",
                                             lineHeight: "1"}}
@@ -395,49 +311,102 @@ export function ExercisesPage({
                                         ›
                                     </Button>
                                 </div>
+
+                                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" }}>
+                                    <Button
+                                        onClick={toggleSidebar}
+                                        variant="light"
+                                        className="sidebar-toggle-button"
+                                        style={{width: "fit-content", position: "relative" }}
+                                    >Filters
+                                    </Button>
+                                    <Button
+                                        onClick={clearSelection}
+                                        variant="outline-secondary"
+                                        disabled={!selExercise}
+                                        style={{
+                                            borderRadius: "10px",
+                                            fontWeight: 600,
+                                            letterSpacing: "0.03em",
+                                            backgroundColor: "#4e81b3",
+                                            color: "#fff",
+                                            borderColor: "#4e81b3",
+                                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                                            transition: "all 0.2s ease",
+                                            opacity: selExercise ? 1 : 0.6
+                                        }}
+                                    >
+                                        Clear selection
+                                    </Button>
+                                </div>
+                            </div>
                             <div style={{flex: "1", display: "flex", flexDirection: "column", minWidth:"200px"}}> {/* SIR: listed exercises, added minHeight to prevent jitter */}
                             {/* pull from paginated exercises */}
-                            {pageExercises.map(function(exercise){
-                                if(exercise !== undefined) {
-                                    return (
-                                    <div key = {exercise.title} id = {exercise.title} onClick={exChange} style={{margin: "4px 0", padding: "10px", cursor: "pointer", backgroundColor: "#fcfcd2", borderRadius: "4px", fontSize: "1.05rem"}}>
-                                        {exercise.title}
-                                    </div>
-                                    )}
-                                else return <></>;
+                            {pageExercises.map(function(exercise, idx){
+                                const isActive = selExercise?.exIndex === exercise.exIndex;
+                                const globalIndex = startIndex + idx;
+                                return (
+                                <div
+                                    key = {exercise.title}
+                                    id = {exercise.title}
+                                    onClick={() => selectExerciseAtIndex(globalIndex)}
+                                    role="button"
+                                    aria-pressed={isActive}
+                                    className={`exercise-list-item${isActive ? " active" : ""}`}>
+                                    {exercise.title}
+                                </div>
+                                )
                             })}
                             </div>
                         </div>
 
                         {/* --- COLUMN 2: Your original 'ex-right' --- */}
                         <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
-                            {selExercise !== undefined ? (
-                            <div> 
-                                <Exercise 
-                                    key={selExercise.exIndex} 
-                                    teacherMode={false} 
-                                    ExData={selExercise} 
-                                    allExData={allExData} 
-                                    setAllExData={setAllExData} 
-                                    exIndex={selExercise.exIndex} 
-                                    handleSelectExercise={undefined} 
-                                    isSelected={undefined}
-                                    fetch={undefined}
-                                />
-                            </div> 
-                            ) : (
-                                <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
-                                    <h3>No exercise loaded</h3>
-                                    <p>Select an exercise from the left to begin.</p>
+                            <div className="exercise-viewer">
+                                <div className="exercise-nav-row">
+                                    <button
+                                        className="exercise-nav-button exercise-nav-button--prev"
+                                        id="back-btn"
+                                        hidden={!navButtonsVisible}
+                                        disabled={disablePrevNav}
+                                        onClick={prevEx}
+                                    >
+                                        Back
+                                    </button>
+                                    <button
+                                        className="exercise-nav-button exercise-nav-button--next"
+                                        id="next-btn"
+                                        hidden={!navButtonsVisible}
+                                        disabled={disableNextNav}
+                                        onClick={nextEx}
+                                    >
+                                        Next
+                                    </button>
                                 </div>
-                        )}
-                        
-                        <div style={{display:"flex", justifyContent: "center", marginLeft: "160px"}}> {/* SIR: added marginLeft to back/next button */}
-                            <button  className= "btnback" id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
-                            <button className= "btnback" id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
-                        </div>
-                        
-                            
+
+                                <div className="exercise-content">
+                                    {selExercise !== undefined ? (
+                                        <div> 
+                                            <Exercise 
+                                                key={selExercise.exIndex} 
+                                                teacherMode={false} 
+                                                ExData={selExercise} 
+                                                allExData={allExData} 
+                                                setAllExData={setAllExData} 
+                                                exIndex={selExercise.exIndex} 
+                                                handleSelectExercise={undefined} 
+                                                isSelected={undefined}
+                                                fetch={undefined}
+                                            />
+                                        </div> 
+                                    ) : (
+                                        <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
+                                            <h3>No exercise loaded</h3>
+                                            <p>Select an exercise from the left to begin.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     
                     </div> {/* --- End of two-column wrapper --- */}

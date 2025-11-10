@@ -1,8 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-
 import { getBlob, getStorage, ref as storageRef } from "firebase/storage";
-
-const storage = getStorage();
+import { useEffect, useRef, useState } from "react";
 
 //file for handling the audio files and turning them into JSX elements that we can use on the screen
 export default function AudioHandler({
@@ -12,6 +9,7 @@ export default function AudioHandler({
 }): JSX.Element {
   const [msgContent] = useState<string>("");
   const audioRef = useRef<HTMLAudioElement>(null);
+  const storage = getStorage();
 
   useEffect(() => {
     // on component creation, fetch audio from firebase and populate it in an audio element
@@ -20,7 +18,7 @@ export default function AudioHandler({
     if (typeof file === "string") {
       // file is a URL to a file
       // get the audio data as a binary blob
-      getBlob(storageRef(storage, file)).then((blob) => {
+      getBlob(storageRef(storage, file)).then((blob: BlobPart) => {
         const fileObject = new File([blob], file, { type: "audio/mpeg" }); // make a file out of the binary data
         const objectURL = URL.createObjectURL(fileObject); // create a URL to link it to an audio element
         if (audioRef.current) audioRef.current.src = objectURL; // set audio element's URL to the URL we just made
@@ -31,7 +29,7 @@ export default function AudioHandler({
       const objectURL = URL.createObjectURL(file);
       if (audioRef.current) audioRef.current.src = objectURL;
     }
-  }, [file]);
+  }, [file, storage]);
 
   return (
     <div>
