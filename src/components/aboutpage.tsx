@@ -1,14 +1,8 @@
-//import { useState } from "react";
-//import noteKey from "../assets/note-color-key.png";
-
-//code for about page
 export function AboutPage() {
     return (
         <div>
-            {/* header for page */}
-            <h2>About</h2>
+            <h2 style={{ marginLeft: '1rem' }}>About</h2>
             
-            {/* class for about text */}
             <div className="about">
                 <div style={{ textAlign: 'left' }}>
                     This website is an error detection practice tool! Choose a category of exercises above to get started, or visit the Help page to learn more. See a problem? Please get in touch with Phil Duker.

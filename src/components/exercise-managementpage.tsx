@@ -12,8 +12,8 @@ export function ExerciseManagementPage({
     fetch,
     authorized
 }:{
-    allExData: (ExerciseData | undefined)[];
-    setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
+    allExData: ExerciseData[];
+    setAllExData: ((newData: ExerciseData[]) => void);
     fetch: (val: boolean) => void;
     authorized: boolean;
 }) {
@@ -30,7 +30,7 @@ export function ExerciseManagementPage({
     const [tags, setTags] = useState<string[]>([]);
     const [transpos, setTranspos] = useState<boolean>(false);
 
-    const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
+    const [exList, setExList] = useState<ExerciseData[]>([]);
 
     const [customId, setCustomId] = useState<string>("");
 

@@ -1,8 +1,5 @@
-import React, { useState } from 'react';
-import { FirebaseApp, initializeApp } from 'firebase/app';
-import { getDatabase, ref as dbRef, push, set } from 'firebase/database';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-
+import { initializeApp } from 'firebase/app';
+import { getAuth } from "firebase/auth";
 
 // Initialize Firebase
 const firebaseConfig = {
@@ -20,11 +17,3 @@ export const auth = getAuth(app);
 
 // Export initialized Firebase app
 export const firebaseApp = app; 
-
-//database isnt seen on screen but needs to be created in order to use
-export function Database() {
-    return (
-        <div>
-        </div>
-    );
-}
