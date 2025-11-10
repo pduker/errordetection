@@ -1,7 +1,9 @@
 import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Button } from 'react-bootstrap';
+import { useSearchParams } from 'react-router-dom';
+import { set } from 'firebase/database';
 
 const pageSize = 5; // show 5 exercises at a time
 
@@ -82,9 +84,12 @@ export function ExercisesPage({
     const [meter, setMeter] = useState<string>("Any");
     const [texturalFactors, setTexturalFactors] = useState<string>("Any");
 
+    const [searchParams] = useSearchParams();
+
     // pagination state
     const [currentPage, setCurrentPage] = useState(0);
 
+    //figure out if this runs whenever the varaibles at the bottom change
     const sortedExercises: ExerciseData[] = useMemo(() => {
         const filterTransposition = tags.includes("Transposition");
         const tagsWithoutTransposition = filterTransposition ? updateTags(tags, "Transposition") : tags;
@@ -104,6 +109,24 @@ export function ExercisesPage({
 
         return sortedExData;
     }, [tags, difficulty, voices, meter, texturalFactors, allExData]);
+
+    useEffect(() => {
+        // update filters based on URL parameters
+        const difficultyParam = searchParams.get('difficulty');
+        const voicesParam = searchParams.get('voices');
+        const tagsParam = searchParams.get('tags');
+        const meterParam = searchParams.get('meter');
+        const transposParam = searchParams.get('transpos');
+
+        //these call the sort function multiple times - fix later
+        setDifficulty(difficultyParam ? Number(difficultyParam) : 0);
+        setVoices(voicesParam ? Number(voicesParam) : 0);
+        setMeter(meterParam ? meterParam : "Any");
+        const newTags: string[] = [];
+        if(tagsParam) newTags.push(tagsParam);
+        if(transposParam) newTags.push("Transposition");
+        setTags(newTags);
+    }, [searchParams]);
 
     const [selectedExercise, setSelectedExercise] = useState<ExerciseData | null>(null);
 
