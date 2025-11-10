@@ -328,6 +328,17 @@ export function ExercisesPage({
                                         onClick={clearSelection}
                                         variant="outline-secondary"
                                         disabled={!selExercise}
+                                        style={{
+                                            borderRadius: "10px",
+                                            fontWeight: 600,
+                                            letterSpacing: "0.03em",
+                                            backgroundColor: "#4e81b3",
+                                            color: "#fff",
+                                            borderColor: "#4e81b3",
+                                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
+                                            transition: "all 0.2s ease",
+                                            opacity: selExercise ? 1 : 0.6
+                                        }}
                                     >
                                         Clear selection
                                     </Button>
