@@ -169,20 +169,21 @@ body {
   text-align: left;
   margin: 10px;
   padding: 30px 20px;
-  background-color: #fcfcd2;
+  background: whitesmoke;
   border-radius: 12px;
 }
 
 .help-page h2 {
   text-align: center;
   margin-bottom: 16px;
+  color: black;
 }
 
 .help-section {
   margin: 20px auto;
   padding: 24px;
   border-radius: 14px;
-  background-color: #6399f0;
+  background-color: rgb(101, 145, 249);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
@@ -196,6 +197,8 @@ body {
 
 .help-section--admin {
   text-align: center;
+  color: white;
+  font-weight: 600;
 }
 
 .help-card {
