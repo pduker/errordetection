@@ -31,12 +31,6 @@ const supporters = [
     "Jessica Schroeder"
 ];
 
-const handleHelpNav = () => {
-    if (typeof window !== "undefined") {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-};
-
 export function AboutPage() {
     return (
         <div className="about-page">
@@ -45,7 +39,7 @@ export function AboutPage() {
                 <h1>Practice error detection with confidence</h1>
                 <p>
                     This is an error detection practice tool for musicians. Choose a category of exercises to get started or 
-                    visit the <Link to="/help" className="inline-link" onClick={handleHelpNav}>help</Link> page to learn more.
+                    visit the <Link to="/help" className="inline-link">help</Link> page to learn more.
                 </p>
                 <div className="about-highlight">
                     Have a suggestion, spot an error, or want to collaborate?
