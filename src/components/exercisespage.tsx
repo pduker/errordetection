@@ -241,7 +241,7 @@ export function ExercisesPage({
 
     //html to render page
     return (
-        <div className="fullpage" style={{ display: 'flex', minHeight: '100vh', position: 'relative' }}>
+        <div className="fullpage" style={{ display: 'flex', height: '100%', minHeight: 0, position: 'relative' }}>
             <AppSidebar
                 isCollapsed={isSidebarCollapsed}
                 selectedTags={tags}
@@ -261,9 +261,9 @@ export function ExercisesPage({
             <div className="ex-page-container"> 
 
                 {/* --- This new wrapper holds the button AND your two columns --- */}
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
                     {/* --- 2. This wrapper holds your two columns side-by-side --- */} 
-                    <div className = "two-column-wrapper" style={{ display: 'flex', flex: 1, gap: '20px' }}> 
+                    <div className = "two-column-wrapper"> 
             
                         {/* --- COLUMN 1: Your original 'ex-left' --- */}
                         <div className="ex-left"> {/* SIR: left column div */}

@@ -75,7 +75,7 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 /* find better font and colors for the page */
 #navbar {
@@ -690,6 +690,7 @@ nav ul li a:hover::after {
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
+  direction: ltr;
 }
 
 .app-sidebar .ps-menuitem-root {
@@ -703,6 +704,8 @@ nav ul li a:hover::after {
   padding: 0.75rem 1rem;
   border-radius: 8px;
   justify-content: flex-start;
+  font-size: clamp(0.95rem, 0.75rem + 0.4vw, 1.25rem);
+  line-height: 1.35;
 }
 
 .app-sidebar .ps-menu-button::after {
@@ -727,11 +730,18 @@ nav ul li a:hover::after {
 /* Exercises page responsive layout */
 .ex-page-container {
   width: 100%;
+  flex: 1 1 auto;
   margin-top: 10px;
   display: flex;
   flex-direction: row;
   align-items: flex-start;
   min-height: 350px;
+}
+.two-column-wrapper {
+  display: flex;
+  flex: 1 1 100%;
+  width: 100%;
+  gap: 20px;
 }
 .ex-left {
   padding-right: 2vw;
