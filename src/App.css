@@ -75,6 +75,7 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  overflow-y: scroll;
 }
 /* find better font and colors for the page */
 #navbar {

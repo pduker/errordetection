@@ -1,5 +1,5 @@
 //imports
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import logo from './assets/UD-circle-logo-email.png';
@@ -124,6 +124,26 @@ function AppLayout({
 }: AppLayoutProps) {
   const location = useLocation();
   const isLanding = location.pathname === "/";
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const resetScrollPosition = useCallback(
+    (behavior: ScrollBehavior = "auto") => {
+      if (!isLanding && contentRef.current) {
+        contentRef.current.scrollTo({ top: 0, behavior });
+      } else if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior });
+      }
+    },
+    [isLanding]
+  );
+  const handleNavClick = (targetPath: string) => {
+    if (location.pathname === targetPath) {
+      resetScrollPosition("auto");
+    }
+  };
+
+  useLayoutEffect(() => {
+    resetScrollPosition("auto");
+  }, [location.pathname, resetScrollPosition]);
 
   return (
     <div>
@@ -142,9 +162,9 @@ function AppLayout({
       </Navbar.Brand>
 
       <Nav className='Home-nav'>
-      <Link to="/exercises" style={{ marginRight: '10px' }}>Exercises</Link>
+      <Link to="/exercises" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercises")}>Exercises</Link>
       {authorized ?
-      <Link to="/exercise-management" style={{ marginRight: '10px' }}>Exercise Management</Link>
+      <Link to="/exercise-management" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercise-management")}>Exercise Management</Link>
       : <></>}
       </Nav>
 
@@ -161,8 +181,8 @@ function AppLayout({
 
 
       <Nav className='Home-nav-right'>
-      <Link to="/about" style={{ marginLeft: '-225px' }}>About</Link>
-      <Link to="/help" style={{ marginLeft: '10px' }}>Help</Link>
+      <Link to="/about" style={{ marginLeft: '-225px' }} onClick={() => handleNavClick("/about")}>About</Link>
+      <Link to="/help" style={{ marginLeft: '10px' }} onClick={() => handleNavClick("/help")}>Help</Link>
       </Nav>
       </Navbar>
 
@@ -170,6 +190,7 @@ function AppLayout({
       </header>
       <div className={`pagediv ${isLanding ? "pagediv-landing" : ""}`}>
       <div
+        ref={contentRef}
         style={{
           overflowY: isLanding ? "hidden" : "scroll",
           margin: isLanding ? "0" : "10px",
