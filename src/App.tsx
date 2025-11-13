@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 
@@ -73,82 +73,60 @@ function App() {
   
   //return fucntion for rendering app
   return (
-    <Router>
-      <div>
-        <header className="App-header" >
-          
-        <Navbar className="Home-bar" fixed='top'>
+    <div>
+      <header className="App-header" >
+        
+      <Navbar className="Home-bar" fixed='top'>
 
-        <Navbar.Brand>
-          <img
-          alt=""
-          src={logo}
-          width="60"
-          height="60"
-          className="d-inline-block align-top"
-        />
-        </Navbar.Brand>
+      <Navbar.Brand>
+        <img
+        alt=""
+        src={logo}
+        width="60"
+        height="60"
+        className="d-inline-block align-top"
+      />
+      </Navbar.Brand>
 
-        <Nav className='Home-nav'>
-        <Link to="/exercises" style={{ marginRight: '10px' }}>Exercises</Link>
-        {authorized ?
-        <Link to="/exercise-management" style={{ marginRight: '10px' }}>Exercise Management</Link>
-        : <></>}
-        </Nav>
+      <Nav className='Home-nav'>
+      <Link to="/exercises" style={{ marginRight: '10px' }}>Exercises</Link>
+      {authorized ?
+      <Link to="/exercise-management" style={{ marginRight: '10px' }}>Exercise Management</Link>
+      : <></>}
+      </Nav>
 
-        <div style={{ position: 'absolute', right: '50%', transform: 'translateX(50%)', textAlign: 'center' }}>
-        <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginBottom: '5px' }}>
-        University of Delaware
-        </Navbar.Brand>
-        <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block' }}>
-        Aural Skills Error Detection Practice Site
-        </Navbar.Brand>
-        </div>
+      <div style={{ position: 'absolute', right: '50%', transform: 'translateX(50%)', textAlign: 'center' }}>
+      <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginBottom: '5px' }}>
+      University of Delaware
+      </Navbar.Brand>
+      <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block' }}>
+      Aural Skills Error Detection Practice Site
+      </Navbar.Brand>
+      </div>
 
 
-        <Nav className='Home-nav-right'>
-        <Link to="/about" style={{ marginLeft: '-225px' }}>About</Link>
-        <Link to="/help" style={{ marginLeft: '10px' }}>Help</Link>
-        </Nav>
-        </Navbar>
+      <Nav className='Home-nav-right'>
+      <Link to="/about" style={{ marginLeft: '-225px' }}>About</Link>
+      <Link to="/help" style={{ marginLeft: '10px' }}>Help</Link>
+      </Nav>
+      </Navbar>
 
-          
-        </header>
-        <div className='pagediv'>
+      </header>
+      <div className='pagediv'>
         <div  style={{overflowY: "scroll",margin: "10px"}}>
           <Routes>
-              <Route path="/" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>}/>
-            </Routes>
-
-            <Routes>
-              <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>} />
-            </Routes>
-            <Routes>
-              <Route path="/about" element={<AboutPage/>} />
-            </Routes>
-            <Routes>
-              <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>} />
-            </Routes>
-
-            <Routes>
-              <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}/>} />
-            </Routes>
-
-            {/* <Routes>
-              <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]}></ExercisesPage>} />
-            </Routes> */}
-
-            <Routes>
-              <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase} authorized={authorized}/>} />
-            </Routes>
-
-            <Routes>
-              <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>} />
-            </Routes>
-          </div>
+            <Route path="/" element={<Navigate to="/exercises" replace></Navigate>}></Route>
+            <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>}/>
+            <Route path="/about" element={<AboutPage/>}/>
+            <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>}/>
+            <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}/>}/>
+            <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]} scoresRet={scoresRetrieved}></ExercisesPage>}/>
+            <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase} authorized={authorized}/>}/>
+            <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>}/>
+          </Routes>
         </div>
       </div>
-    </Router>
+    </div>
   );
 
 }
