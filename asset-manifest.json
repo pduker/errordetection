@@ -1,7 +1,8 @@
 {
   "files": {
     "main.css": "/errordetection/static/css/main.4e931596.css",
-    "main.js": "/errordetection/static/js/main.b42bc321.js",
+    "main.js": "/errordetection/static/js/main.e111e993.js",
+    "static/js/453.3e63ad05.chunk.js": "/errordetection/static/js/453.3e63ad05.chunk.js",
     "static/media/excersie-example.png": "/errordetection/static/media/excersie-example.4e8ebf0a4840c2997302.png",
     "static/media/exc-page.png": "/errordetection/static/media/exc-page.a6ffec773734287a7df0.png",
     "static/media/filterPage.png": "/errordetection/static/media/filterPage.9908d0af97c73ef6c895.png",
@@ -10,10 +11,11 @@
     "static/media/note-color-key.png": "/errordetection/static/media/note-color-key.ac2ee696deb3cc7f1940.png",
     "index.html": "/errordetection/index.html",
     "main.4e931596.css.map": "/errordetection/static/css/main.4e931596.css.map",
-    "main.b42bc321.js.map": "/errordetection/static/js/main.b42bc321.js.map"
+    "main.e111e993.js.map": "/errordetection/static/js/main.e111e993.js.map",
+    "453.3e63ad05.chunk.js.map": "/errordetection/static/js/453.3e63ad05.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.4e931596.css",
-    "static/js/main.b42bc321.js"
+    "static/js/main.e111e993.js"
   ]
 }
