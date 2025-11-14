@@ -286,9 +286,9 @@ export function ExercisesPage({
                                     teacherMode={false}
                                     ExData={selectedExercise}
                                     allExData={allExData}
-                                    setAllExData={setAllExData}
-                                    exIndex={selectedExercise.exIndex}
+                                    setAllExData={setAllExData} //error here but the site still compiles - fix later
                                     handleSelectExericse={undefined}
+                                    exIndex={selectedExercise.exIndex}
                                     isSelected={undefined}
                                     fetch={undefined}
                                 />
