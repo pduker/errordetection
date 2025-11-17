@@ -277,26 +277,50 @@ export function ExercisesPage({
                         {/* --- COLUMN 2: Your original 'ex-right' --- */}
                         <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
                             <div className="exercise-viewer">
-                                {selExercise !== undefined ? (
+                                <div className={`exercise-stage${selExercise ? "" : " exercise-stage--placeholder"}`}>
                                     <div className="exercise-content"> 
-                                        <Exercise 
-                                            key={selExercise.exIndex} 
-                                            teacherMode={false} 
-                                            ExData={selExercise} 
-                                            allExData={allExData} 
-                                            setAllExData={setAllExData} 
-                                            exIndex={selExercise.exIndex} 
-                                            handleSelectExercise={undefined} 
-                                            isSelected={undefined}
-                                            fetch={undefined}
-                                        />
+                                        {selExercise !== undefined ? (
+                                            <>
+                                                {navButtonsVisible && (
+                                                    <button
+                                                        className="exercise-nav-inline exercise-nav-inline--prev"
+                                                        onClick={prevEx}
+                                                        disabled={disablePrevNav}
+                                                        aria-label="Previous exercise"
+                                                    >
+                                                        ‹
+                                                    </button>
+                                                )}
+                                                <Exercise 
+                                                    key={selExercise.exIndex} 
+                                                    teacherMode={false} 
+                                                    ExData={selExercise} 
+                                                    allExData={allExData} 
+                                                    setAllExData={setAllExData} 
+                                                    exIndex={selExercise.exIndex} 
+                                                    handleSelectExercise={undefined} 
+                                                    isSelected={undefined}
+                                                    fetch={undefined}
+                                                />
+                                                {navButtonsVisible && (
+                                                    <button
+                                                        className="exercise-nav-inline exercise-nav-inline--next"
+                                                        onClick={nextEx}
+                                                        disabled={disableNextNav}
+                                                        aria-label="Next exercise"
+                                                    >
+                                                        ›
+                                                    </button>
+                                                )}
+                                            </>
+                                        ) : (
+                                            <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
+                                                <h3>No exercise loaded</h3>
+                                                <p>Select an exercise from the list below to begin.</p>
+                                            </div>
+                                        )}
                                     </div> 
-                                ) : (
-                                    <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
-                                        <h3>No exercise loaded</h3>
-                                        <p>Select an exercise from the list below to begin.</p>
-                                    </div>
-                                )}
+                                </div>
                             </div>
                             <section className="exercise-queue-panel">
                                 <div className="exercise-queue-header">
@@ -319,26 +343,6 @@ export function ExercisesPage({
                                             ›
                                         </Button>
                                     </div>
-                                    {navButtonsVisible && (
-                                        <div className="exercise-queue-cyclers">
-                                            <Button
-                                                onClick={prevEx}
-                                                disabled={disablePrevNav}
-                                                className="exercise-cycle-btn"
-                                                aria-label="Previous exercise"
-                                            >
-                                                ‹ Back
-                                            </Button>
-                                            <Button
-                                                onClick={nextEx}
-                                                disabled={disableNextNav}
-                                                className="exercise-cycle-btn"
-                                                aria-label="Next exercise"
-                                            >
-                                                Next ›
-                                            </Button>
-                                        </div>
-                                    )}
                                     <Button
                                         onClick={clearSelection}
                                         variant="outline-secondary"

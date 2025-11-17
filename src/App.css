@@ -922,13 +922,21 @@ nav ul li a:hover::after {
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 100%;
   margin: 0;
-  padding: 0;
   box-sizing: border-box;
   min-height: 360px;
-  margin-bottom: 10px;
-  gap: 1rem;
+  margin-bottom: 20px;
+}
+
+.exercise-stage {
+  position: relative;
+  width: 100%;
+  padding: 0 80px;
+  box-sizing: border-box;
+}
+
+.exercise-stage--placeholder {
+  padding: 0;
 }
 .exercise-nav-row {
   display: flex;
@@ -942,6 +950,10 @@ nav ul li a:hover::after {
   display: flex;
   align-items: stretch;
   min-height: 360px;
+  border-radius: 24px;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
 }
 .exercise-nav-button {
   margin: 0;
@@ -982,6 +994,40 @@ nav ul li a:hover::after {
 
 .exercise-action-check {
   margin-bottom: 2vh;
+}
+
+.exercise-nav-inline {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: none;
+  background: #1659c1;
+  color: #fff;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.15s ease;
+  z-index: 5;
+}
+
+.exercise-nav-inline:disabled {
+  background: rgba(22, 89, 193, 0.3);
+  cursor: default;
+  box-shadow: none;
+}
+
+.exercise-nav-inline--prev {
+  left: 10px;
+}
+
+.exercise-nav-inline--next {
+  right: 10px;
 }
 
 /* Make forms and lists inside the left column wrap and shrink nicely */
