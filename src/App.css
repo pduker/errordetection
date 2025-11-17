@@ -1191,13 +1191,11 @@ nav ul li a:hover::after {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  border: 2px dashed #ccc;
   border-radius: 12px;
   padding: 2rem;
   background-color: #fff7c9;
   color: #666;
   text-align: center;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
 /* Responsive breakpoint: stack columns on small screens */
