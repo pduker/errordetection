@@ -97,9 +97,6 @@ export function ExercisesPage({
     );
     const paginationStatus = totalPages === 0 ? "Loading..." : `Page ${safePage} of ${totalPages}`;
 
-    // state for sidebar
-    const [isSidebarCollapsed, setSidebarCollapsed] = useState(true);
-
     //pagination functions, navigate between functions
     const nextPage = React.useCallback(() =>{
         if (totalPages === 0) return;
@@ -230,30 +227,9 @@ export function ExercisesPage({
         clearSelection();
     }
 
-    // Toggle function for the sidebar
-    const toggleSidebar = () => {
-      setSidebarCollapsed(!isSidebarCollapsed);
-    };
-
     //html to render page
     return (
-        <div className="fullpage" style={{ display: 'flex', height: '100%', minHeight: 0, position: 'relative' }}>
-            <AppSidebar
-                isCollapsed={isSidebarCollapsed}
-                selectedTags={tags}
-                onToggleTag={handleTagToggle}
-                transposing={transpos}
-                onToggleTransposing={handleTransposToggle}
-                difficulty={diff}
-                onSelectDifficulty={handleDifficultySelect}
-                voices={voices}
-                onSelectVoices={handleVoicesSelect}
-                meter={meter}
-                onSelectMeter={handleMeterSelect}
-                texturalFactor={types}
-                onSelectTexturalFactor={handleTexturalFactorSelect}
-                onResetSort={resetSort}
-            />
+        <div className="fullpage">
             <div className="ex-page-container"> 
 
                 {/* --- This new wrapper holds the button AND your two columns --- */}
@@ -268,7 +244,26 @@ export function ExercisesPage({
                         
                         {/* --- COLUMN 1: Your original 'ex-left' --- */}
                         <div className="ex-left"> {/* SIR: left column div */}
-                        
+                            <section className="filters-panel">
+                                <div className="filters-panel__header">
+                                    <h3>Filters</h3>
+                                </div>
+                                <AppSidebar
+                                    selectedTags={tags}
+                                    onToggleTag={handleTagToggle}
+                                    transposing={transpos}
+                                    onToggleTransposing={handleTransposToggle}
+                                    difficulty={diff}
+                                    onSelectDifficulty={handleDifficultySelect}
+                                    voices={voices}
+                                    onSelectVoices={handleVoicesSelect}
+                                    meter={meter}
+                                    onSelectMeter={handleMeterSelect}
+                                    texturalFactor={types}
+                                    onSelectTexturalFactor={handleTexturalFactorSelect}
+                                    onResetSort={resetSort}
+                                />
+                            </section>
                             
                             <div
                                 style={{
@@ -313,13 +308,6 @@ export function ExercisesPage({
                                 </div>
 
                                 <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" }}>
-                                    <Button
-                                        onClick={toggleSidebar}
-                                        variant="light"
-                                        className="sidebar-toggle-button"
-                                        style={{width: "fit-content", position: "relative" }}
-                                    >Filters
-                                    </Button>
                                     <Button
                                         onClick={clearSelection}
                                         variant="outline-secondary"
