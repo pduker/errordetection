@@ -236,8 +236,6 @@ export function ExercisesPage({
                 {/* --- This new wrapper holds the button AND your two columns --- */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
                     {/* --- 2. This wrapper holds your two columns side-by-side --- */} 
-                    {/* <h2 style={{fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> */}
-                    <h5 style={{fontStyle: "italic", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5>
                     <div className = "two-column-wrapper"> 
                         
                         {/* --- COLUMN 1: Your original 'ex-left' --- */}
