@@ -923,9 +923,9 @@ nav ul li a:hover::after {
   flex-direction: column;
   align-items: stretch;
   width: 100%;
-  max-width: 840px;
+  max-width: 100%;
   margin: 0;
-  padding: 0 1rem;
+  padding: 0;
   box-sizing: border-box;
   min-height: 360px;
 }
@@ -1126,17 +1126,19 @@ nav ul li a:hover::after {
 .exercise-placeholder {
   flex: 1;
   display: flex;
-  margin: 3vw;
-  /* margin-left: 12vw; */
-  min-width: 260px;
-  max-height: 300px; /* SR: Added so that the loaded page doesn't extend to bottom*/
+  margin: 0;
+  width: 100%;
+  min-height: 280px;
   flex-direction: column;
-  align-items: right;
+  justify-content: center;
+  align-items: center;
   border: 2px dashed #ccc;
-  border-radius: 10px;
-  padding: 100px;
-  background-color: #f9f9f9;
+  border-radius: 12px;
+  padding: 2rem;
+  background-color: #fdfdfd;
   color: #666;
+  text-align: center;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
 /* Responsive breakpoint: stack columns on small screens */

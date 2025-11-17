@@ -2100,6 +2100,11 @@ export function Exercise({
               <></>
             )}
             <div className="exercise-action-buttons">
+              {canCheckAnswers && (
+                <button className="btnback exercise-action-check" onClick={checkAnswers}>
+                  Check Answer
+                </button>
+              )}
               <Button
                 className="responsive-element"
                 variant="danger"
@@ -2111,11 +2116,6 @@ export function Exercise({
               >
                 Reset Answers
               </Button>
-              {canCheckAnswers && (
-                <button className="btnback exercise-action-check" onClick={checkAnswers}>
-                  Check Answer
-                </button>
-              )}
             </div>
           </div>
           {canCheckAnswers ? (
