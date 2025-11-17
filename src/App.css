@@ -901,7 +901,7 @@ nav ul li a:hover::after {
   align-items: flex-start;
 }
 .ex-left {
-  padding-right: 2vw;
+  padding-right: 1vw;
   display: flex;
   justify-content: flex-start;
   flex-direction: column;
@@ -911,7 +911,7 @@ nav ul li a:hover::after {
 }
 .ex-right {
   flex: 1; /* grow to fill remaining space, can shrink */
-  margin-left: 2vw;
+  margin-left: 0.5vw;
   display: flex;
   flex-direction: column;
   align-self: stretch;
