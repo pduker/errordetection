@@ -277,20 +277,20 @@ export function ExercisesPage({
                         {/* --- COLUMN 2: Your original 'ex-right' --- */}
                         <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
                             <div className="exercise-viewer">
-                                <div className={`exercise-stage${selExercise ? "" : " exercise-stage--placeholder"}`}>
+                                <div className="exercise-stage">
                                     <div className="exercise-content"> 
-                                        {selExercise !== undefined ? (
-                                            <>
-                                                {navButtonsVisible && (
-                                                    <button
-                                                        className="exercise-nav-inline exercise-nav-inline--prev"
-                                                        onClick={prevEx}
-                                                        disabled={disablePrevNav}
-                                                        aria-label="Previous exercise"
-                                                    >
-                                                        ‹
-                                                    </button>
-                                                )}
+                                        {navButtonsVisible && (
+                                            <button
+                                                className="exercise-nav-inline exercise-nav-inline--prev"
+                                                onClick={prevEx}
+                                                disabled={disablePrevNav}
+                                                aria-label="Previous exercise"
+                                            >
+                                                ‹
+                                            </button>
+                                        )}
+                                        <div className="exercise-content-inner">
+                                            {selExercise !== undefined ? (
                                                 <Exercise 
                                                     key={selExercise.exIndex} 
                                                     teacherMode={false} 
@@ -302,22 +302,22 @@ export function ExercisesPage({
                                                     isSelected={undefined}
                                                     fetch={undefined}
                                                 />
-                                                {navButtonsVisible && (
-                                                    <button
-                                                        className="exercise-nav-inline exercise-nav-inline--next"
-                                                        onClick={nextEx}
-                                                        disabled={disableNextNav}
-                                                        aria-label="Next exercise"
-                                                    >
-                                                        ›
-                                                    </button>
-                                                )}
-                                            </>
-                                        ) : (
-                                            <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
-                                                <h3>No exercise loaded</h3>
-                                                <p>Select an exercise from the list below to begin.</p>
-                                            </div>
+                                            ) : (
+                                                <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
+                                                    <h3>No exercise loaded</h3>
+                                                    <p>Select an exercise from the list below to begin.</p>
+                                                </div>
+                                            )}
+                                        </div>
+                                        {navButtonsVisible && (
+                                            <button
+                                                className="exercise-nav-inline exercise-nav-inline--next"
+                                                onClick={nextEx}
+                                                disabled={disableNextNav}
+                                                aria-label="Next exercise"
+                                            >
+                                                ›
+                                            </button>
                                         )}
                                     </div> 
                                 </div>
