@@ -120,6 +120,8 @@ export function Exercise({
 
   //for disabling ui elements
   const rhythmOnly = tags.length === 1 && tags.includes("Rhythm");
+  const canCheckAnswers =
+    abcFile !== undefined && abcFile !== "" && loaded;
 
   // try to load score when there's either exerciseData or an abc file to pull from
   useEffect(() => {
@@ -2089,7 +2091,7 @@ export function Exercise({
             />
           )}
 
-          <div style={{ display: "inline-flex", marginTop: "-2vh" }}>
+          <div style={{ display: "inline-flex", marginTop: "-2vh", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
             {mp3 !== undefined ? (
               <div style={{ marginTop: "2vh" }}>
                 <AudioHandler file={mp3}></AudioHandler>
@@ -2097,24 +2099,27 @@ export function Exercise({
             ) : (
               <></>
             )}
-            <Button
-              className="responsive-element"
-              variant="danger"
-              onClick={exReload}
-              style={{
-                /*SIR: the actual reset answers button*/ position: "relative",
-                marginLeft: "1vw",
-                marginBottom: "2vh",
-              }}
-            >
-              Reset Answers
-            </Button>
+            <div className="exercise-action-buttons">
+              <Button
+                className="responsive-element"
+                variant="danger"
+                onClick={exReload}
+                style={{
+                  /*SIR: the actual reset answers button*/ position: "relative",
+                  marginBottom: "2vh",
+                }}
+              >
+                Reset Answers
+              </Button>
+              {canCheckAnswers && (
+                <button className="btnback exercise-action-check" onClick={checkAnswers}>
+                  Check Answer
+                </button>
+              )}
+            </div>
           </div>
-          {abcFile !== undefined && abcFile !== "" && loaded ? (
+          {canCheckAnswers ? (
             <div>
-              <button className="btnback" onClick={checkAnswers}>
-                Check Answer
-              </button>
               <div>
                 Next step(s):
                 {customFeedback.map(function (feedback) {

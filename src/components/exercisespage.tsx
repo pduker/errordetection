@@ -238,9 +238,6 @@ export function ExercisesPage({
                     {/* --- 2. This wrapper holds your two columns side-by-side --- */} 
                     {/* <h2 style={{fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> */}
                     <h5 style={{fontStyle: "italic", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5>
-                    {filteredExercises.length === 0 ? 
-                        !scoresRet ? <div style={{textAlign: "left"}}>Loading scores... this process should take 2-10 seconds. <br /> If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
-                    <div>No exercises with those criteria found!</div> : <></>}
                     <div className = "two-column-wrapper"> 
                         
                         {/* --- COLUMN 1: Your original 'ex-left' --- */}
@@ -282,27 +279,6 @@ export function ExercisesPage({
                         {/* --- COLUMN 2: Your original 'ex-right' --- */}
                         <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
                             <div className="exercise-viewer">
-                                <div className="exercise-nav-row">
-                                    <button
-                                        className="exercise-nav-button exercise-nav-button--prev"
-                                        id="back-btn"
-                                        hidden={!navButtonsVisible}
-                                        disabled={disablePrevNav}
-                                        onClick={prevEx}
-                                    >
-                                        Back
-                                    </button>
-                                    <button
-                                        className="exercise-nav-button exercise-nav-button--next"
-                                        id="next-btn"
-                                        hidden={!navButtonsVisible}
-                                        disabled={disableNextNav}
-                                        onClick={nextEx}
-                                    >
-                                        Next
-                                    </button>
-                                </div>
-
                                 <div className="exercise-content">
                                     {selExercise !== undefined ? (
                                         <div> 
@@ -347,6 +323,26 @@ export function ExercisesPage({
                                             ›
                                         </Button>
                                     </div>
+                                    {navButtonsVisible && (
+                                        <div className="exercise-queue-cyclers">
+                                            <Button
+                                                onClick={prevEx}
+                                                disabled={disablePrevNav}
+                                                className="exercise-cycle-btn"
+                                                aria-label="Previous exercise"
+                                            >
+                                                ‹ Back
+                                            </Button>
+                                            <Button
+                                                onClick={nextEx}
+                                                disabled={disableNextNav}
+                                                className="exercise-cycle-btn"
+                                                aria-label="Next exercise"
+                                            >
+                                                Next ›
+                                            </Button>
+                                        </div>
+                                    )}
                                     <Button
                                         onClick={clearSelection}
                                         variant="outline-secondary"
@@ -357,21 +353,37 @@ export function ExercisesPage({
                                     </Button>
                                 </div>
                                 <div className="exercise-queue-list">
-                                    {pageExercises.map(function(exercise, idx){
-                                        const isActive = selExercise?.exIndex === exercise.exIndex;
-                                        const globalIndex = startIndex + idx;
-                                        return (
-                                        <div
-                                            key = {exercise.title}
-                                            id = {exercise.title}
-                                            onClick={() => selectExerciseAtIndex(globalIndex)}
-                                            role="button"
-                                            aria-pressed={isActive}
-                                            className={`exercise-list-item${isActive ? " active" : ""}`}>
-                                            {exercise.title}
-                                        </div>
+                                    {filteredExercises.length === 0 ? (
+                                        !scoresRet ? (
+                                            <div className="exercise-list-empty">
+                                                <strong>Loading scores...</strong>
+                                                <span>
+                                                    This process should take 2-10 seconds. If nothing changes after 10
+                                                    seconds, try sorting using the above criteria.
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <div className="exercise-list-empty">
+                                                <strong>No exercises with those criteria found!</strong>
+                                            </div>
                                         )
-                                    })}
+                                    ) : (
+                                        pageExercises.map(function(exercise, idx){
+                                            const isActive = selExercise?.exIndex === exercise.exIndex;
+                                            const globalIndex = startIndex + idx;
+                                            return (
+                                            <div
+                                                key = {exercise.title}
+                                                id = {exercise.title}
+                                                onClick={() => selectExerciseAtIndex(globalIndex)}
+                                                role="button"
+                                                aria-pressed={isActive}
+                                                className={`exercise-list-item${isActive ? " active" : ""}`}>
+                                                {exercise.title}
+                                            </div>
+                                            )
+                                        })
+                                    )}
                                 </div>
                             </section>
                         </div>

@@ -898,6 +898,7 @@ nav ul li a:hover::after {
   flex: 1 1 100%;
   width: 100%;
   gap: 20px;
+  align-items: flex-start;
 }
 .ex-left {
   padding-right: 2vw;
@@ -913,6 +914,8 @@ nav ul li a:hover::after {
   margin-left: 2vw;
   display: flex;
   flex-direction: column;
+  align-self: stretch;
+  margin-top: 0;
   min-width: 260px;
 }
 .exercise-viewer {
@@ -921,7 +924,7 @@ nav ul li a:hover::after {
   align-items: stretch;
   width: 100%;
   max-width: 840px;
-  margin: 0 auto;
+  margin: 0;
   padding: 0 1rem;
   box-sizing: border-box;
   min-height: 360px;
@@ -965,6 +968,17 @@ nav ul li a:hover::after {
   opacity: 0.35;
   cursor: default;
   transform: none;
+}
+
+.exercise-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.exercise-action-check {
+  margin-bottom: 2vh;
 }
 
 /* Make forms and lists inside the left column wrap and shrink nicely */
@@ -1013,13 +1027,15 @@ nav ul li a:hover::after {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem;
-  justify-content: space-between;
+  width: 100%;
 }
 
 .exercise-queue-nav {
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  flex: 1 1 auto;
+  min-width: 220px;
 }
 
 .exercise-queue-nav-btn {
@@ -1059,12 +1075,51 @@ nav ul li a:hover::after {
   box-shadow: none;
 }
 
+.exercise-queue-cyclers {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex: 0 1 auto;
+  margin-left: auto;
+}
+
+.exercise-cycle-btn {
+  border-radius: 999px !important;
+  background: #114b96 !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 0.4rem 0.95rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em;
+}
+
+.exercise-cycle-btn:disabled {
+  background: rgba(17, 75, 150, 0.4) !important;
+}
+
+.exercise-queue-clear {
+  margin-left: 0.5rem;
+}
+
 .exercise-queue-list {
   margin-top: 1rem;
   display: flex;
   flex-direction: column;
   min-height: 200px;
   gap: 0.35rem;
+}
+
+.exercise-list-empty {
+  padding: 1.25rem;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  color: #1f0545;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
 /*No loaded exercise placeholder styling*/
