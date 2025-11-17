@@ -67,6 +67,7 @@ export function ExercisesPage({
     const [transpos, setTranspos] = useState<boolean>(false);
 
     const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
+    const [filtersOpen, setFiltersOpen] = useState<boolean>(false);
 
     const filteredExercises = React.useMemo(() => {
         const baseList = allExData.filter((exercise): exercise is ExerciseData => exercise !== undefined);
@@ -244,25 +245,36 @@ export function ExercisesPage({
                         
                         {/* --- COLUMN 1: Your original 'ex-left' --- */}
                         <div className="ex-left"> {/* SIR: left column div */}
-                            <section className="filters-panel">
-                                <div className="filters-panel__header">
-                                    <h3>Filters</h3>
+                            <section className={`filters-panel${filtersOpen ? " filters-panel--open" : ""}`}>
+                                <button
+                                    type="button"
+                                    className="filters-panel__toggle"
+                                    onClick={() => setFiltersOpen((prev) => !prev)}
+                                    aria-expanded={filtersOpen}
+                                >
+                                    <span>Filters</span>
+                                    <span className="filters-panel__chevron" aria-hidden="true" />
+                                </button>
+                                <div
+                                    className={`filters-panel__content${filtersOpen ? " filters-panel__content--open" : ""}`}
+                                    aria-hidden={!filtersOpen}
+                                >
+                                    <AppSidebar
+                                        selectedTags={tags}
+                                        onToggleTag={handleTagToggle}
+                                        transposing={transpos}
+                                        onToggleTransposing={handleTransposToggle}
+                                        difficulty={diff}
+                                        onSelectDifficulty={handleDifficultySelect}
+                                        voices={voices}
+                                        onSelectVoices={handleVoicesSelect}
+                                        meter={meter}
+                                        onSelectMeter={handleMeterSelect}
+                                        texturalFactor={types}
+                                        onSelectTexturalFactor={handleTexturalFactorSelect}
+                                        onResetSort={resetSort}
+                                    />
                                 </div>
-                                <AppSidebar
-                                    selectedTags={tags}
-                                    onToggleTag={handleTagToggle}
-                                    transposing={transpos}
-                                    onToggleTransposing={handleTransposToggle}
-                                    difficulty={diff}
-                                    onSelectDifficulty={handleDifficultySelect}
-                                    voices={voices}
-                                    onSelectVoices={handleVoicesSelect}
-                                    meter={meter}
-                                    onSelectMeter={handleMeterSelect}
-                                    texturalFactor={types}
-                                    onSelectTexturalFactor={handleTexturalFactorSelect}
-                                    onResetSort={resetSort}
-                                />
                             </section>
                             
                             <div

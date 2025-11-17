@@ -733,22 +733,67 @@ nav ul li a:hover::after {
   background: linear-gradient(180deg, #fff7c9 0%, #ffe790 100%);
   border-radius: 18px;
   padding: 1.25rem;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55), 0 18px 42px rgba(0, 0, 0, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55),
+    0 18px 42px rgba(0, 0, 0, 0.08);
   margin-bottom: 1rem;
 }
 
-.filters-panel__header {
+.filters-panel__toggle {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.85rem;
+  gap: 0.75rem;
+  background: none;
+  border: none;
+  font-size: 18px;
+  font-weight: 500;
+  color: #1f0545;
+  padding: 0;
+  cursor: pointer;
 }
 
-.filters-panel__header h3 {
-  margin: 0;
-  font-size: clamp(1.1rem, 0.9rem + 0.6vw, 1.45rem);
-  color: #1f0545;
-  font-weight: 700;
+.filters-panel__chevron {
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  border: 2px solid rgba(31, 5, 69, 0.3);
+  position: relative;
+  transition: transform 0.25s ease;
+}
+
+.filters-panel__chevron::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-bottom: 2px solid #1f0545;
+  border-right: 2px solid #1f0545;
+  transform: translate(-50%, -60%) rotate(45deg);
+}
+
+.filters-panel--open .filters-panel__chevron {
+  transform: rotate(180deg);
+}
+
+.filters-panel__content {
+  margin-top: 0.9rem;
+  max-height: 1200px;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+
+.filters-panel__content:not(.filters-panel__content--open) {
+  max-height: 0;
+  margin-top: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.filters-panel__content--open {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .filters-menu {
@@ -777,8 +822,8 @@ nav ul li a:hover::after {
   font-size: 0.95rem;
   padding: 0.35rem 0.9rem;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease,
-    transform 0.1s ease;
+  transition: background-color 0.2s ease, color 0.2s ease,
+    border-color 0.2s ease, transform 0.1s ease;
 }
 
 .filter-chip:hover,
@@ -837,7 +882,6 @@ nav ul li a:hover::after {
 .filters-reset-btn:focus-visible {
   background: #bb2d3b;
 }
-
 
 /* Exercises page responsive layout */
 .ex-page-container {
