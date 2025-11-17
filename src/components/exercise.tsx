@@ -1469,24 +1469,9 @@ export function Exercise({
     ) {
       feedback = ["Great job identifying the errors in this passage!"];
     } else if (tmpSelected.length !== correctAnswers.length) {
-      const pluralText = correctAnswers.length === 1 ? " is " : " are ";
       feedback = [
-        `\nYou selected ${selAnswers.length} answer(s). There${pluralText}${correctAnswers.length} correct answer(s). Here are some specific places to look at and listen to more closely:`,
+        `\nNot quite - try again!`,
       ];
-      for (let i = 0; i < tmpCorrect.length; i++) {
-        feedback.push(
-          `\nMeasure ${Number(tmpCorrect[i]["measurePos"]) + 1}, Staff ${
-            Number(tmpCorrect[i]["staffPos"]) + 1
-          }`
-        );
-      }
-      for (let i = 0; i < wrongList.length; i++) {
-        feedback.push(
-          `\nWrong answer selected at: Measure ${
-            Number(wrongList[i].getAttribute("measurePos")) + 1
-          }, Staff ${Number(wrongList[i].getAttribute("staffPos")) + 1}`
-        );
-      }
     } else if (tmpCorrect.length === correctAnswers.length) {
       feedback = ["Not quite - try again!"];
       for (let i = 0; i < tmpCorrect.length; i++) {
