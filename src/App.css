@@ -919,8 +919,8 @@ nav ul li a:hover::after {
   min-width: 260px;
 }
 .exercise-viewer {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: auto 1fr;
   align-items: stretch;
   width: 100%;
   max-width: 100%;
@@ -928,6 +928,7 @@ nav ul li a:hover::after {
   padding: 0;
   box-sizing: border-box;
   min-height: 360px;
+  gap: 1rem;
 }
 .exercise-nav-row {
   display: flex;
@@ -937,8 +938,9 @@ nav ul li a:hover::after {
 }
 .exercise-content {
   width: 100%;
-  align-items: center;
-  margin: 0 auto;
+  margin: 0;
+  display: flex;
+  align-items: stretch;
 }
 .exercise-nav-button {
   margin: 0;
@@ -1185,9 +1187,6 @@ nav ul li a:hover::after {
     min-height: 35px;
     letter-spacing: 3px;
     max-width: none;
-  }
-  .exercise-content {
-    width: 100%;
   }
 }
 
