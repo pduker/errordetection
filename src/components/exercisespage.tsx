@@ -277,28 +277,26 @@ export function ExercisesPage({
                         {/* --- COLUMN 2: Your original 'ex-right' --- */}
                         <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
                             <div className="exercise-viewer">
-                                <div className="exercise-content">
-                                    {selExercise !== undefined ? (
-                                        <div> 
-                                            <Exercise 
-                                                key={selExercise.exIndex} 
-                                                teacherMode={false} 
-                                                ExData={selExercise} 
-                                                allExData={allExData} 
-                                                setAllExData={setAllExData} 
-                                                exIndex={selExercise.exIndex} 
-                                                handleSelectExercise={undefined} 
-                                                isSelected={undefined}
-                                                fetch={undefined}
-                                            />
-                                        </div> 
-                                    ) : (
-                                        <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
-                                            <h3>No exercise loaded</h3>
-                                            <p>Select an exercise from the list below to begin.</p>
-                                        </div>
-                                    )}
-                                </div>
+                                {selExercise !== undefined ? (
+                                    <div className="exercise-content"> 
+                                        <Exercise 
+                                            key={selExercise.exIndex} 
+                                            teacherMode={false} 
+                                            ExData={selExercise} 
+                                            allExData={allExData} 
+                                            setAllExData={setAllExData} 
+                                            exIndex={selExercise.exIndex} 
+                                            handleSelectExercise={undefined} 
+                                            isSelected={undefined}
+                                            fetch={undefined}
+                                        />
+                                    </div> 
+                                ) : (
+                                    <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
+                                        <h3>No exercise loaded</h3>
+                                        <p>Select an exercise from the list below to begin.</p>
+                                    </div>
+                                )}
                             </div>
                             <section className="exercise-queue-panel">
                                 <div className="exercise-queue-header">

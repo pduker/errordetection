@@ -919,15 +919,15 @@ nav ul li a:hover::after {
   min-width: 260px;
 }
 .exercise-viewer {
-  display: grid;
-  grid-template-rows: auto 1fr;
-  align-items: stretch;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   max-width: 100%;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
   min-height: 360px;
+  margin-bottom: 10px;
   gap: 1rem;
 }
 .exercise-nav-row {
@@ -941,6 +941,7 @@ nav ul li a:hover::after {
   margin: 0;
   display: flex;
   align-items: stretch;
+  min-height: 360px;
 }
 .exercise-nav-button {
   margin: 0;
@@ -1017,7 +1018,7 @@ nav ul li a:hover::after {
 }
 
 .exercise-queue-panel {
-  margin-top: 1.5rem;
+  margin-top: 0;
   background: #fff7c9;
   border-radius: 18px;
   padding: 1.25rem;
@@ -1165,9 +1166,6 @@ nav ul li a:hover::after {
   .ex-left {
     order: 2;
     padding-right: 0;
-  }
-  .exercise-viewer {
-    padding: 0 1.5rem;
   }
   .exercise-queue-panel {
     margin-top: 1rem;
