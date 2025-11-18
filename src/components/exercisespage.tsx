@@ -67,6 +67,7 @@ export function ExercisesPage({
     const [transpos, setTranspos] = useState<boolean>(false);
 
     const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
+    const [filtersOpen, setFiltersOpen] = useState<boolean>(true);
 
     const filteredExercises = React.useMemo(() => {
         const baseList = allExData.filter((exercise): exercise is ExerciseData => exercise !== undefined);
@@ -96,9 +97,6 @@ export function ExercisesPage({
         [filteredExercises, startIndex, pageSize]
     );
     const paginationStatus = totalPages === 0 ? "Loading..." : `Page ${safePage} of ${totalPages}`;
-
-    // state for sidebar
-    const [isSidebarCollapsed, setSidebarCollapsed] = useState(true);
 
     //pagination functions, navigate between functions
     const nextPage = React.useCallback(() =>{
@@ -230,183 +228,164 @@ export function ExercisesPage({
         clearSelection();
     }
 
-    // Toggle function for the sidebar
-    const toggleSidebar = () => {
-      setSidebarCollapsed(!isSidebarCollapsed);
-    };
-
     //html to render page
     return (
-        <div className="fullpage" style={{ display: 'flex', height: '100%', minHeight: 0, position: 'relative' }}>
-            <AppSidebar
-                isCollapsed={isSidebarCollapsed}
-                selectedTags={tags}
-                onToggleTag={handleTagToggle}
-                transposing={transpos}
-                onToggleTransposing={handleTransposToggle}
-                difficulty={diff}
-                onSelectDifficulty={handleDifficultySelect}
-                voices={voices}
-                onSelectVoices={handleVoicesSelect}
-                meter={meter}
-                onSelectMeter={handleMeterSelect}
-                texturalFactor={types}
-                onSelectTexturalFactor={handleTexturalFactorSelect}
-                onResetSort={resetSort}
-            />
+        <div className="fullpage">
             <div className="ex-page-container"> 
 
                 {/* --- This new wrapper holds the button AND your two columns --- */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
                     {/* --- 2. This wrapper holds your two columns side-by-side --- */} 
-                    <h2 style={{fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> {/*SIR: changed fontSize for consistency*/}
-                    <h5 style={{fontStyle: "italic", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5> {/*SIR: changed fontSize for consistency*/}
-                    {filteredExercises.length === 0 ? 
-                        !scoresRet ? <div style={{textAlign: "left"}}>Loading scores... this process should take 2-10 seconds. <br /> If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
-                    <div>No exercises with those criteria found!</div> : <></>}
                     <div className = "two-column-wrapper"> 
                         
                         {/* --- COLUMN 1: Your original 'ex-left' --- */}
                         <div className="ex-left"> {/* SIR: left column div */}
-                        
-                            
-                            <div
-                                style={{
-                                    marginTop: "8px",
-                                    alignItems: "center",
-                                    gap: "8px",
-                                    display: "flex",
-                                    flexWrap: "wrap",
-                                    justifyContent: "space-between"
-                                }}
-                            >
-                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                    {/* add page navigation buttons, call newly defined functions */}
-                                    <Button
-                                        onClick={prevPage}
-                                        disabled={currentPage === 1}
-                                        style={{
-                                            fontSize: "2.5rem",
-                                            background: "none",
-                                            border:"none",
-                                            color: currentPage === 1 ? "gray" : "black",
-                                            padding: "0 8px",
-                                            fontWeight: "bold",
-                                            lineHeight: "1"}}
-                                    >
-                                        ‹
-                                    </Button>
-                                    <span>{paginationStatus}</span>
-                                    <Button
-                                        onClick={nextPage}
-                                        disabled={totalPages === 0 || currentPage >= totalPages}
-                                        style={{fontSize: "2.5rem",
-                                            background: "none",
-                                            border:"none",
-                                            color: totalPages === 0 || currentPage >= totalPages ? "gray" : "black",
-                                            padding: "0 8px",
-                                            fontWeight: "bold",
-                                            lineHeight: "1"}}
-                                    >
-                                        ›
-                                    </Button>
-                                </div>
-
-                                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" }}>
-                                    <Button
-                                        onClick={toggleSidebar}
-                                        variant="light"
-                                        className="sidebar-toggle-button"
-                                        style={{width: "fit-content", position: "relative" }}
-                                    >Filters
-                                    </Button>
-                                    <Button
-                                        onClick={clearSelection}
-                                        variant="outline-secondary"
-                                        disabled={!selExercise}
-                                        style={{
-                                            borderRadius: "10px",
-                                            fontWeight: 600,
-                                            letterSpacing: "0.03em",
-                                            backgroundColor: "#4e81b3",
-                                            color: "#fff",
-                                            borderColor: "#4e81b3",
-                                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                                            transition: "all 0.2s ease",
-                                            opacity: selExercise ? 1 : 0.6
-                                        }}
-                                    >
-                                        Clear selection
-                                    </Button>
-                                </div>
-                            </div>
-                            <div style={{flex: "1", display: "flex", flexDirection: "column", minWidth:"200px"}}> {/* SIR: listed exercises, added minHeight to prevent jitter */}
-                            {/* pull from paginated exercises */}
-                            {pageExercises.map(function(exercise, idx){
-                                const isActive = selExercise?.exIndex === exercise.exIndex;
-                                const globalIndex = startIndex + idx;
-                                return (
+                            <section className={`filters-panel${filtersOpen ? " filters-panel--open" : ""}`}>
+                                <button
+                                    type="button"
+                                    className="filters-panel__toggle"
+                                    onClick={() => setFiltersOpen((prev) => !prev)}
+                                    aria-expanded={filtersOpen}
+                                >
+                                    <span>Filters</span>
+                                    <span className="filters-panel__chevron" aria-hidden="true" />
+                                </button>
                                 <div
-                                    key = {exercise.title}
-                                    id = {exercise.title}
-                                    onClick={() => selectExerciseAtIndex(globalIndex)}
-                                    role="button"
-                                    aria-pressed={isActive}
-                                    className={`exercise-list-item${isActive ? " active" : ""}`}>
-                                    {exercise.title}
+                                    className={`filters-panel__content${filtersOpen ? " filters-panel__content--open" : ""}`}
+                                    aria-hidden={!filtersOpen}
+                                >
+                                    <AppSidebar
+                                        selectedTags={tags}
+                                        onToggleTag={handleTagToggle}
+                                        transposing={transpos}
+                                        onToggleTransposing={handleTransposToggle}
+                                        difficulty={diff}
+                                        onSelectDifficulty={handleDifficultySelect}
+                                        voices={voices}
+                                        onSelectVoices={handleVoicesSelect}
+                                        meter={meter}
+                                        onSelectMeter={handleMeterSelect}
+                                        texturalFactor={types}
+                                        onSelectTexturalFactor={handleTexturalFactorSelect}
+                                        onResetSort={resetSort}
+                                    />
                                 </div>
-                                )
-                            })}
-                            </div>
+                            </section>
+                            
                         </div>
 
                         {/* --- COLUMN 2: Your original 'ex-right' --- */}
                         <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
                             <div className="exercise-viewer">
-                                <div className="exercise-nav-row">
-                                    <button
-                                        className="exercise-nav-button exercise-nav-button--prev"
-                                        id="back-btn"
-                                        hidden={!navButtonsVisible}
-                                        disabled={disablePrevNav}
-                                        onClick={prevEx}
-                                    >
-                                        Back
-                                    </button>
-                                    <button
-                                        className="exercise-nav-button exercise-nav-button--next"
-                                        id="next-btn"
-                                        hidden={!navButtonsVisible}
-                                        disabled={disableNextNav}
-                                        onClick={nextEx}
-                                    >
-                                        Next
-                                    </button>
-                                </div>
-
-                                <div className="exercise-content">
-                                    {selExercise !== undefined ? (
-                                        <div> 
-                                            <Exercise 
-                                                key={selExercise.exIndex} 
-                                                teacherMode={false} 
-                                                ExData={selExercise} 
-                                                allExData={allExData} 
-                                                setAllExData={setAllExData} 
-                                                exIndex={selExercise.exIndex} 
-                                                handleSelectExercise={undefined} 
-                                                isSelected={undefined}
-                                                fetch={undefined}
-                                            />
-                                        </div> 
-                                    ) : (
-                                        <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
-                                            <h3>No exercise loaded</h3>
-                                            <p>Select an exercise from the left to begin.</p>
+                                <div className="exercise-stage">
+                                    <div className="exercise-content"> 
+                                        {navButtonsVisible && (
+                                            <button
+                                                className="exercise-nav-inline exercise-nav-inline--prev"
+                                                onClick={prevEx}
+                                                disabled={disablePrevNav}
+                                                aria-label="Previous exercise"
+                                            >
+                                                ‹
+                                            </button>
+                                        )}
+                                        <div className="exercise-content-inner">
+                                            {selExercise !== undefined ? (
+                                                <Exercise 
+                                                    key={selExercise.exIndex} 
+                                                    teacherMode={false} 
+                                                    ExData={selExercise} 
+                                                    allExData={allExData} 
+                                                    setAllExData={setAllExData} 
+                                                    exIndex={selExercise.exIndex} 
+                                                    handleSelectExercise={undefined} 
+                                                    isSelected={undefined}
+                                                    fetch={undefined}
+                                                />
+                                            ) : (
+                                                <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
+                                                    <h3>No exercise loaded</h3>
+                                                    <p>Select an exercise from the list below to begin.</p>
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
+                                        {navButtonsVisible && (
+                                            <button
+                                                className="exercise-nav-inline exercise-nav-inline--next"
+                                                onClick={nextEx}
+                                                disabled={disableNextNav}
+                                                aria-label="Next exercise"
+                                            >
+                                                ›
+                                            </button>
+                                        )}
+                                    </div> 
                                 </div>
                             </div>
+                            <section className="exercise-queue-panel">
+                                <div className="exercise-queue-header">
+                                    <div className="exercise-queue-nav">
+                                        <Button
+                                            onClick={prevPage}
+                                            disabled={currentPage === 1}
+                                            className="exercise-queue-nav-btn"
+                                            aria-label="Previous page of exercises"
+                                        >
+                                            ‹
+                                        </Button>
+                                        <span className="exercise-queue-status">{paginationStatus}</span>
+                                        <Button
+                                            onClick={nextPage}
+                                            disabled={totalPages === 0 || currentPage >= totalPages}
+                                            className="exercise-queue-nav-btn"
+                                            aria-label="Next page of exercises"
+                                        >
+                                            ›
+                                        </Button>
+                                    </div>
+                                    <Button
+                                        onClick={clearSelection}
+                                        variant="outline-secondary"
+                                        disabled={!selExercise}
+                                        className="exercise-queue-clear"
+                                    >
+                                        Clear selection
+                                    </Button>
+                                </div>
+                                <div className="exercise-queue-list">
+                                    {filteredExercises.length === 0 ? (
+                                        !scoresRet ? (
+                                            <div className="exercise-list-empty">
+                                                <strong>Loading scores...</strong>
+                                                <span>
+                                                    This process should take 2-10 seconds. If nothing changes after 10
+                                                    seconds, try sorting using the above criteria.
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <div className="exercise-list-empty">
+                                                <strong>No exercises with those criteria found!</strong>
+                                            </div>
+                                        )
+                                    ) : (
+                                        pageExercises.map(function(exercise, idx){
+                                            const isActive = selExercise?.exIndex === exercise.exIndex;
+                                            const globalIndex = startIndex + idx;
+                                            return (
+                                            <div
+                                                key = {exercise.title}
+                                                id = {exercise.title}
+                                                onClick={() => selectExerciseAtIndex(globalIndex)}
+                                                role="button"
+                                                aria-pressed={isActive}
+                                                className={`exercise-list-item${isActive ? " active" : ""}`}>
+                                                {exercise.title}
+                                            </div>
+                                            )
+                                        })
+                                    )}
+                                </div>
+                            </section>
                         </div>
                     
                     </div> {/* --- End of two-column wrapper --- */}

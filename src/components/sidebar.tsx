@@ -1,10 +1,6 @@
 import React, { useMemo } from 'react';
-import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
-import { FaCheck } from 'react-icons/fa';
 
-// 1. Define the props interface
 interface AppSidebarProps {
-  isCollapsed: boolean;
   selectedTags: string[];
   onToggleTag: (tag: string) => void;
   transposing: boolean;
@@ -20,9 +16,49 @@ interface AppSidebarProps {
   onResetSort: () => void;
 }
 
-// 2. Update the component to accept and use the props
+const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
+  <section className="filters-section">
+    <h4 className="filters-section__title">{title}</h4>
+    {children}
+  </section>
+);
+
+const OptionGroup: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className="filters-option-group">{children}</div>
+);
+
+const OptionButton: React.FC<{
+  active: boolean;
+  label: string;
+  onClick: () => void;
+}> = ({ active, label, onClick }) => (
+  <button type="button" className={`filter-option${active ? ' filter-option--active' : ''}`} onClick={onClick}>
+    {label}
+  </button>
+);
+
+const ChipButton: React.FC<{
+  active: boolean;
+  label: string;
+  onClick: () => void;
+}> = ({ active, label, onClick }) => (
+  <button type="button" className={`filter-chip${active ? ' filter-chip--active' : ''}`} onClick={onClick}>
+    {label}
+  </button>
+);
+
+const ToggleRow: React.FC<{
+  label: string;
+  checked: boolean;
+  onChange: () => void;
+}> = ({ label, checked, onChange }) => (
+  <label className="filters-toggle">
+    <input type="checkbox" checked={checked} onChange={onChange} />
+    <span>{label}</span>
+  </label>
+);
+
 export const AppSidebar: React.FC<AppSidebarProps> = ({
-  isCollapsed,
   selectedTags,
   onToggleTag,
   transposing,
@@ -37,14 +73,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   onSelectTexturalFactor,
   onResetSort,
 }) => {
-  const tagItems = useMemo(
-    () => ['Pitch', 'Intonation', 'Rhythm'],
-    []
-  );
-  const difficultyItems = useMemo(
-    () => ['All', '1', '2', '3', '4', '5'],
-    []
-  );
+  const tagItems = useMemo(() => ['Pitch', 'Intonation', 'Rhythm'], []);
+  const difficultyItems = useMemo(() => ['All', '1', '2', '3', '4', '5'], []);
   const voiceItems = useMemo(
     () => [
       { value: 0, label: 'Any' },
@@ -56,10 +86,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     ],
     []
   );
-  const meterItems = useMemo(
-    () => ['Anything', 'Simple', 'Compound'],
-    []
-  );
+  const meterItems = useMemo(() => ['Anything', 'Simple', 'Compound'], []);
   const texturalItems = useMemo(
     () => [
       { value: 'None', label: 'None' },
@@ -70,141 +97,73 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     []
   );
 
-  const sidebarRootStyles = useMemo(() => {
-    const baseStyles = {
-      position: 'absolute' as const,
-      top: 0,
-      left: 0,
-      height: '100vh',
-      width: '280px',
-      zIndex: 10,
-      overflowX: 'hidden' as const,
-      overflowY: 'auto' as const,
-      borderRight: 'none',
-      boxShadow: 'none',
-    };
-
-    return isCollapsed
-    ? { ...baseStyles, transform: 'translateX(-100%)' /*SR:Edited so tags would slide back in*/ } 
-    : { ...baseStyles, transform: 'translateX(0)' /*SR: Same edit as above*/};
-}, [isCollapsed]);
-
   return (
-    <Sidebar
-      collapsed={isCollapsed}
-      collapsedWidth="0px"
-      className="app-sidebar"
-      rootStyles={sidebarRootStyles}
-    >
-      <Menu
-          style={{
-            width: '100%',
-            maxWidth: '280px',
-            overflowY: 'auto',
-            overflowX: 'hidden',
-            transition: 'width 0.3s ease',
-          }}
-          menuItemStyles={{
-            button: {
-              display: 'flex',
-              alignItems: 'center',
-              paddingRight: '12px',
-              // The active class will be added by NavLink
-              [`&.active`]: {
-                backgroundColor: '#13395e',
-                color: '#b6c8d9',
-              },
-            },
-            suffix: {
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              marginLeft: 'auto',
-              minWidth: '20px',
-            },
-            label: {
-              flexGrow: 1,
-            },
-            SubMenuExpandIcon: {
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-end',
-              marginLeft: 'auto',
-              minWidth: '20px',
-            },
-          }}
-      >
-        {tagItems.map((tag) => (
-          <MenuItem
-            key={tag}
-            active={selectedTags.includes(tag)}
-            onClick={() => onToggleTag(tag)}
-            suffix={selectedTags.includes(tag) ? <FaCheck size={12} /> : null}
-          >
-            {tag}
-          </MenuItem>
-        ))}
-        <MenuItem
-          active={transposing}
-          onClick={onToggleTransposing}
-          suffix={transposing ? <FaCheck size={12} /> : null}
-        >
-          Transposing Instruments
-        </MenuItem>
-        <SubMenu label="Advanced">
-          <SubMenu label="Difficulty">
+    <div className="filters-menu">
+      <Section title="Focus Areas">
+        <OptionGroup>
+          {tagItems.map((tag) => (
+            <ChipButton key={tag} active={selectedTags.includes(tag)} label={tag} onClick={() => onToggleTag(tag)} />
+          ))}
+        </OptionGroup>
+      </Section>
+
+      <Section title="Additional Options">
+        <ToggleRow label="Transposing Instruments" checked={transposing} onChange={onToggleTransposing} />
+      </Section>
+
+      <Section title="Advanced Filters">
+        <div className="filters-subsection">
+          <span className="filters-subsection__label">Difficulty</span>
+          <OptionGroup>
             {difficultyItems.map((item) => (
-              <MenuItem
+              <OptionButton
                 key={item}
                 active={difficulty === item}
+                label={item}
                 onClick={() => onSelectDifficulty(item)}
-                suffix={difficulty === item ? <FaCheck size={12} /> : null}
-              >
-                {item}
-              </MenuItem>
+              />
             ))}
-          </SubMenu>
-          <SubMenu label="Voices">
+          </OptionGroup>
+        </div>
+        <div className="filters-subsection">
+          <span className="filters-subsection__label">Voices</span>
+          <OptionGroup>
             {voiceItems.map(({ value, label }) => (
-              <MenuItem
+              <OptionButton
                 key={value}
                 active={voices === value}
+                label={label}
                 onClick={() => onSelectVoices(value)}
-                suffix={voices === value ? <FaCheck size={12} /> : null}
-              >
-                {label}
-              </MenuItem>
+              />
             ))}
-          </SubMenu>
-          <SubMenu label="Meter">
+          </OptionGroup>
+        </div>
+        <div className="filters-subsection">
+          <span className="filters-subsection__label">Meter</span>
+          <OptionGroup>
             {meterItems.map((item) => (
-              <MenuItem
-                key={item}
-                active={meter === item}
-                onClick={() => onSelectMeter(item)}
-                suffix={meter === item ? <FaCheck size={12} /> : null}
-              >
-                {item}
-              </MenuItem>
+              <OptionButton key={item} active={meter === item} label={item} onClick={() => onSelectMeter(item)} />
             ))}
-          </SubMenu>
-          <SubMenu label="Textural Factors">
+          </OptionGroup>
+        </div>
+        <div className="filters-subsection">
+          <span className="filters-subsection__label">Textural Factors</span>
+          <OptionGroup>
             {texturalItems.map(({ value, label }) => (
-              <MenuItem
+              <OptionButton
                 key={value}
                 active={texturalFactor === value}
+                label={label}
                 onClick={() => onSelectTexturalFactor(value)}
-                suffix={texturalFactor === value ? <FaCheck size={12} /> : null}
-              >
-                {label}
-              </MenuItem>
+              />
             ))}
-          </SubMenu>
-        </SubMenu>
-        <MenuItem onClick={onResetSort} className="sidebar-reset-button">
-          Reset Sort
-        </MenuItem>
-      </Menu>
-    </Sidebar>
+          </OptionGroup>
+        </div>
+      </Section>
+
+      <button type="button" className="filters-reset-btn" onClick={onResetSort}>
+        Reset Sort
+      </button>
+    </div>
   );
 };
