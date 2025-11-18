@@ -1,6 +1,8 @@
 //imports
+
+// import { sha256 } from 'js-sha256';
+
 import { useState } from "react";
-import { sha256 } from 'js-sha256';
 import noteKey from "../assets/note-color-key.png"
 import exExample from "../assets/excersie-example.png"
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -48,149 +50,187 @@ export function HelpPage({
 
     //rendering page with help information
     return (
-        <div>
-            <h2 style={{textAlign: "center"}}>Welcome to the Help Page!</h2>
-            <div style={{textAlign: "left", margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
-                <div style={{textAlign: "center", margin: "10px auto", padding: "25px", backgroundColor: "white", borderRadius: "10px", width: "1000px"}}>
-                    This site is meant to help you practice your <strong>error detection skills</strong>. You will have the chance to pracitce on a variety of <strong>exercises</strong>. On each you will the <strong>read a music score</strong> attached to the exercise. 
-                    Attached to the exercise is also the <strong>audio sample</strong> of the music. This sample should match the score,
-                    however in each exercise there is <strong>at least one incorrect note</strong>. Students will be able to develop their error detection skills more by working to identify
-                    the error.<br/>
-                </div>
-                <div style={{ display: "flex", justifyContent: "center" , backgroundColor: "#8ecbe1", borderRadius: "10px"}}>
-                    <div style={{textAlign: "center", margin: "10px", padding: "20px", backgroundColor: "white", borderRadius: "10px", width: "200px", height: "150px", marginTop: "75px"}}>
-                        On the <strong>Exercises page</strong>, you’ll find a list of the exercises currently uploaded to the site. <br/>
+        <div className="about-page-wrapper">
+            <div className="about-page help-page">
+                <section className="about-hero help-hero">
+                    <p className="eyebrow">Help &amp; Support</p>
+                    <h1>Welcome to the Help Page!</h1>
+                    <p>
+                        This site is meant to help you practice your <strong>error detection skills</strong>. Every
+                        exercise pairs a <strong>music score</strong> with an <strong>audio sample</strong>. The
+                        recording should match the score, but there is always <strong>at least one incorrect note</strong>.
+                    </p>
+                    <p>
+                        Carefully reviewing the score while you listen trains you to spot mismatches quickly and builds
+                        musicianship in a focused, repeatable way.
+                    </p>
+                    <div className="about-highlight">
+                        Need additional guidance? Explore the sections below or reach out to Phil Duker and the Outclassed
+                        Dev Team for support.
                     </div>
-                    <div style={{textAlign: "center", margin: "10px", marginRight: "20px", padding: "20px", backgroundColor: "white", borderRadius: "10px", marginTop: "75px", width: "200px", height: "150px"}}>
-                        On this page we can view <strong>all exercises</strong> that are stored in our database. <br/>
+                </section>
+
+                <section className="help-section help-section--split">
+                    <div className="help-card help-card--medium">
+                        <h3>Browse the library</h3>
+                        <p>
+                            On the <strong>Exercises</strong> page you’ll find every exercise currently stored in the database.
+                        </p>
                     </div>
-                    <div>
+                    <div className="help-card help-card--medium">
+                        <h3>Side-by-side practice</h3>
+                        <p>
+                            Select any title to load the score, audio player, and answer tools side by side.
+                        </p>
+                    </div>
+                    <div className="help-image">
                         <img
-                            alt="exc-page"
+                            alt="Exercises page overview"
                             src={execPage}
                             width="500"
                             height="300"
                         />
                     </div>
+                </section>
 
-                </div>
-
-                <div style={{ display: "flex", justifyContent: "center", margin: "10px auto", borderRadius: "10px", backgroundColor: "#8ecbe1", width: "fit-content"}}>
-                    <div style={{textAlign: "center", margin: "10px", padding: "10px", borderRadius: "10px", display: "flex", justifyContent: "center"}}>
-                        <img 
-                            alt="filter"
+                <section className="help-section help-section--split">
+                    <div className="help-image">
+                        <img
+                            alt="Filter controls"
                             src={filterSec}
-                            width = "500"
-                            height = "300"
+                            width="500"
+                            height="300"
                         />
                     </div>
-                    <div style={{textAlign: "center", margin: "10px", padding: "20px", backgroundColor: "white", borderRadius: "10px", width: "300px", height: "200px", marginTop: "45px"}}>
-                        You can use the different <strong>filters to sort</strong> and find appropriately challenging exercises for you (e.g. if you are new to this, consider starting with: <i>intonation + 1 voice + level 1 + drone</i>). <br/>
+                    <div className="help-card help-card--wide">
+                        <h3>Dial in the right difficulty</h3>
+                        <p>
+                            Use the <strong>filters</strong> to quickly find appropriately challenging exercises. Tags cover
+                            Pitch, Intonation, and Rhythm; additional options narrow by voices, difficulty, meter, transposition,
+                            or textural factors. If you are new, consider starting with <i>Intonation + 1 voice + Level 1</i>.
+                        </p>
                     </div>
-                </div>
-                <div style={{ display: "flex", justifyContent: "center"}}>
-                    <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px"}}>
-                        Clicking on the <i>“drone”</i> checkbox will find exercises that have a drone on tonic. <br/> <br/>
-                    </div>
-                    <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px"}}>
-                        Clicking on the <i>“ensemble parts”</i> checkbox will have multiple voices/instruments performing the same part (e.g., 3 different clarinets playing the top line, one of which will perform the error(s)). <br/>
-                    </div>
-                </div>
-                <div style={{backgroundColor: "#8ecbe1", borderRadius: "10px", display: "flex", justifyContent: "center", margin: "10px"}}>
-                    <div style={{ display: "flex", flexDirection: "column", justifyContent: "center"}}>
-                        <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px", width: "300px"}}>
-                            After finding some exercises, simply click the exercise to open it! <br/>
-                        </div>
-                        <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px", width: "300px"}}>
-                            A short excerpt of a score and an audio player will show up. Assume that the score will always be correct. <br/>
-                        </div>
-                    </div>
-                    <div>
-                            <img 
-                                alt="exercise"
-                                src={exExample}
-                                width = "500"
-                                height = "300"
-                            />
-                    </div>
-                </div>
-                <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px"}}>
-                    The Audio file will play a short intro (2 bars long) to let you entrain to the key, tempo, and meter (you can move the cursor to skip past this if you don’t need it). <br/>
-                </div>
-                <div style={{justifyContent: "center", display: "flex", backgroundColor: "#8ecbe1", borderRadius: "10px", alignItems: "center"}}>
-                    <div >
+                </section>
+
+                <section className="help-section help-section--split">
+                    <div className="help-image">
                         <img
-                            alt="note click"
+                            alt="Loading an exercise"
+                            src={exExample}
+                            width="500"
+                            height="300"
+                        />
+                    </div>
+                    <div className="help-card help-card--medium">
+                        <h3>Load the score + audio</h3>
+                        <p>
+                            After selecting an exercise, the score and audio player appear together. Assume the score is always
+                            correct.
+                        </p>
+                    </div>
+                    <div className="help-card help-card--medium">
+                        <h3>Feel the groove first</h3>
+                        <p>
+                            The audio opens with a short introduction so you can feel the key, tempo, and meter before the
+                            excerpt begins.
+                        </p>
+                    </div>
+                </section>
+
+                <section className="help-section help-section--split">
+                    <div className="help-image">
+                        <img
+                            alt="Clicking notes to mark errors"
                             src={click}
                             width="500"
-                            height = "300"
+                            height="300"
                         />
                     </div>
-                    <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px", width: "300px", height: "150px", alignContent: "center"}}>
-                        Your job is to <strong>click</strong> on the notes where you hear something <strong>different</strong> from what is in the score.
+                    <div className="help-card help-card--medium">
+                        <h3>Mark what you hear</h3>
+                        <p>
+                            Click notes where you hear something <strong>different</strong> than what is written.
+                        </p>
                     </div>
-                    <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px", width: "300px", height: "150px", alignContent: "center"}}>
-                        Click a note <strong>multiple times</strong> to change which type of error you hear.
+                    <div className="help-card help-card--medium">
+                        <h3>Cycle through error types</h3>
+                        <p>
+                            Click a note multiple times to cycle through the different <strong>error types</strong>.
+                        </p>
                     </div>
-                </div>
-                <div style={{display: "flex", justifyContent: "center", backgroundColor: "#8ecbe1", borderRadius: "10px", margin: "10px auto", width: "fit-content"}}>
-                    <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px", width: "400px", alignContent: "center"}}>
-                        A <strong>key</strong> will be present on each exercise to remind you which <strong>color</strong> corresponds to which kind of <strong>error</strong>.<br/>
-                    </div>
-                    <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px", display: "flex", justifyContent: "center"}}>          
-                        <div>
-                            <img
-                                alt="note-color-key"
-                                src={noteKey}
-                                width="250"
-                                height="125"
-                            />
-                        </div>
-                    </div>
-                </div>
-            <div style={{display: "flex", justifyContent: "center", backgroundColor: "#8ecbe1", alignItems: "center", borderRadius: "10px"}}>
-                <div style={{textAlign: "center", margin: "10px", padding: "10px", backgroundColor: "white", borderRadius: "10px", width: "500px", height: "175px"}}>
-                    After selecting all errors, click <strong>"Check Answers"</strong> to receive feedback on how you did. There will be an <strong>error highlight</strong> to show which meausre has incorrect selections
-                    and a <strong>hint highlight</strong> to help you look more closely at the measure that contains the correct error note. There is also <strong>written feedback</strong> for each incorrect note selection.
-                </div>
-                <div>
-                    <img 
-                        alt="check answer"
-                        src={check}
-                        width="500"
-                        height="300"
-                    />
-                </div>
-            </div>
+                </section>
 
+                <section className="help-section help-section--split">
+                    <div className="help-card help-card--wide">
+                        <h3>Use the color key</h3>
+                        <p>
+                            A <strong>color key</strong> appears with every exercise so you never need to guess which shade
+                            represents a rhythm, pitch, or intonation issue.
+                        </p>
+                    </div>
+                    <div className="help-image">
+                        <img
+                            alt="Error color key"
+                            src={noteKey}
+                            width="250"
+                            height="125"
+                        />
+                    </div>
+                </section>
+
+                <section className="help-section help-section--split">
+                    <div className="help-card help-card--wide">
+                        <h3>Check answers with confidence</h3>
+                        <p>
+                            When you are ready, click <strong>Check Answers</strong>. An <strong>error highlight</strong> shows
+                            measures that still have mistakes, while a <strong>hint highlight</strong> nudges you toward the
+                            correct note. Written feedback accompanies each incorrect selection.
+                        </p>
+                    </div>
+                    <div className="help-image">
+                        <img
+                            alt="Check Answers feedback"
+                            src={check}
+                            width="500"
+                            height="300"
+                        />
+                    </div>
+                </section>
+
+                <section className="help-section help-section--admin">
+                    <h3>Administrator Access</h3>
+                    <p>Staff can log in below to unlock the Exercise Management tools.</p>
+                    <div className="help-login">
+                        <input id="mng-email" placeholder="Enter admin email..." />
+                        <input id="mng-pwd" placeholder="Enter admin password..." type="password" />
+                        <button onClick={checkAuth}>Submit</button>
+                    </div>
+                    {error ? <div className="help-error">Incorrect password.</div> : <></>}
+                    {authorized ? (
+                        <div className="help-card help-card--wide">
+                            <h5>Exercise Management Overview</h5>
+                            <p>
+                                Use the management page to add new exercises, view existing ones, and (when enabled) edit or
+                                delete outdated material. Choose <strong>New Exercise</strong> to open a template where you
+                                can set tags, difficulty, meter, and textural factors, then upload both the
+                                <code>.musicxml</code> score and matching <code>.mp3</code>.
+                            </p>
+                            <p>
+                                The title updates automatically as you adjust options. After the score loads, click notes to
+                                mark correct answers, optionally adding note-specific feedback. Use <strong>Update
+                                Answers</strong> to finalize selections, <strong>Reset Answers</strong> to clear everything,
+                                and <strong>Save</strong> to publish to the database.
+                            </p>
+                            <p>
+                                Saved exercises appear immediately on the Exercises page for students. Report any bugs to
+                                Dr. Duker or the Outclassed Dev Team.
+                            </p>
+                        </div>
+                    ) : (
+                        <></>
+                    )}
+                </section>
             </div>
-            <div style={{margin: "6px"}}>
-                <input id="mng-email" placeholder="Enter admin email..."></input>
-                <span style={{padding: "10px"}}></span>
-                <input id="mng-pwd" placeholder="Enter admin password..."></input>
-                <span style={{padding: "10px"}}></span>
-                <button onClick={checkAuth}>Submit</button>
-            </div>
-            {error ? <div style={{color: "red"}}>Incorrect password.</div> : <></>}
-            {authorized ? <div style={{margin: "10px", padding: "10px", backgroundColor: "#fcfcd2", borderRadius: "10px"}}>
-                <h5>Additional admin info: </h5>
-                On the Exercise Management page, you can add new exercises, view, edit (under construction currently, do not attempt to edit), and delete previous exercises. <br/>
-                To add an exercise, click the "New Exercise" button at the top of the page. <br/>
-                This will open a new exercise, with fields to input tags, difficulty, and places to upload a .musicxml and a .mp3 file. <br/>
-                The title of the exercise will automatically update as you select tags and difficulty. <br/>
-                After uploading a .musicxml file (make sure it's specifically .musicxml!), the score will be loaded in. <br/>
-                The .mp3 file will also allow you to preview the sound when you upload it. <br/>
-                On the score, select a note to toggle its color, corresponding to the errors as illustrated in the key above. <br/>
-                This key will also be included on every exercise for your ease of use. <br/>
-                After you select a note, you can add specific feedback pertaining to the note in the feedback box. <br/>
-                Once you have selected all the desired answers and entered relevant feedback (if any), click the Update Answers button. <br/>
-                This will prepare the exercise for saving and uploading to the database. You can also click Reset Answers to clear the exercise and start from a fresh score. <br/>
-                After clicking Update Answers, click Save once you're ready to upload the exercise to the database. <br/>
-                If you want to delete an exercise instead, just click the Delete button. <br/>
-                Once you've saved an exercise, it will appear on the Exercise page, able to be practiced! <br/>
-                <br></br>
-                If you come across any bugs, be sure to report them to Dr. Duker or the Outclassed Dev Team. <br/>
-            </div> : <></>}
         </div>
     );
 }

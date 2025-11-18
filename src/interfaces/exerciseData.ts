@@ -2,7 +2,7 @@
 class ExerciseData {
     //exercise attribute
     score: string
-    sound: File | string | undefined
+    sound: File | undefined
     correctAnswers: {[label: string]: (number | string)}[]
     feedback: string
     exIndex: number
@@ -31,7 +31,7 @@ class ExerciseData {
         this.types = types;
         this.meter = meter;
         this.transpos = transpos;
-        this.isNew = this.isNew;
+        this.isNew = isNew;
         this.customId = customId;
     }
     

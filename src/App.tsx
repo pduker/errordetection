@@ -1,26 +1,27 @@
-import { useEffect, useState } from 'react';
-import { Routes, Route, Link, Navigate } from 'react-router-dom';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
-
-import { getDatabase } from 'firebase/database';
-import { ref, get, DataSnapshot, orderByKey, query } from 'firebase/database';
-
-import ExerciseData from './interfaces/exerciseData';
+import logo from './assets/UD-circle-logo-email.png';
+import './App.css';
+import { HomePage } from './components/homepage';
 import { HelpPage } from './components/helppage';
 import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import ExerciseData from './interfaces/exerciseData';
+import { getDatabase } from 'firebase/database';
+import { ref, get, query, DataSnapshot, orderByKey } from 'firebase/database';
 
-import './App.css';
-import logo from './assets/UD-circle-logo-email.png';
+//import Navbar from "./components/navbar"
 
-// app function to initialize site
+//app function to initlize site
 function App() {
+  //state initialization
   const [allExData,setAllExData] = useState<(ExerciseData | undefined)[]>([]);
-  const [scoresRetrieved, setScoresRetrieved] = useState<boolean>(false); // track whether scores are retrieved
+  const [scoresRetrieved, setScoresRetrieved] = useState<boolean>(false); // Track whether scores are retrieved
   const [authorized, setAuthorized] = useState<boolean>(false); // has the user put in the admin pwd on help page?
-
+  
   // get data from the database
   const fetchScoresFromDatabase = async () => {
     if(scoresRetrieved) return;
@@ -71,7 +72,29 @@ function App() {
     fetchScoresFromDatabase(); // fetch from the database on component creation
   }, [allExData, setAllExData, scoresRetrieved, setScoresRetrieved]);
   
-  //return fucntion for rendering app
+  const location = useLocation();
+  const isLanding = location.pathname === "/";
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const resetScrollPosition = useCallback(
+    (behavior: ScrollBehavior = "auto") => {
+      if (!isLanding && contentRef.current) {
+        contentRef.current.scrollTo({ top: 0, behavior });
+      } else if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior });
+      }
+    },
+    [isLanding]
+  );
+  const handleNavClick = (targetPath: string) => {
+    if (location.pathname === targetPath) {
+      resetScrollPosition("auto");
+    }
+  };
+
+  useLayoutEffect(() => {
+    resetScrollPosition("auto");
+  }, [location.pathname, resetScrollPosition]);
+
   return (
     <div>
       <header className="App-header" >
@@ -89,33 +112,46 @@ function App() {
       </Navbar.Brand>
 
       <Nav className='Home-nav'>
-      <Link to="/exercises" style={{ marginRight: '10px' }}>Exercises</Link>
+      <Link to="/exercises" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercises")}>Exercises</Link>
       {authorized ?
-      <Link to="/exercise-management" style={{ marginRight: '10px' }}>Exercise Management</Link>
+      <Link to="/exercise-management" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercise-management")}>Exercise Management</Link>
       : <></>}
       </Nav>
 
       <div style={{ position: 'absolute', right: '50%', transform: 'translateX(50%)', textAlign: 'center' }}>
-      <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginBottom: '5px' }}>
-      University of Delaware
-      </Navbar.Brand>
-      <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block' }}>
-      Aural Skills Error Detection Practice Site
-      </Navbar.Brand>
+        <div style={{display: 'flex', flexDirection:'column', alignItems: 'center', gap:0}}>
+          <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginBottom: '6px', lineHeight:1, fontSize: '30px'}}>
+          University of Delaware
+          </Navbar.Brand>
+          <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block' }}>
+          Aural Skills Error Detection Practice Site
+          </Navbar.Brand>
+        </div>
       </div>
 
 
       <Nav className='Home-nav-right'>
-      <Link to="/about" style={{ marginLeft: '-225px' }}>About</Link>
-      <Link to="/help" style={{ marginLeft: '10px' }}>Help</Link>
+      <Link to="/about" style={{ marginLeft: '-225px' }} onClick={() => handleNavClick("/about")}>About</Link>
+      <Link to="/help" style={{ marginLeft: '10px' }} onClick={() => handleNavClick("/help")}>Help</Link>
       </Nav>
       </Navbar>
 
+        
       </header>
-      <div className='pagediv'>
-        <div  style={{overflowY: "scroll",margin: "10px"}}>
-          <Routes>
-            <Route path="/" element={<Navigate to="/exercises" replace></Navigate>}></Route>
+      <div className={`pagediv ${isLanding ? "pagediv-landing" : ""}`}>
+      <div
+        ref={contentRef}
+        style={{
+          overflowY: isLanding ? "hidden" : "scroll",
+          margin: isLanding ? "0" : "10px",
+          height: "100%",
+          width: "100%",
+          display: isLanding ? "flex" : "block",
+          alignItems: isLanding ? "center" : undefined,
+          justifyContent: isLanding ? "center" : undefined
+        }}>
+        <Routes>
+            <Route path="/" element={<HomePage/>}></Route>
             <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>}/>
             <Route path="/about" element={<AboutPage/>}/>
             <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>}/>
@@ -123,14 +159,11 @@ function App() {
             <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]} scoresRet={scoresRetrieved}></ExercisesPage>}/>
             <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase} authorized={authorized}/>}/>
             <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>}/>
-          </Routes>
-        </div>
+        </Routes>
+      </div>
       </div>
     </div>
   );
-
 }
 
 export default App;
-
-
