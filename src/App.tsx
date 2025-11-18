@@ -8,7 +8,7 @@ import { HelpPage } from './components/helppage';
 import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import ExerciseData from './interfaces/exerciseData';
 import { getDatabase } from 'firebase/database';
 import { ref, get, query, DataSnapshot, orderByKey } from 'firebase/database';
@@ -23,7 +23,7 @@ function App() {
   const [authorized, setAuthorized] = useState<boolean>(false); // has the user put in the admin pwd on help page?
   
   // get data from the database
-  const fetchScoresFromDatabase = async () => {
+  const fetchScoresFromDatabase = useCallback(async () => {
     if(scoresRetrieved) return;
 
     console.log("Retrieving scores...");
@@ -66,11 +66,11 @@ function App() {
     } catch (error) {
       console.error('Error fetching scores:', error);
     }
-  };
+  }, [scoresRetrieved]);
 
   useEffect(() => {
     fetchScoresFromDatabase(); // fetch from the database on component creation
-  }, [allExData, setAllExData, scoresRetrieved, setScoresRetrieved]);
+  }, [allExData, setAllExData, scoresRetrieved, setScoresRetrieved, fetchScoresFromDatabase]);
   
   const location = useLocation();
   const isLanding = location.pathname === "/";

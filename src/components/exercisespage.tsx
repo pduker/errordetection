@@ -1,12 +1,186 @@
-//imports
-
-// import { isDisabled } from '@testing-library/user-event/dist/utils';
-
 import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from 'react-bootstrap';
 import { AppSidebar } from './sidebar';
+
+const pageSize = 5; //show 5 exercises at a time
+
+function ExerciseQueueComponent({
+    currentPage,
+    setCurrentPage,
+    filteredExercises,
+    clearSelection,
+    selExercise,
+    scoresRet,
+    selectExerciseAtIndex
+}: {
+    setCurrentPage: (currentPage: number) => void;
+    currentPage: number;
+    filteredExercises: ExerciseData[];
+    clearSelection: () => void;
+    selExercise: ExerciseData | undefined;
+    scoresRet: boolean;
+    selectExerciseAtIndex: (index: number) => void;
+}) {
+    const totalPages = Math.ceil(filteredExercises.length / pageSize);
+    const safePage = Math.max(currentPage, 1);
+    const startIndex = (safePage -1) * pageSize;
+    const paginationStatus = totalPages === 0 ? "" : `Page ${safePage} of ${totalPages}`;
+
+    const pageExercises = React.useMemo(
+        () => filteredExercises.slice(startIndex, startIndex + pageSize),
+        [filteredExercises, startIndex]
+    );
+
+    // pagination functions, navigate between functions
+    const nextPage = useCallback(() => {
+        if (totalPages === 0) return;
+        setCurrentPage(Math.min(currentPage + 1, totalPages));
+    }, [currentPage, setCurrentPage, totalPages]);
+
+    const prevPage = useCallback(() => {
+        setCurrentPage(Math.max(1, currentPage - 1));
+    }, [currentPage, setCurrentPage]);
+
+    useEffect(() => {
+        if (totalPages === 0) {
+            setCurrentPage(1);
+        } else {
+            setCurrentPage(Math.min(currentPage, totalPages));
+        }
+    }, [currentPage, setCurrentPage, totalPages]);
+
+    return (
+        <section className="exercise-queue-panel">
+            <div className="exercise-queue-header">
+                <div className="exercise-queue-nav">
+                    <Button
+                        onClick={prevPage}
+                        disabled={currentPage === 1}
+                        className="exercise-queue-nav-btn"
+                        aria-label="Previous page of exercises"
+                    >
+                        ‹
+                    </Button>
+                    <span className="exercise-queue-status">{paginationStatus}</span>
+                    <Button
+                        onClick={nextPage}
+                        disabled={totalPages === 0 || currentPage >= totalPages}
+                        className="exercise-queue-nav-btn"
+                        aria-label="Next page of exercises"
+                    >
+                        ›
+                    </Button>
+                </div>
+                <Button
+                    onClick={clearSelection}
+                    variant="outline-secondary"
+                    disabled={!selExercise}
+                    className="exercise-queue-clear"
+                >
+                    Clear selection
+                </Button>
+            </div>
+            <div className="exercise-queue-list">
+                {filteredExercises.length === 0 ? (
+                    !scoresRet ? (
+                        <div className="exercise-list-empty">
+                            <strong>Loading scores...</strong>
+                            <span>
+                                This process should take 2-10 seconds. If nothing changes after 10
+                                seconds, try sorting using the above criteria.
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="exercise-list-empty">
+                            <strong>No exercises with those criteria found!</strong>
+                        </div>
+                    )
+                ) : (
+                    pageExercises.map(function(exercise: ExerciseData, idx: number){
+                        const isActive = selExercise?.exIndex === exercise.exIndex;
+                        const globalIndex = startIndex + idx;
+                        return (
+                        <div
+                            key = {exercise.title}
+                            id = {exercise.title}
+                            onClick={() => selectExerciseAtIndex(globalIndex)}
+                            role="button"
+                            aria-pressed={isActive}
+                            className={`exercise-list-item${isActive ? " active" : ""}`}>
+                            {exercise.title}
+                        </div>
+                        )
+                    })
+                )}
+            </div>
+        </section>
+    );
+}
+
+function FiltersComponent({
+    tags,
+    handleTagToggle,
+    transpos,
+    handleTransposToggle,
+    diff,
+    handleDifficultySelect,
+    voices,
+    handleVoicesSelect,
+    meter,
+    handleMeterSelect,
+    types,
+    handleTexturalFactorSelect,
+    resetSort
+}: {
+    tags: string[];
+    handleTagToggle: (tag: string) => void;
+    transpos: boolean;
+    handleTransposToggle: () => void;
+    diff: string;
+    handleDifficultySelect: (value: string) => void;
+    voices: number;
+    handleVoicesSelect: (value: number) => void;
+    meter: string;
+    handleMeterSelect: (value: string) => void;
+    types: string;
+    handleTexturalFactorSelect: (value: string) => void;
+    resetSort: () => void;
+}) {
+    const [filtersOpen, setFiltersOpen] = useState<boolean>(true);
+
+    return (
+        <section className={`filters-panel${filtersOpen ? " filters-panel--open" : ""}`}>
+            <button
+                type="button"
+                className="filters-panel__toggle"
+                onClick={() => setFiltersOpen((prev) => !prev)}
+                aria-expanded={filtersOpen}
+            >
+                <span>Filters</span>
+                <span className="filters-panel__chevron" aria-hidden="true" />
+            </button>
+            <div className={`filters-panel__content${filtersOpen ? " filters-panel__content--open" : ""}`} aria-hidden={!filtersOpen}>
+                <AppSidebar
+                    selectedTags={tags}
+                    onToggleTag={handleTagToggle}
+                    transposing={transpos}
+                    onToggleTransposing={handleTransposToggle}
+                    difficulty={diff}
+                    onSelectDifficulty={handleDifficultySelect}
+                    voices={voices}
+                    onSelectVoices={handleVoicesSelect}
+                    meter={meter}
+                    onSelectMeter={handleMeterSelect}
+                    texturalFactor={types}
+                    onSelectTexturalFactor={handleTexturalFactorSelect}
+                    onResetSort={resetSort}
+                />
+            </div>
+        </section>
+    );
+}
 
 const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
     if (e1 !== undefined && e2 !== undefined) {
@@ -67,7 +241,6 @@ export function ExercisesPage({
     const [transpos, setTranspos] = useState<boolean>(false);
 
     const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
-    const [filtersOpen, setFiltersOpen] = useState<boolean>(true);
 
     const filteredExercises = React.useMemo(() => {
         const baseList = allExData.filter((exercise): exercise is ExerciseData => exercise !== undefined);
@@ -88,33 +261,6 @@ export function ExercisesPage({
 
     //adding in state for pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 5; //show 5 exercises at a time
-    const totalPages = Math.ceil(filteredExercises.length / pageSize);
-    const safePage = Math.max(currentPage, 1);
-    const startIndex = (safePage -1) * pageSize;
-    const pageExercises = React.useMemo(
-        () => filteredExercises.slice(startIndex, startIndex + pageSize),
-        [filteredExercises, startIndex, pageSize]
-    );
-    const paginationStatus = totalPages === 0 ? "Loading..." : `Page ${safePage} of ${totalPages}`;
-
-    //pagination functions, navigate between functions
-    const nextPage = React.useCallback(() =>{
-        if (totalPages === 0) return;
-        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-    }, [totalPages]);
-
-    const prevPage = React.useCallback(() => {
-        setCurrentPage((prev) => Math.max(1, prev - 1));
-    }, []);
-
-    useEffect(() => {
-        if (totalPages === 0) {
-            setCurrentPage(1);
-        } else {
-            setCurrentPage((prev) => Math.min(prev, totalPages));
-        }
-    }, [totalPages]);
 
     const currentExerciseIndex = React.useMemo(() => {
         if (!selExercise) return -1;
@@ -136,14 +282,14 @@ export function ExercisesPage({
         if (!targetExercise) return;
         setSelExercise(targetExercise);
         setCurrentPage(Math.floor(targetIndex / pageSize) + 1);
-    }, [filteredExercises, pageSize]);
+    }, [filteredExercises]);
 
-    const clearStoredSelection = React.useCallback(() => {
+    const clearStoredSelection = useCallback(() => {
         if (typeof window === "undefined") return;
         window.localStorage.removeItem(LAST_SELECTED_STORAGE_KEY);
     }, []);
 
-    const clearSelection = React.useCallback(() => {
+    const clearSelection = useCallback(() => {
         clearStoredSelection();
         setSelExercise(undefined);
     }, [clearStoredSelection]);
@@ -232,50 +378,27 @@ export function ExercisesPage({
     return (
         <div className="fullpage">
             <div className="ex-page-container"> 
-
-                {/* --- This new wrapper holds the button AND your two columns --- */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
-                    {/* --- 2. This wrapper holds your two columns side-by-side --- */} 
                     <div className = "two-column-wrapper"> 
-                        
-                        {/* --- COLUMN 1: Your original 'ex-left' --- */}
-                        <div className="ex-left"> {/* SIR: left column div */}
-                            <section className={`filters-panel${filtersOpen ? " filters-panel--open" : ""}`}>
-                                <button
-                                    type="button"
-                                    className="filters-panel__toggle"
-                                    onClick={() => setFiltersOpen((prev) => !prev)}
-                                    aria-expanded={filtersOpen}
-                                >
-                                    <span>Filters</span>
-                                    <span className="filters-panel__chevron" aria-hidden="true" />
-                                </button>
-                                <div
-                                    className={`filters-panel__content${filtersOpen ? " filters-panel__content--open" : ""}`}
-                                    aria-hidden={!filtersOpen}
-                                >
-                                    <AppSidebar
-                                        selectedTags={tags}
-                                        onToggleTag={handleTagToggle}
-                                        transposing={transpos}
-                                        onToggleTransposing={handleTransposToggle}
-                                        difficulty={diff}
-                                        onSelectDifficulty={handleDifficultySelect}
-                                        voices={voices}
-                                        onSelectVoices={handleVoicesSelect}
-                                        meter={meter}
-                                        onSelectMeter={handleMeterSelect}
-                                        texturalFactor={types}
-                                        onSelectTexturalFactor={handleTexturalFactorSelect}
-                                        onResetSort={resetSort}
-                                    />
-                                </div>
-                            </section>
-                            
+                        <div className="ex-left">
+                            <FiltersComponent
+                                tags={tags}
+                                handleTagToggle={handleTagToggle}
+                                transpos={transpos}
+                                handleTransposToggle={handleTransposToggle}
+                                diff={diff}
+                                handleDifficultySelect={handleDifficultySelect}
+                                voices={voices}
+                                handleVoicesSelect={handleVoicesSelect}
+                                meter={meter}
+                                handleMeterSelect={handleMeterSelect}
+                                types={types}
+                                handleTexturalFactorSelect={handleTexturalFactorSelect}
+                                resetSort={resetSort}
+                            />
                         </div>
 
-                        {/* --- COLUMN 2: Your original 'ex-right' --- */}
-                        <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
+                        <div className="ex-right">
                             <div className="exercise-viewer">
                                 <div className="exercise-stage">
                                     <div className="exercise-content"> 
@@ -303,7 +426,7 @@ export function ExercisesPage({
                                                     fetch={undefined}
                                                 />
                                             ) : (
-                                                <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
+                                                <div className="exercise-placeholder">
                                                     <h3>No exercise loaded</h3>
                                                     <p>Select an exercise from the list below to begin.</p>
                                                 </div>
@@ -322,75 +445,19 @@ export function ExercisesPage({
                                     </div> 
                                 </div>
                             </div>
-                            <section className="exercise-queue-panel">
-                                <div className="exercise-queue-header">
-                                    <div className="exercise-queue-nav">
-                                        <Button
-                                            onClick={prevPage}
-                                            disabled={currentPage === 1}
-                                            className="exercise-queue-nav-btn"
-                                            aria-label="Previous page of exercises"
-                                        >
-                                            ‹
-                                        </Button>
-                                        <span className="exercise-queue-status">{paginationStatus}</span>
-                                        <Button
-                                            onClick={nextPage}
-                                            disabled={totalPages === 0 || currentPage >= totalPages}
-                                            className="exercise-queue-nav-btn"
-                                            aria-label="Next page of exercises"
-                                        >
-                                            ›
-                                        </Button>
-                                    </div>
-                                    <Button
-                                        onClick={clearSelection}
-                                        variant="outline-secondary"
-                                        disabled={!selExercise}
-                                        className="exercise-queue-clear"
-                                    >
-                                        Clear selection
-                                    </Button>
-                                </div>
-                                <div className="exercise-queue-list">
-                                    {filteredExercises.length === 0 ? (
-                                        !scoresRet ? (
-                                            <div className="exercise-list-empty">
-                                                <strong>Loading scores...</strong>
-                                                <span>
-                                                    This process should take 2-10 seconds. If nothing changes after 10
-                                                    seconds, try sorting using the above criteria.
-                                                </span>
-                                            </div>
-                                        ) : (
-                                            <div className="exercise-list-empty">
-                                                <strong>No exercises with those criteria found!</strong>
-                                            </div>
-                                        )
-                                    ) : (
-                                        pageExercises.map(function(exercise, idx){
-                                            const isActive = selExercise?.exIndex === exercise.exIndex;
-                                            const globalIndex = startIndex + idx;
-                                            return (
-                                            <div
-                                                key = {exercise.title}
-                                                id = {exercise.title}
-                                                onClick={() => selectExerciseAtIndex(globalIndex)}
-                                                role="button"
-                                                aria-pressed={isActive}
-                                                className={`exercise-list-item${isActive ? " active" : ""}`}>
-                                                {exercise.title}
-                                            </div>
-                                            )
-                                        })
-                                    )}
-                                </div>
-                            </section>
+                            <ExerciseQueueComponent
+                                currentPage={currentPage}
+                                setCurrentPage={setCurrentPage}
+                                filteredExercises={filteredExercises}
+                                clearSelection={clearSelection}
+                                selExercise={selExercise}
+                                scoresRet={scoresRet}
+                                selectExerciseAtIndex={selectExerciseAtIndex}
+                            />
                         </div>
-                    
-                    </div> {/* --- End of two-column wrapper --- */}
-                </div> {/* --- End of main content + button wrapper --- */}
-            </div> {/* --- End of ex-page-container --- */}
-        </div> // --- End of root flex container ---
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }

@@ -530,6 +530,8 @@ export function Exercise({
           currentBeatIndex++;
         }
 
+        console.log("note count: ", noteCount);
+
         if (teacherMode) {
           const noteIndexAttr = noteElems.getAttribute("index");
           const isBarNote = note.el_type === "bar";
