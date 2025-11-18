@@ -12,8 +12,7 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import ExerciseData from './interfaces/exerciseData';
 import { getDatabase } from 'firebase/database';
 import { ref, get, query, DataSnapshot, orderByKey } from 'firebase/database';
-
-//import Navbar from "./components/navbar"
+import isMobile from "./services/mobiledetection";
 
 //app function to initlize site
 function App() {
@@ -21,7 +20,14 @@ function App() {
   const [allExData,setAllExData] = useState<(ExerciseData | undefined)[]>([]);
   const [scoresRetrieved, setScoresRetrieved] = useState<boolean>(false); // Track whether scores are retrieved
   const [authorized, setAuthorized] = useState<boolean>(false); // has the user put in the admin pwd on help page?
-  
+
+  const [headerIsVisible, setHeaderIsVisible] = useState<boolean>(true);
+
+  const toggleHeaderVisibility = useCallback(() => {
+    if(!isMobile) return;
+    setHeaderIsVisible(!headerIsVisible);
+  }, [headerIsVisible, setHeaderIsVisible]);
+
   // get data from the database
   const fetchScoresFromDatabase = useCallback(async () => {
     if(scoresRetrieved) return;
@@ -95,9 +101,11 @@ function App() {
     resetScrollPosition("auto");
   }, [location.pathname, resetScrollPosition]);
 
+  useLayoutEffect(() => resetScrollPosition("auto"));
+
   return (
     <div>
-      <header className="App-header" >
+      <header className={`App-header ${!headerIsVisible ? "is-invisible" : ""}`} onClick={toggleHeaderVisibility}>
         
       <Navbar className="Home-bar" fixed='top'>
 
@@ -138,7 +146,7 @@ function App() {
 
         
       </header>
-      <div className={`pagediv ${isLanding ? "pagediv-landing" : ""}`}>
+      <div className={`pagediv ${isLanding ? "pagediv-landing" : ""} ${isMobile ? "mobile" : ""}`}>
       <div
         ref={contentRef}
         style={{
