@@ -76,6 +76,7 @@ body {
   background-repeat: no-repeat;
   background-position: center;
   overflow-y: auto;
+  scrollbar-gutter: stable both-edges;
 }
 /* find better font and colors for the page */
 #navbar {
@@ -912,6 +913,7 @@ nav ul li a:hover::after {
 .ex-right {
   flex: 1; /* grow to fill remaining space, can shrink */
   margin-left: 0.5vw;
+  padding-right: 10px;
   display: flex;
   flex-direction: column;
   align-self: stretch;
