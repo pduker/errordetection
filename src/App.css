@@ -914,7 +914,6 @@ nav ul li a:hover::after {
   flex: 1; /* grow to fill remaining space, can shrink */
   padding-right: 10px;
   margin-left: 0.5vw;
-  padding-right: 10px;
   display: flex;
   flex-direction: column;
   align-self: stretch;
