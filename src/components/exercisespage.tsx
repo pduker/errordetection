@@ -6,6 +6,75 @@ import { AppSidebar } from './sidebar';
 
 const pageSize = 5; //show 5 exercises at a time
 
+function ExerciseViewerComponent({
+    navButtonsVisible,
+    disablePrevNav,
+    disableNextNav,
+    prevEx,
+    nextEx,
+    selExercise,
+    allExData,
+    setAllExData
+}: {
+    navButtonsVisible: boolean;
+    disablePrevNav: boolean;
+    disableNextNav: boolean;
+    prevEx: () => void;
+    nextEx: () => void;
+    selExercise: ExerciseData | undefined;
+    allExData: (ExerciseData | undefined)[];
+    setAllExData: (newData: (ExerciseData | undefined)[]) => void;
+}) {
+    return (
+        <div className="exercise-viewer">
+            <div className="exercise-stage">
+                <div className="exercise-content"> 
+                    {navButtonsVisible && (
+                        <button
+                            className="exercise-nav-inline exercise-nav-inline--prev"
+                            onClick={prevEx}
+                            disabled={disablePrevNav}
+                            aria-label="Previous exercise"
+                        >
+                            ‹
+                        </button>
+                    )}
+                    <div className="exercise-content-inner">
+                        {selExercise !== undefined ? (
+                            <Exercise 
+                                key={selExercise.exIndex} 
+                                teacherMode={false} 
+                                ExData={selExercise} 
+                                allExData={allExData} 
+                                setAllExData={setAllExData} 
+                                exIndex={selExercise.exIndex} 
+                                handleSelectExercise={undefined} 
+                                isSelected={undefined}
+                                fetch={undefined}
+                            />
+                        ) : (
+                            <div className="exercise-placeholder">
+                                <h3>No exercise loaded</h3>
+                                <p>Select an exercise from the list below to begin.</p>
+                            </div>
+                        )}
+                    </div>
+                    {navButtonsVisible && (
+                        <button
+                            className="exercise-nav-inline exercise-nav-inline--next"
+                            onClick={nextEx}
+                            disabled={disableNextNav}
+                            aria-label="Next exercise"
+                        >
+                            ›
+                        </button>
+                    )}
+                </div> 
+            </div>
+        </div>
+    );
+}
+
 function ExerciseQueueComponent({
     currentPage,
     setCurrentPage,
@@ -350,13 +419,13 @@ export function ExercisesPage({
     }, []);
 
     //onClick function for when Back button is pushed under exercise
-    const prevEx = React.useCallback(() => {
+    const prevEx = useCallback(() => {
         if (currentExerciseIndex <= 0) return;
         selectExerciseAtIndex(currentExerciseIndex - 1);
     }, [currentExerciseIndex, selectExerciseAtIndex]);
 
     //onClick function for when Next button is pushed under exercise
-    const nextEx = React.useCallback(() => {
+    const nextEx = useCallback(() => {
         if (currentExerciseIndex === -1) return;
         if (currentExerciseIndex >= filteredExercises.length - 1) return;
         selectExerciseAtIndex(currentExerciseIndex + 1);
@@ -399,52 +468,16 @@ export function ExercisesPage({
                         </div>
 
                         <div className="ex-right">
-                            <div className="exercise-viewer">
-                                <div className="exercise-stage">
-                                    <div className="exercise-content"> 
-                                        {navButtonsVisible && (
-                                            <button
-                                                className="exercise-nav-inline exercise-nav-inline--prev"
-                                                onClick={prevEx}
-                                                disabled={disablePrevNav}
-                                                aria-label="Previous exercise"
-                                            >
-                                                ‹
-                                            </button>
-                                        )}
-                                        <div className="exercise-content-inner">
-                                            {selExercise !== undefined ? (
-                                                <Exercise 
-                                                    key={selExercise.exIndex} 
-                                                    teacherMode={false} 
-                                                    ExData={selExercise} 
-                                                    allExData={allExData} 
-                                                    setAllExData={setAllExData} 
-                                                    exIndex={selExercise.exIndex} 
-                                                    handleSelectExercise={undefined} 
-                                                    isSelected={undefined}
-                                                    fetch={undefined}
-                                                />
-                                            ) : (
-                                                <div className="exercise-placeholder">
-                                                    <h3>No exercise loaded</h3>
-                                                    <p>Select an exercise from the list below to begin.</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                        {navButtonsVisible && (
-                                            <button
-                                                className="exercise-nav-inline exercise-nav-inline--next"
-                                                onClick={nextEx}
-                                                disabled={disableNextNav}
-                                                aria-label="Next exercise"
-                                            >
-                                                ›
-                                            </button>
-                                        )}
-                                    </div> 
-                                </div>
-                            </div>
+                            <ExerciseViewerComponent
+                                navButtonsVisible={navButtonsVisible}
+                                disablePrevNav={disablePrevNav}
+                                disableNextNav={disableNextNav}
+                                prevEx={prevEx}
+                                nextEx={nextEx}
+                                selExercise={selExercise}
+                                allExData={allExData}
+                                setAllExData={setAllExData}
+                            />
                             <ExerciseQueueComponent
                                 currentPage={currentPage}
                                 setCurrentPage={setCurrentPage}
