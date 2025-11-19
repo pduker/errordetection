@@ -84,12 +84,12 @@ export function ExercisesPage({
     const [meter, setMeter] = useState<string>("Any");
     const [texturalFactors, setTexturalFactors] = useState<string>("Any");
 
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     // pagination state
     const [currentPage, setCurrentPage] = useState(0);
 
-    //figure out if this runs whenever the varaibles at the bottom change
+    //function is executed whenever any of the filter states change
     const sortedExercises: ExerciseData[] = useMemo(() => {
         const filterTransposition = tags.includes("Transposition");
         const tagsWithoutTransposition = filterTransposition ? updateTags(tags, "Transposition") : tags;
@@ -110,21 +110,30 @@ export function ExercisesPage({
         return sortedExData;
     }, [tags, difficulty, voices, meter, texturalFactors, allExData]);
 
+    //weird glitch where the tags checkboxes don't update the URL properly - fix later
+    useEffect(() => {
+        // update URL parameters based on filter states
+        setSearchParams({
+            difficulty: difficulty.toString(),
+            voices: voices.toString(),
+            tags: tags.join(','),
+            meter: meter,
+        });
+    }, [tags, difficulty, voices, meter, setSearchParams]);
+
+
     useEffect(() => {
         // update filters based on URL parameters
         const difficultyParam = searchParams.get('difficulty');
         const voicesParam = searchParams.get('voices');
         const tagsParam = searchParams.get('tags');
         const meterParam = searchParams.get('meter');
-        const transposParam = searchParams.get('transpos');
 
         //these call the sort function multiple times - fix later
         setDifficulty(difficultyParam ? Number(difficultyParam) : 0);
         setVoices(voicesParam ? Number(voicesParam) : 0);
         setMeter(meterParam ? meterParam : "Any");
-        const newTags: string[] = [];
-        if(tagsParam) newTags.push(tagsParam);
-        if(transposParam) newTags.push("Transposition");
+        const newTags = tagsParam ? tagsParam.split(',') : [];
         setTags(newTags);
     }, [searchParams]);
 
