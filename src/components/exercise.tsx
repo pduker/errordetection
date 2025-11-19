@@ -10,7 +10,7 @@ import { Button } from "react-bootstrap";
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import noteKey from "../assets/note-color-key.png";
-// import path from "path";
+import isMobile from "../services/mobiledetection";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -120,6 +120,8 @@ export function Exercise({
 
   //for disabling ui elements
   const rhythmOnly = tags.length === 1 && tags.includes("Rhythm");
+  const canCheckAnswers =
+    abcFile !== undefined && abcFile !== "" && loaded;
 
   // try to load score when there's either exerciseData or an abc file to pull from
   useEffect(() => {
@@ -168,11 +170,14 @@ export function Exercise({
     var retval = 0;
     var selTim = Number(note.abselem.elemset[0].getAttribute("selectedTimes"));
     if (clicked) selTim++;
-    if (selTim >= 3) {
+    if (isMobile) selTim++; // mobile clicks register as two events, so this corrects it
+    if (selTim === 3) {
       selTim = 0;
       selNotes.splice(selNotes.indexOf(note), 1);
       selAnswers.splice(selAnswers.indexOf(note), 1);
       retval = 1;
+    } else if(selTim > 3) {
+      selTim %= 3;
     }
     if (klass === undefined) klass = "abcjs-note_selected";
     if (selTim <= 0) {
@@ -534,6 +539,8 @@ export function Exercise({
           beatSum = 0;
           currentBeatIndex++;
         }
+
+        console.log("note count: ", noteCount);
 
         if (teacherMode) {
           const noteIndexAttr = noteElems.getAttribute("index");
@@ -2042,7 +2049,7 @@ export function Exercise({
             />
           )}
 
-          <div style={{ display: "inline-flex", marginTop: "-2vh" }}>
+          <div style={{ display: "inline-flex", marginTop: "-2vh", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
             {mp3 !== undefined ? (
               <div style={{ marginTop: "2vh" }}>
                 <AudioHandler file={mp3}></AudioHandler>
@@ -2050,24 +2057,27 @@ export function Exercise({
             ) : (
               <></>
             )}
-            <Button
-              className="responsive-element"
-              variant="danger"
-              onClick={exReload}
-              style={{
-                /*SIR: the actual reset answers button*/ position: "relative",
-                marginLeft: "1vw",
-                marginBottom: "2vh",
-              }}
-            >
-              Reset Answers
-            </Button>
+            <div className="exercise-action-buttons">
+              {canCheckAnswers && (
+                <button className="btnback exercise-action-check" onClick={checkAnswers}>
+                  Check Answer
+                </button>
+              )}
+              <Button
+                className="responsive-element"
+                variant="danger"
+                onClick={exReload}
+                style={{
+                  /*SIR: the actual reset answers button*/ position: "relative",
+                  marginBottom: "2vh",
+                }}
+              >
+                Reset Answers
+              </Button>
+            </div>
           </div>
-          {abcFile !== undefined && abcFile !== "" && loaded ? (
+          {canCheckAnswers ? (
             <div>
-              <button className="btnback" onClick={checkAnswers}>
-                Check Answer
-              </button>
               <div>
                 {customFeedback.map(function (feedback) {
                   return (

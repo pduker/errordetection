@@ -1,12 +1,255 @@
-//imports
-
-// import { isDisabled } from '@testing-library/user-event/dist/utils';
-
 import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from 'react-bootstrap';
 import { AppSidebar } from './sidebar';
+
+const pageSize = 5; //show 5 exercises at a time
+
+function ExerciseViewerComponent({
+    navButtonsVisible,
+    disablePrevNav,
+    disableNextNav,
+    prevEx,
+    nextEx,
+    selExercise,
+    allExData,
+    setAllExData
+}: {
+    navButtonsVisible: boolean;
+    disablePrevNav: boolean;
+    disableNextNav: boolean;
+    prevEx: () => void;
+    nextEx: () => void;
+    selExercise: ExerciseData | undefined;
+    allExData: (ExerciseData | undefined)[];
+    setAllExData: (newData: (ExerciseData | undefined)[]) => void;
+}) {
+    return (
+        <div className="exercise-viewer">
+            <div className="exercise-stage">
+                <div className="exercise-content"> 
+                    {navButtonsVisible && (
+                        <button
+                            className="exercise-nav-inline exercise-nav-inline--prev"
+                            onClick={prevEx}
+                            disabled={disablePrevNav}
+                            aria-label="Previous exercise"
+                        >
+                            ‹
+                        </button>
+                    )}
+                    <div className="exercise-content-inner">
+                        {selExercise !== undefined ? (
+                            <Exercise 
+                                key={selExercise.exIndex} 
+                                teacherMode={false} 
+                                ExData={selExercise} 
+                                allExData={allExData} 
+                                setAllExData={setAllExData} 
+                                exIndex={selExercise.exIndex} 
+                                handleSelectExercise={undefined} 
+                                isSelected={undefined}
+                                fetch={undefined}
+                            />
+                        ) : (
+                            <div className="exercise-placeholder">
+                                <h3>No exercise loaded</h3>
+                                <p>Select an exercise from the list below to begin.</p>
+                            </div>
+                        )}
+                    </div>
+                    {navButtonsVisible && (
+                        <button
+                            className="exercise-nav-inline exercise-nav-inline--next"
+                            onClick={nextEx}
+                            disabled={disableNextNav}
+                            aria-label="Next exercise"
+                        >
+                            ›
+                        </button>
+                    )}
+                </div> 
+            </div>
+        </div>
+    );
+}
+
+function ExerciseQueueComponent({
+    currentPage,
+    setCurrentPage,
+    filteredExercises,
+    clearSelection,
+    selExercise,
+    scoresRet,
+    selectExerciseAtIndex
+}: {
+    setCurrentPage: (currentPage: number) => void;
+    currentPage: number;
+    filteredExercises: ExerciseData[];
+    clearSelection: () => void;
+    selExercise: ExerciseData | undefined;
+    scoresRet: boolean;
+    selectExerciseAtIndex: (index: number) => void;
+}) {
+    const totalPages = Math.ceil(filteredExercises.length / pageSize);
+    const safePage = Math.max(currentPage, 1);
+    const startIndex = (safePage -1) * pageSize;
+    const paginationStatus = totalPages === 0 ? "" : `Page ${safePage} of ${totalPages}`;
+
+    const pageExercises = React.useMemo(
+        () => filteredExercises.slice(startIndex, startIndex + pageSize),
+        [filteredExercises, startIndex]
+    );
+
+    // pagination functions, navigate between functions
+    const nextPage = useCallback(() => {
+        if (totalPages === 0) return;
+        setCurrentPage(Math.min(currentPage + 1, totalPages));
+    }, [currentPage, setCurrentPage, totalPages]);
+
+    const prevPage = useCallback(() => {
+        setCurrentPage(Math.max(1, currentPage - 1));
+    }, [currentPage, setCurrentPage]);
+
+    useEffect(() => {
+        if (totalPages === 0) {
+            setCurrentPage(1);
+        } else {
+            setCurrentPage(Math.min(currentPage, totalPages));
+        }
+    }, [currentPage, setCurrentPage, totalPages]);
+
+    return (
+        <section className="exercise-queue-panel">
+            <div className="exercise-queue-header">
+                <div className="exercise-queue-nav">
+                    <Button
+                        onClick={prevPage}
+                        disabled={currentPage === 1}
+                        className="exercise-queue-nav-btn"
+                        aria-label="Previous page of exercises"
+                    >
+                        ‹
+                    </Button>
+                    <span className="exercise-queue-status">{paginationStatus}</span>
+                    <Button
+                        onClick={nextPage}
+                        disabled={totalPages === 0 || currentPage >= totalPages}
+                        className="exercise-queue-nav-btn"
+                        aria-label="Next page of exercises"
+                    >
+                        ›
+                    </Button>
+                </div>
+                <Button
+                    onClick={clearSelection}
+                    variant="outline-secondary"
+                    disabled={!selExercise}
+                    className="exercise-queue-clear"
+                >
+                    Clear selection
+                </Button>
+            </div>
+            <div className="exercise-queue-list">
+                {filteredExercises.length === 0 ? (
+                    !scoresRet ? (
+                        <div className="exercise-list-empty">
+                            <strong>Loading scores...</strong>
+                            <span>
+                                This process should take 2-10 seconds. If nothing changes after 10
+                                seconds, try sorting using the above criteria.
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="exercise-list-empty">
+                            <strong>No exercises with those criteria found!</strong>
+                        </div>
+                    )
+                ) : (
+                    pageExercises.map(function(exercise: ExerciseData, idx: number){
+                        const isActive = selExercise?.exIndex === exercise.exIndex;
+                        const globalIndex = startIndex + idx;
+                        return (
+                        <div
+                            key = {exercise.title}
+                            id = {exercise.title}
+                            onClick={() => selectExerciseAtIndex(globalIndex)}
+                            role="button"
+                            aria-pressed={isActive}
+                            className={`exercise-list-item${isActive ? " active" : ""}`}>
+                            {exercise.title}
+                        </div>
+                        )
+                    })
+                )}
+            </div>
+        </section>
+    );
+}
+
+function FiltersComponent({
+    tags,
+    handleTagToggle,
+    transpos,
+    handleTransposToggle,
+    diff,
+    handleDifficultySelect,
+    voices,
+    handleVoicesSelect,
+    meter,
+    handleMeterSelect,
+    types,
+    handleTexturalFactorSelect,
+    resetSort
+}: {
+    tags: string[];
+    handleTagToggle: (tag: string) => void;
+    transpos: boolean;
+    handleTransposToggle: () => void;
+    diff: string;
+    handleDifficultySelect: (value: string) => void;
+    voices: number;
+    handleVoicesSelect: (value: number) => void;
+    meter: string;
+    handleMeterSelect: (value: string) => void;
+    types: string;
+    handleTexturalFactorSelect: (value: string) => void;
+    resetSort: () => void;
+}) {
+    const [filtersOpen, setFiltersOpen] = useState<boolean>(true);
+
+    return (
+        <section className={`filters-panel${filtersOpen ? " filters-panel--open" : ""}`}>
+            <button
+                type="button"
+                className="filters-panel__toggle"
+                onClick={() => setFiltersOpen((prev) => !prev)}
+                aria-expanded={filtersOpen}
+            >
+                <span>Filters</span>
+                <span className="filters-panel__chevron" aria-hidden="true" />
+            </button>
+            <div className={`filters-panel__content${filtersOpen ? " filters-panel__content--open" : ""}`} aria-hidden={!filtersOpen}>
+                <AppSidebar
+                    selectedTags={tags}
+                    onToggleTag={handleTagToggle}
+                    transposing={transpos}
+                    onToggleTransposing={handleTransposToggle}
+                    difficulty={diff}
+                    onSelectDifficulty={handleDifficultySelect}
+                    voices={voices}
+                    onSelectVoices={handleVoicesSelect}
+                    meter={meter}
+                    onSelectMeter={handleMeterSelect}
+                    texturalFactor={types}
+                    onSelectTexturalFactor={handleTexturalFactorSelect}
+                    onResetSort={resetSort}
+                />
+            </div>
+        </section>
+    );
+}
 
 const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
     if (e1 !== undefined && e2 !== undefined) {
@@ -87,36 +330,6 @@ export function ExercisesPage({
 
     //adding in state for pagination
     const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 5; //show 5 exercises at a time
-    const totalPages = Math.ceil(filteredExercises.length / pageSize);
-    const safePage = Math.max(currentPage, 1);
-    const startIndex = (safePage -1) * pageSize;
-    const pageExercises = React.useMemo(
-        () => filteredExercises.slice(startIndex, startIndex + pageSize),
-        [filteredExercises, startIndex, pageSize]
-    );
-    const paginationStatus = totalPages === 0 ? "Loading..." : `Page ${safePage} of ${totalPages}`;
-
-    // state for sidebar
-    const [isSidebarCollapsed, setSidebarCollapsed] = useState(true);
-
-    //pagination functions, navigate between functions
-    const nextPage = React.useCallback(() =>{
-        if (totalPages === 0) return;
-        setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-    }, [totalPages]);
-
-    const prevPage = React.useCallback(() => {
-        setCurrentPage((prev) => Math.max(1, prev - 1));
-    }, []);
-
-    useEffect(() => {
-        if (totalPages === 0) {
-            setCurrentPage(1);
-        } else {
-            setCurrentPage((prev) => Math.min(prev, totalPages));
-        }
-    }, [totalPages]);
 
     const currentExerciseIndex = React.useMemo(() => {
         if (!selExercise) return -1;
@@ -138,14 +351,14 @@ export function ExercisesPage({
         if (!targetExercise) return;
         setSelExercise(targetExercise);
         setCurrentPage(Math.floor(targetIndex / pageSize) + 1);
-    }, [filteredExercises, pageSize]);
+    }, [filteredExercises]);
 
-    const clearStoredSelection = React.useCallback(() => {
+    const clearStoredSelection = useCallback(() => {
         if (typeof window === "undefined") return;
         window.localStorage.removeItem(LAST_SELECTED_STORAGE_KEY);
     }, []);
 
-    const clearSelection = React.useCallback(() => {
+    const clearSelection = useCallback(() => {
         clearStoredSelection();
         setSelExercise(undefined);
     }, [clearStoredSelection]);
@@ -206,13 +419,13 @@ export function ExercisesPage({
     }, []);
 
     //onClick function for when Back button is pushed under exercise
-    const prevEx = React.useCallback(() => {
+    const prevEx = useCallback(() => {
         if (currentExerciseIndex <= 0) return;
         selectExerciseAtIndex(currentExerciseIndex - 1);
     }, [currentExerciseIndex, selectExerciseAtIndex]);
 
     //onClick function for when Next button is pushed under exercise
-    const nextEx = React.useCallback(() => {
+    const nextEx = useCallback(() => {
         if (currentExerciseIndex === -1) return;
         if (currentExerciseIndex >= filteredExercises.length - 1) return;
         selectExerciseAtIndex(currentExerciseIndex + 1);
@@ -230,188 +443,54 @@ export function ExercisesPage({
         clearSelection();
     }
 
-    // Toggle function for the sidebar
-    const toggleSidebar = () => {
-      setSidebarCollapsed(!isSidebarCollapsed);
-    };
-
     //html to render page
     return (
-        <div className="fullpage" style={{ display: 'flex', height: '100%', minHeight: 0, position: 'relative' }}>
-            <AppSidebar
-                isCollapsed={isSidebarCollapsed}
-                selectedTags={tags}
-                onToggleTag={handleTagToggle}
-                transposing={transpos}
-                onToggleTransposing={handleTransposToggle}
-                difficulty={diff}
-                onSelectDifficulty={handleDifficultySelect}
-                voices={voices}
-                onSelectVoices={handleVoicesSelect}
-                meter={meter}
-                onSelectMeter={handleMeterSelect}
-                texturalFactor={types}
-                onSelectTexturalFactor={handleTexturalFactorSelect}
-                onResetSort={resetSort}
-            />
+        <div className="fullpage">
             <div className="ex-page-container"> 
-
-                {/* --- This new wrapper holds the button AND your two columns --- */}
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
-                    {/* --- 2. This wrapper holds your two columns side-by-side --- */} 
-                    <h2 style={{fontSize: "1.9rem"}}>Welcome to the Exercises Page!</h2> {/*SIR: changed fontSize for consistency*/}
-                    <h5 style={{fontStyle: "italic", fontSize: "1rem"}}>Sort by any of the given fields, then click an exercise to get started.</h5> {/*SIR: changed fontSize for consistency*/}
-                    {filteredExercises.length === 0 ? 
-                        !scoresRet ? <div style={{textAlign: "left"}}>Loading scores... this process should take 2-10 seconds. <br /> If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
-                    <div>No exercises with those criteria found!</div> : <></>}
                     <div className = "two-column-wrapper"> 
-                        
-                        {/* --- COLUMN 1: Your original 'ex-left' --- */}
-                        <div className="ex-left"> {/* SIR: left column div */}
-                        
-                            
-                            <div
-                                style={{
-                                    marginTop: "8px",
-                                    alignItems: "center",
-                                    gap: "8px",
-                                    display: "flex",
-                                    flexWrap: "wrap",
-                                    justifyContent: "space-between"
-                                }}
-                            >
-                                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                                    {/* add page navigation buttons, call newly defined functions */}
-                                    <Button
-                                        onClick={prevPage}
-                                        disabled={currentPage === 1}
-                                        style={{
-                                            fontSize: "2.5rem",
-                                            background: "none",
-                                            border:"none",
-                                            color: currentPage === 1 ? "gray" : "black",
-                                            padding: "0 8px",
-                                            fontWeight: "bold",
-                                            lineHeight: "1"}}
-                                    >
-                                        ‹
-                                    </Button>
-                                    <span>{paginationStatus}</span>
-                                    <Button
-                                        onClick={nextPage}
-                                        disabled={totalPages === 0 || currentPage >= totalPages}
-                                        style={{fontSize: "2.5rem",
-                                            background: "none",
-                                            border:"none",
-                                            color: totalPages === 0 || currentPage >= totalPages ? "gray" : "black",
-                                            padding: "0 8px",
-                                            fontWeight: "bold",
-                                            lineHeight: "1"}}
-                                    >
-                                        ›
-                                    </Button>
-                                </div>
-
-                                <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "auto" }}>
-                                    <Button
-                                        onClick={toggleSidebar}
-                                        variant="light"
-                                        className="sidebar-toggle-button"
-                                        style={{width: "fit-content", position: "relative" }}
-                                    >Filters
-                                    </Button>
-                                    <Button
-                                        onClick={clearSelection}
-                                        variant="outline-secondary"
-                                        disabled={!selExercise}
-                                        style={{
-                                            borderRadius: "10px",
-                                            fontWeight: 600,
-                                            letterSpacing: "0.03em",
-                                            backgroundColor: "#4e81b3",
-                                            color: "#fff",
-                                            borderColor: "#4e81b3",
-                                            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.08)",
-                                            transition: "all 0.2s ease",
-                                            opacity: selExercise ? 1 : 0.6
-                                        }}
-                                    >
-                                        Clear selection
-                                    </Button>
-                                </div>
-                            </div>
-                            <div style={{flex: "1", display: "flex", flexDirection: "column", minWidth:"200px"}}> {/* SIR: listed exercises, added minHeight to prevent jitter */}
-                            {/* pull from paginated exercises */}
-                            {pageExercises.map(function(exercise, idx){
-                                const isActive = selExercise?.exIndex === exercise.exIndex;
-                                const globalIndex = startIndex + idx;
-                                return (
-                                <div
-                                    key = {exercise.title}
-                                    id = {exercise.title}
-                                    onClick={() => selectExerciseAtIndex(globalIndex)}
-                                    role="button"
-                                    aria-pressed={isActive}
-                                    className={`exercise-list-item${isActive ? " active" : ""}`}>
-                                    {exercise.title}
-                                </div>
-                                )
-                            })}
-                            </div>
+                        <div className="ex-left">
+                            <FiltersComponent
+                                tags={tags}
+                                handleTagToggle={handleTagToggle}
+                                transpos={transpos}
+                                handleTransposToggle={handleTransposToggle}
+                                diff={diff}
+                                handleDifficultySelect={handleDifficultySelect}
+                                voices={voices}
+                                handleVoicesSelect={handleVoicesSelect}
+                                meter={meter}
+                                handleMeterSelect={handleMeterSelect}
+                                types={types}
+                                handleTexturalFactorSelect={handleTexturalFactorSelect}
+                                resetSort={resetSort}
+                            />
                         </div>
 
-                        {/* --- COLUMN 2: Your original 'ex-right' --- */}
-                        <div className="ex-right"> {/*SIR: DIV tag for the loaded exercise*/}
-                            <div className="exercise-viewer">
-                                <div className="exercise-nav-row">
-                                    <button
-                                        className="exercise-nav-button exercise-nav-button--prev"
-                                        id="back-btn"
-                                        hidden={!navButtonsVisible}
-                                        disabled={disablePrevNav}
-                                        onClick={prevEx}
-                                    >
-                                        Back
-                                    </button>
-                                    <button
-                                        className="exercise-nav-button exercise-nav-button--next"
-                                        id="next-btn"
-                                        hidden={!navButtonsVisible}
-                                        disabled={disableNextNav}
-                                        onClick={nextEx}
-                                    >
-                                        Next
-                                    </button>
-                                </div>
-
-                                <div className="exercise-content">
-                                    {selExercise !== undefined ? (
-                                        <div> 
-                                            <Exercise 
-                                                key={selExercise.exIndex} 
-                                                teacherMode={false} 
-                                                ExData={selExercise} 
-                                                allExData={allExData} 
-                                                setAllExData={setAllExData} 
-                                                exIndex={selExercise.exIndex} 
-                                                handleSelectExercise={undefined} 
-                                                isSelected={undefined}
-                                                fetch={undefined}
-                                            />
-                                        </div> 
-                                    ) : (
-                                        <div className="exercise-placeholder"> {/*SIR: Added placeholder when no exercise is loaded*/}
-                                            <h3>No exercise loaded</h3>
-                                            <p>Select an exercise from the left to begin.</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                        <div className="ex-right">
+                            <ExerciseViewerComponent
+                                navButtonsVisible={navButtonsVisible}
+                                disablePrevNav={disablePrevNav}
+                                disableNextNav={disableNextNav}
+                                prevEx={prevEx}
+                                nextEx={nextEx}
+                                selExercise={selExercise}
+                                allExData={allExData}
+                                setAllExData={setAllExData}
+                            />
+                            <ExerciseQueueComponent
+                                currentPage={currentPage}
+                                setCurrentPage={setCurrentPage}
+                                filteredExercises={filteredExercises}
+                                clearSelection={clearSelection}
+                                selExercise={selExercise}
+                                scoresRet={scoresRet}
+                                selectExerciseAtIndex={selectExerciseAtIndex}
+                            />
                         </div>
-                    
-                    </div> {/* --- End of two-column wrapper --- */}
-                </div> {/* --- End of main content + button wrapper --- */}
-            </div> {/* --- End of ex-page-container --- */}
-        </div> // --- End of root flex container ---
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 }

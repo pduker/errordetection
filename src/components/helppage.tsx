@@ -6,7 +6,7 @@ import { useState } from "react";
 import noteKey from "../assets/note-color-key.png"
 import exExample from "../assets/excersie-example.png"
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "./database"
+import { auth } from "../services/database"
 import execPage from "../assets/exc-page.png";
 import filterSec from "../assets/filterPage.png";
 import click from "../assets/noteClick.png";

@@ -1,24 +1,68 @@
-//imports
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import logo from './assets/UD-circle-logo-email.png';
 import './App.css';
-//import BoopButton from "./components/audiohander"
 import { HomePage } from './components/homepage';
 import { HelpPage } from './components/helppage';
 import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
-//import { Interface } from 'readline';
+import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import ExerciseData from './interfaces/exerciseData';
-import DBData from './interfaces/DBData';
 import { getDatabase } from 'firebase/database';
-import { ref, onValue, DataSnapshot } from 'firebase/database';
-import { getBlob, getStorage, ref as storageRef } from 'firebase/storage';
+import { ref, get, query, DataSnapshot, orderByKey } from 'firebase/database';
+import isMobile from "./services/mobiledetection";
 
-//import Navbar from "./components/navbar"
+function Header({ authorized, resetScrollPosition }: { authorized: boolean; resetScrollPosition: (behavior?: ScrollBehavior) => void; }) {
+  const handleNavClick = useCallback((targetPath: string) => {
+    if (window.location.pathname === targetPath) {
+      resetScrollPosition("auto");
+    }
+  }, [resetScrollPosition]);
+
+  return (
+  <header className="App-header">
+        
+    <Navbar className={`Home-bar ${isMobile ? "mobile" : ""}`} fixed={isMobile ? undefined : "top"}>
+
+    <Navbar.Brand>
+      <img
+      alt=""
+      src={logo}
+      width="60"
+      height="60"
+      className="d-inline-block align-top"
+    />
+    </Navbar.Brand>
+
+    <Nav className='Home-nav'>
+    <Link to="/exercises" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercises")}>Exercises</Link>
+    {authorized ?
+    <Link to="/exercise-management" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercise-management")}>Exercise Management</Link>
+    : <></>}
+    </Nav>
+
+    <div style={{ position: 'absolute', right: '50%', transform: 'translateX(50%)', textAlign: 'center' }}>
+      <div style={{display: 'flex', flexDirection:'column', alignItems: 'center', gap:0}}>
+        <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginBottom: '6px', lineHeight:1, fontSize: '30px'}}>
+        University of Delaware
+        </Navbar.Brand>
+        <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block' }}>
+        Aural Skills Error Detection Practice Site
+        </Navbar.Brand>
+      </div>
+    </div>
+
+    <Nav className='Home-nav-right'>
+    <Link to="/about" style={{ marginLeft: '-225px' }} onClick={() => handleNavClick("/about")}>About</Link>
+    <Link to="/help" style={{ marginLeft: '10px' }} onClick={() => handleNavClick("/help")}>Help</Link>
+    </Nav>
+    </Navbar>
+
+    </header>
+  );
+}
 
 //app function to initlize site
 function App() {
@@ -26,102 +70,57 @@ function App() {
   const [allExData,setAllExData] = useState<(ExerciseData | undefined)[]>([]);
   const [scoresRetrieved, setScoresRetrieved] = useState<boolean>(false); // Track whether scores are retrieved
   const [authorized, setAuthorized] = useState<boolean>(false); // has the user put in the admin pwd on help page?
-  
-  //get data from the database
-  const fetchScoresFromDatabase = async (scoresRet: boolean) => {
-    if(!scoresRet) {
-      console.log("Retrieving scores");
-      try {
-        const database = getDatabase();
-        const scoresRef = ref(database, 'scores');
-        onValue(scoresRef, (snapshot) => {
-          const scoresData: DBData[] = [];
-          snapshot.forEach((childSnapshot: DataSnapshot) => {
-            const score = childSnapshot.val();
-            if (score) {
-              scoresData.push(score);
-            }
-          });
-          // Update state with scores retrieved from the database
-          const scoresData2: ExerciseData[] = [];
-          const storage = getStorage();
-          //const audioref = storageRef(storage, "mp3Files");
-          scoresData.forEach(async function (value) {
-            if(value.sound){
-            const blob = await getBlob(storageRef(storage, value.sound));
-            //console.log(blob);
-            //let response = await fetch(blob);
-            //let data = await response.blob();
-            var file = new File([blob], value.sound, {type: "audio/mpeg"})
-            var thing = new ExerciseData(
-                value.score,
-                file,
-                value.correctAnswers,
-                value.feedback,
-                value.exIndex,
-                value.empty,
-                value.title,
-                value.difficulty,
-                value.voices,
-                value.tags,
-                value.types,
-                value.meter,
-                value.transpos,
-                undefined,
-                value.customId
-            );
-            scoresData2.push(thing);
-            //console.log(thing);
-            }
-        });
-        // After timed delay: set scoresRetrieved to true after retrieving scores
-          if(scoresData.length < 80) setTimeout(function(){setAllExData(scoresData2); setScoresRetrieved(true);}, 2000 + (100*scoresData.length));
-          else setTimeout(function(){setAllExData(scoresData2); setScoresRetrieved(true);}, 10000);
-           
-        });
-      } catch (error) {
-        console.error('Error fetching scores:', error);
-        // Add additional error handling if necessary
-      }
+
+  // get data from the database
+  const fetchScoresFromDatabase = useCallback(async () => {
+    if(scoresRetrieved) return;
+
+    console.log("Retrieving scores...");
+
+    try {
+      const database = getDatabase();
+
+      const exerciseList: ExerciseData[] = [];
+      // fetch all scores from the database
+      // we have a relatively low amount of scores, so this operation is very quick
+      // if the scope of this application is larger in the future, look into pagination
+      const scores = await get(query(ref(database, 'scores'), orderByKey()));
+      scores.forEach((scoreSnapshot: DataSnapshot) => { // for every score fetched,
+        const score = scoreSnapshot.val(); // get the data fetched
+        if(!score || !score.sound) return; // if these values aren't populated, something has gone seriously wrong!
+
+        exerciseList.push(new ExerciseData( // add it to the list of exercises
+          score.score,
+          score.sound,
+          score.correctAnswers,
+          score.feedback,
+          score.exIndex,
+          score.empty,
+          score.title,
+          score.difficulty,
+          score.voices,
+          score.tags,
+          score.types,
+          score.meter,
+          score.transpos,
+          undefined,
+          score.customId
+        ));
+      });
+
+      setAllExData(exerciseList); // once we've fetched and filled out our list, commit it to React state
+      setScoresRetrieved(true); // all done!
+
+      console.log("Loaded exercise list");
+    } catch (error) {
+      console.error('Error fetching scores:', error);
     }
-    console.log(allExData);
-  };
+  }, [scoresRetrieved]);
 
-  useEffect(()=>{fetchScoresFromDatabase(scoresRetrieved)});
+  useEffect(() => {
+    fetchScoresFromDatabase(); // fetch from the database on component creation
+  }, [allExData, setAllExData, scoresRetrieved, setScoresRetrieved, fetchScoresFromDatabase]);
   
-  //return fucntion for rendering app
-  return (
-    <Router>
-      <AppLayout
-        allExData={allExData}
-        setAllExData={setAllExData}
-        scoresRetrieved={scoresRetrieved}
-        authorized={authorized}
-        setAuthorized={setAuthorized}
-        fetchScoresFromDatabase={fetchScoresFromDatabase}
-      />
-    </Router>
-  );
-
-}
-
-type AppLayoutProps = {
-  allExData: (ExerciseData | undefined)[];
-  setAllExData: (newData: (ExerciseData | undefined)[]) => void;
-  scoresRetrieved: boolean;
-  authorized: boolean;
-  setAuthorized: React.Dispatch<React.SetStateAction<boolean>>;
-  fetchScoresFromDatabase: (scoresRet: boolean) => Promise<void>;
-};
-
-function AppLayout({
-  allExData,
-  setAllExData,
-  scoresRetrieved,
-  authorized,
-  setAuthorized,
-  fetchScoresFromDatabase
-}: AppLayoutProps) {
   const location = useLocation();
   const isLanding = location.pathname === "/";
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -135,11 +134,6 @@ function AppLayout({
     },
     [isLanding]
   );
-  const handleNavClick = (targetPath: string) => {
-    if (location.pathname === targetPath) {
-      resetScrollPosition("auto");
-    }
-  };
 
   useLayoutEffect(() => {
     resetScrollPosition("auto");
@@ -147,48 +141,10 @@ function AppLayout({
 
   return (
     <div>
-      <header className="App-header" >
-        
-      <Navbar className="Home-bar" fixed='top'>
-
-      <Navbar.Brand>
-        <img
-        alt=""
-        src={logo}
-        width="60"
-        height="60"
-        className="d-inline-block align-top"
-      />
-      </Navbar.Brand>
-
-      <Nav className='Home-nav'>
-      <Link to="/exercises" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercises")}>Exercises</Link>
-      {authorized ?
-      <Link to="/exercise-management" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercise-management")}>Exercise Management</Link>
-      : <></>}
-      </Nav>
-
-      <div style={{ position: 'absolute', right: '50%', transform: 'translateX(50%)', textAlign: 'center' }}>
-        <div style={{display: 'flex', flexDirection:'column', alignItems: 'center', gap:0}}>
-          <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginBottom: '6px', lineHeight:1, fontSize: '30px'}}>
-          University of Delaware
-          </Navbar.Brand>
-          <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block' }}>
-          Aural Skills Error Detection Practice Site
-          </Navbar.Brand>
-        </div>
-      </div>
-
-
-      <Nav className='Home-nav-right'>
-      <Link to="/about" style={{ marginLeft: '-225px' }} onClick={() => handleNavClick("/about")}>About</Link>
-      <Link to="/help" style={{ marginLeft: '10px' }} onClick={() => handleNavClick("/help")}>Help</Link>
-      </Nav>
-      </Navbar>
-
-        
-      </header>
-      <div className={`pagediv ${isLanding ? "pagediv-landing" : ""}`}>
+      {
+        isMobile ? "" : <Header authorized={authorized} resetScrollPosition={resetScrollPosition}/>
+      }
+      <div className={`pagediv ${isLanding ? "pagediv-landing" : ""} ${isMobile ? "mobile" : ""}`}>
       <div
         ref={contentRef}
         style={{
@@ -201,20 +157,22 @@ function AppLayout({
           justifyContent: isLanding ? "center" : undefined
         }}>
         <Routes>
-            <Route path="/" element={<HomePage />}/>
-            <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>} />
-            <Route path="/about" element={<AboutPage/>} />
-            <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>} />
-            <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}/>} />
-            {/* <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]}></ExercisesPage>} /> */}
-            <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase} authorized={authorized}/>} />
-            <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>} />
+            <Route path="/" element={<HomePage/>}></Route>
+            <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>}/>
+            <Route path="/about" element={<AboutPage/>}/>
+            <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>}/>
+            <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}/>}/>
+            <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]} scoresRet={scoresRetrieved}></ExercisesPage>}/>
+            <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase} authorized={authorized}/>}/>
+            <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>}/>
         </Routes>
       </div>
       </div>
+      {
+        isMobile ? <Header authorized={authorized} resetScrollPosition={resetScrollPosition}/> : ""
+      }
     </div>
   );
-
 }
 
 export default App;

@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Error Detection",
+  "name": "Error Detection",
+  "orientation": "landscape",
   "icons": [
     {
       "src": "favicon.ico",
