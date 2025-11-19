@@ -4,7 +4,6 @@
 }
 
 .App-header {
-  background-color: #12efef;
   min-height: 11vh;
   display: inline-block;
   flex-direction: row;
@@ -31,6 +30,10 @@
   height: 70px;
   justify-content: space-between;
   align-items: center;
+}
+
+.Home-bar.mobile {
+  height: 100%;
 }
 
 .Home-nav {
@@ -609,9 +612,9 @@ nav {
   flex-wrap: wrap;
   background: #785812;
   position: fixed;
-  top: 20px;
+
   padding: 7px;
-  width: 100%;
+  width: 100vw;
   text-align: left;
 }
 nav ul li {

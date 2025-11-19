@@ -10,7 +10,7 @@ import { Button } from "react-bootstrap";
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 import { initializeApp } from "firebase/app";
 import noteKey from "../assets/note-color-key.png";
-// import path from "path";
+import isMobile from "../services/mobiledetection";
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 
@@ -170,11 +170,14 @@ export function Exercise({
     var retval = 0;
     var selTim = Number(note.abselem.elemset[0].getAttribute("selectedTimes"));
     if (clicked) selTim++;
-    if (selTim >= 3) {
+    if (isMobile) selTim++; // mobile clicks register as two events, so this corrects it
+    if (selTim === 3) {
       selTim = 0;
       selNotes.splice(selNotes.indexOf(note), 1);
       selAnswers.splice(selAnswers.indexOf(note), 1);
       retval = 1;
+    } else if(selTim > 3) {
+      selTim %= 3;
     }
     if (klass === undefined) klass = "abcjs-note_selected";
     if (selTim <= 0) {

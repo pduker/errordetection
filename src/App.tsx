@@ -14,19 +14,62 @@ import { getDatabase } from 'firebase/database';
 import { ref, get, query, DataSnapshot, orderByKey } from 'firebase/database';
 import isMobile from "./services/mobiledetection";
 
+function Header({ authorized, resetScrollPosition }: { authorized: boolean; resetScrollPosition: (behavior?: ScrollBehavior) => void; }) {
+  const handleNavClick = useCallback((targetPath: string) => {
+    if (window.location.pathname === targetPath) {
+      resetScrollPosition("auto");
+    }
+  }, [resetScrollPosition]);
+
+  return (
+  <header className="App-header">
+        
+    <Navbar className={`Home-bar ${isMobile ? "mobile" : ""}`} fixed={isMobile ? undefined : "top"}>
+
+    <Navbar.Brand>
+      <img
+      alt=""
+      src={logo}
+      width="60"
+      height="60"
+      className="d-inline-block align-top"
+    />
+    </Navbar.Brand>
+
+    <Nav className='Home-nav'>
+    <Link to="/exercises" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercises")}>Exercises</Link>
+    {authorized ?
+    <Link to="/exercise-management" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercise-management")}>Exercise Management</Link>
+    : <></>}
+    </Nav>
+
+    <div style={{ position: 'absolute', right: '50%', transform: 'translateX(50%)', textAlign: 'center' }}>
+      <div style={{display: 'flex', flexDirection:'column', alignItems: 'center', gap:0}}>
+        <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginBottom: '6px', lineHeight:1, fontSize: '30px'}}>
+        University of Delaware
+        </Navbar.Brand>
+        <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block' }}>
+        Aural Skills Error Detection Practice Site
+        </Navbar.Brand>
+      </div>
+    </div>
+
+    <Nav className='Home-nav-right'>
+    <Link to="/about" style={{ marginLeft: '-225px' }} onClick={() => handleNavClick("/about")}>About</Link>
+    <Link to="/help" style={{ marginLeft: '10px' }} onClick={() => handleNavClick("/help")}>Help</Link>
+    </Nav>
+    </Navbar>
+
+    </header>
+  );
+}
+
 //app function to initlize site
 function App() {
   //state initialization
   const [allExData,setAllExData] = useState<(ExerciseData | undefined)[]>([]);
   const [scoresRetrieved, setScoresRetrieved] = useState<boolean>(false); // Track whether scores are retrieved
   const [authorized, setAuthorized] = useState<boolean>(false); // has the user put in the admin pwd on help page?
-
-  const [headerIsVisible, setHeaderIsVisible] = useState<boolean>(true);
-
-  const toggleHeaderVisibility = useCallback(() => {
-    if(!isMobile) return;
-    setHeaderIsVisible(!headerIsVisible);
-  }, [headerIsVisible, setHeaderIsVisible]);
 
   // get data from the database
   const fetchScoresFromDatabase = useCallback(async () => {
@@ -91,61 +134,16 @@ function App() {
     },
     [isLanding]
   );
-  const handleNavClick = (targetPath: string) => {
-    if (location.pathname === targetPath) {
-      resetScrollPosition("auto");
-    }
-  };
 
   useLayoutEffect(() => {
     resetScrollPosition("auto");
   }, [location.pathname, resetScrollPosition]);
 
-  useLayoutEffect(() => resetScrollPosition("auto"));
-
   return (
     <div>
-      <header className={`App-header ${!headerIsVisible ? "is-invisible" : ""}`} onClick={toggleHeaderVisibility}>
-        
-      <Navbar className="Home-bar" fixed='top'>
-
-      <Navbar.Brand>
-        <img
-        alt=""
-        src={logo}
-        width="60"
-        height="60"
-        className="d-inline-block align-top"
-      />
-      </Navbar.Brand>
-
-      <Nav className='Home-nav'>
-      <Link to="/exercises" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercises")}>Exercises</Link>
-      {authorized ?
-      <Link to="/exercise-management" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercise-management")}>Exercise Management</Link>
-      : <></>}
-      </Nav>
-
-      <div style={{ position: 'absolute', right: '50%', transform: 'translateX(50%)', textAlign: 'center' }}>
-        <div style={{display: 'flex', flexDirection:'column', alignItems: 'center', gap:0}}>
-          <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginBottom: '6px', lineHeight:1, fontSize: '30px'}}>
-          University of Delaware
-          </Navbar.Brand>
-          <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block' }}>
-          Aural Skills Error Detection Practice Site
-          </Navbar.Brand>
-        </div>
-      </div>
-
-
-      <Nav className='Home-nav-right'>
-      <Link to="/about" style={{ marginLeft: '-225px' }} onClick={() => handleNavClick("/about")}>About</Link>
-      <Link to="/help" style={{ marginLeft: '10px' }} onClick={() => handleNavClick("/help")}>Help</Link>
-      </Nav>
-      </Navbar>
-
-        
-      </header>
+      {
+        isMobile ? "" : <Header authorized={authorized} resetScrollPosition={resetScrollPosition}/>
+      }
       <div className={`pagediv ${isLanding ? "pagediv-landing" : ""} ${isMobile ? "mobile" : ""}`}>
       <div
         ref={contentRef}
@@ -170,6 +168,9 @@ function App() {
         </Routes>
       </div>
       </div>
+      {
+        isMobile ? <Header authorized={authorized} resetScrollPosition={resetScrollPosition}/> : ""
+      }
     </div>
   );
 }
