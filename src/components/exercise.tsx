@@ -259,7 +259,7 @@ export function Exercise({
       });
 
       let beatSum: number = 0;
-      let noteCount: number = 0;
+
       let barStartX = 0;
       let created = false;
       let remainLen = 0;
@@ -319,22 +319,21 @@ export function Exercise({
         // Accumulate beat duration
         if (typeof note.duration === "number" && !isNaN(note.duration)) {
           beatSum += note.duration;
-          noteCount++;
         }
 
         const topLines = svgElement?.querySelectorAll(".abcjs-top-line");
         let totalSum = 0;
 
         if (note.duration >= visualObjs[0].getBeatLength() * 4) {
-          // This note spans 2 or more beats - create multiple beat bars
+          // This note spans 4 or more beats - create multiple beat bars
           const noteBox = noteElems.getBoundingClientRect();
-          let nextNoteElem = noteElems.nextSibling;
+          let nextNoteElem = noteElems.nextElementSibling as HTMLElement | null;
           while (
             nextNoteElem &&
-            (!nextNoteElem.getBoundingClientRect ||
-              nextNoteElem.getAttribute("data-name") === "bar")
+            typeof nextNoteElem.getBoundingClientRect !== "function"
           ) {
-            nextNoteElem = nextNoteElem.nextSibling;
+            nextNoteElem =
+              nextNoteElem.nextElementSibling as HTMLElement | null;
           }
           const noteRight = nextNoteElem
             ? nextNoteElem.getBoundingClientRect().left
@@ -345,7 +344,17 @@ export function Exercise({
           const numBeats = Math.floor(
             note.duration / visualObjs[0].getBeatLength()
           );
-          const beatWidth = totalNoteWidth / numBeats - 5;
+
+          let beatWidth: number;
+
+          //if the next element is a bar, adjust beat width accordingly (prevents overflow)
+          if (nextNoteElem?.getAttribute("data-name") === "bar") {
+            beatWidth =
+              nextNoteElem.getBoundingClientRect().left - noteLeft - 5;
+          } else {
+            beatWidth = totalNoteWidth / numBeats - 5;
+          }
+
 
           const noteTopPt = toSvgCoords(svgElement, 0, noteBox.top);
           const topLinePt =
@@ -454,7 +463,6 @@ export function Exercise({
 
           totalSum = beatSum;
           beatSum -= visualObjs[0].getBeatLength();
-          noteCount = 0;
           created = true;
           currentBeatIndex++;
         }
@@ -524,7 +532,6 @@ export function Exercise({
           });
 
           beatSum = 0;
-          noteCount = 0;
           currentBeatIndex++;
         }
 
@@ -623,7 +630,7 @@ export function Exercise({
     bar.classList.add("bar");
     bar.setAttribute("x", x.toString());
     bar.setAttribute("y", y.toString());
-    bar.setAttribute("width", width.toString());
+    bar.setAttribute("width", Math.abs(width).toString());
     bar.setAttribute("height", "7");
     if (tags.includes("Rhythm")) {
       bar.setAttribute("fill", "purple");
@@ -1469,9 +1476,7 @@ export function Exercise({
     ) {
       feedback = ["Great job identifying the errors in this passage!"];
     } else if (tmpSelected.length !== correctAnswers.length) {
-      feedback = [
-        `\nNot quite - try again!`,
-      ];
+      feedback = [`\nNot quite - try again!`];
     } else if (tmpCorrect.length === correctAnswers.length) {
       feedback = ["Not quite - try again!"];
       for (let i = 0; i < tmpCorrect.length; i++) {
