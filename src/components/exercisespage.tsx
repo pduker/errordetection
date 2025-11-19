@@ -110,7 +110,6 @@ export function ExercisesPage({
         return sortedExData;
     }, [tags, difficulty, voices, meter, texturalFactors, allExData]);
 
-    //weird glitch where the tags checkboxes don't update the URL properly - fix later
     useEffect(() => {
         // update URL parameters based on filter states
         setSearchParams({

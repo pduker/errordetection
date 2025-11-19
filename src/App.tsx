@@ -11,7 +11,6 @@ import { HelpPage } from './components/helppage';
 import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
-import { ExercisesPageWrapper } from './components/exercisepagewrapper';
 
 import './App.css';
 import logo from './assets/UD-circle-logo-email.png';
