@@ -124,7 +124,7 @@ export function HelpPage({
                     <div className="help-card help-card--medium">
                         <h3>Load the score + audio</h3>
                         <p>
-                            After selecting an exercise, the score and audio player appear together. Assume the score is always
+                            After selecting an exercise, the score and audio player appear together. Assume the audio is always
                             correct.
                         </p>
                     </div>
