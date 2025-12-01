@@ -110,16 +110,8 @@ export function ExercisesPage({
         return sortedExData;
     }, [tags, difficulty, voices, meter, texturalFactors, allExData]);
 
-    useEffect(() => {
-        // update URL parameters based on filter states
-        setSearchParams({
-            difficulty: difficulty.toString(),
-            voices: voices.toString(),
-            tags: tags.join(','),
-            meter: meter,
-        });
-    }, [tags, difficulty, voices, meter, setSearchParams]);
-
+    //for tagsParam in the URL, split each item with %2C (comma)
+    // example: tags=Intonation%2CRhythm%2CTransposition%2CPitch
 
     useEffect(() => {
         // update filters based on URL parameters
