@@ -442,6 +442,27 @@ export function ExercisesPage({
         setCurrentPage(1);
         clearSelection();
     }
+    
+    useEffect(() => {
+        const savedProgress = localStorage.getItem("userProgress");
+        if (savedProgress) {
+        try {
+            const parsed = JSON.parse(savedProgress);
+            console.log("Loaded saved progress:", parsed);
+        } catch (err) {
+            console.error("Error parsing saved progress:", err);
+        }
+        }
+    }, []);
+
+    const updateProgress = (title: string | number, data: any) => {
+        const current = JSON.parse(localStorage.getItem("userProgress") || "{}");
+        current[title] = { ...current[title], ...data };
+        localStorage.setItem("userProgress", JSON.stringify(current));
+        console.log("Updated progress:", current); // check updates in console
+    };
+
+
 
     //html to render page
     return (
@@ -490,6 +511,33 @@ export function ExercisesPage({
                         </div>
                     </div>
                 </div>
+                {exList.length === 0 ? 
+                    !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
+                <div>No exercises with those criteria found!</div> : <></>}
+            </div>
+            <div style={{float:'right',width:'65%', marginRight: "2vw"}}>
+                {selExercise !== undefined ? <div>
+                    <Exercise 
+                        key={selExercise.exIndex} 
+                        teacherMode={false} 
+                        ExData={selExercise} 
+                        allExData={allExData} 
+                        setAllExData={setAllExData} 
+                        exIndex={selExercise.exIndex} 
+                        handleSelectExercise={undefined} 
+                        isSelected={undefined}
+                        fetch={undefined}
+                        updateProgress={updateProgress}
+                    />
+                    
+                </div> : <></>}
+            
+            <div style={{display:"flex", justifyContent: "center"}}>
+                <button  className= "btnback" id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
+                <button className= "btnback" id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
+            </div>
+            
+                
             </div>
         </div>
     );
