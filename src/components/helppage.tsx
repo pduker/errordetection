@@ -65,7 +65,7 @@ export function HelpPage({
                         musicianship in a focused, repeatable way.
                     </p>
                     <div className="about-highlight">
-                        Need additional guidance? Explore the sections below or reach out to Phil Duker and the Outclassed
+                        Need additional guidance? Explore the sections below or reach out to <a className="inline-link highlight-email" href="mailto:pduker@udel.edu" data-label="pduker@udel.edu">Phil Duker</a> and the Outclassed
                         Dev Team for support.
                     </div>
                 </section>
