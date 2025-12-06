@@ -369,6 +369,17 @@ body {
   backdrop-filter: blur(6px);
 }
 
+.about-highlight .highlight-email {
+  display: inline-block;
+  padding: 4px 10px;
+  margin: 0 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .about-panels {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
