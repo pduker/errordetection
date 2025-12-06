@@ -378,6 +378,32 @@ body {
   border-radius: 999px;
   font-weight: 700;
   text-decoration: none;
+  position: relative;
+}
+
+.about-highlight .highlight-email::after {
+  content: attr(data-label);
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translate(-50%, -4px);
+  background: #0d3b78;
+  color: #ffffff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+  z-index: 2;
+}
+
+.about-highlight .highlight-email:hover::after,
+.about-highlight .highlight-email:focus-visible::after {
+  opacity: 1;
+  transform: translate(-50%, -8px);
 }
 
 .about-panels {
