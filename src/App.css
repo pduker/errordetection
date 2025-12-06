@@ -929,9 +929,11 @@ nav ul li a:hover::after {
   transition: background-color 0.2s ease, transform 0.15s ease;
 }
 
-.filters-reset-btn:hover,
-.filters-reset-btn:focus-visible {
-  background: #bb2d3b;
+.filters-reset-btn:disabled {
+  background: #e1e1e1;
+  color: #8a8a8a;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Exercises page responsive layout */

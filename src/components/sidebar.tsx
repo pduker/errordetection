@@ -14,11 +14,11 @@ interface AppSidebarProps {
   texturalFactor: string;
   onSelectTexturalFactor: (value: string) => void;
   onResetSort: () => void;
+  resetDisabled: boolean;
 }
 
-const Section: React.FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
+const Section: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <section className="filters-section">
-    <h4 className="filters-section__title">{title}</h4>
     {children}
   </section>
 );
@@ -72,6 +72,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
   texturalFactor,
   onSelectTexturalFactor,
   onResetSort,
+  resetDisabled,
 }) => {
   const tagItems = useMemo(() => ['Pitch', 'Intonation', 'Rhythm'], []);
   const difficultyItems = useMemo(() => ['All', '1', '2', '3', '4', '5'], []);
@@ -99,7 +100,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
   return (
     <div className="filters-menu">
-      <Section title="Focus Areas">
+      <Section>
         <OptionGroup>
           {tagItems.map((tag) => (
             <ChipButton key={tag} active={selectedTags.includes(tag)} label={tag} onClick={() => onToggleTag(tag)} />
@@ -107,11 +108,11 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         </OptionGroup>
       </Section>
 
-      <Section title="Additional Options">
+      <Section>
         <ToggleRow label="Transposing Instruments" checked={transposing} onChange={onToggleTransposing} />
       </Section>
 
-      <Section title="Advanced Filters">
+      <Section>
         <div className="filters-subsection">
           <span className="filters-subsection__label">Difficulty</span>
           <OptionGroup>
@@ -161,7 +162,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         </div>
       </Section>
 
-      <button type="button" className="filters-reset-btn" onClick={onResetSort}>
+      <button type="button" className="filters-reset-btn" onClick={onResetSort} disabled={resetDisabled}>
         Reset Sort
       </button>
     </div>

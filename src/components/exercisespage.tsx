@@ -201,7 +201,8 @@ function FiltersComponent({
     handleMeterSelect,
     types,
     handleTexturalFactorSelect,
-    resetSort
+    resetSort,
+    resetDisabled
 }: {
     tags: string[];
     handleTagToggle: (tag: string) => void;
@@ -216,6 +217,7 @@ function FiltersComponent({
     types: string;
     handleTexturalFactorSelect: (value: string) => void;
     resetSort: () => void;
+    resetDisabled: boolean;
 }) {
     const [filtersOpen, setFiltersOpen] = useState<boolean>(true);
 
@@ -245,6 +247,7 @@ function FiltersComponent({
                     texturalFactor={types}
                     onSelectTexturalFactor={handleTexturalFactorSelect}
                     onResetSort={resetSort}
+                    resetDisabled={resetDisabled}
                 />
             </div>
         </section>
@@ -443,6 +446,18 @@ export function ExercisesPage({
         clearSelection();
     }
 
+    const resetDisabled = React.useMemo(() => {
+        const tagsMatchDefaults = tags.length === 0;
+        return (
+            tagsMatchDefaults &&
+            diff === "All" &&
+            voices === 0 &&
+            types === "None" &&
+            meter === "Anything" &&
+            transpos === false
+        );
+    }, [tags, diff, voices, types, meter, transpos]);
+
     //html to render page
     return (
         <div className="fullpage">
@@ -459,13 +474,14 @@ export function ExercisesPage({
                                 handleDifficultySelect={handleDifficultySelect}
                                 voices={voices}
                                 handleVoicesSelect={handleVoicesSelect}
-                                meter={meter}
-                                handleMeterSelect={handleMeterSelect}
-                                types={types}
-                                handleTexturalFactorSelect={handleTexturalFactorSelect}
-                                resetSort={resetSort}
-                            />
-                        </div>
+                            meter={meter}
+                            handleMeterSelect={handleMeterSelect}
+                            types={types}
+                            handleTexturalFactorSelect={handleTexturalFactorSelect}
+                            resetSort={resetSort}
+                            resetDisabled={resetDisabled}
+                        />
+                    </div>
 
                         <div className="ex-right">
                             <ExerciseViewerComponent
