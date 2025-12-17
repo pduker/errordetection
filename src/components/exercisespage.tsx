@@ -157,19 +157,11 @@ function ExerciseQueueComponent({
             </div>
             <div className="exercise-queue-list">
                 {filteredExercises.length === 0 ? (
-                    !scoresRet ? (
-                        <div className="exercise-list-empty">
-                            <strong>Loading scores...</strong>
-                            <span>
-                                This process should take 2-10 seconds. If nothing changes after 10
-                                seconds, try sorting using the above criteria.
-                            </span>
-                        </div>
-                    ) : (
-                        <div className="exercise-list-empty">
+                    scoresRet ? (
+                        <div className="exercise-list-item exercise-list-item--empty">
                             <strong>No exercises with those criteria found!</strong>
                         </div>
-                    )
+                    ) : null
                 ) : (
                     pageExercises.map(function(exercise: ExerciseData, idx: number){
                         const isActive = selExercise?.exIndex === exercise.exIndex;
@@ -520,6 +512,15 @@ export function ExercisesPage({
                                 setAllExData={setAllExData}
                                 updateProgress={updateProgress}
                             />
+                            {!scoresRet ? (
+                                <div className="exercise-queue-loading">
+                                    <strong>Loading scores...</strong>
+                                    <span>
+                                        This process should take 2-10 seconds. If nothing changes after 10
+                                        seconds, try sorting using the above criteria.
+                                    </span>
+                                </div>
+                            ) : null}
                             <ExerciseQueueComponent
                                 currentPage={currentPage}
                                 setCurrentPage={setCurrentPage}
@@ -532,9 +533,6 @@ export function ExercisesPage({
                         </div>
                     </div>
                 </div>
-                {filteredExercises.length === 0 ? 
-                    !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
-                <div>No exercises with those criteria found!</div> : <></>}
             </div>
         </div>
     );

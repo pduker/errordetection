@@ -454,7 +454,28 @@
   gap: 0.35rem;
 }
 
-.exercise-list-empty {
+.exercise-list-item--empty {
+  padding: 1.25rem;
+  border-radius: 14px;
+  background: #fff;
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+  color: #1f0545;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  cursor: default;
+}
+
+.exercise-list-item--empty:hover {
+  background: #fff;
+  border-color: rgba(0, 0, 0, 0.2);
+  box-shadow: none;
+  transform: none;
+}
+
+.exercise-queue-loading {
+  margin: 0 0 1rem;
   padding: 1.25rem;
   border-radius: 14px;
   background: #fff;
