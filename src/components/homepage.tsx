@@ -1,5 +1,5 @@
 //imports
-import '../App.css';
+import '../styles/home.css';
 import musicnote from "../assets/musicnote.jpg";
 import { Link } from 'react-router-dom';
 

@@ -1,3 +1,4 @@
+import '../styles/exercises.css';
 import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
 import React, { useState, useEffect, useCallback } from 'react';
@@ -14,7 +15,8 @@ function ExerciseViewerComponent({
     nextEx,
     selExercise,
     allExData,
-    setAllExData
+    setAllExData,
+    updateProgress
 }: {
     navButtonsVisible: boolean;
     disablePrevNav: boolean;
@@ -24,6 +26,7 @@ function ExerciseViewerComponent({
     selExercise: ExerciseData | undefined;
     allExData: (ExerciseData | undefined)[];
     setAllExData: (newData: (ExerciseData | undefined)[]) => void;
+    updateProgress: (title: string | number, data: any) => void;
 }) {
     return (
         <div className="exercise-viewer">
@@ -51,6 +54,7 @@ function ExerciseViewerComponent({
                                 handleSelectExercise={undefined} 
                                 isSelected={undefined}
                                 fetch={undefined}
+                                updateProgress={updateProgress}
                             />
                         ) : (
                             <div className="exercise-placeholder">
@@ -514,6 +518,7 @@ export function ExercisesPage({
                                 selExercise={selExercise}
                                 allExData={allExData}
                                 setAllExData={setAllExData}
+                                updateProgress={updateProgress}
                             />
                             <ExerciseQueueComponent
                                 currentPage={currentPage}
@@ -530,30 +535,6 @@ export function ExercisesPage({
                 {filteredExercises.length === 0 ? 
                     !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
                 <div>No exercises with those criteria found!</div> : <></>}
-            </div>
-            <div style={{float:'right',width:'65%', marginRight: "2vw"}}>
-                {selExercise !== undefined ? <div>
-                    <Exercise 
-                        key={selExercise.exIndex} 
-                        teacherMode={false} 
-                        ExData={selExercise} 
-                        allExData={allExData} 
-                        setAllExData={setAllExData} 
-                        exIndex={selExercise.exIndex} 
-                        handleSelectExercise={undefined} 
-                        isSelected={undefined}
-                        fetch={undefined}
-                        updateProgress={updateProgress}
-                    />
-                    
-                </div> : <></>}
-            
-            <div style={{display:"flex", justifyContent: "center"}}>
-                <button  className= "btnback" id="back-btn" hidden={true} disabled={false} onClick={prevEx}>Back</button>
-                <button className= "btnback" id="next-btn" hidden={true} disabled={false} onClick={nextEx}>Next</button>
-            </div>
-            
-                
             </div>
         </div>
     );

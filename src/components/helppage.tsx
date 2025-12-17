@@ -1,4 +1,6 @@
 //imports
+import '../styles/about.css';
+import '../styles/help.css';
 
 // import { sha256 } from 'js-sha256';
 

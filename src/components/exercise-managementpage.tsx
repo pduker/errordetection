@@ -1,3 +1,4 @@
+import '../styles/exercises.css';
 import { Button } from 'react-bootstrap';
 import ExerciseData from '../interfaces/exerciseData';
 import { Exercise } from './exercise';
