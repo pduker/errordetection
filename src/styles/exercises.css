@@ -180,7 +180,6 @@
   display: flex;
   flex: 1 1 100%;
   width: 100%;
-  gap: 20px;
   align-items: flex-start;
 }
 .ex-left {
