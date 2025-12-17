@@ -527,7 +527,7 @@ export function ExercisesPage({
                         </div>
                     </div>
                 </div>
-                {exList.length === 0 ? 
+                {filteredExercises.length === 0 ? 
                     !scoresRet ? <div>Loading scores... this process should take 2-10 seconds. If nothing changes after 10 seconds, try sorting using the above criteria.</div> : 
                 <div>No exercises with those criteria found!</div> : <></>}
             </div>
