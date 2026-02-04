@@ -1,6 +1,6 @@
 import { getBlob, getStorage, ref as storageRef } from 'firebase/storage';
 import { useEffect, useRef, useState } from 'react';
-import '../styles/exercises.css';
+import '../styles/exercises/audio-player.css';
 
 // Custom audio player with full controls and styling
 export default function AudioHandler({ file }: { file: string | File }): JSX.Element {

@@ -1,4 +1,4 @@
-import '../styles/exercises.css';
+import '../styles/exercises/index.css';
 import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
 import React, { useState, useEffect, useCallback } from 'react';
