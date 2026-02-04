@@ -1339,7 +1339,7 @@ export function Exercise({
     }
     
     // Branch for Rhythm exercises with only Rhythm tag
-    else if (tags.includes("Rhythm") && tags.length == 1){
+    else if (tags.includes("Rhythm") && tags.length === 1){
       const instruments = getInstrumentList(exerciseData.score);
 
       // Define proper types for beat and note selections

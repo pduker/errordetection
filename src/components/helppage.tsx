@@ -1,8 +1,11 @@
 //imports
+import '../styles/about.css';
+import '../styles/help.css';
 
 // import { sha256 } from 'js-sha256';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import noteKey from "../assets/note-color-key.png"
 import exExample from "../assets/excersie-example.png"
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -20,33 +23,68 @@ export function HelpPage({
     authorized: boolean;
     setAuthorized: ((authorized: boolean) => void);
 }) {
+    const navigate = useNavigate();
     //setting state
-    const [error, setError] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
 
     //checking user with login functionality
 
     const login = async (email: string, password: string) => {
         try {
+          console.log("Attempting login with email:", email);
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
-          console.log("Logged in as:", userCredential.user.email);
-          // Set admin privileges based on login
+          console.log("Login successful! Logged in as:", userCredential.user.email);
+          
+          // Set admin privileges based on login - useEffect will handle navigation
           setAuthorized(true);
-          setError(false);
-        } catch (error) {
-          console.error("Login failed");
-          setError(true);
+          setError("");
+          
+        } catch (error: any) {
+          console.error("Login failed:", error);
+          let errorMessage = "Login failed. Please check your credentials.";
+          
+          if (error.code === 'auth/user-not-found') {
+            errorMessage = "User not found. Please check the email address.";
+          } else if (error.code === 'auth/wrong-password') {
+            errorMessage = "Incorrect password. Please try again.";
+          } else if (error.code === 'auth/invalid-email') {
+            errorMessage = "Invalid email address format.";
+          } else if (error.code === 'auth/user-disabled') {
+            errorMessage = "This account has been disabled.";
+          } else if (error.code === 'auth/too-many-requests') {
+            errorMessage = "Too many failed attempts. Please try again later.";
+          }
+          
+          setError(errorMessage);
         }
     };
     
-    const checkAuth = function() {
-        var box1 = document.getElementById("mng-email");
-        var box2 = document.getElementById("mng-pwd");
-        if(box2 !== null && "value" in box2 && box1 !== null && "value" in box1) {
-            var email = box1.value as string;
-            var password = box2.value as string;
-            login(email,password);
+    const checkAuth = function(e?: React.FormEvent) {
+        // Prevent form submission if called from form event
+        if (e) {
+            e.preventDefault();
+        }
+        
+        var box1 = document.getElementById("mng-email") as HTMLInputElement;
+        var box2 = document.getElementById("mng-pwd") as HTMLInputElement;
+        
+        if (box1 && box2 && box1.value && box2.value) {
+            var email = box1.value;
+            var password = box2.value;
+            console.log("Attempting login with:", email);
+            login(email, password);
+        } else {
+            setError("Please enter both email and password.");
         }
     }
+    
+    // Navigate to exercise management when authorized becomes true
+    useEffect(() => {
+        if (authorized) {
+            console.log("User is authorized, navigating to exercise-management...");
+            navigate("/exercise-management");
+        }
+    }, [authorized, navigate]);
 
     //rendering page with help information
     return (
@@ -200,12 +238,12 @@ export function HelpPage({
                 <section className="help-section help-section--admin">
                     <h3>Administrator Access</h3>
                     <p>Staff can log in below to unlock the Exercise Management tools.</p>
-                    <div className="help-login">
-                        <input id="mng-email" placeholder="Enter admin email..." />
-                        <input id="mng-pwd" placeholder="Enter admin password..." type="password" />
-                        <button onClick={checkAuth}>Submit</button>
-                    </div>
-                    {error ? <div className="help-error">Incorrect password.</div> : <></>}
+                    <form onSubmit={checkAuth} className="help-login">
+                        <input id="mng-email" placeholder="Enter admin email..." type="email" required />
+                        <input id="mng-pwd" placeholder="Enter admin password..." type="password" required />
+                        <button type="submit">Submit</button>
+                    </form>
+                    {error ? <div className="help-error">{error}</div> : <></>}
                     {authorized ? (
                         <div className="help-card help-card--wide">
                             <h5>Exercise Management Overview</h5>

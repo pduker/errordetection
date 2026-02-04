@@ -68,6 +68,7 @@
     "@types/jest": "^29.5.8",
     "@types/jquery": "^3.5.29",
     "@types/react": "^18.3.18",
+    "baseline-browser-mapping": "^2.9.19",
     "gh-pages": "^6.3.0"
   }
 }

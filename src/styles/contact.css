@@ -1,0 +1,66 @@
+/* --------------contact-------------- */
+#contact {
+  padding: 80px 0;
+}
+.contact-left {
+  flex-basis: 35%;
+}
+.contact-left p {
+  margin-top: 30px;
+}
+.contact-left p i {
+  color: #0010df;
+  margin-right: 15px;
+  font-size: 25px;
+}
+.contact-right {
+  flex-basis: 60%;
+}
+.contact-right form {
+  width: 100%;
+}
+
+.social-icons {
+  margin-top: 30px;
+}
+.social-icons a {
+  text-decoration: none;
+  font-size: 30px;
+  margin-right: 15px;
+  color: #ababab;
+  display: inline-block;
+  transition: transform 0.5s;
+}
+.social-icons a:hover {
+  color: #0010df;
+  transform: translateY(-5px);
+}
+
+.copyright {
+  box-shadow: inset 0 0 5px grey;
+  background: #114b96;
+  width: 100%;
+  text-align: center;
+  padding: 25px 0;
+  font-weight: 300;
+  margin-top: 20px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+}
+.copyright i {
+  color: #ff0418;
+}
+
+@media only screen and (max-width: 1100px) {
+  .contact-left {
+    flex-basis: 100%;
+  }
+  .contact-right {
+    flex-basis: 100%;
+  }
+  .copyright {
+    font-size: 15px;
+  }
+}
