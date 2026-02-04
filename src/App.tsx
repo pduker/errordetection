@@ -85,13 +85,20 @@ function App() {
       // we have a relatively low amount of scores, so this operation is very quick
       // if the scope of this application is larger in the future, look into pagination
       const scores = await get(query(ref(database, 'scores'), orderByKey()));
+      
+      if (!scores.exists()) {
+        console.log("No scores found in database");
+        setScoresRetrieved(true);
+        return;
+      }
+      
       scores.forEach((scoreSnapshot: DataSnapshot) => { // for every score fetched,
         const score = scoreSnapshot.val(); // get the data fetched
         if(!score || !score.sound) return; // if these values aren't populated, something has gone seriously wrong!
 
         exerciseList.push(new ExerciseData( // add it to the list of exercises
           score.score,
-          score.sound,
+          score.sound, // Firebase stores this as string filename, not File object
           score.correctAnswers,
           score.feedback,
           score.exIndex,
@@ -114,6 +121,7 @@ function App() {
       console.log("Loaded exercise list");
     } catch (error) {
       console.error('Error fetching scores:', error);
+      setScoresRetrieved(true); // Set to true to prevent infinite loading
     }
   }, []);
 

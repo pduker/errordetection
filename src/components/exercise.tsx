@@ -72,8 +72,25 @@ export function Exercise({
   var title = "";
   var tagsInit: string[] = [];
   var diffInit = 1;
+  // Helper function to get filename from File or string
+  const getMp3FileName = (mp3: File | string): string => {
+    if (typeof mp3 === 'string') {
+      return mp3;
+    }
+    return mp3.name;
+  };
+
+  // Helper function to convert string to File for audio processing
+  const getMp3ForAudio = (mp3: File | string): File | string => {
+    if (typeof mp3 === 'string') {
+      // For string filenames, we'll need to handle them differently in audio processing
+      return mp3;
+    }
+    return mp3;
+  };
+
   var voicesInit = 1;
-  var mp3: File = new File([], "");
+  var mp3: File | string = new File([], "");
   var typesInit = "None";
   var meterInit = "Anything";
   var transposInit = false;
@@ -116,7 +133,12 @@ export function Exercise({
     useState<{ [label: string]: number | string }[]>(ans);
 
   const [xmlFile, setXmlFile] = useState<File>();
-  const [mp3File, setMp3File] = useState<File>(mp3);
+  const [mp3File, setMp3File] = useState<File | string>(mp3);
+  
+  // Helper to update mp3File with proper type handling
+  const handleSetMp3File = (file: File | string) => {
+    setMp3File(file);
+  };
   const [abcFile, setAbcFile] = useState<string>(abc);
 
   // check if an exercise has been completed
@@ -810,7 +832,7 @@ export function Exercise({
       if (
         abcFile !== undefined &&
         abcFile !== "" &&
-        mp3File.name !== "" &&
+        getMp3FileName(mp3File) !== "" &&
         correctAnswers.length > 0
       ) {
         data = new ExerciseData(
@@ -836,9 +858,9 @@ export function Exercise({
         const storage = getStorage();
 
         const scoresRef = ref(database, "scores");
-        const audioref = storageRef(storage, mp3File.name);
+        const audioref = storageRef(storage, getMp3FileName(mp3File));
 
-        await uploadBytes(audioref, mp3File);
+        await uploadBytes(audioref, typeof mp3File === 'string' ? new File([], mp3File) : mp3File);
         const dbDataRef = child(scoresRef, exInd.toString());
 
         const snapshot = await get(dbDataRef);
@@ -854,7 +876,7 @@ export function Exercise({
           alert("exercise data was updated!");
         } else {
           // Create new exercise
-          const newData = new DBData(data, mp3File.name);
+          const newData = new DBData(data, getMp3FileName(mp3File));
           newData.customId = customId; // Ensure customId is included in new data
           await set(dbDataRef, newData);
           console.log("New exercise added!");
@@ -2055,15 +2077,19 @@ export function Exercise({
           </div>
           <div id="mp3Upload" style={{ display: "inline-flex" }}>
             MP3 Upload:{" "}
-            <FileUpload
-              setFile={setMp3File}
-              file={mp3File}
-              setAbcFile={setAbcFile}
-              type="mp3"
-              setLoaded={setLoaded}
-            ></FileUpload>
+            {typeof mp3File === 'string' ? (
+              <span>{mp3File}</span>
+            ) : (
+              <FileUpload
+                setFile={handleSetMp3File}
+                file={mp3File}
+                setAbcFile={setAbcFile}
+                type="mp3"
+                setLoaded={setLoaded}
+              ></FileUpload>
+            )}
           </div>
-          {mp3File.name === "" ? <br /> : <></>}
+          {getMp3FileName(mp3File) === "" ? <br /> : <></>}
           {(exerciseData !== undefined && !exerciseData.empty && !loaded) ||
           (abcFile !== undefined && abcFile !== "" && !loaded) ? (
             <button onClick={loadScore}>Load Score</button>

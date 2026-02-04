@@ -439,7 +439,7 @@ export function ExercisesPage({
         setMeter("Anything");
         setTranspos(false);
         setCurrentPage(1);
-        clearSelection();
+        // Removed clearSelection() to keep the selected exercise
     }
     
     useEffect(() => {
