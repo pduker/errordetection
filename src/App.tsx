@@ -41,7 +41,7 @@ function Header({ authorized, resetScrollPosition }: { authorized: boolean; rese
     <Nav className='Home-nav'>
     <Link to="/exercises" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercises")}>Exercises</Link>
     {authorized ?
-    <Link to="/exercise-management" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercise-management")}>Exercise Management</Link>
+    <Link to="exercise-management" style={{ marginRight: '10px' }} onClick={() => handleNavClick("exercise-management")}>Exercise Management</Link>
     : <></>}
     </Nav>
 
@@ -75,8 +75,6 @@ function App() {
 
   // get data from the database
   const fetchScoresFromDatabase = useCallback(async () => {
-    if(scoresRetrieved) return;
-
     console.log("Retrieving scores...");
 
     try {
@@ -117,11 +115,17 @@ function App() {
     } catch (error) {
       console.error('Error fetching scores:', error);
     }
-  }, [scoresRetrieved]);
+  }, []);
+
+  // Manual refresh function for admin use
+  const refreshExercises = useCallback(async () => {
+    setScoresRetrieved(false);
+    await fetchScoresFromDatabase();
+  }, [fetchScoresFromDatabase]);
 
   useEffect(() => {
     fetchScoresFromDatabase(); // fetch from the database on component creation
-  }, [allExData, setAllExData, scoresRetrieved, setScoresRetrieved, fetchScoresFromDatabase]);
+  }, [fetchScoresFromDatabase]);
   
   const location = useLocation();
   const isLanding = location.pathname === "/";
@@ -165,7 +169,7 @@ function App() {
             <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>}/>
             <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}/>}/>
             <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]} scoresRet={scoresRetrieved}></ExercisesPage>}/>
-            <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase} authorized={authorized}/>}/>
+            <Route path="exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={refreshExercises} authorized={authorized}/>}/>
             <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>}/>
         </Routes>
       </div>

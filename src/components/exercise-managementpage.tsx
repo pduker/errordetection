@@ -2,7 +2,7 @@ import '../styles/exercises.css';
 import { Button } from 'react-bootstrap';
 import ExerciseData from '../interfaces/exerciseData';
 import { Exercise } from './exercise';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { get, getDatabase, ref, remove } from 'firebase/database';
 
 //code for creating the exercise management page, seen by admin to work on updating exercises
@@ -35,6 +35,71 @@ export function ExerciseManagementPage({
 
     const [customId, setCustomId] = useState<string>("");
 
+    //sort function for the exercises - optimized with useCallback
+    const exSortFunc = useCallback(function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
+        if (e1 !== undefined && e2 !== undefined) {
+            try {
+                //sorts exercises alphabetically
+                if(e1.title.startsWith("Exercise ") && e2.title.startsWith("Exercise ")) {
+                    if (e1.title > e2.title) return 1;
+                    else if (e1.title < e2.title) return -1;
+                    else return 0;
+                }
+                else if(e1.title.startsWith("Exercise ")) return -1;
+                else if(e2.title.startsWith("Exercise ")) return 1;
+
+                //compare number of tags, more tags come later (increasing order)
+                // FIXED: Don't sort tags just to get length - that's very expensive!
+                var e1Sorted = e1.tags.length;
+                var e2Sorted = e2.tags.length;
+                if (e1Sorted > e2Sorted) return 1;
+                else if (e1Sorted < e2Sorted) return -1;
+                else {
+                    if(Number(e1.difficulty) > Number(e2.difficulty)) return 1;
+                    else if(Number(e1.difficulty) < Number(e2.difficulty)) return -1;
+                    else {
+                        let e1Split = e1.title.split(":"), e2Split = e2.title.split(":");
+                        if(Number(e1Split[e1Split.length-1]) > Number(e2Split[e2Split.length-1])) return 1;
+                        else if(Number(e1Split[e1Split.length-1]) < Number(e2Split[e2Split.length-1])) return -1;
+                        else {
+                            //final comparison isf equal up to this point
+                            if (e1.title > e2.title) return 1;
+                            else if (e1.title < e2.title) return -1;
+                            else return 0;
+                        }
+                    }
+                }
+                //if an error occurs default to sorting alphabetically
+            } catch {
+                if(e1.title > e2.title) return 1;
+                else if (e1.title < e2.title) return -1;
+                else return 0;
+            };
+            //if undefined treat as equal
+        } else return 0;
+    }, []);
+
+    // Fetch exercises when component mounts
+    useEffect(() => {
+        console.log("ExerciseManagementPage mounted, fetching exercises...");
+        if (fetch) {
+            fetch(false);
+        }
+    }, [fetch]);
+
+    // Update exList when allExData changes - optimized with useMemo
+    const sortedExList = useMemo(() => {
+        console.log("Sorting exercises:", allExData.length, "exercises");
+        if (allExData.length > 0) {
+            return [...allExData].sort(exSortFunc);
+        }
+        return [];
+    }, [allExData, exSortFunc]);
+
+    useEffect(() => {
+        setExList(sortedExList);
+    }, [sortedExList]);
+
     /* previously used when add/edit mode were separate, keeping for now for posterity
     const modeChange = function () {
         setMode(!mode);
@@ -54,7 +119,7 @@ export function ExerciseManagementPage({
         }
         //more exercises then all exercise data
         if(exList.length > allExData.length) setExList(allExData.sort(exSortFunc));
-    },[exList.length, allExData, tags.length, diff, voices, types, meter, transpos]);
+    },[exList.length, allExData, tags.length, diff, voices, types, meter, transpos, exSortFunc]);
     
     //function to allow admin to create a new exercise
     const createExercise = function () {
@@ -125,49 +190,6 @@ export function ExerciseManagementPage({
         }
         list = list.sort(exSortFunc);
         setExList(list);
-    }
-
-    //sort function for the exercises
-    const exSortFunc = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
-        if (e1 !== undefined && e2 !== undefined) {
-            try {
-                //sorts exercises alphabetically
-                if(e1.title.startsWith("Exercise ") && e2.title.startsWith("Exercise ")) {
-                    if (e1.title > e2.title) return 1;
-                    else if (e1.title < e2.title) return -1;
-                    else return 0;
-                }
-                else if(e1.title.startsWith("Exercise ")) return -1;
-                else if(e2.title.startsWith("Exercise ")) return 1;
-
-                //compare number of tags, more tags come later (increasing order)
-                var e1Sorted = e1.tags.sort().length;
-                var e2Sorted = e2.tags.sort().length;
-                if (e1Sorted > e2Sorted) return 1;
-                else if (e1Sorted < e2Sorted) return -1;
-                else {
-                    if(Number(e1.difficulty) > Number(e2.difficulty)) return 1;
-                    else if(Number(e1.difficulty) < Number(e2.difficulty)) return -1;
-                    else {
-                        let e1Split = e1.title.split(":"), e2Split = e2.title.split(":");
-                        if(Number(e1Split[e1Split.length-1]) > Number(e2Split[e2Split.length-1])) return 1;
-                        else if(Number(e1Split[e1Split.length-1]) < Number(e2Split[e2Split.length-1])) return -1;
-                        else {
-                            //final comparison isf equal up to this point
-                            if (e1.title > e2.title) return 1;
-                            else if (e1.title < e2.title) return -1;
-                            else return 0;
-                        }
-                    }
-                }
-                //if an error occurs default to sorting alphabetically
-            } catch {
-                if(e1.title > e2.title) return 1;
-                else if(e1.title < e2.title) return -1;
-                else return 0;
-            };
-            //if undefined treat as equal
-        } else return 0;
     }
 
     //sort indexes alphabetically
@@ -294,30 +316,29 @@ export function ExerciseManagementPage({
     };
 
     //html for the page
+    console.log("ExerciseManagementPage rendering. authorized:", authorized, "allExData.length:", allExData.length);
+    
+    if (!authorized) {
+        return <div>Unauthorized access. See help page to enter admin password for access.</div>;
+    }
+
     return (
         <div style={{width: "90vw"}}>
-            {/* if authorized user then they can see the page*/}
-            {authorized ? 
-                <div>
-                    <div>
-                        {/*page header*/}
-                    <h2 style={{display:"inline"}}>Welcome to the Exercise Management Page!</h2>
-                    </div>
-                    {/*<form id="editMode" style={{display: "inline", float:"right"}}>
-                        <div className="form-check form-switch">
-                            <input className="form-check-input" type="checkbox" role="switch" id="switchCheckDefault" checked={mode} onChange={modeChange}/>
-                        </div> 
-                    </form>*/}
-                    
-                    {/*creating an exercise*/}
-                    <Button style={{display: "inline", float:"right", marginRight: "1vw"}} onClick={createExercise}>+</Button>
-                    <h5 style={{marginTop: "8px", fontStyle: "italic"}}>Click the + in the top right to add a new exercise, then edit as needed and save.</h5>
-                        <div>
-                            <h5 style={{marginLeft: "4px", marginBottom: "-20px"}}>Sort By:</h5>
-                            <br/>
+            <div>
+                {/*page header*/}
+                <h2 style={{display:"inline"}}>Welcome to the Exercise Management Page!</h2>
+            </div>
+            
+            {/*creating an exercise*/}
+            <Button style={{display: "inline", float:"right", marginRight: "1vw"}} onClick={createExercise}>+</Button>
+            <h5 style={{marginTop: "8px", fontStyle: "italic"}}>Click the + in the top right to add a new exercise, then edit as needed and save.</h5>
+            
+            <div>
+                <h5 style={{marginLeft: "4px", marginBottom: "-20px"}}>Sort By:</h5>
+                <br/>
 
-                        {/*editing an exercise, filling in all paramters*/}
-                        <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
+                {/*editing an exercise, filling in all paramters*/}
+                <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
                             <form id="tags" style={{ display: "flex", alignItems: "center", marginRight: "20px" }}>
                                 <div style={{ fontSize: "16px", marginRight: "8px" }}>Tags:</div>
                                 <label style={{ display: "flex", alignItems: "center", marginRight: "12px" }}>
@@ -444,37 +465,11 @@ export function ExerciseManagementPage({
                                 fetch={fetch}
                                 />
                             );
-                            })}
+                        })}
 
+            {exList.length === 0 ? <div>No exercises found! Maybe try adding one?</div> : <></>}
 
-                        {exList.length === 0 ? <div>No exercises found! Maybe try adding one?</div> : <></>}
-
-                        </div> 
-                        
-                        {/* previously used when add/edit modes were separate, keeping for posterity
-                        <div>
-                        <Button style={{ color: "white", borderColor: "blue", display: "flex" }} onClick={createExercise}>+ New Exercise</Button>
-                            {newExercise !== undefined ? <div>
-                                <Exercise
-                                    key={newExercise.exIndex}
-                                    teacherMode={true}
-                                    ExData={newExercise}
-                                    allExData={allExData}
-                                    setAllExData={setAllExData}
-                                    exIndex={newExercise.exIndex}
-                                    setNewExercise={setNewExercise}
-                                    handleSelectExercise={undefined}
-                                    isSelected={undefined}
-                                    fetch={fetch}
-                                />
-
-                            </div> : <></>}
-                        </div> */}
-                    
-                    <br></br>
-                    {/* <Button onClick={fetch} variant="success">Sync with Database</Button> */}
-                </div>
-            : <div>Unauthorized access. See help page to enter admin password for access.</div>}
         </div>
-    );
+    </div>
+);
 }
