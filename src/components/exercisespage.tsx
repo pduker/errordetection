@@ -39,7 +39,7 @@ function ExerciseViewerComponent({
                             disabled={disablePrevNav}
                             aria-label="Previous exercise"
                         >
-                            ‹
+                            ←
                         </button>
                     )}
                     <div className="exercise-content-inner">
@@ -70,7 +70,7 @@ function ExerciseViewerComponent({
                             disabled={disableNextNav}
                             aria-label="Next exercise"
                         >
-                            ›
+                            →
                         </button>
                     )}
                 </div> 
@@ -134,7 +134,7 @@ function ExerciseQueueComponent({
                         className="exercise-queue-nav-btn"
                         aria-label="Previous page of exercises"
                     >
-                        ‹
+                        ←
                     </Button>
                     <span className="exercise-queue-status">{paginationStatus}</span>
                     <Button
@@ -143,7 +143,7 @@ function ExerciseQueueComponent({
                         className="exercise-queue-nav-btn"
                         aria-label="Next page of exercises"
                     >
-                        ›
+                        →
                     </Button>
                 </div>
                 <Button
