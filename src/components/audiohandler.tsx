@@ -1,35 +1,140 @@
 import { getBlob, getStorage, ref as storageRef } from 'firebase/storage';
 import { useEffect, useRef, useState } from 'react';
+import '../styles/exercises.css';
 
-//file for handling the audio files and turning them into JSX elements that we can use on the screen
+// Custom audio player with full controls and styling
 export default function AudioHandler({ file }: { file: string | File }): JSX.Element {
   const [msgContent] = useState<string>("");
   const audioRef = useRef<HTMLAudioElement>(null);
   const storage = getStorage();
+  
+  // Audio state
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [volume, setVolume] = useState(1);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  useEffect(() => { // on component creation, fetch audio from firebase and populate it in an audio element
-    if(audioRef.current?.src) URL.revokeObjectURL(audioRef.current.src); // if we've previously linked a URL, remove it
+  useEffect(() => {
+    if(audioRef.current?.src) URL.revokeObjectURL(audioRef.current.src);
 
-    if(typeof file === "string") { // file is a URL to a file
-      // get the audio data as a binary blob
+    if(typeof file === "string") {
       getBlob(storageRef(storage, file)).then((blob: BlobPart) => {
-        const fileObject = new File([blob], file, {type: "audio/mpeg"}); // make a file out of the binary data
-        const objectURL = URL.createObjectURL(fileObject); // create a URL to link it to an audio element
-        if(audioRef.current) audioRef.current.src = objectURL; // set audio element's URL to the URL we just made
+        const fileObject = new File([blob], file, {type: "audio/mpeg"});
+        const objectURL = URL.createObjectURL(fileObject);
+        if(audioRef.current) {
+          audioRef.current.src = objectURL;
+          setIsLoaded(true);
+        }
       });
-    } else { // file is a File object
-      // don't do any of that fancy new File object stuff
+    } else {
       const objectURL = URL.createObjectURL(file);
-      if(audioRef.current) audioRef.current.src = objectURL;
+      if(audioRef.current) {
+        audioRef.current.src = objectURL;
+        setIsLoaded(true);
+      }
     }
   }, [file, storage]);
 
-  //plays the audio that is uploaded 
+  // Update time and duration
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const updateTime = () => setCurrentTime(audio.currentTime);
+    const updateDuration = () => setDuration(audio.duration);
+    const handleEnded = () => setIsPlaying(false);
+
+    audio.addEventListener('timeupdate', updateTime);
+    audio.addEventListener('loadedmetadata', updateDuration);
+    audio.addEventListener('ended', handleEnded);
+
+    return () => {
+      audio.removeEventListener('timeupdate', updateTime);
+      audio.removeEventListener('loadedmetadata', updateDuration);
+      audio.removeEventListener('ended', handleEnded);
+    };
+  }, [isLoaded]);
+
+  const togglePlayPause = () => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      audio.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    
+    const newTime = parseFloat(e.target.value);
+    audio.currentTime = newTime;
+    setCurrentTime(newTime);
+  };
+
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    
+    const newVolume = parseFloat(e.target.value);
+    audio.volume = newVolume;
+    setVolume(newVolume);
+  };
+
+  const formatTime = (time: number) => {
+    if (isNaN(time)) return "0:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
   return (
-    <div>
-            <audio ref={audioRef} controls>
-            </audio>
-            <p>{msgContent}</p>
+    <div className="custom-audio-player">
+      <audio ref={audioRef} preload="metadata" />
+      
+      <div className="audio-controls">
+        <button 
+          className="audio-play-btn"
+          onClick={togglePlayPause}
+          disabled={!isLoaded}
+        >
+          {isPlaying ? '❚❚' : '▶'}
+        </button>
+        
+        <div className="audio-time-display">
+          {formatTime(currentTime)} / {formatTime(duration)}
         </div>
+        
+        <input
+          type="range"
+          className="audio-progress"
+          min="0"
+          max={duration || 0}
+          value={currentTime}
+          onChange={handleSeek}
+          disabled={!isLoaded}
+        />
+        
+        <div className="audio-volume-section">
+          <span className="volume-icon">🔊</span>
+          <input
+            type="range"
+            className="audio-volume"
+            min="0"
+            max="1"
+            step="0.1"
+            value={volume}
+            onChange={handleVolumeChange}
+          />
+        </div>
+      </div>
+      
+      {msgContent && <p className="audio-message">{msgContent}</p>}
+    </div>
   );
 }
