@@ -43,7 +43,10 @@ export function Exercise({
   teacherMode: boolean;
   ExData: ExerciseData;
   allExData: (ExerciseData | undefined)[];
-  updateProgress?: (title: string, data: { completed?: boolean; score?: number }) => void;
+  updateProgress?: (
+    title: string,
+    data: { completed?: boolean; score?: number },
+  ) => void;
   setAllExData: (newData: (ExerciseData | undefined)[]) => void;
   handleSelectExercise: ((exIndex: number) => void) | undefined;
   isSelected: boolean | undefined;
@@ -121,25 +124,26 @@ export function Exercise({
 
   // Check localStorage to see if this exercise was previously completed
   useEffect(() => {
-  const saved = localStorage.getItem("userProgress");
-  if (saved) {
-    try {
-      const progress = JSON.parse(saved);
-      if (progress[ExData.title]?.completed) {
-        setIsCompleted(true);
+    const saved = localStorage.getItem("userProgress");
+    if (saved) {
+      try {
+        const progress = JSON.parse(saved);
+        if (progress[ExData.title]?.completed) {
+          setIsCompleted(true);
+        }
+      } catch (err) {
+        console.error("Error reading localStorage progress:", err);
       }
-    } catch (err) {
-      console.error("Error reading localStorage progress:", err);
     }
-  }
-}, [ExData.title]);
+  }, [ExData.title]);
 
-  const [customId, setCustomId] = useState<string>(exerciseData?.customId || "");
+  const [customId, setCustomId] = useState<string>(
+    exerciseData?.customId || "",
+  );
 
   //for disabling ui elements
   const rhythmOnly = tags.length === 1 && tags.includes("Rhythm");
-  const canCheckAnswers =
-    abcFile !== undefined && abcFile !== "" && loaded;
+  const canCheckAnswers = abcFile !== undefined && abcFile !== "" && loaded;
 
   // try to load score when there's either exerciseData or an abc file to pull from
   useEffect(() => {
@@ -155,7 +159,7 @@ export function Exercise({
     elemset: any,
     addClass: any,
     removeClass: any,
-    color: any
+    color: any,
   ) {
     if (!elemset) return;
     for (var i = 0; i < elemset.length; i++) {
@@ -194,7 +198,7 @@ export function Exercise({
       selNotes.splice(selNotes.indexOf(note), 1);
       selAnswers.splice(selAnswers.indexOf(note), 1);
       retval = 1;
-    } else if(selTim > 3) {
+    } else if (selTim > 3) {
       selTim %= 3;
     }
     if (klass === undefined) klass = "abcjs-note_selected";
@@ -218,7 +222,7 @@ export function Exercise({
     tuneNumber: number,
     classes: string,
     analysis: abcjs.ClickListenerAnalysis,
-    drag: abcjs.ClickListenerDrag
+    drag: abcjs.ClickListenerDrag,
   ) {
     var note = abcelem;
     if (
@@ -366,7 +370,7 @@ export function Exercise({
           const noteLeft = noteBox.left;
           const totalNoteWidth = noteRight - noteLeft;
           const numBeats = Math.floor(
-            note.duration / visualObjs[0].getBeatLength()
+            note.duration / visualObjs[0].getBeatLength(),
           );
           const beatWidth = totalNoteWidth / numBeats - 5;
 
@@ -376,7 +380,7 @@ export function Exercise({
               ? toSvgCoords(
                   svgElement,
                   0,
-                  topLines[staff].getBoundingClientRect().top
+                  topLines[staff].getBoundingClientRect().top,
                 )
               : noteTopPt;
           const barTopY = Math.min(noteTopPt.y, topLinePt.y) - 15;
@@ -386,7 +390,7 @@ export function Exercise({
             const barX = toSvgCoords(
               svgElement,
               noteLeft + b * (beatWidth + 5),
-              0
+              0,
             ).x;
             createBeatRect({
               x: barX,
@@ -430,14 +434,14 @@ export function Exercise({
           const noteTopPt = toSvgCoords(
             svgElement,
             0,
-            noteElems.getBoundingClientRect().top
+            noteElems.getBoundingClientRect().top,
           );
           const topLinePt =
             topLines && topLines[staff]
               ? toSvgCoords(
                   svgElement,
                   0,
-                  topLines[staff].getBoundingClientRect().top
+                  topLines[staff].getBoundingClientRect().top,
                 )
               : noteTopPt;
 
@@ -493,14 +497,14 @@ export function Exercise({
           const noteTopPt = toSvgCoords(
             svgElement,
             0,
-            noteElems.getBoundingClientRect().top
+            noteElems.getBoundingClientRect().top,
           );
           const topLinePt =
             topLines && topLines[staff]
               ? toSvgCoords(
                   svgElement,
                   0,
-                  topLines[staff].getBoundingClientRect().top
+                  topLines[staff].getBoundingClientRect().top,
                 )
               : noteTopPt;
 
@@ -675,7 +679,7 @@ export function Exercise({
     const pathBottom = toSvgCoords(
       svgElement,
       0,
-      paths[staff].getBoundingClientRect().bottom
+      paths[staff].getBoundingClientRect().bottom,
     ).y;
     const pathHeight = paths[staff].getBoundingClientRect().height;
     const noteHeight = pathBottom - y + pathHeight / 4;
@@ -716,7 +720,7 @@ export function Exercise({
             item.type === "beat" &&
             item.measurePos === measure &&
             item.staffPos === staff &&
-            item.beatIndex === beatIndexForOverlay
+            item.beatIndex === beatIndexForOverlay,
         );
         if (index !== -1) selAnswers.splice(index, 1);
       } else {
@@ -751,7 +755,7 @@ export function Exercise({
   const exReload = function () {
     // Clear all beat selections by resetting all data-selected attributes
     const selectedBeatElements = document.querySelectorAll(
-      "[data-selected='true']"
+      "[data-selected='true']",
     );
     selectedBeatElements.forEach((elem) => {
       elem.setAttribute("data-selected", "false");
@@ -769,7 +773,7 @@ export function Exercise({
 
     // Clear note selections by resetting highlighting
     const selectedNoteElements = document.querySelectorAll(
-      "[selectedTimes='1'], [selectedTimes='2']"
+      "[selectedTimes='1'], [selectedTimes='2']",
     );
     selectedNoteElements.forEach((elem) => {
       elem.setAttribute("selectedTimes", "0");
@@ -782,7 +786,7 @@ export function Exercise({
 
     // Remove any highlight overlays
     const overlays = document.querySelectorAll(
-      ".hint-highlight, .error-highlight"
+      ".hint-highlight, .error-highlight",
     );
     overlays.forEach((overlay) => overlay.remove());
 
@@ -824,7 +828,7 @@ export function Exercise({
           meter,
           transpos,
           false,
-          customId
+          customId,
         );
 
         data.isNew = false;
@@ -866,7 +870,7 @@ export function Exercise({
             "- uploaded both a musicxml AND an mp3 file",
             "- marked any applicable tags, voice #, and difficulty",
             "- selected at least one correct answer",
-          ].join("\n")
+          ].join("\n"),
         );
       }
     } catch (error) {
@@ -931,7 +935,7 @@ export function Exercise({
 
   const highlightBeat = function (
     selectedBeats: Element[],
-    correctAnswers: any[]
+    correctAnswers: any[],
   ) {
     const selectedBeatIndices = new Set<string>();
     const correctBeatIndices = new Set<string>();
@@ -960,7 +964,7 @@ export function Exercise({
           staffPos !== undefined
         ) {
           correctBeatIndices.add(
-            `${measurePos}-${staffPos}-${correctBeatIndex}`
+            `${measurePos}-${staffPos}-${correctBeatIndex}`,
           );
         }
       }
@@ -981,7 +985,7 @@ export function Exercise({
       const staffPos = beatElem.getAttribute("data-staff-pos");
 
       const coverBox = document.querySelector(
-        `.cover-box[data-beatIndex='${beatIndex}'][data-measure-pos='${measurePos}'][data-staff-pos='${staffPos}']`
+        `.cover-box[data-beatIndex='${beatIndex}'][data-measure-pos='${measurePos}'][data-staff-pos='${staffPos}']`,
       );
       if (coverBox) {
         coverBox.setAttribute("fill", "none");
@@ -1005,7 +1009,7 @@ export function Exercise({
 
           // Update associated cover box (if it exists)
           const coverBox = document.querySelector(
-            `.cover-box[data-beatIndex='${beatIndex}'][data-measure-pos='${measurePos}'][data-staff-pos='${staffPos}']`
+            `.cover-box[data-beatIndex='${beatIndex}'][data-measure-pos='${measurePos}'][data-staff-pos='${staffPos}']`,
           );
           if (coverBox) {
             coverBox.setAttribute("fill", "rgba(61, 245, 39, 0.6)");
@@ -1018,7 +1022,7 @@ export function Exercise({
 
           // Update associated cover box (if it exists)
           const coverBox = document.querySelector(
-            `.cover-box[data-beatIndex='${beatIndex}'][data-measure-pos='${measurePos}'][data-staff-pos='${staffPos}']`
+            `.cover-box[data-beatIndex='${beatIndex}'][data-measure-pos='${measurePos}'][data-staff-pos='${staffPos}']`,
           );
           if (coverBox) {
             coverBox.setAttribute("fill", "rgba(255, 0, 0, 0.6)");
@@ -1031,11 +1035,11 @@ export function Exercise({
 
   const highlightMeasure = function (
     selectedNotes: Element[],
-    correctAnswers: any[]
+    correctAnswers: any[],
   ) {
     // Remove any previous overlays
     const overlays = document.querySelectorAll(
-      ".hint-highlight, .error-highlight"
+      ".hint-highlight, .error-highlight",
     );
     overlays.forEach((overlay) => overlay.remove());
 
@@ -1047,7 +1051,7 @@ export function Exercise({
       if (!beatIndex || !measurePos || !staffPos) return;
 
       const coverBox = document.querySelector(
-        `.cover-box[data-beatIndex='${beatIndex}'][data-measure-pos='${measurePos}'][data-staff-pos='${staffPos}']`
+        `.cover-box[data-beatIndex='${beatIndex}'][data-measure-pos='${measurePos}'][data-staff-pos='${staffPos}']`,
       );
       if (coverBox) {
         coverBox.setAttribute("fill", color);
@@ -1057,7 +1061,7 @@ export function Exercise({
 
     // Find which selected notes are correct
     const correctNoteIndices = new Set(
-      correctAnswers.map((ans) => String(ans.index))
+      correctAnswers.map((ans) => String(ans.index)),
     );
 
     selectedNotes.forEach((noteElem) => {
@@ -1114,7 +1118,7 @@ export function Exercise({
 
       // Check for all elements with data-selected="true" to find selected beats
       const selectedBeatElements = document.querySelectorAll(
-        "[data-selected='true']"
+        "[data-selected='true']",
       );
       const selectedBeats: BeatSelection[] = Array.from(selectedBeatElements)
         .map((elem) => ({
@@ -1131,10 +1135,10 @@ export function Exercise({
 
       // Get all selected notes by checking for selectedTimes attribute
       const selectedNoteElements = document.querySelectorAll(
-        "[selectedTimes='1'], [selectedTimes='2']"
+        "[selectedTimes='1'], [selectedTimes='2']",
       );
       const selectedNotes: NoteSelection[] = Array.from(
-        selectedNoteElements
+        selectedNoteElements,
       ).map((elem) => ({
         type: "note" as const,
         measurePos: Number(elem.getAttribute("measurePos")),
@@ -1167,16 +1171,16 @@ export function Exercise({
       const plural = currentCorrectAnswers.length === 1 ? " is " : " are ";
 
       feedback.push(
-        `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`
+        `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`,
       );
 
       highlightBeat(
         selectedBeatElements as unknown as Element[],
-        currentCorrectAnswers
+        currentCorrectAnswers,
       );
       highlightMeasure(
         selectedNoteElements as unknown as Element[],
-        currentCorrectAnswers
+        currentCorrectAnswers,
       );
 
       // Check for missing correct answers (both notes and beats)
@@ -1189,13 +1193,13 @@ export function Exercise({
             (s) =>
               s.type === "beat" &&
               Number(s.measurePos) === Number(corr.measurePos) &&
-              Number(s.beatIndex) === Number(corr.beatIndex)
+              Number(s.beatIndex) === Number(corr.beatIndex),
           );
 
           if (!found) {
             allCorrect = false;
             console.log(
-              `Missing beat: measure ${corr.measurePos}, beat ${corr.beatIndex}, staff ${corr.staffPos}`
+              `Missing beat: measure ${corr.measurePos}, beat ${corr.beatIndex}, staff ${corr.staffPos}`,
             );
 
             if (
@@ -1205,13 +1209,13 @@ export function Exercise({
               feedback.push(
                 `\nMissing correct beat in Measure ${
                   Number(corr.measurePos) + 1
-                } on the ${instruments[Number(corr.staffPos)]} staff.`
+                } on the ${instruments[Number(corr.staffPos)]} staff.`,
               );
             } else {
               feedback.push(
                 `\nMissing correct beat in Measure ${
                   Number(corr.measurePos) + 1
-                }.`
+                }.`,
               );
             }
           }
@@ -1221,13 +1225,13 @@ export function Exercise({
             (s) =>
               s.type === "note" &&
               Number(s.measurePos) === Number(corr.measurePos) &&
-              Number(s.index) === Number(corr.index)
+              Number(s.index) === Number(corr.index),
           );
 
           if (!found) {
             allCorrect = false;
             console.log(
-              `Missing note: measure ${corr.measurePos}, index ${corr.index}, staff ${corr.staffPos}`
+              `Missing note: measure ${corr.measurePos}, index ${corr.index}, staff ${corr.staffPos}`,
             );
 
             if (
@@ -1237,13 +1241,13 @@ export function Exercise({
               feedback.push(
                 `\nMissing correct note in Measure ${
                   Number(corr.measurePos) + 1
-                } on the ${instruments[Number(corr.staffPos)]} staff.`
+                } on the ${instruments[Number(corr.staffPos)]} staff.`,
               );
             } else {
               feedback.push(
                 `\nMissing correct note in Measure ${
                   Number(corr.measurePos) + 1
-                }.`
+                }.`,
               );
             }
           }
@@ -1260,13 +1264,13 @@ export function Exercise({
             (c) =>
               c.type === "beat" &&
               Number(c.measurePos) === Number(sel.measurePos) &&
-              Number(c.beatIndex) === Number(sel.beatIndex)
+              Number(c.beatIndex) === Number(sel.beatIndex),
           );
 
           if (!found) {
             allCorrect = false;
             console.log(
-              `Extra beat: measure ${sel.measurePos}, beat ${sel.beatIndex}, staff ${sel.staffPos}`
+              `Extra beat: measure ${sel.measurePos}, beat ${sel.beatIndex}, staff ${sel.staffPos}`,
             );
 
             if (
@@ -1278,13 +1282,13 @@ export function Exercise({
                   Number(sel.measurePos) + 1
                 } on the ${instruments[Number(sel.staffPos)]} staff (Beat ${
                   sel.beatIndex
-                }).`
+                }).`,
               );
             } else {
               feedback.push(
                 `\nIncorrect beat selected in Measure ${
                   Number(sel.measurePos) + 1
-                }, Beat ${sel.beatIndex}.`
+                }, Beat ${sel.beatIndex}.`,
               );
             }
           }
@@ -1294,13 +1298,13 @@ export function Exercise({
             (c) =>
               c.type === "note" &&
               Number(c.measurePos) === Number(sel.measurePos) &&
-              Number(c.index) === Number(sel.index)
+              Number(c.index) === Number(sel.index),
           );
 
           if (!found) {
             allCorrect = false;
             console.log(
-              `Extra note: measure ${sel.measurePos}, index ${sel.index}, staff ${sel.staffPos}`
+              `Extra note: measure ${sel.measurePos}, index ${sel.index}, staff ${sel.staffPos}`,
             );
 
             if (
@@ -1310,13 +1314,13 @@ export function Exercise({
               feedback.push(
                 `\nIncorrect note selected in Measure ${
                   Number(sel.measurePos) + 1
-                } on the ${instruments[Number(sel.staffPos)]} staff.`
+                } on the ${instruments[Number(sel.staffPos)]} staff.`,
               );
             } else {
               feedback.push(
                 `\nIncorrect note selected in Measure ${
                   Number(sel.measurePos) + 1
-                }.`
+                }.`,
               );
             }
           }
@@ -1337,9 +1341,9 @@ export function Exercise({
       console.log(`Progress saved for ${ExData.title}: correct=${isCorrect}`);
       return;
     }
-    
+
     // Branch for Rhythm exercises with only Rhythm tag
-    else if (tags.includes("Rhythm") && tags.length === 1){
+    else if (tags.includes("Rhythm") && tags.length === 1) {
       const instruments = getInstrumentList(exerciseData.score);
 
       // Define proper types for beat and note selections
@@ -1354,7 +1358,7 @@ export function Exercise({
 
       // Check for all elements with data-selected="true" to find selected beats
       const selectedBeatElements = document.querySelectorAll(
-        "[data-selected='true']"
+        "[data-selected='true']",
       );
       const selectedBeats: BeatSelection[] = Array.from(selectedBeatElements)
         .map((elem) => ({
@@ -1388,7 +1392,7 @@ export function Exercise({
       const plural = currentCorrectAnswers.length === 1 ? " is " : " are ";
 
       feedback.push(
-        `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`
+        `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`,
       );
 
       // Check for missing correct answers (both notes and beats)
@@ -1401,13 +1405,13 @@ export function Exercise({
             (s) =>
               s.type === "beat" &&
               Number(s.measurePos) === Number(corr.measurePos) &&
-              Number(s.beatIndex) === Number(corr.beatIndex)
+              Number(s.beatIndex) === Number(corr.beatIndex),
           );
 
           if (!found) {
             allCorrect = false;
             console.log(
-              `Missing beat: measure ${corr.measurePos}, beat ${corr.beatIndex}, staff ${corr.staffPos}`
+              `Missing beat: measure ${corr.measurePos}, beat ${corr.beatIndex}, staff ${corr.staffPos}`,
             );
 
             if (
@@ -1417,13 +1421,13 @@ export function Exercise({
               feedback.push(
                 `\nMissing correct beat in Measure ${
                   Number(corr.measurePos) + 1
-                } on the ${instruments[Number(corr.staffPos)]} staff.`
+                } on the ${instruments[Number(corr.staffPos)]} staff.`,
               );
             } else {
               feedback.push(
                 `\nMissing correct beat in Measure ${
                   Number(corr.measurePos) + 1
-                }.`
+                }.`,
               );
             }
           }
@@ -1432,7 +1436,7 @@ export function Exercise({
 
       highlightBeat(
         selectedBeatElements as unknown as Element[],
-        currentCorrectAnswers
+        currentCorrectAnswers,
       );
 
       // Check for extra (incorrect) selections
@@ -1445,13 +1449,13 @@ export function Exercise({
             (c) =>
               c.type === "beat" &&
               Number(c.measurePos) === Number(sel.measurePos) &&
-              Number(c.beatIndex) === Number(sel.beatIndex)
+              Number(c.beatIndex) === Number(sel.beatIndex),
           );
 
           if (!found) {
             allCorrect = false;
             console.log(
-              `Extra beat: measure ${sel.measurePos}, beat ${sel.beatIndex}, staff ${sel.staffPos}`
+              `Extra beat: measure ${sel.measurePos}, beat ${sel.beatIndex}, staff ${sel.staffPos}`,
             );
 
             if (
@@ -1463,13 +1467,13 @@ export function Exercise({
                   Number(sel.measurePos) + 1
                 } on the ${instruments[Number(sel.staffPos)]} staff (Beat ${
                   sel.beatIndex
-                }).`
+                }).`,
               );
             } else {
               feedback.push(
                 `\nIncorrect beat selected in Measure ${
                   Number(sel.measurePos) + 1
-                }, Beat ${sel.beatIndex}.`
+                }, Beat ${sel.beatIndex}.`,
               );
             }
           }
@@ -1515,7 +1519,7 @@ export function Exercise({
           tmpCorrect[i]["selectedTimes"]
         ) {
           tmpCorrect = tmpCorrect.filter(
-            (ans) => Number(ans["index"]) !== indexCorrect
+            (ans) => Number(ans["index"]) !== indexCorrect,
           );
         } else {
           closeList.push(indexCorrect);
@@ -1532,7 +1536,7 @@ export function Exercise({
     // Always highlight all selected notes, passing SVG elements
     highlightMeasure(
       selAnswers.map((note) => note.abselem.elemset[0]),
-      correctAnswers
+      correctAnswers,
     );
 
     if (
@@ -1549,14 +1553,14 @@ export function Exercise({
         feedback.push(
           `\nMeasure ${Number(tmpCorrect[i]["measurePos"]) + 1}, Staff ${
             Number(tmpCorrect[i]["staffPos"]) + 1
-          }`
+          }`,
         );
       }
       for (let i = 0; i < wrongList.length; i++) {
         feedback.push(
           `\nWrong answer selected at: Measure ${
             Number(wrongList[i].getAttribute("measurePos")) + 1
-          }, Staff ${Number(wrongList[i].getAttribute("staffPos")) + 1}`
+          }, Staff ${Number(wrongList[i].getAttribute("staffPos")) + 1}`,
         );
       }
     } else if (tmpCorrect.length === correctAnswers.length) {
@@ -1567,7 +1571,7 @@ export function Exercise({
         feedback.push(
           `\nMeasure ${Number(tmpCorrect[i]["measurePos"]) + 1}, Staff ${
             Number(tmpCorrect[i]["staffPos"]) + 1
-          }`
+          }`,
         );
         let addtlFeedback = tmpCorrect[i]["feedback"];
         if (
@@ -1575,7 +1579,7 @@ export function Exercise({
           !tmpCorrect[i]["feedback"]
             .toString()
             .startsWith(
-              "You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). "
+              "You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). ",
             )
         ) {
           addtlFeedback =
@@ -1595,7 +1599,7 @@ export function Exercise({
         feedback.push(
           `\nMeasure ${Number(tmpCorrect[i]["measurePos"]) + 1}, Staff ${
             Number(tmpCorrect[i]["staffPos"]) + 1
-          }`
+          }`,
         );
         let addtlFeedback = tmpCorrect[i]["feedback"];
         if (
@@ -1603,7 +1607,7 @@ export function Exercise({
           !tmpCorrect[i]["feedback"]
             .toString()
             .startsWith(
-              "You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). "
+              "You've found where the error is (hurray!) but you've mis-identified the kind of error (try again!). ",
             )
         ) {
           addtlFeedback =
@@ -1619,8 +1623,8 @@ export function Exercise({
 
     setCustomFeedback(feedback);
     // progress tracking
-    const isCorrect = feedback.some(line =>
-    line.toLowerCase().includes("great job")
+    const isCorrect = feedback.some((line) =>
+      line.toLowerCase().includes("great job"),
     );
     const scoreValue = isCorrect ? 1 : 0;
 
@@ -1655,13 +1659,13 @@ export function Exercise({
     voices: number,
     types: string,
     meter: string,
-    transpos: boolean
+    transpos: boolean,
   ) {
     let exNum = findNum(tags, diff, voices, types, meter, transpos);
     if (meter === "Anything") {
       if (types === "None") {
         setCustomTitle(
-          tags.sort().join(" & ") + ": Level " + diff + ", Exercise: " + exNum
+          tags.sort().join(" & ") + ": Level " + diff + ", Exercise: " + exNum,
         );
         if (transpos)
           setCustomTitle(
@@ -1669,7 +1673,7 @@ export function Exercise({
               ": Transpose Insts - Level " +
               diff +
               ", Exercise: " +
-              exNum
+              exNum,
           );
       } else if (types === "Both") {
         setCustomTitle(
@@ -1677,7 +1681,7 @@ export function Exercise({
             ": Drone/Ens Parts  - Level " +
             diff +
             ", Exercise: " +
-            exNum
+            exNum,
         );
         if (transpos)
           setCustomTitle(
@@ -1685,7 +1689,7 @@ export function Exercise({
               ": Drone/Ens Parts w/ Transpose Insts - Level " +
               diff +
               ", Exercise: " +
-              exNum
+              exNum,
           );
       } else {
         setCustomTitle(
@@ -1695,7 +1699,7 @@ export function Exercise({
             " - Level " +
             diff +
             ", Exercise: " +
-            exNum
+            exNum,
         );
         if (transpos)
           setCustomTitle(
@@ -1705,7 +1709,7 @@ export function Exercise({
               " w/ Transpose Insts - Level " +
               diff +
               ", Exercise: " +
-              exNum
+              exNum,
           );
       }
     } else {
@@ -1717,7 +1721,7 @@ export function Exercise({
             " - Level " +
             diff +
             ", Exercise: " +
-            exNum
+            exNum,
         );
         if (transpos)
           setCustomTitle(
@@ -1727,7 +1731,7 @@ export function Exercise({
               "  w/ Transpose Insts - Level " +
               diff +
               ", Exercise: " +
-              exNum
+              exNum,
           );
       } else if (types === "Both") {
         setCustomTitle(
@@ -1737,7 +1741,7 @@ export function Exercise({
             " - Level " +
             diff +
             ", Exercise: " +
-            exNum
+            exNum,
         );
         if (transpos)
           setCustomTitle(
@@ -1747,7 +1751,7 @@ export function Exercise({
               " w/ Transpose Insts - Level " +
               diff +
               ", Exercise: " +
-              exNum
+              exNum,
           );
       } else {
         setCustomTitle(
@@ -1759,7 +1763,7 @@ export function Exercise({
             " - Level " +
             diff +
             ", Exercise: " +
-            exNum
+            exNum,
         );
         if (transpos)
           setCustomTitle(
@@ -1771,7 +1775,7 @@ export function Exercise({
               " w/ Transpose Insts - Level " +
               diff +
               ", Exercise: " +
-              exNum
+              exNum,
           );
       }
     }
@@ -1785,7 +1789,7 @@ export function Exercise({
       voices,
       types,
       meter,
-      transpos
+      transpos,
     );
   };
 
@@ -1826,7 +1830,7 @@ export function Exercise({
     voices: number,
     types: string,
     meter: string,
-    transpos: boolean
+    transpos: boolean,
   ): number {
     const count = allExData.filter((exData: ExerciseData | undefined) => {
       if (
@@ -1874,7 +1878,7 @@ export function Exercise({
 
   const handleCancelExercise = (exIndex: number) => {
     const updatedExercises = allExData.filter(
-      (exercise) => exercise && exercise.exIndex !== exIndex
+      (exercise) => exercise && exercise.exIndex !== exIndex,
     );
     setAllExData(updatedExercises);
   };
@@ -1902,7 +1906,13 @@ export function Exercise({
         <h3 onClick={() => setEditingTitle(!editingTitle)}>
           {customTitle}
           {isCompleted && (
-            <div style={{ color: "green", fontWeight: "bold", marginBottom: "10px" }}>
+            <div
+              style={{
+                color: "green",
+                fontWeight: "bold",
+                marginBottom: "10px",
+              }}
+            >
               Exercise Completed
             </div>
           )}
@@ -1926,7 +1936,7 @@ export function Exercise({
               Cancel Exercise Creation
             </Button>
           )}
-          <div id="forms" style={{ display: "inline-flex", padding: "4px" }}>
+          <div id="forms" style={{ display: "inline-flex", padding: "4px", alignItems: "center" }}>
             <form id="customId">
               Custom ID:
               <br />
@@ -2139,15 +2149,23 @@ export function Exercise({
               style={{
                 display: "inline-flex",
                 marginRight: "1vw",
-                marginTop: "-2.5vh",
+                marginTop: "-1vh",
                 borderRadius: "1px",
               }}
             />
           )}
 
-          <div style={{ display: "inline-flex", marginTop: "-2vh", alignItems: "center", gap: "1rem", flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "inline-flex",
+              marginTop: "-2vh",
+              alignItems: "center",
+              gap: "1rem",
+              flexWrap: "wrap",
+            }}
+          >
             {mp3 !== undefined ? (
-              <div style={{ marginTop: "2vh" }}>
+              <div style={{ marginTop: "1vh" }}>
                 <AudioHandler file={mp3}></AudioHandler>
               </div>
             ) : (
@@ -2155,14 +2173,17 @@ export function Exercise({
             )}
             <div className="exercise-action-buttons">
               {canCheckAnswers && (
-                <button className="btnback exercise-action-check" onClick={checkAnswers}>
+                <button
+                  className="btnback exercise-action-check"
+                  onClick={checkAnswers}
+                >
                   Check Answer
                 </button>
               )}
               <Button
-                className="responsive-element"
                 variant="danger"
                 onClick={exReload}
+                className="exercise-action-reset"
                 style={{
                   /*SIR: the actual reset answers button*/ position: "relative",
                   marginBottom: "2vh",

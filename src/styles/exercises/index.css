@@ -1,0 +1,11 @@
+/* Exercises CSS - Main Entry Point */
+
+/* Import all component-specific styles */
+@import './layout.css';
+@import './filters.css';
+@import './exercise-viewer.css';
+@import './exercise-queue.css';
+@import './audio-player.css';
+@import './responsive.css';
+
+/* Any global exercises styles that don't fit in components can go here */
