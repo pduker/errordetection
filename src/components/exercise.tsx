@@ -1197,15 +1197,9 @@ export function Exercise({
       let allCorrect = true;
       const plural = currentCorrectAnswers.length === 1 ? " is " : " are ";
 
-<<<<<<< HEAD
-      // feedback.push(
-      //   `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`
-      // );
-=======
       feedback.push(
         `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`,
       );
->>>>>>> 85b8cd3abd2630ff508b80a7112e8f1509755f09
 
       highlightBeat(
         selectedBeatElements as unknown as Element[],
