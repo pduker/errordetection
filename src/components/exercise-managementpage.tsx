@@ -4,6 +4,8 @@ import ExerciseData from '../interfaces/exerciseData';
 import { Exercise } from './exercise';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { get, getDatabase, ref, remove } from 'firebase/database';
+import { useNavigate } from 'react-router-dom';
+import { exerciseConfig } from '../config/exercise-config';
 
 //code for creating the exercise management page, seen by admin to work on updating exercises
 //take in exercise data and return updated data, must be authorized users
@@ -18,6 +20,8 @@ export function ExerciseManagementPage({
     fetch: (val: boolean) => void;
     authorized: boolean;
 }) {
+
+    const navigate = useNavigate();
 
     //use states for getting and setting specific attributes of exercises and music
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
@@ -330,7 +334,7 @@ export function ExerciseManagementPage({
             </div>
             
             {/*creating an exercise*/}
-            <Button style={{display: "inline", float:"right", marginRight: "1vw"}} onClick={createExercise}>+</Button>
+            <Button style={{display: "inline", float:"right", marginRight: "1vw"}} onClick={() => navigate('/exercise-management/create')}>+</Button>
             <h5 style={{marginTop: "8px", fontStyle: "italic"}}>Click the + in the top right to add a new exercise, then edit as needed and save.</h5>
             
             <div>
@@ -430,24 +434,7 @@ export function ExerciseManagementPage({
                             </div>
 
                         {/*returning exercise data */}
-                        {/* {exList.map((exercise) => {
-                                if (exercise !== undefined)
-                                    return (
-                                        <Exercise
-                                            key={exercise.exIndex}
-                                            teacherMode={true}
-                                            ExData={exercise}
-                                            allExData={allExData}
-                                            setAllExData={setAllExData}
-                                            exIndex={exercise.exIndex}
-                                            handleSelectExercise={handleSelectExercise}
-                                            isSelected={selectedIndexes.includes(exercise.exIndex)}
-                                            fetch={fetch}
-                                        />
-                                    )
-                                else return (<div key={Math.random()} />);
-                            })} */}
-                        {exList.map((exercise) => {
+                        {exerciseConfig.showExercises && exList.map((exercise) => {
                             if (!exercise) return <div key={Math.random()} />;
 
                             console.log("Rendering exercise:", exercise.exIndex, "isNew:", exercise.isNew);
@@ -467,7 +454,7 @@ export function ExerciseManagementPage({
                             );
                         })}
 
-            {exList.length === 0 ? <div>No exercises found! Maybe try adding one?</div> : <></>}
+            {exerciseConfig.showNoExercisesMessage && exList.length === 0 ? <div>No exercises found! Maybe try adding one?</div> : <></>}
 
         </div>
     </div>

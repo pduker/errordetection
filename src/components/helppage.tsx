@@ -59,6 +59,11 @@ export function HelpPage({
         }
     };
     
+    const logout = function() {
+        setAuthorized(false);
+        console.log("Logged out - admin mode ended");
+    }
+    
     const checkAuth = function(e?: React.FormEvent) {
         // Prevent form submission if called from form event
         if (e) {
@@ -243,6 +248,11 @@ export function HelpPage({
                         <input id="mng-pwd" placeholder="Enter admin password..." type="password" required />
                         <button type="submit">Submit</button>
                     </form>
+                    {authorized && (
+                        <button onClick={logout} className="help-logout" style={{ marginTop: '10px', backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}>
+                            End Admin Mode
+                        </button>
+                    )}
                     {error ? <div className="help-error">{error}</div> : <></>}
                     {authorized ? (
                         <div className="help-card help-card--wide">
