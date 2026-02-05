@@ -26,6 +26,7 @@ export function HelpPage({
     const navigate = useNavigate();
     //setting state
     const [error, setError] = useState<string>("");
+    const [justLoggedIn, setJustLoggedIn] = useState<boolean>(false);
 
     //checking user with login functionality
 
@@ -37,6 +38,7 @@ export function HelpPage({
           
           // Set admin privileges based on login - useEffect will handle navigation
           setAuthorized(true);
+          setJustLoggedIn(true);
           setError("");
           
         } catch (error: any) {
@@ -61,6 +63,7 @@ export function HelpPage({
     
     const logout = function() {
         setAuthorized(false);
+        setJustLoggedIn(false);
         console.log("Logged out - admin mode ended");
     }
     
@@ -83,13 +86,14 @@ export function HelpPage({
         }
     }
     
-    // Navigate to exercise management when authorized becomes true
+    // Navigate to exercise management only when user just logged in
     useEffect(() => {
-        if (authorized) {
-            console.log("User is authorized, navigating to exercise-management...");
+        if (authorized && justLoggedIn) {
+            console.log("User just logged in, navigating to exercise-management...");
             navigate("/exercise-management");
+            setJustLoggedIn(false); // Reset flag after navigation
         }
-    }, [authorized, navigate]);
+    }, [authorized, justLoggedIn, navigate]);
 
     //rendering page with help information
     return (

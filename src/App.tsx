@@ -192,7 +192,7 @@ function App() {
             <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>}/>
             <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}/>}/>
             <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]} scoresRet={scoresRetrieved}></ExercisesPage>}/>
-            <Route path="exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={refreshExercises} authorized={authorized}/>}/>
+            <Route path="exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={refreshExercises} authorized={authorized} setAuthorized={updateAuthorized}/>}/>
             <Route path="/exercise-management/create" element={<CreateExercisePage />}/>
             <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={updateAuthorized}/>}/>
         </Routes>

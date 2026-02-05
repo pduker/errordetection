@@ -13,15 +13,23 @@ export function ExerciseManagementPage({
     allExData,
     setAllExData,
     fetch,
-    authorized
+    authorized,
+    setAuthorized
 }:{
     allExData: (ExerciseData | undefined)[];
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
     fetch: (val: boolean) => void;
     authorized: boolean;
+    setAuthorized: ((authorized: boolean) => void);
 }) {
 
     const navigate = useNavigate();
+
+    // Logout function to end admin mode
+    const handleLogout = () => {
+        setAuthorized(false);
+        navigate('/help');
+    };
 
     //use states for getting and setting specific attributes of exercises and music
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
@@ -328,13 +336,30 @@ export function ExerciseManagementPage({
 
     return (
         <div style={{width: "90vw"}}>
-            <div>
-                {/*page header*/}
-                <h2 style={{display:"inline"}}>Welcome to the Exercise Management Page!</h2>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div>
+                    {/*page header*/}
+                    <h2 style={{display:"inline"}}>Welcome to the Exercise Management Page!</h2>
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                    <button 
+                        onClick={handleLogout}
+                        style={{
+                            padding: "8px 16px",
+                            backgroundColor: "#dc3545",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            fontSize: "14px"
+                        }}
+                    >
+                        Exit Admin Mode
+                    </button>
+                    {/*creating an exercise*/}
+                    <Button style={{display: "inline", marginRight: "1vw"}} onClick={() => navigate('/exercise-management/create')}>+</Button>
+                </div>
             </div>
-            
-            {/*creating an exercise*/}
-            <Button style={{display: "inline", float:"right", marginRight: "1vw"}} onClick={() => navigate('/exercise-management/create')}>+</Button>
             <h5 style={{marginTop: "8px", fontStyle: "italic"}}>Click the + in the top right to add a new exercise, then edit as needed and save.</h5>
             
             <div>
