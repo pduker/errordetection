@@ -308,7 +308,7 @@ export function Exercise({
       });
 
       let beatSum: number = 0;
-      let noteCount: number = 0;
+
       let barStartX = 0;
       let created = false;
       let remainLen = 0;
@@ -368,22 +368,21 @@ export function Exercise({
         // Accumulate beat duration
         if (typeof note.duration === "number" && !isNaN(note.duration)) {
           beatSum += note.duration;
-          noteCount++;
         }
 
         const topLines = svgElement?.querySelectorAll(".abcjs-top-line");
         let totalSum = 0;
 
         if (note.duration >= visualObjs[0].getBeatLength() * 4) {
-          // This note spans 2 or more beats - create multiple beat bars
+          // This note spans 4 or more beats - create multiple beat bars
           const noteBox = noteElems.getBoundingClientRect();
-          let nextNoteElem = noteElems.nextSibling;
+          let nextNoteElem = noteElems.nextElementSibling as HTMLElement | null;
           while (
             nextNoteElem &&
-            (!nextNoteElem.getBoundingClientRect ||
-              nextNoteElem.getAttribute("data-name") === "bar")
+            typeof nextNoteElem.getBoundingClientRect !== "function"
           ) {
-            nextNoteElem = nextNoteElem.nextSibling;
+            nextNoteElem =
+              nextNoteElem.nextElementSibling as HTMLElement | null;
           }
           const noteRight = nextNoteElem
             ? nextNoteElem.getBoundingClientRect().left
@@ -394,7 +393,17 @@ export function Exercise({
           const numBeats = Math.floor(
             note.duration / visualObjs[0].getBeatLength(),
           );
-          const beatWidth = totalNoteWidth / numBeats - 5;
+
+          let beatWidth: number;
+
+          //if the next element is a bar, adjust beat width accordingly (prevents overflow)
+          if (nextNoteElem?.getAttribute("data-name") === "bar") {
+            beatWidth =
+              nextNoteElem.getBoundingClientRect().left - noteLeft - 10;
+          } else {
+            beatWidth = totalNoteWidth / numBeats - 5;
+          }
+
 
           const noteTopPt = toSvgCoords(svgElement, 0, noteBox.top);
           const topLinePt =
@@ -503,7 +512,6 @@ export function Exercise({
 
           totalSum = beatSum;
           beatSum -= visualObjs[0].getBeatLength();
-          noteCount = 0;
           created = true;
           currentBeatIndex++;
         }
@@ -573,11 +581,8 @@ export function Exercise({
           });
 
           beatSum = 0;
-          noteCount = 0;
           currentBeatIndex++;
         }
-
-        console.log("note count: ", noteCount);
 
         if (teacherMode) {
           const noteIndexAttr = noteElems.getAttribute("index");
@@ -674,7 +679,7 @@ export function Exercise({
     bar.classList.add("bar");
     bar.setAttribute("x", x.toString());
     bar.setAttribute("y", y.toString());
-    bar.setAttribute("width", width.toString());
+    bar.setAttribute("width", Math.abs(width).toString());
     bar.setAttribute("height", "7");
     if (tags.includes("Rhythm")) {
       bar.setAttribute("fill", "purple");
@@ -1192,9 +1197,15 @@ export function Exercise({
       let allCorrect = true;
       const plural = currentCorrectAnswers.length === 1 ? " is " : " are ";
 
+<<<<<<< HEAD
+      // feedback.push(
+      //   `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`
+      // );
+=======
       feedback.push(
         `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`,
       );
+>>>>>>> 85b8cd3abd2630ff508b80a7112e8f1509755f09
 
       highlightBeat(
         selectedBeatElements as unknown as Element[],
@@ -1223,23 +1234,6 @@ export function Exercise({
             console.log(
               `Missing beat: measure ${corr.measurePos}, beat ${corr.beatIndex}, staff ${corr.staffPos}`,
             );
-
-            if (
-              !isNaN(corr.staffPos) &&
-              instruments[Number(corr.staffPos)] !== undefined
-            ) {
-              feedback.push(
-                `\nMissing correct beat in Measure ${
-                  Number(corr.measurePos) + 1
-                } on the ${instruments[Number(corr.staffPos)]} staff.`,
-              );
-            } else {
-              feedback.push(
-                `\nMissing correct beat in Measure ${
-                  Number(corr.measurePos) + 1
-                }.`,
-              );
-            }
           }
         } else if (corr.type === "note") {
           // Check if this note was selected
@@ -1318,7 +1312,7 @@ export function Exercise({
           // Check if this note is correct
           found = currentCorrectAnswers.some(
             (c) =>
-              c.type === "note" &&
+              // c.type === "note" &&
               Number(c.measurePos) === Number(sel.measurePos) &&
               Number(c.index) === Number(sel.index),
           );
@@ -1333,24 +1327,26 @@ export function Exercise({
               !isNaN(sel.staffPos) &&
               instruments[Number(sel.staffPos)] !== undefined
             ) {
-              feedback.push(
-                `\nIncorrect note selected in Measure ${
-                  Number(sel.measurePos) + 1
-                } on the ${instruments[Number(sel.staffPos)]} staff.`,
-              );
+              feedback.push(`\nNot quite - try again!`);
             } else {
-              feedback.push(
-                `\nIncorrect note selected in Measure ${
-                  Number(sel.measurePos) + 1
-                }.`,
-              );
+              feedback.push(`\nNot quite - try again!`);
             }
           }
         }
       });
 
-      if (allCorrect && combinedSelections.length > 0) {
+      if (
+        allCorrect &&
+        combinedSelections.length === currentCorrectAnswers.length
+      ) {
         feedback = ["Great job!"];
+      } else if (
+        allCorrect &&
+        combinedSelections.length < currentCorrectAnswers.length
+      ) {
+        feedback.push(
+          `Very close! There${plural}${currentCorrectAnswers.length} correct answer(s).`
+        );
       }
 
       setCustomFeedback(feedback);
@@ -1413,9 +1409,11 @@ export function Exercise({
       let allCorrect = true;
       const plural = currentCorrectAnswers.length === 1 ? " is " : " are ";
 
-      feedback.push(
-        `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`,
-      );
+      if (!allCorrect) {
+        feedback.push(
+          `Try again - there${plural}${currentCorrectAnswers.length} correct answer(s).`
+        );
+      }
 
       // Check for missing correct answers (both notes and beats)
       currentCorrectAnswers.forEach((corr) => {
@@ -1435,23 +1433,6 @@ export function Exercise({
             console.log(
               `Missing beat: measure ${corr.measurePos}, beat ${corr.beatIndex}, staff ${corr.staffPos}`,
             );
-
-            if (
-              !isNaN(corr.staffPos) &&
-              instruments[Number(corr.staffPos)] !== undefined
-            ) {
-              feedback.push(
-                `\nMissing correct beat in Measure ${
-                  Number(corr.measurePos) + 1
-                } on the ${instruments[Number(corr.staffPos)]} staff.`,
-              );
-            } else {
-              feedback.push(
-                `\nMissing correct beat in Measure ${
-                  Number(corr.measurePos) + 1
-                }.`,
-              );
-            }
           }
         }
       });
@@ -1484,26 +1465,26 @@ export function Exercise({
               !isNaN(sel.staffPos) &&
               instruments[Number(sel.staffPos)] !== undefined
             ) {
-              feedback.push(
-                `\nIncorrect beat selected in Measure ${
-                  Number(sel.measurePos) + 1
-                } on the ${instruments[Number(sel.staffPos)]} staff (Beat ${
-                  sel.beatIndex
-                }).`,
-              );
+              feedback.push(`\nNot quite - try again!`);
             } else {
-              feedback.push(
-                `\nIncorrect beat selected in Measure ${
-                  Number(sel.measurePos) + 1
-                }, Beat ${sel.beatIndex}.`,
-              );
+              feedback.push(`\nNot quite - try again!`);
             }
           }
         }
       });
 
-      if (allCorrect && combinedSelections.length > 0) {
+      if (
+        allCorrect &&
+        combinedSelections.length === currentCorrectAnswers.length
+      ) {
         feedback = ["Great job!"];
+      } else if (
+        allCorrect &&
+        combinedSelections.length < currentCorrectAnswers.length
+      ) {
+        feedback.push(
+          `Very close! There${plural}${currentCorrectAnswers.length} correct answer(s).`
+        );
       }
 
       setCustomFeedback(feedback);
@@ -1567,34 +1548,10 @@ export function Exercise({
     ) {
       feedback = ["Great job identifying the errors in this passage!"];
     } else if (tmpSelected.length !== correctAnswers.length) {
-      const pluralText = correctAnswers.length === 1 ? " is " : " are ";
-      feedback = [
-        `\nYou selected ${selAnswers.length} answer(s). There${pluralText}${correctAnswers.length} correct answer(s). Here are some specific places to look at and listen to more closely:`,
-      ];
-      for (let i = 0; i < tmpCorrect.length; i++) {
-        feedback.push(
-          `\nMeasure ${Number(tmpCorrect[i]["measurePos"]) + 1}, Staff ${
-            Number(tmpCorrect[i]["staffPos"]) + 1
-          }`,
-        );
-      }
-      for (let i = 0; i < wrongList.length; i++) {
-        feedback.push(
-          `\nWrong answer selected at: Measure ${
-            Number(wrongList[i].getAttribute("measurePos")) + 1
-          }, Staff ${Number(wrongList[i].getAttribute("staffPos")) + 1}`,
-        );
-      }
+      feedback = [`\nNot quite - try again!`];
     } else if (tmpCorrect.length === correctAnswers.length) {
-      feedback = [
-        "Keep trying; the more you practice the better you will get. Here are some specific places to look at and listen to more closely:",
-      ];
+      feedback = ["Not quite - try again!"];
       for (let i = 0; i < tmpCorrect.length; i++) {
-        feedback.push(
-          `\nMeasure ${Number(tmpCorrect[i]["measurePos"]) + 1}, Staff ${
-            Number(tmpCorrect[i]["staffPos"]) + 1
-          }`,
-        );
         let addtlFeedback = tmpCorrect[i]["feedback"];
         if (
           closeList.includes(Number(tmpCorrect[i]["index"])) &&
@@ -1615,7 +1572,7 @@ export function Exercise({
       }
     } else if (tmpCorrect.length < correctAnswers.length) {
       feedback = [
-        "Good work – you've found some of the errors, but here are some specific places to look at and listen to more closely:",
+        "Good work – you've found some of the errors. Try again to find all of them!",
       ];
       for (let i = 0; i < tmpCorrect.length; i++) {
         feedback.push(
@@ -2222,7 +2179,6 @@ export function Exercise({
           {canCheckAnswers ? (
             <div>
               <div>
-                Next step(s):
                 {customFeedback.map(function (feedback) {
                   return (
                     <li
