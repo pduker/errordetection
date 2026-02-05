@@ -1,0 +1,237 @@
+.Home-title {
+  margin: 0;
+  padding: 0;
+}
+
+.Home-bar {
+  display: flex;
+  padding-left: 1vw;
+  padding-top: 1vh;
+  background-color: #ffdb63;
+  height: 70px;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.Home-bar.mobile {
+  height: 100%;
+}
+
+.Home-nav {
+  align-items: center;
+  display: inline;
+}
+
+.Home-nav-right {
+  margin-left: auto;
+}
+
+#navbar {
+  height: 90%;
+  position: sticky;
+  top: 20px;
+}
+#header {
+  width: 100%;
+  height: 100vh;
+  background-image: url(../assets/musicbg1.jpg);
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  /* 600px 1000px; */
+}
+.pagediv {
+  height: 86.5vh;
+  width: 95vw;
+  display: flex;
+  box-shadow: inset 0 0 5px grey;
+  flex-direction: column;
+  align-items: center; /*SIR: removed justifyContent: center*/
+  text-align: center;
+  padding: 1vh 1vw 1vh 1vw;
+  margin-top: 0px;
+  background: #ffdb63;
+  border-radius: 10px;
+  margin-left: 2.5vw;
+}
+
+.pagediv.mobile {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  border-radius: 0;
+}
+
+.pagediv-landing {
+  width: min(92vw, 1100px);
+  height: calc(100vh - 140px);
+  margin: 0 auto;
+  border-radius: 12px;
+  background: #ffdb63;
+  box-shadow: none;
+  padding: 0;
+}
+
+.landing-page {
+  width: 100%;
+  min-height: calc(100vh - 140px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1.5rem;
+}
+
+.landing-card {
+  max-width: 750px;
+  text-align: center;
+  background: #ffffff;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+}
+
+.landing-card h1 {
+  color: #114b96;
+  margin-bottom: 1rem;
+}
+
+.landing-card p {
+  color: #333;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.landing-button {
+  display: inline-block;
+  background: #114b96;
+  color: #fff;
+  padding: 0.75rem 1.75rem;
+  border-radius: 999px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: transform 0.15s ease, box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.landing-button:hover {
+  background: #0d3b78;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(17, 75, 150, 0.3);
+}
+
+.container {
+  box-shadow: inset 0 0 5px grey;
+  width: 100%;
+  padding: 15px 10%;
+  background: #ffdb63;
+  border-radius: 5px;
+  margin: "5px";
+}
+
+.logo {
+  position: sticky;
+  width: 140px;
+}
+nav {
+  box-shadow: inset 0 0 5px grey;
+  display: grid;
+  align-items: left;
+  justify-content: space-between;
+  z-index: 3;
+  flex-wrap: wrap;
+  background: #785812;
+  position: fixed;
+
+  padding: 7px;
+  width: 100vw;
+  text-align: left;
+}
+nav ul li {
+  display: inline-block;
+  list-style: none;
+  margin: 10px 20px;
+}
+
+nav ul li a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 18px;
+  position: relative;
+}
+
+nav ul li a::after {
+  content: "";
+  width: 0;
+  height: 3px;
+  background: #02113f;
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  transition: 0.5s;
+}
+/* cool transition css stuff */
+nav ul li a:hover::after {
+  width: 100%;
+}
+.header-text {
+  margin-top: 20%;
+  font-size: 30px;
+}
+
+.header-text h1 {
+  font-size: 60px;
+  margin-top: 20px;
+}
+.header-text h1 span {
+  color: black;
+}
+
+nav .fas {
+  display: none;
+}
+
+@media only screen and (max-width: 1100px) {
+  #header {
+    background-image: url(../assets/musicbg1.jpg);
+  }
+  .header-text {
+    margin-top: 100%;
+    font-size: 16px;
+  }
+
+  .header-text h1 {
+    font-size: 30px;
+    margin-top: 20px;
+  }
+  .header-text h1 span {
+    color: black;
+  }
+  nav .fas {
+    display: block;
+    font-size: 25px;
+    padding: 10px;
+    color: #000;
+  }
+  nav ul {
+    background: #0010df;
+    position: fixed;
+    top: 0;
+    right: -200px;
+    width: 200px;
+    height: 100vh;
+    padding-top: 50px;
+    z-index: 2;
+    transition: right 0.5s;
+  }
+  nav ul li {
+    display: block;
+    margin: 25px;
+  }
+  nav ul .fas {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    cursor: pointer;
+  }
+}

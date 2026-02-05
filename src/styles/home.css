@@ -1,0 +1,140 @@
+.home-page {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: clamp(20px, 4vw, 60px);
+}
+
+.home-card {
+  width: min(960px, 100%);
+  padding: clamp(24px, 5vw, 48px);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.home-card h1 {
+  color: #114b96;
+  margin-bottom: 6px;
+}
+
+.home-card h1:last-of-type {
+  margin-bottom: 10px;
+}
+
+/* -----------------------------services---------------------- */
+#services {
+  padding: 80px 0;
+}
+.services-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-gap: 40px;
+  margin-top: 50px;
+}
+.services-list div {
+  background: #1f28fd;
+  padding: 40px;
+  font-size: 13px;
+  font-weight: 300;
+  border-radius: 10px;
+  border-style: dashed;
+  transition: background 0.5s, transform 0.5s;
+}
+.services-list div i {
+  font-size: 50px;
+  margin-bottom: 30px;
+}
+.services-list div a {
+  padding: 5px;
+  width: fit-content;
+  border-style: dashed;
+  border-radius: 5px;
+  text-decoration: none;
+  color: #fff;
+  font-size: 12px;
+  margin-top: 20px;
+  display: inline-block;
+}
+.services-list div:hover {
+  background: #add8e6;
+  transform: translateY(-10px);
+}
+/* ---------portfolio-------- */
+#portfolio {
+  padding: 80px 0;
+}
+.work-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-gap: 30px;
+  margin-top: 30px;
+}
+
+.work {
+  border-radius: 15px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  border: 0.5px solid #114b96;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.work img {
+  width: 100%;
+  border-radius: 10px;
+  display: block;
+  transition: transform 0.5s;
+}
+.layer {
+  width: 100%;
+  height: 0;
+  background: linear-gradient(rgba(256, 256, 256, 0.6), #a1c0dc);
+  border-radius: 10px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0 40px;
+  flex-direction: column;
+  font-size: 14px;
+  transition: height 0.5s;
+}
+
+.layer h3 {
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+.layer h2 {
+  font-weight: 750;
+  margin-bottom: 20px;
+}
+.layer a {
+  margin-top: 20px;
+  color: #1f104f;
+  text-decoration: none;
+  font-size: 18px;
+  line-height: 40px;
+  background: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  text-align: center;
+}
+.work:hover img {
+  transform: scale(1.1);
+}
+.work:hover .layer {
+  height: 100%;
+}
+.work:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 22px 45px rgba(0, 0, 0, 0.35);
+}
