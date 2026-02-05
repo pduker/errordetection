@@ -1,3 +1,4 @@
+import '../styles/about.css';
 import { Link } from "react-router-dom";
 
 const contributors = [
@@ -44,7 +45,7 @@ export function AboutPage() {
                     </p>
                     <div className="about-highlight">
                         Have a suggestion, spot an error, or want to collaborate?
-                        Email Phil Duker and let us know how we can help.
+                        Email <a className="inline-link highlight-email" href="mailto:pduker@udel.edu" data-label="pduker@udel.edu">Phil Duker</a> and let us know how we can help.
                     </div>
                 </section>
 

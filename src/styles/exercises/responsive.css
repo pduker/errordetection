@@ -1,0 +1,96 @@
+/* Responsive design for exercises page */
+
+/* Responsive breakpoint: stack columns on small screens */
+@media (max-width: 1400px) {
+  .ex-page-container,
+  .two-column-wrapper {
+    /*SR: added class for two-column-wrapped so it shrinks nicely*/
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .ex-left,
+  .ex-right,
+  .exercise-placeholder {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+  }
+  .ex-right {
+    order: 1;
+  }
+  .ex-left {
+    order: 2;
+    padding-right: 0;
+  }
+  .exercise-queue-panel {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .exercise-viewer {
+    padding: 0;
+  }
+  /*
+  .exercise-nav-row {
+    flex-direction: column;
+  }*/
+  .exercise-nav-button {
+    width: 50%;
+    min-height: 35px;
+    letter-spacing: 3px;
+    max-width: none;
+  }
+}
+
+/* Small tweaks for very small screens */
+@media (max-width: 480px) {
+  .ex-left {
+    padding-right: 0.5rem;
+  }
+  .ex-right {
+    padding-left: 0.5rem;
+  }
+  .ex-left form {
+    font-size: 0.95rem;
+  }
+}
+
+/* Responsive design for mobile audio player */
+@media only screen and (max-width: 1100px) {
+  .responsive-element {
+    /*edit button so that it shrinks*/
+    height: 50px;
+  }
+  
+  .custom-audio-player {
+    max-width: 150px;
+  }
+  
+  .audio-controls {
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+  }
+  
+  .audio-play-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+  
+  .audio-time-display {
+    font-size: 10px;
+    min-width: 60px;
+  }
+  
+  .audio-volume-section {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .audio-volume {
+    width: 40px;
+  }
+}

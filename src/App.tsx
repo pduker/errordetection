@@ -2,7 +2,9 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import logo from './assets/UD-circle-logo-email.png';
-import './App.css';
+import './styles/global.css';
+import './styles/app.css';
+import './styles/controls.css';
 import { HomePage } from './components/homepage';
 import { HelpPage } from './components/helppage';
 import { AboutPage } from './components/aboutpage';
@@ -39,7 +41,7 @@ function Header({ authorized, resetScrollPosition }: { authorized: boolean; rese
     <Nav className='Home-nav'>
     <Link to="/exercises" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercises")}>Exercises</Link>
     {authorized ?
-    <Link to="/exercise-management" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercise-management")}>Exercise Management</Link>
+    <Link to="exercise-management" style={{ marginRight: '10px' }} onClick={() => handleNavClick("exercise-management")}>Exercise Management</Link>
     : <></>}
     </Nav>
 
@@ -73,8 +75,6 @@ function App() {
 
   // get data from the database
   const fetchScoresFromDatabase = useCallback(async () => {
-    if(scoresRetrieved) return;
-
     console.log("Retrieving scores...");
 
     try {
@@ -85,13 +85,20 @@ function App() {
       // we have a relatively low amount of scores, so this operation is very quick
       // if the scope of this application is larger in the future, look into pagination
       const scores = await get(query(ref(database, 'scores'), orderByKey()));
+      
+      if (!scores.exists()) {
+        console.log("No scores found in database");
+        setScoresRetrieved(true);
+        return;
+      }
+      
       scores.forEach((scoreSnapshot: DataSnapshot) => { // for every score fetched,
         const score = scoreSnapshot.val(); // get the data fetched
         if(!score || !score.sound) return; // if these values aren't populated, something has gone seriously wrong!
 
         exerciseList.push(new ExerciseData( // add it to the list of exercises
           score.score,
-          score.sound,
+          score.sound, // Firebase stores this as string filename, not File object
           score.correctAnswers,
           score.feedback,
           score.exIndex,
@@ -114,12 +121,19 @@ function App() {
       console.log("Loaded exercise list");
     } catch (error) {
       console.error('Error fetching scores:', error);
+      setScoresRetrieved(true); // Set to true to prevent infinite loading
     }
-  }, [scoresRetrieved]);
+  }, []);
+
+  // Manual refresh function for admin use
+  const refreshExercises = useCallback(async () => {
+    setScoresRetrieved(false);
+    await fetchScoresFromDatabase();
+  }, [fetchScoresFromDatabase]);
 
   useEffect(() => {
     fetchScoresFromDatabase(); // fetch from the database on component creation
-  }, [allExData, setAllExData, scoresRetrieved, setScoresRetrieved, fetchScoresFromDatabase]);
+  }, [fetchScoresFromDatabase]);
   
   const location = useLocation();
   const isLanding = location.pathname === "/";
@@ -163,7 +177,7 @@ function App() {
             <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>}/>
             <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}/>}/>
             <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]} scoresRet={scoresRetrieved}></ExercisesPage>}/>
-            <Route path="/exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={fetchScoresFromDatabase} authorized={authorized}/>}/>
+            <Route path="exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={refreshExercises} authorized={authorized}/>}/>
             <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>}/>
         </Routes>
       </div>

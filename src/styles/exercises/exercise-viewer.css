@@ -1,0 +1,119 @@
+/* Exercise viewer and navigation components */
+.exercise-nav-button {
+  margin: 0;
+  min-height: 48px;
+  min-width: 0;
+  padding: 0 1.25rem;
+  border-radius: 12px;
+  border: none;
+  background: #4e81b3;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
+  flex: 1 1 50%;
+  letter-spacing: 3px;
+}
+
+.exercise-nav-button:not(:disabled):hover,
+.exercise-nav-button:not(:disabled):focus-visible {
+  background: #114b96;
+}
+
+.exercise-nav-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+  transform: none;
+}
+
+.exercise-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.exercise-action-check {
+  margin-bottom: 2vh;
+  margin-top: 3vh;
+  min-height: 56px;
+}
+
+.exercise-action-reset {
+  margin-top: 3vh;
+  min-height: 56px;
+}
+
+.exercise-nav-inline {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  border: none;
+  background: #1659c1;
+  color: #fff;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease;
+  z-index: 5;
+}
+
+.exercise-nav-inline:disabled {
+  background: rgba(22, 89, 193, 0.3);
+  cursor: default;
+  box-shadow: none;
+}
+
+.exercise-nav-inline--prev {
+  left: 16px;
+}
+
+.exercise-nav-inline--next {
+  right: 16px;
+}
+
+/*No loaded exercise placeholder styling*/
+.exercise-placeholder {
+  flex: 1;
+  display: flex;
+  margin: 0;
+  width: 100%;
+  min-height: inherit;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  padding: 2rem;
+  background-color: #fff7c9;
+  color: #666;
+  text-align: center;
+}
+
+/* Highlight styles for exercises */
+.hint-highlight {
+  fill: rgba(61, 245, 39, 0.6); /* Adjust color and opacity as needed */
+  stroke: green;
+  stroke-width: 2;
+}
+
+.error-highlight {
+  fill: rgba(255, 0, 0, 0, 6);
+  stroke: red;
+  stroke-width: 2;
+}

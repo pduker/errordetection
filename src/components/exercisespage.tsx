@@ -1,3 +1,4 @@
+import '../styles/exercises/index.css';
 import { Exercise } from './exercise';
 import ExerciseData from '../interfaces/exerciseData';
 import React, { useState, useEffect, useCallback } from 'react';
@@ -14,7 +15,8 @@ function ExerciseViewerComponent({
     nextEx,
     selExercise,
     allExData,
-    setAllExData
+    setAllExData,
+    updateProgress
 }: {
     navButtonsVisible: boolean;
     disablePrevNav: boolean;
@@ -24,6 +26,7 @@ function ExerciseViewerComponent({
     selExercise: ExerciseData | undefined;
     allExData: (ExerciseData | undefined)[];
     setAllExData: (newData: (ExerciseData | undefined)[]) => void;
+    updateProgress: (title: string | number, data: any) => void;
 }) {
     return (
         <div className="exercise-viewer">
@@ -36,7 +39,7 @@ function ExerciseViewerComponent({
                             disabled={disablePrevNav}
                             aria-label="Previous exercise"
                         >
-                            ‹
+                            ←
                         </button>
                     )}
                     <div className="exercise-content-inner">
@@ -51,6 +54,7 @@ function ExerciseViewerComponent({
                                 handleSelectExercise={undefined} 
                                 isSelected={undefined}
                                 fetch={undefined}
+                                updateProgress={updateProgress}
                             />
                         ) : (
                             <div className="exercise-placeholder">
@@ -66,7 +70,7 @@ function ExerciseViewerComponent({
                             disabled={disableNextNav}
                             aria-label="Next exercise"
                         >
-                            ›
+                            →
                         </button>
                     )}
                 </div> 
@@ -130,7 +134,7 @@ function ExerciseQueueComponent({
                         className="exercise-queue-nav-btn"
                         aria-label="Previous page of exercises"
                     >
-                        ‹
+                        ←
                     </Button>
                     <span className="exercise-queue-status">{paginationStatus}</span>
                     <Button
@@ -139,7 +143,7 @@ function ExerciseQueueComponent({
                         className="exercise-queue-nav-btn"
                         aria-label="Next page of exercises"
                     >
-                        ›
+                        →
                     </Button>
                 </div>
                 <Button
@@ -153,19 +157,11 @@ function ExerciseQueueComponent({
             </div>
             <div className="exercise-queue-list">
                 {filteredExercises.length === 0 ? (
-                    !scoresRet ? (
-                        <div className="exercise-list-empty">
-                            <strong>Loading scores...</strong>
-                            <span>
-                                This process should take 2-10 seconds. If nothing changes after 10
-                                seconds, try sorting using the above criteria.
-                            </span>
-                        </div>
-                    ) : (
-                        <div className="exercise-list-empty">
+                    scoresRet ? (
+                        <div className="exercise-list-item exercise-list-item--empty">
                             <strong>No exercises with those criteria found!</strong>
                         </div>
-                    )
+                    ) : null
                 ) : (
                     pageExercises.map(function(exercise: ExerciseData, idx: number){
                         const isActive = selExercise?.exIndex === exercise.exIndex;
@@ -201,7 +197,8 @@ function FiltersComponent({
     handleMeterSelect,
     types,
     handleTexturalFactorSelect,
-    resetSort
+    resetSort,
+    resetDisabled
 }: {
     tags: string[];
     handleTagToggle: (tag: string) => void;
@@ -216,6 +213,7 @@ function FiltersComponent({
     types: string;
     handleTexturalFactorSelect: (value: string) => void;
     resetSort: () => void;
+    resetDisabled: boolean;
 }) {
     const [filtersOpen, setFiltersOpen] = useState<boolean>(true);
 
@@ -245,6 +243,7 @@ function FiltersComponent({
                     texturalFactor={types}
                     onSelectTexturalFactor={handleTexturalFactorSelect}
                     onResetSort={resetSort}
+                    resetDisabled={resetDisabled}
                 />
             </div>
         </section>
@@ -440,8 +439,41 @@ export function ExercisesPage({
         setMeter("Anything");
         setTranspos(false);
         setCurrentPage(1);
-        clearSelection();
+        // Removed clearSelection() to keep the selected exercise
     }
+    
+    useEffect(() => {
+        const savedProgress = localStorage.getItem("userProgress");
+        if (savedProgress) {
+        try {
+            const parsed = JSON.parse(savedProgress);
+            console.log("Loaded saved progress:", parsed);
+        } catch (err) {
+            console.error("Error parsing saved progress:", err);
+        }
+        }
+    }, []);
+
+    const updateProgress = (title: string | number, data: any) => {
+        const current = JSON.parse(localStorage.getItem("userProgress") || "{}");
+        current[title] = { ...current[title], ...data };
+        localStorage.setItem("userProgress", JSON.stringify(current));
+        console.log("Updated progress:", current); // check updates in console
+    };
+
+
+
+    const resetDisabled = React.useMemo(() => {
+        const tagsMatchDefaults = tags.length === 0;
+        return (
+            tagsMatchDefaults &&
+            diff === "All" &&
+            voices === 0 &&
+            types === "None" &&
+            meter === "Anything" &&
+            transpos === false
+        );
+    }, [tags, diff, voices, types, meter, transpos]);
 
     //html to render page
     return (
@@ -459,13 +491,14 @@ export function ExercisesPage({
                                 handleDifficultySelect={handleDifficultySelect}
                                 voices={voices}
                                 handleVoicesSelect={handleVoicesSelect}
-                                meter={meter}
-                                handleMeterSelect={handleMeterSelect}
-                                types={types}
-                                handleTexturalFactorSelect={handleTexturalFactorSelect}
-                                resetSort={resetSort}
-                            />
-                        </div>
+                            meter={meter}
+                            handleMeterSelect={handleMeterSelect}
+                            types={types}
+                            handleTexturalFactorSelect={handleTexturalFactorSelect}
+                            resetSort={resetSort}
+                            resetDisabled={resetDisabled}
+                        />
+                    </div>
 
                         <div className="ex-right">
                             <ExerciseViewerComponent
@@ -477,7 +510,17 @@ export function ExercisesPage({
                                 selExercise={selExercise}
                                 allExData={allExData}
                                 setAllExData={setAllExData}
+                                updateProgress={updateProgress}
                             />
+                            {!scoresRet ? (
+                                <div className="exercise-queue-loading">
+                                    <strong>Loading scores...</strong>
+                                    <span>
+                                        This process should take 2-10 seconds. If nothing changes after 10
+                                        seconds, try sorting using the above criteria.
+                                    </span>
+                                </div>
+                            ) : null}
                             <ExerciseQueueComponent
                                 currentPage={currentPage}
                                 setCurrentPage={setCurrentPage}
