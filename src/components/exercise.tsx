@@ -355,7 +355,7 @@ export function Exercise({
           //if the next element is a bar, adjust beat width accordingly (prevents overflow)
           if (nextNoteElem?.getAttribute("data-name") === "bar") {
             beatWidth =
-              nextNoteElem.getBoundingClientRect().left - noteLeft - 5;
+              nextNoteElem.getBoundingClientRect().left - noteLeft - 10;
           } else {
             beatWidth = totalNoteWidth / numBeats - 5;
           }
@@ -539,8 +539,6 @@ export function Exercise({
           beatSum = 0;
           currentBeatIndex++;
         }
-
-        console.log("note count: ", noteCount);
 
         if (teacherMode) {
           const noteIndexAttr = noteElems.getAttribute("index");
