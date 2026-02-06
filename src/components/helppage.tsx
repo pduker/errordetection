@@ -251,36 +251,13 @@ export function HelpPage({
                         <input id="mng-email" placeholder="Enter admin email..." type="email" required />
                         <input id="mng-pwd" placeholder="Enter admin password..." type="password" required />
                         <button type="submit">Submit</button>
+                        {authorized && (
+                            <button onClick={logout} className="help-logout" style={{ marginTop: '10px', backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}>
+                                Exit Admin Mode
+                            </button>
+                        )}
                     </form>
-                    {authorized && (
-                        <button onClick={logout} className="help-logout" style={{ marginTop: '10px', backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}>
-                            End Admin Mode
-                        </button>
-                    )}
                     {error ? <div className="help-error">{error}</div> : <></>}
-                    {authorized ? (
-                        <div className="help-card help-card--wide">
-                            <h5>Exercise Management Overview</h5>
-                            <p>
-                                Use the management page to add new exercises, view existing ones, and (when enabled) edit or
-                                delete outdated material. Choose <strong>New Exercise</strong> to open a template where you
-                                can set tags, difficulty, meter, and textural factors, then upload both the
-                                <code>.musicxml</code> score and matching <code>.mp3</code>.
-                            </p>
-                            <p>
-                                The title updates automatically as you adjust options. After the score loads, click notes to
-                                mark correct answers, optionally adding note-specific feedback. Use <strong>Update
-                                Answers</strong> to finalize selections, <strong>Reset Answers</strong> to clear everything,
-                                and <strong>Save</strong> to publish to the database.
-                            </p>
-                            <p>
-                                Saved exercises appear immediately on the Exercises page for students. Report any bugs to
-                                Dr. Duker or the Outclassed Dev Team.
-                            </p>
-                        </div>
-                    ) : (
-                        <></>
-                    )}
                 </section>
             </div>
         </div>
