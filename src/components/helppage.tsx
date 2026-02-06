@@ -251,11 +251,11 @@ export function HelpPage({
                         <input id="mng-email" placeholder="Enter admin email..." type="email" required />
                         <input id="mng-pwd" placeholder="Enter admin password..." type="password" required />
                         <button type="submit">Submit</button>
-                        {authorized && (
+                        {/* {authorized && (
                             <button onClick={logout} className="help-logout" style={{ marginTop: '10px', backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}>
                                 Exit Admin Mode
                             </button>
-                        )}
+                        )} */}
                     </form>
                     {error ? <div className="help-error">{error}</div> : <></>}
                 </section>
