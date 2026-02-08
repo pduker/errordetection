@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import ExerciseData from "../interfaces/exerciseData";
@@ -18,6 +18,24 @@ export function CreateExercisePage() {
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [musicXmlFile, setMusicXmlFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState<string>("");
+  
+  useEffect(() => {
+    // Component initialization logic here if needed
+  }, []);
+
+  const clearAllData = () => {
+    // Clear form data
+    setTitle("");
+    setDifficulty(1);
+    setVoices(1);
+    setTags([]);
+    setTypes("None");
+    setMeter("Anything");
+    setTranspos(false);
+    setCustomId("");
+    setAudioFile(null);
+    setMusicXmlFile(null);
+  };
 
   const handleTagChange = (tag: string) => {
     if (tags.includes(tag)) {
@@ -135,13 +153,24 @@ export function CreateExercisePage() {
   return (
     <div className="create-exercise-container">
       <div className="create-exercise-header">
-        <h2 className="create-exercise-title">Create New Exercise</h2>
-        <button
-          onClick={() => navigate("/exercise-management")}
-          className="back-button"
-        >
-          Back to Management
-        </button>
+        <div className="header-left">
+          <h2 className="create-exercise-title">Create New Exercise</h2>
+        </div>
+        <div className="header-right">
+          <button
+            onClick={clearAllData}
+            className="clear-all-button"
+            title="Clear all form data"
+          >
+            Clear All
+          </button>
+          <button
+            onClick={() => navigate("/exercise-management")}
+            className="back-button"
+          >
+            Back to Management
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="create-exercise-form">

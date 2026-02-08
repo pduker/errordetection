@@ -133,17 +133,6 @@ export function ExerciseManagementPage({
         if(exList.length > allExData.length) setExList(allExData.sort(exSortFunc));
     },[exList.length, allExData, tags.length, diff, voices, types, meter, transpos, exSortFunc]);
     
-    //function to allow admin to create a new exercise
-    const createExercise = function () {
-        var last = allExData[allExData.sort(indexSort).length-1];
-        var newEx: ExerciseData;
-        if(last !== undefined) newEx = new ExerciseData("", undefined, [], "", (last.exIndex) + 1, true,"Exercise " + (allExData.length+1), 1, 1, [], "None", "Anything", false, true, customId);
-        else newEx = new ExerciseData("", undefined, [], "", 0, true,"Exercise " + (allExData.length+1), 1, 1, [], "None", "Anything", false, true, customId);
-        newEx.isNew = true;
-        setAllExData([newEx, ...allExData]);
-        setExList([newEx, ...allExData]);
-    }
-
     //function to sort exercises in the list
     const sortExercises = function (input: string | string[] | number | boolean | undefined, inputType:string) {
         var tempTags = tags, tempDiff = diff, tempVoices = voices, tempTypes = types, tempMeter = meter, tempTranspos = transpos;
@@ -204,15 +193,7 @@ export function ExerciseManagementPage({
         setExList(list);
     }
 
-    //sort indexes alphabetically
-    const indexSort = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
-        if (e1 !== undefined && e2 !== undefined) {
-            if(e1.exIndex > e2.exIndex) return 1;
-            else if(e1.exIndex < e2.exIndex) return -1;
-            else return 0;
-        } else return 0;
-    }
-
+    
     //all the onClicks for when a sorting field changes
     //changing difficulty
     const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {

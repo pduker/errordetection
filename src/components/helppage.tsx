@@ -61,12 +61,7 @@ export function HelpPage({
         }
     };
     
-    const logout = function() {
-        setAuthorized(false);
-        setJustLoggedIn(false);
-        console.log("Logged out - admin mode ended");
-    }
-    
+        
     const checkAuth = function(e?: React.FormEvent) {
         // Prevent form submission if called from form event
         if (e) {
