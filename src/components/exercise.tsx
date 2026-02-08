@@ -80,15 +80,7 @@ export function Exercise({
     return mp3.name;
   };
 
-  // Helper function to convert string to File for audio processing
-  const getMp3ForAudio = (mp3: File | string): File | string => {
-    if (typeof mp3 === 'string') {
-      // For string filenames, we'll need to handle them differently in audio processing
-      return mp3;
-    }
-    return mp3;
-  };
-
+  
   var voicesInit = 1;
   var mp3: File | string = new File([], "");
   var typesInit = "None";

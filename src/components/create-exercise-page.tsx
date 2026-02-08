@@ -1,0 +1,404 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "react-bootstrap";
+import ExerciseData from "../interfaces/exerciseData";
+import "../styles/create-exercise.css";
+
+export function CreateExercisePage() {
+  const navigate = useNavigate();
+
+  const [title, setTitle] = useState<string>("");
+  const [difficulty, setDifficulty] = useState<number>(1);
+  const [voices, setVoices] = useState<number>(1);
+  const [tags, setTags] = useState<string[]>([]);
+  const [types, setTypes] = useState<string>("None");
+  const [meter, setMeter] = useState<string>("Anything");
+  const [transpos, setTranspos] = useState<boolean>(false);
+  const [customId, setCustomId] = useState<string>("");
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [musicXmlFile, setMusicXmlFile] = useState<File | null>(null);
+  const [dragOver, setDragOver] = useState<string>("");
+  
+  useEffect(() => {
+    // Component initialization logic here if needed
+  }, []);
+
+  const clearAllData = () => {
+    // Clear form data
+    setTitle("");
+    setDifficulty(1);
+    setVoices(1);
+    setTags([]);
+    setTypes("None");
+    setMeter("Anything");
+    setTranspos(false);
+    setCustomId("");
+    setAudioFile(null);
+    setMusicXmlFile(null);
+  };
+
+  const handleTagChange = (tag: string) => {
+    if (tags.includes(tag)) {
+      setTags(tags.filter((t) => t !== tag));
+    } else {
+      setTags([...tags, tag]);
+    }
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  };
+
+  const getFileIcon = (fileName: string): string => {
+    const extension = fileName.split('.').pop()?.toLowerCase();
+    switch (extension) {
+      case 'mp3':
+      case 'wav':
+      case 'm4a':
+        return '🎵';
+      case 'xml':
+      case 'musicxml':
+        return '🎼';
+      default:
+        return '📄';
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent, type: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver(type);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver('');
+  };
+
+  const handleDrop = (e: React.DragEvent, type: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOver('');
+
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      const file = files[0];
+      
+      if (type === 'audio') {
+        const audioTypes = ['audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/m4a'];
+        if (!audioTypes.includes(file.type) || !file.name.match(/\.(mp3|wav|m4a)$/i)) {
+          alert('Please drop a valid audio file (.mp3, .wav, .m4a)');
+        }
+        setAudioFile(file);
+      } else if (type === 'musicxml') {
+        const xmlTypes = ['application/xml', 'text/xml'];
+        if (!xmlTypes.includes(file.type) || !file.name.match(/\.(xml|musicxml)$/i)) {
+          alert('Please drop a valid MusicXML file (.xml, .musicxml)');
+        }
+        setMusicXmlFile(file);
+      }
+    }
+  };
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (type === 'audio') {
+        setAudioFile(file);
+      } else if (type === 'musicxml') {
+        setMusicXmlFile(file);
+      }
+    }
+  };
+
+  const removeFile = (type: string) => {
+    if (type === 'audio') {
+      setAudioFile(null);
+    } else if (type === 'musicxml') {
+      setMusicXmlFile(null);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const newExercise = new ExerciseData(
+      "",
+      audioFile || "",
+      [],
+      "",
+      Date.now(),
+      false,
+      title || "New Exercise",
+      difficulty,
+      voices,
+      tags,
+      types,
+      meter,
+      transpos,
+      true,
+      customId,
+    );
+
+    console.log("Creating new exercise:", newExercise);
+    alert("Exercise created! (Note: Database saving not implemented yet)");
+    navigate("/exercise-management");
+  };
+
+  return (
+    <div className="create-exercise-container">
+      <div className="create-exercise-header">
+        <div className="header-left">
+          <h2 className="create-exercise-title">Create New Exercise</h2>
+        </div>
+        <div className="header-right">
+          <button
+            onClick={clearAllData}
+            className="clear-all-button"
+            title="Clear all form data"
+          >
+            Clear All
+          </button>
+          <button
+            onClick={() => navigate("/exercise-management")}
+            className="back-button"
+          >
+            Back to Management
+          </button>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="create-exercise-form">
+        {/* Basic Information */}
+        <div className="form-section">
+          <h3>Basic Information</h3>
+
+          <div className="form-group">
+            <label className="form-label">Title:</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Enter exercise title"
+              className="form-input"
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Custom ID:</label>
+            <input
+              type="text"
+              value={customId}
+              onChange={(e) => setCustomId(e.target.value)}
+              placeholder="Enter custom ID (optional)"
+              className="form-input"
+            />
+          </div>
+        </div>
+
+        {/* Exercise Properties */}
+        <div className="form-section">
+          <h3>Exercise Properties</h3>
+
+          <div className="form-grid">
+            <div className="form-group">
+              <label className="form-label">Difficulty:</label>
+              <select
+                value={difficulty}
+                onChange={(e) => setDifficulty(Number(e.target.value))}
+                className="form-select"
+              >
+                <option value={1}>1</option>
+                <option value={2}>2</option>
+                <option value={3}>3</option>
+                <option value={4}>4</option>
+                <option value={5}>5</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Voices:</label>
+              <select
+                value={voices}
+                onChange={(e) => setVoices(Number(e.target.value))}
+                className="form-select"
+              >
+                <option value={1}>1</option>
+                <option value={2}>2</option>
+                <option value={3}>3</option>
+                <option value={4}>4</option>
+                <option value={5}>5</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Meter:</label>
+              <select
+                value={meter}
+                onChange={(e) => setMeter(e.target.value)}
+                className="form-select"
+              >
+                <option value="Anything">Anything</option>
+                <option value="Simple">Simple</option>
+                <option value="Compound">Compound</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Textural Factors:</label>
+              <select
+                value={types}
+                onChange={(e) => setTypes(e.target.value)}
+                className="form-select"
+              >
+                <option value="None">None</option>
+                <option value="Drone">Drone</option>
+                <option value="Ensemble Parts">Ensemble Parts</option>
+                <option value="Both">Drone & Ensemble Parts</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="checkbox-group">
+              <input
+                type="checkbox"
+                checked={transpos}
+                onChange={(e) => setTranspos(e.target.checked)}
+                className="checkbox-input"
+              />
+              <span className="checkbox-label">Transposing Instruments</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Tags */}
+        <div className="form-section">
+          <h3>Tags</h3>
+          <div className="tags-container">
+            {["Pitch", "Intonation", "Rhythm"].map((tag) => (
+              <label
+                key={tag}
+                className={`tag-item ${tags.includes(tag) ? "selected" : ""}`}
+              >
+                <input
+                  type="checkbox"
+                  checked={tags.includes(tag)}
+                  onChange={() => handleTagChange(tag)}
+                  style={{ display: "none" }}
+                />
+                <span className="checkbox-label">{tag}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* File Uploads */}
+        <div className="form-section">
+          <h3>Files</h3>
+          
+          <div className="form-group file-upload-group">
+            <label className="form-label">MusicXML Score (.musicxml):</label>
+            <div 
+              className={`file-drop-zone ${dragOver === 'musicxml' ? 'drag-over' : ''}`}
+              onDragOver={(e) => handleDragOver(e, 'musicxml')}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, 'musicxml')}
+            >
+              <input
+                type="file"
+                accept=".musicxml,.xml"
+                onChange={(e) => handleFileSelect(e, 'musicxml')}
+                className="file-input"
+              />
+              <div className="file-upload-content">
+                <div className="file-upload-icon">📁</div>
+                <div className="file-upload-text">
+                  {musicXmlFile ? 'Replace MusicXML File' : 'Drop MusicXML file here or click to browse'}
+                </div>
+                <div className="file-upload-subtext">
+                  Supports .xml, .musicxml files
+                </div>
+              </div>
+            </div>
+            {musicXmlFile && (
+              <div className="file-preview">
+                <div className="file-preview-icon">{getFileIcon(musicXmlFile.name)}</div>
+                <div className="file-preview-info">
+                  <div className="file-preview-name">{musicXmlFile.name}</div>
+                  <div className="file-preview-details">{formatFileSize(musicXmlFile.size)}</div>
+                </div>
+                <button 
+                  className="file-preview-remove"
+                  onClick={() => removeFile('musicxml')}
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="form-group file-upload-group">
+            <label className="form-label">Audio File (.mp3):</label>
+            <div 
+              className={`file-drop-zone ${dragOver === 'audio' ? 'drag-over' : ''}`}
+              onDragOver={(e) => handleDragOver(e, 'audio')}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, 'audio')}
+            >
+              <input
+                type="file"
+                accept=".mp3,.wav,.m4a"
+                onChange={(e) => handleFileSelect(e, 'audio')}
+                className="file-input"
+              />
+              <div className="file-upload-content">
+                <div className="file-upload-icon">🎵</div>
+                <div className="file-upload-text">
+                  {audioFile ? 'Replace Audio File' : 'Drop audio file here or click to browse'}
+                </div>
+                <div className="file-upload-subtext">
+                  Supports .mp3, .wav, .m4a files
+                </div>
+              </div>
+            </div>
+            {audioFile && (
+              <div className="file-preview">
+                <div className="file-preview-icon">{getFileIcon(audioFile.name)}</div>
+                <div className="file-preview-info">
+                  <div className="file-preview-name">{audioFile.name}</div>
+                  <div className="file-preview-details">{formatFileSize(audioFile.size)}</div>
+                </div>
+                <button 
+                  className="file-preview-remove"
+                  onClick={() => removeFile('audio')}
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="action-buttons">
+          <Button
+            variant="secondary"
+            onClick={() => navigate("/exercise-management")}
+            className="btn-cancel"
+          >
+            Cancel
+          </Button>
+          <Button variant="primary" type="submit" className="btn-create">
+            Create Exercise
+          </Button>
+        </div>
+      </form>
+    </div>
+  );
+}
