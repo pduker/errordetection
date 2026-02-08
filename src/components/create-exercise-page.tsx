@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import ExerciseData from "../interfaces/exerciseData";
+import { ConfirmationModal } from "./confirmation-modal";
 import "../styles/create-exercise.css";
 
 export function CreateExercisePage() {
@@ -18,6 +19,8 @@ export function CreateExercisePage() {
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [musicXmlFile, setMusicXmlFile] = useState<File | null>(null);
   const [dragOver, setDragOver] = useState<string>("");
+  const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
+  const [confirmAction, setConfirmAction] = useState<"back" | "cancel" | null>(null);
   
   useEffect(() => {
     // Component initialization logic here if needed
@@ -35,6 +38,58 @@ export function CreateExercisePage() {
     setCustomId("");
     setAudioFile(null);
     setMusicXmlFile(null);
+  };
+
+  const hasUnsavedData = (): boolean => {
+    return (
+      title.trim() !== "" ||
+      customId.trim() !== "" ||
+      difficulty !== 1 ||
+      voices !== 1 ||
+      tags.length > 0 ||
+      types !== "None" ||
+      meter !== "Anything" ||
+      transpos !== false ||
+      audioFile !== null ||
+      musicXmlFile !== null
+    );
+  };
+
+  const handleBackToManagement = () => {
+    if (hasUnsavedData()) {
+      setConfirmAction("back");
+      setShowConfirmModal(true);
+    } else {
+      navigate("/exercise-management");
+    }
+  };
+
+  const handleCancel = () => {
+    if (hasUnsavedData()) {
+      setConfirmAction("cancel");
+      setShowConfirmModal(true);
+    } else {
+      navigate("/exercise-management");
+    }
+  };
+
+  const handleModalConfirm = () => {
+    setShowConfirmModal(false);
+    navigate("/exercise-management");
+  };
+
+  const handleModalCancel = () => {
+    setShowConfirmModal(false);
+    setConfirmAction(null);
+  };
+
+  const getModalMessage = (): string => {
+    if (confirmAction === "back") {
+      return "Are you sure you want to go back to the management page? Your changes will not be saved.";
+    } else if (confirmAction === "cancel") {
+      return "Are you sure you want to cancel? Your changes will not be saved.";
+    }
+    return "";
   };
 
   const handleTagChange = (tag: string) => {
@@ -151,7 +206,8 @@ export function CreateExercisePage() {
   };
 
   return (
-    <div className="create-exercise-container">
+    <>
+      <div className="create-exercise-container">
       <div className="create-exercise-header">
         <div className="header-left">
           <h2 className="create-exercise-title">Create New Exercise</h2>
@@ -165,7 +221,7 @@ export function CreateExercisePage() {
             Clear All
           </button>
           <button
-            onClick={() => navigate("/exercise-management")}
+            onClick={handleBackToManagement}
             className="back-button"
           >
             Back to Management
@@ -389,7 +445,7 @@ export function CreateExercisePage() {
         <div className="action-buttons">
           <Button
             variant="secondary"
-            onClick={() => navigate("/exercise-management")}
+            onClick={handleCancel}
             className="btn-cancel"
           >
             Cancel
@@ -400,5 +456,16 @@ export function CreateExercisePage() {
         </div>
       </form>
     </div>
+    
+    <ConfirmationModal
+      show={showConfirmModal}
+      onHide={handleModalCancel}
+      onConfirm={handleModalConfirm}
+      title="Unsaved Changes"
+      message={getModalMessage()}
+      confirmText="Yes, Proceed"
+      cancelText="No, Stay Here"
+    />
+    </>
   );
 }
