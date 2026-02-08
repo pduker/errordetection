@@ -1,6 +1,7 @@
 //imports
 import '../styles/about.css';
 import '../styles/help.css';
+import '../styles/logout-modal.css';
 
 // import { sha256 } from 'js-sha256';
 
@@ -8,12 +9,13 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import noteKey from "../assets/note-color-key.png"
 import exExample from "../assets/excersie-example.png"
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../services/database"
 import execPage from "../assets/exc-page.png";
 import filterSec from "../assets/filterPage.png";
 import click from "../assets/noteClick.png";
 import check from "../assets/check-answer.png";
+import { LogoutModal } from "./LogoutModal";
 
 //function for creating the help page, for authorized users
 export function HelpPage({
@@ -27,6 +29,7 @@ export function HelpPage({
     //setting state
     const [error, setError] = useState<string>("");
     const [justLoggedIn, setJustLoggedIn] = useState<boolean>(false);
+    const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
 
     //checking user with login functionality
 
@@ -61,15 +64,16 @@ export function HelpPage({
         }
     };
     
-    const logout = async () => {
-        try {
-            await signOut(auth);
-            setAuthorized(false);
-            localStorage.removeItem('adminAuthorized');
-            console.log("Logged out successfully");
-        } catch (error) {
-            console.error("Logout failed:", error);
-        }
+    const logout = () => {
+        setShowLogoutModal(true);
+    };
+
+    const confirmLogout = () => {
+        setShowLogoutModal(false);
+    };
+
+    const cancelLogout = () => {
+        setShowLogoutModal(false);
     };
         
     const checkAuth = function(e?: React.FormEvent) {
@@ -102,6 +106,7 @@ export function HelpPage({
 
     //rendering page with help information
     return (
+        <>
         <div className="about-page-wrapper">
             <div className="about-page help-page">
                 <section className="about-hero help-hero">
@@ -275,5 +280,14 @@ export function HelpPage({
                 </section>
             </div>
         </div>
+
+        {/* Logout Confirmation Modal */}
+        <LogoutModal 
+            show={showLogoutModal}
+            onConfirm={confirmLogout}
+            onCancel={cancelLogout}
+            setAuthorized={setAuthorized}
+        />
+        </>
     );
 }

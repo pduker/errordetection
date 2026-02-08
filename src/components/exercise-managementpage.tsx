@@ -1,7 +1,9 @@
 import '../styles/exercises/index.css';
+import '../styles/logout-modal.css';
 import { Button } from 'react-bootstrap';
 import ExerciseData from '../interfaces/exerciseData';
 import { Exercise } from './exercise';
+import { LogoutModal } from './LogoutModal';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { get, getDatabase, ref, remove } from 'firebase/database';
 import { useNavigate } from 'react-router-dom';
@@ -25,10 +27,20 @@ export function ExerciseManagementPage({
 
     const navigate = useNavigate();
 
+    // Modal state for logout confirmation
+    const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
+
     // Logout function to end admin mode
     const handleLogout = () => {
-        setAuthorized(false);
-        navigate('/help');
+        setShowLogoutModal(true);
+    };
+
+    const confirmLogout = () => {
+        setShowLogoutModal(false);
+    };
+
+    const cancelLogout = () => {
+        setShowLogoutModal(false);
     };
 
     //use states for getting and setting specific attributes of exercises and music
@@ -462,7 +474,15 @@ export function ExerciseManagementPage({
 
             {exerciseConfig.showNoExercisesMessage && exList.length === 0 ? <div>No exercises found! Maybe try adding one?</div> : <></>}
 
-        </div>
+        {/* Logout Confirmation Modal */}
+        <LogoutModal 
+            show={showLogoutModal}
+            onConfirm={confirmLogout}
+            onCancel={cancelLogout}
+            setAuthorized={setAuthorized}
+            navigateTo="/exercises"
+        />
+    </div>
     </div>
 );
 }
