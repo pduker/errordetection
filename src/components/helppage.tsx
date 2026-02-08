@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import noteKey from "../assets/note-color-key.png"
 import exExample from "../assets/excersie-example.png"
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "../services/database"
 import execPage from "../assets/exc-page.png";
 import filterSec from "../assets/filterPage.png";
@@ -61,6 +61,16 @@ export function HelpPage({
         }
     };
     
+    const logout = async () => {
+        try {
+            await signOut(auth);
+            setAuthorized(false);
+            localStorage.removeItem('adminAuthorized');
+            console.log("Logged out successfully");
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
         
     const checkAuth = function(e?: React.FormEvent) {
         // Prevent form submission if called from form event
@@ -241,17 +251,26 @@ export function HelpPage({
 
                 <section className="help-section help-section--admin">
                     <h3>Administrator Access</h3>
-                    <p>Staff can log in below to unlock the Exercise Management tools.</p>
-                    <form onSubmit={checkAuth} className="help-login">
-                        <input id="mng-email" placeholder="Enter admin email..." type="email" required />
-                        <input id="mng-pwd" placeholder="Enter admin password..." type="password" required />
-                        <button type="submit">Submit</button>
-                        {/* {authorized && (
-                            <button onClick={logout} className="help-logout" style={{ marginTop: '10px', backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}>
-                                Exit Admin Mode
-                            </button>
-                        )} */}
-                    </form>
+                    {authorized ? (
+                        <div className="admin-logged-in">
+                            <div className="admin-status">
+                                <p className="admin-message">You are currently logged in with administrator privileges. 
+                                <button onClick={logout} className="help-logout">
+                                    Logout
+                                </button>
+                                </p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div>
+                            <p>Staff can log in below to unlock the Exercise Management tools.</p>
+                            <form onSubmit={checkAuth} className="help-login">
+                                <input id="mng-email" placeholder="Enter admin email..." type="email" required />
+                                <input id="mng-pwd" placeholder="Enter admin password..." type="password" required />
+                                <button type="submit">Submit</button>
+                            </form>
+                        </div>
+                    )}
                     {error ? <div className="help-error">{error}</div> : <></>}
                 </section>
             </div>
