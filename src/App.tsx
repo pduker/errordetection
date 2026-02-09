@@ -10,7 +10,7 @@ import { HelpPage } from './components/helppage';
 import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
-import { CreateExercisePage } from './components/create-exercise-page';
+import { CreateExercisePage } from './components/exercise-creation';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import ExerciseData from './interfaces/exerciseData';
 import { getDatabase } from 'firebase/database';
