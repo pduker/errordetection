@@ -42,23 +42,13 @@ export function ConfirmationModal({
             {cancelText}
           </Button>
         )}
-        {hideCancelButton ? (
-          <div style={{ marginLeft: 'auto' }}>
-            <Button 
-              variant="primary" 
-              onClick={onConfirm}
-            >
-              {confirmText}
-            </Button>
-          </div>
-        ) : (
-          <Button 
-            variant="primary" 
-            onClick={onConfirm}
-          >
-            {confirmText}
-          </Button>
-        )}
+        <Button 
+          variant="primary" 
+          onClick={onConfirm}
+          style={hideCancelButton ? { marginLeft: 'auto' } : undefined}
+        >
+          {confirmText}
+        </Button>
       </Modal.Footer>
     </Modal>
   );
