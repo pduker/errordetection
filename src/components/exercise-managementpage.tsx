@@ -9,6 +9,33 @@ import { get, getDatabase, ref, remove } from 'firebase/database';
 import { useNavigate } from 'react-router-dom';
 import { exerciseConfig } from '../config/exercise-config';
 
+import '../styles/exercises/exercise-management.css'
+
+function ExerciseManagementListEntry({
+    exercise,
+    isSelected,
+    handleSelectExercise,
+}: {
+    exercise: ExerciseData | undefined;
+    isSelected: boolean;
+    handleSelectExercise: (exIndex: number) => void;
+}) {
+    if(!exercise) return <></>;
+
+    return (
+        <div className={`exercise-list-item no-hover exercise-management-list-entry ${isSelected ? "active" : ""}`}>
+            <div>
+                <input type="checkbox" checked={isSelected} onChange={() => handleSelectExercise(exercise.exIndex)}></input>&nbsp;
+            </div>
+            <span>{exercise.title} <span className="custom-id">{exercise.customId ? `(ID: ${exercise.customId})` : ""}</span></span>
+            <div className="actions">
+                <Button className="p-0">👁️</Button>
+                <Button className="p-0">✏️</Button>
+            </div>
+        </div>
+    );
+}
+
 //code for creating the exercise management page, seen by admin to work on updating exercises
 //take in exercise data and return updated data, must be authorized users
 export function ExerciseManagementPage({
@@ -103,6 +130,7 @@ export function ExerciseManagementPage({
         } else return 0;
     }, []);
 
+    /*
     // Fetch exercises when component mounts
     useEffect(() => {
         console.log("ExerciseManagementPage mounted, fetching exercises...");
@@ -110,6 +138,7 @@ export function ExerciseManagementPage({
             fetch(false);
         }
     }, [fetch]);
+    */
 
     // Update exList when allExData changes - optimized with useMemo
     const sortedExList = useMemo(() => {
@@ -455,8 +484,13 @@ export function ExerciseManagementPage({
                         {exerciseConfig.showExercises && exList.map((exercise) => {
                             if (!exercise) return <div key={Math.random()} />;
 
-                            console.log("Rendering exercise:", exercise.exIndex, "isNew:", exercise.isNew);
+                            return <ExerciseManagementListEntry
+                                exercise={exercise}
+                                isSelected={selectedIndexes.includes(exercise.exIndex)}
+                                handleSelectExercise={handleSelectExercise}
+                            />;
 
+                            /*
                             return (
                                 <Exercise
                                 key={exercise.exIndex}
@@ -469,7 +503,7 @@ export function ExerciseManagementPage({
                                 isSelected={selectedIndexes.includes(exercise.exIndex)}
                                 fetch={fetch}
                                 />
-                            );
+                            */
                         })}
 
             {exerciseConfig.showNoExercisesMessage && exList.length === 0 ? <div>No exercises found! Maybe try adding one?</div> : <></>}
