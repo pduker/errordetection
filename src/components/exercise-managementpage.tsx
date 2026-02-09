@@ -3,7 +3,7 @@ import '../styles/logout-modal.css';
 import { Button } from 'react-bootstrap';
 import ExerciseData from '../interfaces/exerciseData';
 import { Exercise } from './exercise';
-import { LogoutModal } from './LogoutModal';
+import { LogoutModal } from './modals/LogoutModal';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { get, getDatabase, ref, remove } from 'firebase/database';
 import { useNavigate } from 'react-router-dom';

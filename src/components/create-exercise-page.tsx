@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import ExerciseData from "../interfaces/exerciseData";
-import { ConfirmationModal } from "./confirmation-modal";
+import { ConfirmationModal } from "./modals/confirmation-modal";
 import "../styles/create-exercise.css";
 
 export function CreateExercisePage() {

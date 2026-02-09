@@ -15,7 +15,7 @@ import execPage from "../assets/exc-page.png";
 import filterSec from "../assets/filterPage.png";
 import click from "../assets/noteClick.png";
 import check from "../assets/check-answer.png";
-import { LogoutModal } from "./LogoutModal";
+import { LogoutModal } from "./modals/LogoutModal";
 
 //function for creating the help page, for authorized users
 export function HelpPage({
