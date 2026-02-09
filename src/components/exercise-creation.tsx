@@ -390,7 +390,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
 
         {/* Tags */}
         <div className="form-section">
-          <h3>Tags</h3>
+          <h3>Exercise Type</h3>
           <div className="tags-container">
             {["Pitch", "Intonation", "Rhythm"].map((tag) => (
               <label
@@ -406,22 +406,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                 <span className="checkbox-label">{tag}</span>
               </label>
             ))}
-          </div>
-        </div>
-
-        {/* Identification */}
-        <div className="form-section">
-          <h3>Identification</h3>
-
-          <div className="form-group">
-            <label className="form-label">Custom ID:</label>
-            <input
-              type="text"
-              value={customId}
-              onChange={(e) => setCustomId(e.target.value)}
-              placeholder="Enter custom ID (optional)"
-              className="form-input"
-            />
           </div>
         </div>
 
@@ -509,6 +493,22 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                 </button>
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Identification */}
+        <div className="form-section">
+          <h3>Identification</h3>
+
+          <div className="form-group">
+            <label className="form-label">Custom ID:</label>
+            <input
+              type="text"
+              value={customId}
+              onChange={(e) => setCustomId(e.target.value)}
+              placeholder="Enter custom ID (optional)"
+              className="form-input"
+            />
           </div>
         </div>
 

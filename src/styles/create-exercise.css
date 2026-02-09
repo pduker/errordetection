@@ -145,30 +145,7 @@
 }
 
 .checkbox-group:hover {
-  background: linear-gradient(135deg, #e7f3ff 0%, #d4e9ff 100%);
-  border-color: #114b96;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(17, 75, 150, 0.15);
-}
-
-.checkbox-group::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(17, 75, 150, 0.1),
-    transparent
-  );
-  transition: left 0.5s ease;
-}
-
-.checkbox-group:hover::before {
-  left: 100%;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e7f3ff 100%);
 }
 
 .checkbox-input {
