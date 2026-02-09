@@ -1087,13 +1087,15 @@ export function Exercise({
     }
 
     // Find which selected notes are correct
-    const correctNoteIndices = new Set(
-      correctAnswers.map((ans) => String(ans.index)),
+    const correctNoteKeys = new Set(
+      correctAnswers.map((ans) => `${ans.index}-${ans.selectedTimes ?? 0}`),
     );
 
     selectedNotes.forEach((noteElem) => {
       const noteIndex = noteElem.getAttribute("index");
-      if (noteIndex != null && correctNoteIndices.has(noteIndex)) {
+      const selTimes = noteElem.getAttribute("selectedTimes") ?? "0";
+      const noteKey = `${noteIndex}-${selTimes}`;
+      if (noteIndex != null && correctNoteKeys.has(noteKey)) {
         // Correct selection: highlight beat green
         highlightBeatOfNote(noteElem, "rgba(61, 245, 39, 0.6)");
       } else {
@@ -1197,16 +1199,6 @@ export function Exercise({
       let allCorrect = true;
       const plural = currentCorrectAnswers.length === 1 ? " is " : " are ";
 
-<<<<<<< HEAD
-      // feedback.push(
-      //   `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`
-      // );
-=======
-      feedback.push(
-        `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`,
-      );
->>>>>>> 85b8cd3abd2630ff508b80a7112e8f1509755f09
-
       highlightBeat(
         selectedBeatElements as unknown as Element[],
         currentCorrectAnswers,
@@ -1241,7 +1233,9 @@ export function Exercise({
             (s) =>
               s.type === "note" &&
               Number(s.measurePos) === Number(corr.measurePos) &&
-              Number(s.index) === Number(corr.index),
+              Number(s.index) === Number(corr.index) &&
+              // ensure the number of times selected matches expected
+              Number((s as any).selectedTimes) === Number(corr.selectedTimes),
           );
 
           if (!found) {
@@ -1312,9 +1306,10 @@ export function Exercise({
           // Check if this note is correct
           found = currentCorrectAnswers.some(
             (c) =>
-              // c.type === "note" &&
               Number(c.measurePos) === Number(sel.measurePos) &&
-              Number(c.index) === Number(sel.index),
+              Number(c.index) === Number(sel.index) &&
+              // ensure the selectedTimes also match
+              Number(c.selectedTimes) === Number((sel as any).selectedTimes),
           );
 
           if (!found) {
