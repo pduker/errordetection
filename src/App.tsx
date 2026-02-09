@@ -72,11 +72,7 @@ function App() {
   //state initialization
   const [allExData,setAllExData] = useState<(ExerciseData | undefined)[]>([]);
   const [scoresRetrieved, setScoresRetrieved] = useState<boolean>(false); // Track whether scores are retrieved
-  const [authorized, setAuthorized] = useState<boolean>(() => {
-    // Check localStorage on initial load to restore admin state
-    const savedAuth = localStorage.getItem('adminAuthorized');
-    return savedAuth === 'true';
-  }); // has the user put in the admin pwd on help page?
+  const [authorized, setAuthorized] = useState<boolean>(false); // has the user put in the admin pwd on help page?
 
   // get data from the database
   const fetchScoresFromDatabase = useCallback(async () => {
@@ -127,16 +123,6 @@ function App() {
     } catch (error) {
       console.error('Error fetching scores:', error);
       setScoresRetrieved(true); // Set to true to prevent infinite loading
-    }
-  }, []);
-
-  // Wrapper function to update authorization state and localStorage
-  const updateAuthorized = useCallback((newAuthState: boolean) => {
-    setAuthorized(newAuthState);
-    if (newAuthState) {
-      localStorage.setItem('adminAuthorized', 'true');
-    } else {
-      localStorage.removeItem('adminAuthorized');
     }
   }, []);
 
@@ -192,9 +178,8 @@ function App() {
             <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>}/>
             <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}/>}/>
             <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]} scoresRet={scoresRetrieved}></ExercisesPage>}/>
-            <Route path="exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={refreshExercises} authorized={authorized} setAuthorized={updateAuthorized}/>}/>
-            <Route path="/exercise-management/create" element={<CreateExercisePage />}/>
-            <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={updateAuthorized}/>}/>
+            <Route path="exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={refreshExercises} authorized={authorized}/>}/>
+            <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={setAuthorized}/>}/>
         </Routes>
       </div>
       </div>

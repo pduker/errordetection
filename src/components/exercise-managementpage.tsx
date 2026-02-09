@@ -1,13 +1,10 @@
 import '../styles/exercises/index.css';
-import '../styles/logout-modal.css';
 import { Button } from 'react-bootstrap';
 import ExerciseData from '../interfaces/exerciseData';
 import { Exercise } from './exercise';
 import { LogoutModal } from './modals/LogoutModal';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { get, getDatabase, ref, remove } from 'firebase/database';
-import { useNavigate } from 'react-router-dom';
-import { exerciseConfig } from '../config/exercise-config';
 
 //code for creating the exercise management page, seen by admin to work on updating exercises
 //take in exercise data and return updated data, must be authorized users
@@ -15,33 +12,13 @@ export function ExerciseManagementPage({
     allExData,
     setAllExData,
     fetch,
-    authorized,
-    setAuthorized
+    authorized
 }:{
     allExData: (ExerciseData | undefined)[];
     setAllExData: ((newData: (ExerciseData | undefined)[]) => void);
     fetch: (val: boolean) => void;
     authorized: boolean;
-    setAuthorized: ((authorized: boolean) => void);
 }) {
-
-    const navigate = useNavigate();
-
-    // Modal state for logout confirmation
-    const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
-
-    // Logout function to end admin mode
-    const handleLogout = () => {
-        setShowLogoutModal(true);
-    };
-
-    const confirmLogout = () => {
-        setShowLogoutModal(false);
-    };
-
-    const cancelLogout = () => {
-        setShowLogoutModal(false);
-    };
 
     //use states for getting and setting specific attributes of exercises and music
     const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
@@ -145,6 +122,17 @@ export function ExerciseManagementPage({
         if(exList.length > allExData.length) setExList(allExData.sort(exSortFunc));
     },[exList.length, allExData, tags.length, diff, voices, types, meter, transpos, exSortFunc]);
     
+    //function to allow admin to create a new exercise
+    const createExercise = function () {
+        var last = allExData[allExData.sort(indexSort).length-1];
+        var newEx: ExerciseData;
+        if(last !== undefined) newEx = new ExerciseData("", undefined, [], "", (last.exIndex) + 1, true,"Exercise " + (allExData.length+1), 1, 1, [], "None", "Anything", false, true, customId);
+        else newEx = new ExerciseData("", undefined, [], "", 0, true,"Exercise " + (allExData.length+1), 1, 1, [], "None", "Anything", false, true, customId);
+        newEx.isNew = true;
+        setAllExData([newEx, ...allExData]);
+        setExList([newEx, ...allExData]);
+    }
+
     //function to sort exercises in the list
     const sortExercises = function (input: string | string[] | number | boolean | undefined, inputType:string) {
         var tempTags = tags, tempDiff = diff, tempVoices = voices, tempTypes = types, tempMeter = meter, tempTranspos = transpos;
@@ -205,7 +193,15 @@ export function ExerciseManagementPage({
         setExList(list);
     }
 
-    
+    //sort indexes alphabetically
+    const indexSort = function (e1: ExerciseData | undefined, e2: ExerciseData | undefined): number {
+        if (e1 !== undefined && e2 !== undefined) {
+            if(e1.exIndex > e2.exIndex) return 1;
+            else if(e1.exIndex < e2.exIndex) return -1;
+            else return 0;
+        } else return 0;
+    }
+
     //all the onClicks for when a sorting field changes
     //changing difficulty
     const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
@@ -329,30 +325,13 @@ export function ExerciseManagementPage({
 
     return (
         <div style={{width: "90vw"}}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <div>
-                    {/*page header*/}
-                    <h2 style={{display:"inline"}}>Welcome to the Exercise Management Page!</h2>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <button 
-                        onClick={handleLogout}
-                        style={{
-                            padding: "8px 16px",
-                            backgroundColor: "#dc3545",
-                            color: "white",
-                            border: "none",
-                            borderRadius: "4px",
-                            cursor: "pointer",
-                            fontSize: "14px"
-                        }}
-                    >
-                        Exit Admin Mode
-                    </button>
-                    {/*creating an exercise*/}
-                    <Button style={{display: "inline", marginRight: "1vw"}} onClick={() => navigate('/exercise-management/create')}>+</Button>
-                </div>
+            <div>
+                {/*page header*/}
+                <h2 style={{display:"inline"}}>Welcome to the Exercise Management Page!</h2>
             </div>
+            
+            {/*creating an exercise*/}
+            <Button style={{display: "inline", float:"right", marginRight: "1vw"}} onClick={createExercise}>+</Button>
             <h5 style={{marginTop: "8px", fontStyle: "italic"}}>Click the + in the top right to add a new exercise, then edit as needed and save.</h5>
             
             <div>
@@ -452,7 +431,24 @@ export function ExerciseManagementPage({
                             </div>
 
                         {/*returning exercise data */}
-                        {exerciseConfig.showExercises && exList.map((exercise) => {
+                        {/* {exList.map((exercise) => {
+                                if (exercise !== undefined)
+                                    return (
+                                        <Exercise
+                                            key={exercise.exIndex}
+                                            teacherMode={true}
+                                            ExData={exercise}
+                                            allExData={allExData}
+                                            setAllExData={setAllExData}
+                                            exIndex={exercise.exIndex}
+                                            handleSelectExercise={handleSelectExercise}
+                                            isSelected={selectedIndexes.includes(exercise.exIndex)}
+                                            fetch={fetch}
+                                        />
+                                    )
+                                else return (<div key={Math.random()} />);
+                            })} */}
+                        {exList.map((exercise) => {
                             if (!exercise) return <div key={Math.random()} />;
 
                             console.log("Rendering exercise:", exercise.exIndex, "isNew:", exercise.isNew);
@@ -472,17 +468,9 @@ export function ExerciseManagementPage({
                             );
                         })}
 
-            {exerciseConfig.showNoExercisesMessage && exList.length === 0 ? <div>No exercises found! Maybe try adding one?</div> : <></>}
+            {exList.length === 0 ? <div>No exercises found! Maybe try adding one?</div> : <></>}
 
-        {/* Logout Confirmation Modal */}
-        <LogoutModal 
-            show={showLogoutModal}
-            onConfirm={confirmLogout}
-            onCancel={cancelLogout}
-            setAuthorized={setAuthorized}
-            navigateTo="/exercises"
-        />
-    </div>
+        </div>
     </div>
 );
 }

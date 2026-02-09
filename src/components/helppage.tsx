@@ -1,7 +1,6 @@
 //imports
 import '../styles/about.css';
 import '../styles/help.css';
-import '../styles/logout-modal.css';
 
 // import { sha256 } from 'js-sha256';
 
@@ -28,8 +27,6 @@ export function HelpPage({
     const navigate = useNavigate();
     //setting state
     const [error, setError] = useState<string>("");
-    const [justLoggedIn, setJustLoggedIn] = useState<boolean>(false);
-    const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
 
     //checking user with login functionality
 
@@ -41,7 +38,6 @@ export function HelpPage({
           
           // Set admin privileges based on login - useEffect will handle navigation
           setAuthorized(true);
-          setJustLoggedIn(true);
           setError("");
           
         } catch (error: any) {
@@ -64,18 +60,6 @@ export function HelpPage({
         }
     };
     
-    const logout = () => {
-        setShowLogoutModal(true);
-    };
-
-    const confirmLogout = () => {
-        setShowLogoutModal(false);
-    };
-
-    const cancelLogout = () => {
-        setShowLogoutModal(false);
-    };
-        
     const checkAuth = function(e?: React.FormEvent) {
         // Prevent form submission if called from form event
         if (e) {
@@ -95,18 +79,16 @@ export function HelpPage({
         }
     }
     
-    // Navigate to exercise management only when user just logged in
+    // Navigate to exercise management when authorized becomes true
     useEffect(() => {
-        if (authorized && justLoggedIn) {
-            console.log("User just logged in, navigating to exercise-management...");
+        if (authorized) {
+            console.log("User is authorized, navigating to exercise-management...");
             navigate("/exercise-management");
-            setJustLoggedIn(false); // Reset flag after navigation
         }
-    }, [authorized, justLoggedIn, navigate]);
+    }, [authorized, navigate]);
 
     //rendering page with help information
     return (
-        <>
         <div className="about-page-wrapper">
             <div className="about-page help-page">
                 <section className="about-hero help-hero">
@@ -256,38 +238,38 @@ export function HelpPage({
 
                 <section className="help-section help-section--admin">
                     <h3>Administrator Access</h3>
+                    <p>Staff can log in below to unlock the Exercise Management tools.</p>
+                    <form onSubmit={checkAuth} className="help-login">
+                        <input id="mng-email" placeholder="Enter admin email..." type="email" required />
+                        <input id="mng-pwd" placeholder="Enter admin password..." type="password" required />
+                        <button type="submit">Submit</button>
+                    </form>
+                    {error ? <div className="help-error">{error}</div> : <></>}
                     {authorized ? (
-                        <div className="admin-logged-in">
-                            <div className="admin-status">
-                                <p className="admin-message">You are currently logged in with administrator privileges. 
-                                <button onClick={logout} className="help-logout">
-                                    Logout
-                                </button>
-                                </p>
-                            </div>
+                        <div className="help-card help-card--wide">
+                            <h5>Exercise Management Overview</h5>
+                            <p>
+                                Use the management page to add new exercises, view existing ones, and (when enabled) edit or
+                                delete outdated material. Choose <strong>New Exercise</strong> to open a template where you
+                                can set tags, difficulty, meter, and textural factors, then upload both the
+                                <code>.musicxml</code> score and matching <code>.mp3</code>.
+                            </p>
+                            <p>
+                                The title updates automatically as you adjust options. After the score loads, click notes to
+                                mark correct answers, optionally adding note-specific feedback. Use <strong>Update
+                                Answers</strong> to finalize selections, <strong>Reset Answers</strong> to clear everything,
+                                and <strong>Save</strong> to publish to the database.
+                            </p>
+                            <p>
+                                Saved exercises appear immediately on the Exercises page for students. Report any bugs to
+                                Dr. Duker or the Outclassed Dev Team.
+                            </p>
                         </div>
                     ) : (
-                        <div>
-                            <p>Staff can log in below to unlock the Exercise Management tools.</p>
-                            <form onSubmit={checkAuth} className="help-login">
-                                <input id="mng-email" placeholder="Enter admin email..." type="email" required />
-                                <input id="mng-pwd" placeholder="Enter admin password..." type="password" required />
-                                <button type="submit">Submit</button>
-                            </form>
-                        </div>
+                        <></>
                     )}
-                    {error ? <div className="help-error">{error}</div> : <></>}
                 </section>
             </div>
         </div>
-
-        {/* Logout Confirmation Modal */}
-        <LogoutModal 
-            show={showLogoutModal}
-            onConfirm={confirmLogout}
-            onCancel={cancelLogout}
-            setAuthorized={setAuthorized}
-        />
-        </>
     );
 }
