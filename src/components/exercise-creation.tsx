@@ -233,7 +233,7 @@ export function CreateExercisePage() {
     );
 
     console.log("Creating new exercise:", newExercise);
-    alert("Exercise created! (Note: Database saving not implemented yet)");
+    alert("Database saving not implemented yet");
     navigate("/exercise-management");
   };
 
