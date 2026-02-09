@@ -3,12 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import ExerciseData from "../interfaces/exerciseData";
 import { ConfirmationModal } from "./modals/confirmation-modal";
+import { getDatabase, ref, set, push } from "firebase/database";
 import "../styles/create-exercise.css";
 
-export function CreateExercisePage() {
+interface CreateExercisePageProps {
+  allExData: (ExerciseData | undefined)[];
+  setAllExData: (newData: (ExerciseData | undefined)[]) => void;
+  refreshExercises: () => Promise<void>;
+}
+
+export function CreateExercisePage({ allExData, setAllExData, refreshExercises }: CreateExercisePageProps) {
   const navigate = useNavigate();
 
-  const [title, setTitle] = useState<string>("");
+  const [title, setTitle] = useState<string>(""); // Keep for internal logic but won't be shown in UI
   const [difficulty, setDifficulty] = useState<number>(1);
   const [voices, setVoices] = useState<number>(1);
   const [tags, setTags] = useState<string[]>([]);
@@ -29,8 +36,7 @@ export function CreateExercisePage() {
   }, []);
 
   const clearAllData = () => {
-    // Clear form data
-    setTitle("");
+    // Clear form data (except title which is auto-generated)
     setDifficulty(1);
     setVoices(1);
     setTags([]);
@@ -44,7 +50,6 @@ export function CreateExercisePage() {
 
   const hasUnsavedData = (): boolean => {
     return (
-      title.trim() !== "" ||
       customId.trim() !== "" ||
       difficulty !== 1 ||
       voices !== 1 ||
@@ -211,30 +216,75 @@ export function CreateExercisePage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const newExercise = new ExerciseData(
-      "",
-      audioFile || "",
-      [],
-      "",
-      Date.now(),
-      false,
-      title || "New Exercise",
-      difficulty,
-      voices,
-      tags,
-      types,
-      meter,
-      transpos,
-      true,
-      customId,
-    );
+    try {
+      // Generate automatic title based on exercise index
+      const maxIndex = allExData.reduce((max, exercise) => {
+        if (exercise && exercise.exIndex > max) {
+          return exercise.exIndex;
+        }
+        return max;
+      }, -1);
+      const newExIndex = maxIndex + 1;
+      const autoTitle = `Exercise ${newExIndex + 1}`;
 
-    console.log("Creating new exercise:", newExercise);
-    alert("Database saving not implemented yet");
-    navigate("/exercise-management");
+      // Create new exercise with the generated index and auto title
+      const newExercise = new ExerciseData(
+        "",
+        audioFile?.name || "", // Store filename instead of File object
+        [],
+        "",
+        newExIndex,
+        false,
+        autoTitle, // Use auto-generated title
+        difficulty,
+        voices,
+        tags,
+        types,
+        meter,
+        transpos,
+        true,
+        customId,
+      );
+
+      // Save to Firebase database
+      const database = getDatabase();
+      const exerciseRef = ref(database, `scores/${newExIndex}`);
+      
+      await set(exerciseRef, {
+        score: newExercise.score,
+        sound: newExercise.sound,
+        correctAnswers: newExercise.correctAnswers,
+        feedback: newExercise.feedback,
+        exIndex: newExercise.exIndex,
+        empty: newExercise.empty,
+        title: newExercise.title,
+        difficulty: newExercise.difficulty,
+        voices: newExercise.voices,
+        tags: newExercise.tags,
+        types: newExercise.types,
+        meter: newExercise.meter,
+        transpos: newExercise.transpos,
+        customId: newExercise.customId
+      });
+
+      console.log("Exercise saved to database successfully:", newExercise);
+      
+      // Refresh the exercises list from database
+      await refreshExercises();
+      
+      alert("Exercise created successfully!");
+      
+      // Add a small delay to ensure the state is updated before navigation
+      setTimeout(() => {
+        navigate("/exercise-management");
+      }, 100);
+    } catch (error) {
+      console.error("Error saving exercise:", error);
+      alert("Error saving exercise. Please try again.");
+    }
   };
 
   return (
@@ -262,33 +312,6 @@ export function CreateExercisePage() {
       </div>
 
       <form onSubmit={handleSubmit} className="create-exercise-form">
-        {/* Basic Information */}
-        <div className="form-section">
-          <h3>Basic Information</h3>
-
-          <div className="form-group">
-            <label className="form-label">Title:</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter exercise title"
-              className="form-input"
-            />
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Custom ID:</label>
-            <input
-              type="text"
-              value={customId}
-              onChange={(e) => setCustomId(e.target.value)}
-              placeholder="Enter custom ID (optional)"
-              className="form-input"
-            />
-          </div>
-        </div>
-
         {/* Exercise Properties */}
         <div className="form-section">
           <h3>Exercise Properties</h3>
@@ -383,6 +406,22 @@ export function CreateExercisePage() {
                 <span className="checkbox-label">{tag}</span>
               </label>
             ))}
+          </div>
+        </div>
+
+        {/* Identification */}
+        <div className="form-section">
+          <h3>Identification</h3>
+
+          <div className="form-group">
+            <label className="form-label">Custom ID:</label>
+            <input
+              type="text"
+              value={customId}
+              onChange={(e) => setCustomId(e.target.value)}
+              placeholder="Enter custom ID (optional)"
+              className="form-input"
+            />
           </div>
         </div>
 

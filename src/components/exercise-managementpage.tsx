@@ -142,7 +142,6 @@ export function ExerciseManagementPage({
 
     // Update exList when allExData changes - optimized with useMemo
     const sortedExList = useMemo(() => {
-        console.log("Sorting exercises:", allExData.length, "exercises");
         if (allExData.length > 0) {
             return [...allExData].sort(exSortFunc);
         }
@@ -173,6 +172,13 @@ export function ExerciseManagementPage({
         //more exercises then all exercise data
         if(exList.length > allExData.length) setExList(allExData.sort(exSortFunc));
     },[exList.length, allExData, tags.length, diff, voices, types, meter, transpos, exSortFunc]);
+    
+    // Additional effect to update exList when allExData changes
+    useEffect(() => {
+        if(tags.length === 0 && diff === "All" && voices === 0 && types === "None" && meter === "Anything" && !transpos) {
+            setExList([...allExData].sort(exSortFunc));
+        }
+    }, [allExData, exSortFunc]);
     
     //function to sort exercises in the list
     const sortExercises = function (input: string | string[] | number | boolean | undefined, inputType:string) {
@@ -485,6 +491,7 @@ export function ExerciseManagementPage({
                             if (!exercise) return <div key={Math.random()} />;
 
                             return <ExerciseManagementListEntry
+                                key={exercise.exIndex}
                                 exercise={exercise}
                                 isSelected={selectedIndexes.includes(exercise.exIndex)}
                                 handleSelectExercise={handleSelectExercise}

@@ -122,8 +122,6 @@ function App() {
 
       setAllExData(exerciseList); // once we've fetched and filled out our list, commit it to React state
       setScoresRetrieved(true); // all done!
-
-      console.log("Loaded exercise list");
     } catch (error) {
       console.error('Error fetching scores:', error);
       setScoresRetrieved(true); // Set to true to prevent infinite loading
@@ -193,7 +191,7 @@ function App() {
             <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}/>}/>
             <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]} scoresRet={scoresRetrieved}></ExercisesPage>}/>
             <Route path="exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={refreshExercises} authorized={authorized} setAuthorized={updateAuthorized}/>}/>
-            <Route path="/exercise-management/create" element={<CreateExercisePage />}/>
+            <Route path="/exercise-management/create" element={<CreateExercisePage allExData={allExData} setAllExData={setAllExData} refreshExercises={refreshExercises}/>}/>
             <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={updateAuthorized}/>}/>
         </Routes>
       </div>
