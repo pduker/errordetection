@@ -21,6 +21,8 @@ export function CreateExercisePage() {
   const [dragOver, setDragOver] = useState<string>("");
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<"back" | "cancel" | null>(null);
+  const [showFileErrorModal, setShowFileErrorModal] = useState<boolean>(false);
+  const [fileErrorType, setFileErrorType] = useState<"audio" | "musicxml" | null>(null);
   
   useEffect(() => {
     // Component initialization logic here if needed
@@ -92,6 +94,20 @@ export function CreateExercisePage() {
     return "";
   };
 
+  const handleFileErrorConfirm = () => {
+    setShowFileErrorModal(false);
+    setFileErrorType(null);
+  };
+
+  const getFileErrorMessage = (): string => {
+    if (fileErrorType === "audio") {
+      return "Please drop a valid audio file!\nValid formats: .mp3, .wav, .m4a";
+    } else if (fileErrorType === "musicxml") {
+      return "Please drop a valid MusicXML file!\nValid formats: .xml, .musicxml";
+    }
+    return "";
+  };
+
   const handleTagChange = (tag: string) => {
     if (tags.includes(tag)) {
       setTags(tags.filter((t) => t !== tag));
@@ -114,7 +130,7 @@ export function CreateExercisePage() {
       case 'mp3':
       case 'wav':
       case 'm4a':
-        return '🎵';
+        return '💿';
       case 'xml':
       case 'musicxml':
         return '🎼';
@@ -147,13 +163,17 @@ export function CreateExercisePage() {
       if (type === 'audio') {
         const audioTypes = ['audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/m4a'];
         if (!audioTypes.includes(file.type) || !file.name.match(/\.(mp3|wav|m4a)$/i)) {
-          alert('Please drop a valid audio file (.mp3, .wav, .m4a)');
+          setFileErrorType('audio');
+          setShowFileErrorModal(true);
+          return;
         }
         setAudioFile(file);
       } else if (type === 'musicxml') {
         const xmlTypes = ['application/xml', 'text/xml'];
         if (!xmlTypes.includes(file.type) || !file.name.match(/\.(xml|musicxml)$/i)) {
-          alert('Please drop a valid MusicXML file (.xml, .musicxml)');
+          setFileErrorType('musicxml');
+          setShowFileErrorModal(true);
+          return;
         }
         setMusicXmlFile(file);
       }
@@ -164,8 +184,20 @@ export function CreateExercisePage() {
     const file = e.target.files?.[0];
     if (file) {
       if (type === 'audio') {
+        const audioTypes = ['audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/m4a'];
+        if (!audioTypes.includes(file.type) || !file.name.match(/\.(mp3|wav|m4a)$/i)) {
+          setFileErrorType('audio');
+          setShowFileErrorModal(true);
+          return;
+        }
         setAudioFile(file);
       } else if (type === 'musicxml') {
+        const xmlTypes = ['application/xml', 'text/xml'];
+        if (!xmlTypes.includes(file.type) || !file.name.match(/\.(xml|musicxml)$/i)) {
+          setFileErrorType('musicxml');
+          setShowFileErrorModal(true);
+          return;
+        }
         setMusicXmlFile(file);
       }
     }
@@ -359,7 +391,7 @@ export function CreateExercisePage() {
           <h3>Files</h3>
           
           <div className="form-group file-upload-group">
-            <label className="form-label">MusicXML Score (.musicxml):</label>
+            <label className="form-label">MusicXML Score (.xml, .musicxml):</label>
             <div 
               className={`file-drop-zone ${dragOver === 'musicxml' ? 'drag-over' : ''}`}
               onDragOver={(e) => handleDragOver(e, 'musicxml')}
@@ -373,7 +405,7 @@ export function CreateExercisePage() {
                 className="file-input"
               />
               <div className="file-upload-content">
-                <div className="file-upload-icon">📁</div>
+                <div className="file-upload-icon">🎼</div>
                 <div className="file-upload-text">
                   {musicXmlFile ? 'Replace MusicXML File' : 'Drop MusicXML file here or click to browse'}
                 </div>
@@ -400,7 +432,7 @@ export function CreateExercisePage() {
           </div>
 
           <div className="form-group file-upload-group">
-            <label className="form-label">Audio File (.mp3):</label>
+            <label className="form-label">Audio File (.mp3, .wav, .m4a):</label>
             <div 
               className={`file-drop-zone ${dragOver === 'audio' ? 'drag-over' : ''}`}
               onDragOver={(e) => handleDragOver(e, 'audio')}
@@ -414,7 +446,7 @@ export function CreateExercisePage() {
                 className="file-input"
               />
               <div className="file-upload-content">
-                <div className="file-upload-icon">🎵</div>
+                <div className="file-upload-icon">🔊</div>
                 <div className="file-upload-text">
                   {audioFile ? 'Replace Audio File' : 'Drop audio file here or click to browse'}
                 </div>
@@ -465,6 +497,16 @@ export function CreateExercisePage() {
       message={getModalMessage()}
       confirmText="Yes, Proceed"
       cancelText="No, Stay Here"
+    />
+    
+    <ConfirmationModal
+      show={showFileErrorModal}
+      onHide={handleFileErrorConfirm}
+      onConfirm={handleFileErrorConfirm}
+      title="Invalid File Type"
+      message={getFileErrorMessage()}
+      confirmText="OK"
+      hideCancelButton={true}
     />
     </>
   );

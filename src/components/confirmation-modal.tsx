@@ -9,6 +9,7 @@ interface ConfirmationModalProps {
   message: string;
   confirmText?: string;
   cancelText?: string;
+  hideCancelButton?: boolean;
 }
 
 export function ConfirmationModal({
@@ -18,7 +19,8 @@ export function ConfirmationModal({
   title,
   message,
   confirmText = "Confirm",
-  cancelText = "Cancel"
+  cancelText = "Cancel",
+  hideCancelButton = false
 }: ConfirmationModalProps) {
   return (
     <Modal
@@ -32,15 +34,31 @@ export function ConfirmationModal({
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <p>{message}</p>
+        <p style={{ whiteSpace: 'pre-wrap' }}>{message}</p>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={onHide}>
-          {cancelText}
-        </Button>
-        <Button variant="primary" onClick={onConfirm}>
-          {confirmText}
-        </Button>
+        {!hideCancelButton && (
+          <Button variant="secondary" onClick={onHide}>
+            {cancelText}
+          </Button>
+        )}
+        {hideCancelButton ? (
+          <div style={{ marginLeft: 'auto' }}>
+            <Button 
+              variant="primary" 
+              onClick={onConfirm}
+            >
+              {confirmText}
+            </Button>
+          </div>
+        ) : (
+          <Button 
+            variant="primary" 
+            onClick={onConfirm}
+          >
+            {confirmText}
+          </Button>
+        )}
       </Modal.Footer>
     </Modal>
   );
