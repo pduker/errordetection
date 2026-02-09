@@ -1,7 +1,7 @@
 // Configuration for exercise management page visibility
 export const exerciseConfig = {
   // Whether to show exercises on the exercise management page
-  showExercises: false,
+  showExercises: true,
   
   // Whether to show the "no exercises found" message
   showNoExercisesMessage: false,
