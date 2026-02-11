@@ -26,7 +26,7 @@ function Header({ authorized, resetScrollPosition }: { authorized: boolean; rese
   return (
   <header className="App-header">
         
-    <Navbar className={`Home-bar ${isMobile ? "mobile" : ""}`} fixed={isMobile ? undefined : "top"}>
+    <Navbar expand="lg" className="Home-bar" fixed="top">
 
     <Navbar.Brand>
       <img
@@ -38,28 +38,36 @@ function Header({ authorized, resetScrollPosition }: { authorized: boolean; rese
     />
     </Navbar.Brand>
 
-    <Nav className='Home-nav'>
-    <Link to="/exercises" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercises")}>Exercises</Link>
-    {authorized ?
-    <Link to="exercise-management" style={{ marginRight: '10px' }} onClick={() => handleNavClick("exercise-management")}>Exercise Management</Link>
-    : <></>}
-    </Nav>
-
-    <div style={{ position: 'absolute', right: '50%', transform: 'translateX(50%)', textAlign: 'center' }}>
-      <div style={{display: 'flex', flexDirection:'column', alignItems: 'center', gap:0}}>
-        <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginBottom: '6px', lineHeight:1, fontSize: '30px'}}>
-        University of Delaware
-        </Navbar.Brand>
-        <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block' }}>
-        Aural Skills Error Detection Practice Site
-        </Navbar.Brand>
+      {/* Centered title */}
+      <div style={{ position: 'absolute', right: '50%', transform: 'translateX(50%)', textAlign: 'center', pointerEvents: "none" }}>
+        <div style={{display: 'flex', flexDirection:'column', alignItems: 'center', gap:0}}>
+          <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginBottom: '6px', lineHeight:1, fontSize: '30px'}}>
+          University of Delaware
+          </Navbar.Brand>
+          <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block' }}>
+          Aural Skills Error Detection Practice Site
+          </Navbar.Brand>
+        </div>
       </div>
-    </div>
 
-    <Nav className='Home-nav-right'>
-    <Link to="/about" style={{ marginLeft: '-225px' }} onClick={() => handleNavClick("/about")}>About</Link>
-    <Link to="/help" style={{ marginLeft: '10px' }} onClick={() => handleNavClick("/help")}>Help</Link>
-    </Nav>
+    {/* Hamburger button for mobile view */}
+    <Navbar.Toggle aria-controls="main-navbar" />
+
+    <Navbar.Collapse id="main-navbar">
+
+    {/* Left-aligned nav links */}
+      <Nav className='Home-nav'>
+      <Link to="/exercises" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercises")}>Exercises</Link>
+      {authorized ?
+      <Link to="exercise-management" style={{ marginRight: '10px' }} onClick={() => handleNavClick("exercise-management")}>Exercise Management</Link>
+      : <></>}
+      </Nav>
+
+      <Nav className='Home-nav-right'>
+      <Link to="/about" onClick={() => handleNavClick("/about")}>About</Link>
+      <Link to="/help" onClick={() => handleNavClick("/help")}>Help</Link>
+      </Nav>
+    </Navbar.Collapse>
     </Navbar>
 
     </header>
