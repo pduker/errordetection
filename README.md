@@ -65,7 +65,7 @@ For the next steps to work on for this project, two main issues can be addressed
 ## Contact
 
 For admin credentials or technical access, please contact:  
-**Professor Duker** –
+**Professor Duker** – pduker@udel.edu
 
 ---
 
