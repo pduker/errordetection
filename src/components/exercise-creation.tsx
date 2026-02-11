@@ -15,7 +15,7 @@ interface CreateExercisePageProps {
 export function CreateExercisePage({ allExData, setAllExData, refreshExercises }: CreateExercisePageProps) {
   const navigate = useNavigate();
 
-  const [title, setTitle] = useState<string>(""); // Keep for internal logic but won't be shown in UI
+  // const [title, setTitle] = useState<string>(""); // Keep for internal logic but won't be shown in UI
   const [difficulty, setDifficulty] = useState<number>(1);
   const [voices, setVoices] = useState<number>(1);
   const [tags, setTags] = useState<string[]>([]);
