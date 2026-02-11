@@ -475,7 +475,7 @@ export function ExerciseManagementPage({
               fontSize: "14px",
             }}
           >
-            Exit Admin Mode
+            Logout
           </button>
           {/*creating an exercise*/}
           <Button
