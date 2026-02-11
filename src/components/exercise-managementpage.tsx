@@ -488,10 +488,12 @@ export function ExerciseManagementPage({
       </div>
       <h5 style={{ marginTop: "8px", fontStyle: "italic" }}>
         Click the + in the top right to add a new exercise, then edit as needed
-        and save.
+        and save. <br /> To edit an existing exercise, click on the pencil icon
+        next to the corresponding exercise in the list below.
       </h5>
 
       <div>
+        <br />
         <h5 style={{ marginLeft: "4px", marginBottom: "-20px" }}>Sort By:</h5>
         <br />
 
