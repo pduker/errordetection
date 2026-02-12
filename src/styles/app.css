@@ -170,6 +170,10 @@ nav ul li a::after {
   bottom: -6px;
   transition: 0.5s;
 }
+
+#main-navbar {
+  background-color: #f4d35e;
+}
 /* cool transition css stuff */
 nav ul li a:hover::after {
   width: 100%;
@@ -191,7 +195,7 @@ nav .fas {
   display: none;
 }
 
-@media only screen and (max-width: 1100px) {
+@media only screen and (max-width: 768px) {
   #header {
     background-image: url(../assets/musicbg1.jpg);
   }
