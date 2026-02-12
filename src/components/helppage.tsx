@@ -1,7 +1,6 @@
 //imports
 import '../styles/about.css';
 import '../styles/help.css';
-import '../styles/logout-modal.css';
 
 // import { sha256 } from 'js-sha256';
 
@@ -63,7 +62,7 @@ export function HelpPage({
           setError(errorMessage);
         }
     };
-    
+
     const logout = () => {
         setShowLogoutModal(true);
     };
@@ -75,7 +74,7 @@ export function HelpPage({
     const cancelLogout = () => {
         setShowLogoutModal(false);
     };
-        
+    
     const checkAuth = function(e?: React.FormEvent) {
         // Prevent form submission if called from form event
         if (e) {
@@ -95,14 +94,14 @@ export function HelpPage({
         }
     }
     
-    // Navigate to exercise management only when user just logged in
+    // Navigate to exercise management when authorized becomes true
     useEffect(() => {
-        if (authorized && justLoggedIn) {
-            console.log("User just logged in, navigating to exercise-management...");
+        if (authorized) {
+            console.log("User is authorized, navigating to exercise-management...");
             navigate("/exercise-management");
             setJustLoggedIn(false); // Reset flag after navigation
         }
-    }, [authorized, justLoggedIn, navigate]);
+    }, [authorized, navigate]);
 
     //rendering page with help information
     return (
@@ -256,7 +255,7 @@ export function HelpPage({
 
                 <section className="help-section help-section--admin">
                     <h3>Administrator Access</h3>
-                    {authorized ? (
+{authorized ? (
                         <div className="admin-logged-in">
                             <div className="admin-status">
                                 <p className="admin-message">You are currently logged in with administrator privileges. 
