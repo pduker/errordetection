@@ -1877,7 +1877,7 @@ export function Exercise({
           <button onClick={saveTitle}>Save Title</button>
         </span>
       ) : (
-        <h3 onClick={() => setEditingTitle(!editingTitle)}>
+        <h3 className = "custom-title"onClick={() => setEditingTitle(!editingTitle)}>
           {customTitle}
           {isCompleted && (
             <div

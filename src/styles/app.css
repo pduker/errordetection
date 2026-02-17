@@ -1,6 +1,18 @@
-.Home-title {
+.Home-title-1 {
   margin: 0;
   padding: 0;
+  color: #114b96;
+  display: block;
+  margin-bottom: 6px;
+  line-height: 1;
+  font-size: 30px;
+}
+
+.Home-title-2 {
+  margin: 0;
+  padding: 0;
+  color: #114b96;
+  display: block;
 }
 
 .Home-bar {
@@ -233,5 +245,16 @@ nav .fas {
     top: 25px;
     left: 25px;
     cursor: pointer;
+  }
+}
+
+
+/* Mobile-specific styles */
+@media only screen and (max-width: 700px) {
+  .Home-title-1 {
+    display: none;
+  }
+  .Home-title-2 {
+    display: none;
   }
 }

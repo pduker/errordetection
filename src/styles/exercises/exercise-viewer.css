@@ -1,4 +1,16 @@
 /* Exercise viewer and navigation components */
+
+
+.exercise-stage {
+  display: block;
+  overflow: visible;
+}
+
+.exercise-content-inner {
+  height: auto;
+  min-height: 0;
+}
+
 .exercise-nav-button {
   margin: 0;
   min-height: 48px;
@@ -87,6 +99,11 @@
   right: 16px;
 }
 
+.exercise-nav-mobile .exercise-nav-inline {
+  background: #1659c1;
+  color: #fff;
+}
+
 /*No loaded exercise placeholder styling*/
 .exercise-placeholder {
   flex: 1;
@@ -116,4 +133,56 @@
   fill: rgba(255, 0, 0, 0, 6);
   stroke: red;
   stroke-width: 2;
+}
+
+.exercise-nav-mobile {
+  display: none;
+}
+
+.exercise-nav-desktop {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+}
+
+.exercise-nav-inline--prev.exercise-nav-desktop {
+  left: 16px;
+}
+
+.exercise-nav-inline--next.exercise-nav-desktop {
+  right: 16px;
+}
+
+@media only screen and (max-width: 700px) {
+  
+  .exercise-content {
+    padding: 0 0px;
+  }
+  
+  .exercise-viewer {
+    max-width: 80%;
+  }
+  
+  .exercise-nav-desktop {
+    display: none;
+  }
+
+  .exercise-nav-mobile {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+    margin-right: 10%;
+  }
+
+  .exercise-nav-mobile .exercise-nav-inline {
+    position: static;
+    transform: none;
+  }
+  
+  .custom-title {
+    font-size: 1.15rem;
+  }
 }

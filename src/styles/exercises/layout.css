@@ -102,3 +102,43 @@
 .ex-left #dropdowns {
   width: 100%;
 }
+
+@media only screen and (max-width: 700px) {
+  .exercise-viewer {
+    max-width: 50%;
+
+  }
+  }
+
+/* Mobile fixed right-side nav for prev/next buttons (mobile only) */
+@media only screen and (max-width: 700px) {
+  .exercise-nav-mobile {
+    position: fixed !important;
+    right: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+  }
+
+  .exercise-nav-mobile .exercise-nav-inline {
+    background: #ffffffcc;
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 8px;
+    padding: 8px 10px;
+    min-width: 44px;
+    min-height: 44px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+  }
+
+  /* Slightly larger hit target on small mobile */
+  .exercise-nav-mobile .exercise-nav-inline {
+    padding: 10px 12px;
+    min-width: 48px;
+    min-height: 48px;
+    font-size: 18px;
+  }
+}
