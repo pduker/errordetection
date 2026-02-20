@@ -96,6 +96,20 @@
   justify-content: center;
 }
 
+/* Layout styles for the exercise management page */
+.exercise-management {
+  width: 100%;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  min-height: 360px;
+  border-radius: 24px;
+  background: #fff7c9;
+  position: relative;
+  overflow: hidden;
+  padding: 0 64px;
+}
+
 /* Make forms and lists inside the left column wrap and shrink nicely */
 .ex-left form,
 .ex-left #boxes,

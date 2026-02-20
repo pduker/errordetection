@@ -462,6 +462,7 @@ export function ExerciseManagementPage({
             Welcome to the Exercise Management Page!
           </h2>
         </div>
+
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <button
             onClick={handleLogout}
@@ -491,157 +492,157 @@ export function ExerciseManagementPage({
         and save. <br /> To edit an existing exercise, click on the pencil icon
         next to the corresponding exercise in the list below.
       </h5>
-
       <div>
-        <br />
-        <h5 style={{ marginLeft: "4px", marginBottom: "-20px" }}>Sort By:</h5>
-        <br />
-
-        {/*editing an exercise, filling in all paramters*/}
-        <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
-          <form
-            id="tags"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              marginRight: "20px",
-            }}
-          >
-            <div style={{ fontSize: "16px", marginRight: "8px" }}>Tags:</div>
-            <label
+        <div className="exercise-management" >
+          <br />
+          <h5>Sort By:</h5>
+          <br />
+          {/*editing an exercise, filling in all paramters*/}
+          <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
+            <form
+              id="tags"
               style={{
                 display: "flex",
                 alignItems: "center",
-                marginRight: "12px",
+                marginRight: "20px",
               }}
             >
+              <div style={{ fontSize: "16px", marginRight: "8px" }}>Tags:</div>
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginRight: "12px",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  name="tags"
+                  value="Pitch"
+                  checked={tags.includes("Pitch")}
+                  onChange={tagsChange}
+                  style={{ marginRight: "4px" }}
+                />
+                Pitch
+              </label>
+              <label style={{ display: "flex", alignItems: "center" }}>
+                <input
+                  type="checkbox"
+                  name="tags"
+                  value="Intonation"
+                  checked={tags.includes("Intonation")}
+                  onChange={tagsChange}
+                  style={{ marginRight: "4px" }}
+                />
+                Intonation
+              </label>
+              <label
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginRight: "12px",
+                }}
+              >
+                <input
+                  type="checkbox"
+                  name="tags"
+                  value="Rhythm"
+                  checked={tags.includes("Rhythm")}
+                  onChange={tagsChange}
+                  style={{ marginRight: "4px" }}
+                />
+                Rhythm
+              </label>
+            </form>
+            <form id="transpos" style={{ display: "flex", alignItems: "center" }}>
               <input
                 type="checkbox"
-                name="tags"
-                value="Pitch"
-                checked={tags.includes("Pitch")}
-                onChange={tagsChange}
-                style={{ marginRight: "4px" }}
+                name="transpos"
+                value="buh"
+                checked={transpos}
+                onChange={transposChange}
+                style={{ marginRight: "8px" }}
               />
-              Pitch
-            </label>
-            <label style={{ display: "flex", alignItems: "center" }}>
+              <div style={{ fontSize: "16px" }}>Transposing Instruments</div>
+            </form>
+          </div>
+
+          <br />
+          <div id="dropdowns" style={{ display: "inline-flex", padding: "4px" }}>
+            <form id="difficulty">
+              <div style={{ fontSize: "16px", display: "inline" }}>
+                Difficulty:
+              </div>
+              <br></br>
+              <select name="difficulty" onChange={diffChange}>
+                <option value="All">All</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </form>
+            <form id="voiceCt">
+              Voices:
+              <br></br>
+              <select name="voices" onChange={voiceChange}>
+                <option value={0}>Any</option>
+                <option value={1}>1</option>
+                <option value={2}>2</option>
+                <option value={3}>3</option>
+                <option value={4}>4</option>
+                <option value={5}>5</option>
+              </select>
+            </form>
+            <form id="meterForm">
+              Meter:
+              <br></br>
+              <select name="meter" defaultValue={types} onChange={meterChange}>
+                <option value="Anything">Anything</option>
+                <option value="Simple">Simple</option>
+                <option value="Compound">Compound</option>
+              </select>
+            </form>
+          </div>
+
+          <div id="secondLine" style={{ display: "inline-flex", padding: "4px" }}>
+            <form id="typesForm">
+              Textural Factors:
+              <br></br>
+              <select name="types" onChange={typesChange}>
+                <option value="None">None</option>
+                <option value="Drone">Drone</option>
+                <option value="Ensemble Parts">Ensemble Parts</option>
+                <option value="Both">Drone & Ensemble Parts</option>
+              </select>
+            </form>
+            <form id="customIdForm" style={{ marginLeft: "10px" }}>
+              Custom ID:
+              <br></br>
               <input
-                type="checkbox"
-                name="tags"
-                value="Intonation"
-                checked={tags.includes("Intonation")}
-                onChange={tagsChange}
-                style={{ marginRight: "4px" }}
+                type="text"
+                value={customId}
+                onChange={(e) => setCustomId(e.target.value)}
+                placeholder="Enter custom ID"
               />
-              Intonation
-            </label>
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginRight: "12px",
-              }}
+            </form>
+            {/*reset sort*/}
+            <Button
+              variant="danger"
+              onClick={resetSort}
+              style={{ marginLeft: "10px" }}
             >
-              <input
-                type="checkbox"
-                name="tags"
-                value="Rhythm"
-                checked={tags.includes("Rhythm")}
-                onChange={tagsChange}
-                style={{ marginRight: "4px" }}
-              />
-              Rhythm
-            </label>
-          </form>
-          <form id="transpos" style={{ display: "flex", alignItems: "center" }}>
-            <input
-              type="checkbox"
-              name="transpos"
-              value="buh"
-              checked={transpos}
-              onChange={transposChange}
-              style={{ marginRight: "8px" }}
-            />
-            <div style={{ fontSize: "16px" }}>Transposing Instruments</div>
-          </form>
-        </div>
-
-        <br />
-        <div id="dropdowns" style={{ display: "inline-flex", padding: "4px" }}>
-          <form id="difficulty">
-            <div style={{ fontSize: "16px", display: "inline" }}>
-              Difficulty:
-            </div>
-            <br></br>
-            <select name="difficulty" onChange={diffChange}>
-              <option value="All">All</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
-          </form>
-          <form id="voiceCt">
-            Voices:
-            <br></br>
-            <select name="voices" onChange={voiceChange}>
-              <option value={0}>Any</option>
-              <option value={1}>1</option>
-              <option value={2}>2</option>
-              <option value={3}>3</option>
-              <option value={4}>4</option>
-              <option value={5}>5</option>
-            </select>
-          </form>
-          <form id="meterForm">
-            Meter:
-            <br></br>
-            <select name="meter" defaultValue={types} onChange={meterChange}>
-              <option value="Anything">Anything</option>
-              <option value="Simple">Simple</option>
-              <option value="Compound">Compound</option>
-            </select>
-          </form>
-        </div>
-
-        <div id="secondLine" style={{ display: "inline-flex", padding: "4px" }}>
-          <form id="typesForm">
-            Textural Factors:
-            <br></br>
-            <select name="types" onChange={typesChange}>
-              <option value="None">None</option>
-              <option value="Drone">Drone</option>
-              <option value="Ensemble Parts">Ensemble Parts</option>
-              <option value="Both">Drone & Ensemble Parts</option>
-            </select>
-          </form>
-          <form id="customIdForm" style={{ marginLeft: "10px" }}>
-            Custom ID:
-            <br></br>
-            <input
-              type="text"
-              value={customId}
-              onChange={(e) => setCustomId(e.target.value)}
-              placeholder="Enter custom ID"
-            />
-          </form>
-          {/*reset sort*/}
-          <Button
-            variant="danger"
-            onClick={resetSort}
-            style={{ marginLeft: "10px" }}
-          >
-            Reset Sort
-          </Button>
-          <Button
-            variant="danger"
-            onClick={() => handleMultipleExerciseDelete(selectedIndexes)}
-            style={{ marginLeft: "10px", marginTop: "10px" }}
-          >
-            Delete Selected Exercises
-          </Button>
+              Reset Sort
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => handleMultipleExerciseDelete(selectedIndexes)}
+              style={{ marginLeft: "10px", marginTop: "10px" }}
+            >
+              Delete Selected Exercises
+            </Button>
+          </div>
         </div>
 
         {/*returning exercise data */}
