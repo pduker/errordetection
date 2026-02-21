@@ -101,6 +101,7 @@
   width: 100%;
   margin: 0;
   display: flex;
+  flex-direction: column;
   align-items: center;
   min-height: 360px;
   border-radius: 24px;
@@ -108,6 +109,13 @@
   position: relative;
   overflow: hidden;
   padding: 0 64px;
+}
+
+.exercise-management-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 /* Make forms and lists inside the left column wrap and shrink nicely */
