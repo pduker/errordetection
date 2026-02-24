@@ -27,7 +27,7 @@ function Header({ authorized, resetScrollPosition }: { authorized: boolean; rese
   return (
   <header className="App-header">
         
-    <Navbar expand="lg" className="Home-bar" fixed="top">
+  <Navbar expand="lg" className="Home-bar" fixed="top">
 
     <Navbar.Brand>
       <img

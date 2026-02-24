@@ -123,6 +123,9 @@ function ExerciseQueueComponent({
             setCurrentPage(Math.min(currentPage, totalPages));
         }
     }, [currentPage, setCurrentPage, totalPages]);
+    
+    console.log(pageExercises.length); // check duplication bug
+
 
     return (
         <section className="exercise-queue-panel">
@@ -168,7 +171,7 @@ function ExerciseQueueComponent({
                         const globalIndex = startIndex + idx;
                         return (
                         <div
-                            key = {exercise.title}
+                            key = {exercise.exIndex}
                             id = {exercise.title}
                             onClick={() => selectExerciseAtIndex(globalIndex)}
                             role="button"

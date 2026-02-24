@@ -175,6 +175,7 @@ nav ul li a::after {
 
 #main-navbar {
   padding-right: 10px;
+  padding-left: 10px;
 }
 /* cool transition css stuff */
 nav ul li a:hover::after {
@@ -240,7 +241,22 @@ nav .fas {
     left: 25px;
     cursor: pointer;
   }
-  .Home-bar .navbar-collapse  {
+
+  /* Hamburger menu reactive CSS */
+  .Home-bar .navbar-collapse  { 
     background-color: #fff7c9; 
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+
+  .Home-bar, .container {
+    padding: 0px;
+  }
+
+  .Home-nav a, .Home-nav-right a {
+    display: block;              /* stack vertically */
+    padding: 6px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    text-decoration: none;
   }
 }
