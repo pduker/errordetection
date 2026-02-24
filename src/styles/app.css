@@ -11,6 +11,8 @@
   height: 70px;
   justify-content: space-between;
   align-items: center;
+  padding-top: 0px;
+  box-shadow: none;
 }
 
 .Home-bar.mobile {
@@ -172,7 +174,7 @@ nav ul li a::after {
 }
 
 #main-navbar {
-  background-color: #f4d35e;
+  padding-right: 10px;
 }
 /* cool transition css stuff */
 nav ul li a:hover::after {
@@ -195,7 +197,7 @@ nav .fas {
   display: none;
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: 991px) {
   #header {
     background-image: url(../assets/musicbg1.jpg);
   }
@@ -237,5 +239,8 @@ nav .fas {
     top: 25px;
     left: 25px;
     cursor: pointer;
+  }
+  .Home-bar .navbar-collapse  {
+    background-color: #fff7c9; 
   }
 }
