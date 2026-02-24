@@ -112,7 +112,7 @@
     transform 0.2s ease;
 }
 
-.exercise-list-item:hover {
+.exercise-list-item:not(.no-hover):hover {
   background-color: #f4f7ff;
   border-color: #a8cafe;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);

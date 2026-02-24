@@ -1,0 +1,22 @@
+.exercise-management-list-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: default;
+
+    span.custom-id {
+        font-size: 0.8em;
+        color: #666;
+    }
+
+    div.actions {
+        
+    }
+}
+
+.exercise-management-list-entry.active {
+    background-color: #ffe4e4;
+    border-color: #fd0d0d;
+    box-shadow: 0 0 0 2px rgba(253, 13, 13, 0.15);
+    font-weight: 600;
+}
