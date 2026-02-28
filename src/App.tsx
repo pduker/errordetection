@@ -11,6 +11,7 @@ import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
 import { CreateExercisePage } from './components/exercise-creation';
+import { LoadingScreen, useFirstVisit } from './components/loading-screen';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import ExerciseData from './interfaces/exerciseData';
 import { getDatabase } from 'firebase/database';
@@ -77,6 +78,8 @@ function App() {
     const savedAuth = localStorage.getItem('adminAuthorized');
     return savedAuth === 'true';
   }); // has the user put in the admin pwd on help page?
+  
+  const isFirstVisit = useFirstVisit();
 
   // get data from the database
   const fetchScoresFromDatabase = useCallback(async () => {
@@ -149,17 +152,24 @@ function App() {
   }, [fetchScoresFromDatabase]);
   
   const location = useLocation();
-  const isLanding = location.pathname === "/";
+  const [showLoading, setShowLoading] = useState(false);
+
+  useEffect(() => {
+    // Show loading screen on first visit or when refreshing on exercises page
+    const isExercisesPage = location.pathname.startsWith('/exercises');
+    setShowLoading(isFirstVisit || isExercisesPage);
+  }, [location.pathname, isFirstVisit]);
+  
   const contentRef = useRef<HTMLDivElement | null>(null);
   const resetScrollPosition = useCallback(
     (behavior: ScrollBehavior = "auto") => {
-      if (!isLanding && contentRef.current) {
+      if (contentRef.current) {
         contentRef.current.scrollTo({ top: 0, behavior });
       } else if (typeof window !== "undefined") {
         window.scrollTo({ top: 0, behavior });
       }
     },
-    [isLanding]
+    []
   );
 
   useLayoutEffect(() => {
@@ -168,20 +178,19 @@ function App() {
 
   return (
     <div>
+      {showLoading && <LoadingScreen />}
       {
         isMobile ? "" : <Header authorized={authorized} resetScrollPosition={resetScrollPosition}/>
       }
-      <div className={`pagediv ${isLanding ? "pagediv-landing" : ""} ${isMobile ? "mobile" : ""}`}>
+      <div className={`pagediv ${isMobile ? "mobile" : ""}`}>
       <div
         ref={contentRef}
         style={{
-          overflowY: isLanding ? "hidden" : "scroll",
-          margin: isLanding ? "0" : "10px",
+          overflowY: "scroll",
+          margin: "10px",
           height: "100%",
           width: "100%",
-          display: isLanding ? "flex" : "block",
-          alignItems: isLanding ? "center" : undefined,
-          justifyContent: isLanding ? "center" : undefined
+          display: "block"
         }}>
         <Routes>
             <Route path="/" element={<HomePage/>}></Route>
