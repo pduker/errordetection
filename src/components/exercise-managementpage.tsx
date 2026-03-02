@@ -604,9 +604,6 @@ export function ExerciseManagementPage({
               <option value="Compound">Compound</option>
             </select>
           </form>
-        </div>
-
-        <div id="secondLine" style={{ display: "inline-flex", padding: "4px" }}>
           <form id="typesForm">
             Textural Factors:
             <br></br>

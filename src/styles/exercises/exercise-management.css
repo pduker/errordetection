@@ -19,30 +19,43 @@
 #boxes, #dropdowns, #secondLine {
     gap: 24px;
     align-items: flex-start;
-    flex-wrap: wrap;
-    margin-bottom: 16px;
+    flex-wrap: nowrap;
+    margin-bottom: 24px;
+    padding: 24px;
 }
 
 #boxes {
-    background: rgba(248, 250, 252, 0.8);
-    padding: 16px;
-    border-radius: 8px;
-    backdrop-filter: blur(4px);
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 24px;
 }
 
 #dropdowns {
-    background: rgba(248, 250, 252, 0.8);
-    padding: 16px;
-    border-radius: 8px;
-    backdrop-filter: blur(4px);
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 #secondLine {
-    background: rgba(248, 250, 252, 0.8);
-    padding: 16px;
-    border-radius: 8px;
-    backdrop-filter: blur(4px);
-    align-items: center;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 /* Form styling */
@@ -67,16 +80,18 @@ form div {
     justify-content: space-between;
     align-items: center;
     cursor: default;
-    background: white;
+    background: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 8px;
-    padding: 12px 16px;
-    margin-bottom: 8px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
     transition: all 0.2s ease;
+    color: #1f2937;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 
     span.custom-id {
         font-size: 0.8em;
-        color: #666;
+        color: #6b7280;
     }
 
     div.actions {
@@ -87,7 +102,8 @@ form div {
 
 .exercise-management-list-entry:hover {
     border-color: #d1d5db;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    transform: translateY(-1px);
 }
 
 .exercise-management-list-entry.active {
@@ -155,15 +171,17 @@ input[type="checkbox"]:hover {
     display: flex;
     align-items: center;
     padding: 12px 16px;
-    background: white;
-    border-radius: 6px;
+    background: #ffffff;
+    border-radius: 8px;
     border: 1px solid #e5e7eb;
     transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
 #transpos:hover {
     border-color: #dc2626;
-    box-shadow: 0 2px 4px rgba(220, 38, 38, 0.1);
+    box-shadow: 0 4px 8px rgba(220, 38, 38, 0.15);
+    transform: translateY(-1px);
 }
 
 #transpos input[type="checkbox"]:checked + div {
@@ -174,7 +192,7 @@ input[type="checkbox"]:hover {
 /* Dropdown select styling */
 select {
     width: 140px;
-    padding: 8px 12px;
+    padding: 12px 16px;
     border: 2px solid #e5e7eb;
     border-radius: 6px;
     background-color: white;
@@ -214,6 +232,13 @@ select option {
     flex-direction: column;
     gap: 4px;
     min-width: 140px;
+    align-items: flex-start;
+    margin: 0;
+    padding: 8px;
+}
+
+#difficulty br, #voiceCt br, #meterForm br, #typesForm br {
+    display: none;
 }
 
 #difficulty div, #voiceCt div, #meterForm div, #typesForm div {
@@ -221,6 +246,7 @@ select option {
     font-weight: 600;
     color: #6b7280;
     margin-bottom: 4px;
+    margin-top: 0;
 }
 
 /* Button styling for management actions */
@@ -228,7 +254,7 @@ select option {
     background-color: #dc2626 !important;
     border-color: #dc2626 !important;
     color: white !important;
-    padding: 10px 20px !important;
+    padding: 12px 24px !important;
     border-radius: 6px !important;
     font-weight: 600 !important;
     font-size: 14px !important;
@@ -260,6 +286,7 @@ select option {
     gap: 12px;
     align-items: center;
     margin-top: 16px;
+    padding: 8px;
 }
 
 /* Delete button special styling */
@@ -291,10 +318,11 @@ select option {
     flex-direction: column;
     gap: 4px;
     min-width: 200px;
+    padding: 8px;
 }
 
 #customIdForm input[type="text"] {
-    padding: 8px 12px;
+    padding: 12px 16px;
     border: 2px solid #e5e7eb;
     border-radius: 6px;
     background-color: white;
@@ -332,7 +360,7 @@ select option {
 .management-page-wrapper {
     background: linear-gradient(135deg, #fff9e6 0%, #ffeb99 100%);
     min-height: 100vh;
-    padding: 20px;
+    padding: 40px;
 }
 
 .management-header h2 {
@@ -347,7 +375,7 @@ select option {
     margin-top: 8px;
     font-weight: 400;
     line-height: 1.5;
-    margin-bottom: 24px;
+    margin-bottom: 40px;
 }
 
 /* Responsive design */
@@ -378,13 +406,12 @@ select option {
 
 /* Exercise list container improvements */
 .exercise-list-container {
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 8px;
-    padding: 16px;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
     margin-top: 20px;
-    backdrop-filter: blur(4px);
-    height: calc(100vh - 400px);
-    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .exercise-list-container::-webkit-scrollbar {
