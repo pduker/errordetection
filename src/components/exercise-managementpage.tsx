@@ -495,7 +495,7 @@ export function ExerciseManagementPage({
       </div>
 
       <div className="filter-section">
-        <h5>Sort By:</h5>
+        {/* <h5>Sort By:</h5> */}
 
         {/*editing an exercise, filling in all paramters*/}
         <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
