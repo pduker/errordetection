@@ -6,16 +6,23 @@
 
 /* Exercise Header - matches the image layout */
 .exercise-header {
-  text-align: center;
+  text-align: left;
   margin-bottom: 16px;
-  padding: 20px 16px 0 16px;
+  padding: 20px 16px 0 0;
 }
 
 .exercise-title {
-  color: #1f2a44;
-  font-weight: 600;
-  font-size: 1.2rem;
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 1.4rem;
   margin: 0;
+  letter-spacing: 1px;
+  padding: 12px 24px;
+  border: 1px solid #e1e4e8;
+  border-radius: 12px;
+  background: #ffffff;
+  display: inline-block;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 /* Main Exercise Card - the large white card where musical notation would be */
@@ -69,6 +76,16 @@
   font-size: 1rem;
   margin: 0 0 8px 0;
   text-align: left;
+}
+
+.id-separator {
+  height: 1px;
+  background: #e8eaed;
+  margin: 5px 0;
+}
+
+.identification-section .exercise-input {
+  width: 100%;
 }
 
 .property-section:hover,
@@ -341,13 +358,13 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 16px 20px 16px;
+  padding: 18px 28px 20px 28px;
   background: rgba(255, 255, 255, 0.95);
   border-radius: 12px;
   border: 1px solid #e8eaed;
   backdrop-filter: blur(8px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  margin-bottom: 40px;
+  margin-bottom: 20px;
 }
 
 .controls-left,
@@ -355,6 +372,7 @@
 .controls-right {
   display: flex;
   align-items: center;
+  gap: 16px;
 }
 
 /* Type Indicator - like the Pitch/Intonation badges */

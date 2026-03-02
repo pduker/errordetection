@@ -450,6 +450,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
 
                       <div className="identification-section">
                         <label className="id-label">ID</label>
+                        <div className="id-separator"></div>
                         <input
                           type="text"
                           value={customId}
