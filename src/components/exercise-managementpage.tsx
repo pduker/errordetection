@@ -448,54 +448,54 @@ export function ExerciseManagementPage({
   }
 
   return (
-    <div style={{ width: "90vw" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <div>
-          {/*page header*/}
-          <h2 style={{ display: "inline" }}>
-            Welcome to the Exercise Management Page!
-          </h2>
+    <div className="management-page-wrapper">
+      <div className="management-header">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <div>
+            {/*page header*/}
+            <h2 style={{ display: "inline" }}>
+              Welcome to the Exercise Management Page!
+            </h2>
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <button
+              onClick={handleLogout}
+              style={{
+                padding: "8px 16px",
+                backgroundColor: "#dc3545",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "14px",
+              }}
+            >
+              Logout
+            </button>
+            {/*creating an exercise*/}
+            <Button
+              style={{ display: "inline", marginRight: "1vw" }}
+              onClick={() => navigate("/exercise-management/create")}
+            >
+              +
+            </Button>
+          </div>
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <button
-            onClick={handleLogout}
-            style={{
-              padding: "8px 16px",
-              backgroundColor: "#dc3545",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontSize: "14px",
-            }}
-          >
-            Logout
-          </button>
-          {/*creating an exercise*/}
-          <Button
-            style={{ display: "inline", marginRight: "1vw" }}
-            onClick={() => navigate("/exercise-management/create")}
-          >
-            +
-          </Button>
-        </div>
+        <h5 style={{ marginTop: "8px", fontStyle: "italic" }}>
+          Click the + in the top right to add a new exercise, then edit as needed
+          and save. <br /> To edit an existing exercise, click on the pencil icon
+          next to the corresponding exercise in the list below.
+        </h5>
       </div>
-      <h5 style={{ marginTop: "8px", fontStyle: "italic" }}>
-        Click the + in the top right to add a new exercise, then edit as needed
-        and save. <br /> To edit an existing exercise, click on the pencil icon
-        next to the corresponding exercise in the list below.
-      </h5>
 
-      <div>
-        <br />
-        <h5 style={{ marginLeft: "4px", marginBottom: "-20px" }}>Sort By:</h5>
-        <br />
+      <div className="filter-section">
+        <h5>Sort By:</h5>
 
         {/*editing an exercise, filling in all paramters*/}
         <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
@@ -628,37 +628,40 @@ export function ExerciseManagementPage({
             />
           </form>
           {/*reset sort*/}
-          <Button
-            variant="danger"
-            onClick={resetSort}
-            style={{ marginLeft: "10px" }}
-          >
-            Reset Sort
-          </Button>
-          <Button
-            variant="danger"
-            onClick={() => handleMultipleExerciseDelete(selectedIndexes)}
-            style={{ marginLeft: "10px", marginTop: "10px" }}
-          >
-            Delete Selected Exercises
-          </Button>
+          <div className="action-buttons">
+            <Button
+              variant="danger"
+              onClick={resetSort}
+              className="btn-danger"
+            >
+              Reset Sort
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => handleMultipleExerciseDelete(selectedIndexes)}
+              className="btn-danger btn-delete"
+            >
+              Delete Selected Exercises
+            </Button>
+          </div>
         </div>
 
         {/*returning exercise data */}
-        {exerciseConfig.showExercises &&
-          exList.map((exercise) => {
-            if (!exercise) return <div key={Math.random()} />;
+        <div className="exercise-list-container">
+          {exerciseConfig.showExercises &&
+            exList.map((exercise) => {
+              if (!exercise) return <div key={Math.random()} />;
 
-            return (
-              <ExerciseManagementListEntry
-                key={exercise.exIndex}
-                exercise={exercise}
-                isSelected={selectedIndexes.includes(exercise.exIndex)}
-                handleSelectExercise={handleSelectExercise}
-              />
-            );
+              return (
+                <ExerciseManagementListEntry
+                  key={exercise.exIndex}
+                  exercise={exercise}
+                  isSelected={selectedIndexes.includes(exercise.exIndex)}
+                  handleSelectExercise={handleSelectExercise}
+                />
+              );
 
-            /*
+              /*
                             return (
                                 <Exercise
                                 key={exercise.exIndex}
@@ -672,13 +675,14 @@ export function ExerciseManagementPage({
                                 fetch={fetch}
                                 />
                             */
-          })}
+            })}
 
-        {exerciseConfig.showNoExercisesMessage && exList.length === 0 ? (
-          <div>No exercises found! Maybe try adding one?</div>
-        ) : (
-          <></>
-        )}
+          {exerciseConfig.showNoExercisesMessage && exList.length === 0 ? (
+            <div className="no-exercises-message">No exercises found! Maybe try adding one?</div>
+          ) : (
+            <></>
+          )}
+        </div>
 
         {/* Logout Confirmation Modal */}
         <LogoutModal
