@@ -289,244 +289,217 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
 
   return (
     <>
-      <div className="create-exercise-container">
-      <div className="create-exercise-header">
-        <div className="header-left">
-          <h2 className="create-exercise-title">Create New Exercise</h2>
-        </div>
-        <div className="header-right">
-          <button
-            onClick={clearAllData}
-            className="clear-all-button"
-            title="Clear all form data"
-          >
-            Clear All
-          </button>
-          <button
-            onClick={handleBackToManagement}
-            className="back-button"
-          >
-            Back to Management
-          </button>
+      <div className="exercise-viewer">
+        <div className="exercise-stage">
+          <div className="exercise-content"> 
+            <div className="exercise-content-inner">
+              {/* Exercise Header */}
+              <div className="exercise-header">
+                <h2 className="exercise-title">Create New Exercise</h2>
+              </div>
+
+              {/* Main Exercise Card - where musical notation would be */}
+              <div className="exercise-main-card">
+                <div className="creation-workspace">
+                  <div className="workspace-grid">
+                    {/* Left side - Exercise Properties */}
+                    <div className="workspace-left">
+                      <div className="property-section">
+                        <h4>Exercise Properties</h4>
+                        <div className="property-controls">
+                          <div className="control-group">
+                            <label>Difficulty:</label>
+                            <div className="difficulty-selector">
+                              {[1, 2, 3, 4, 5].map((level) => (
+                                <button
+                                  key={level}
+                                  type="button"
+                                  onClick={() => setDifficulty(level)}
+                                  className={`difficulty-btn ${difficulty === level ? 'active' : ''}`}
+                                >
+                                  {level}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="control-group">
+                            <label>Voices:</label>
+                            <div className="voice-selector">
+                              {[1, 2, 3, 4, 5].map((voice) => (
+                                <button
+                                  key={voice}
+                                  type="button"
+                                  onClick={() => setVoices(voice)}
+                                  className={`voice-btn ${voices === voice ? 'active' : ''}`}
+                                >
+                                  {voice}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="control-group">
+                            <label>Meter:</label>
+                            <select
+                              value={meter}
+                              onChange={(e) => setMeter(e.target.value)}
+                              className="exercise-select"
+                            >
+                              <option value="Anything">Anything</option>
+                              <option value="Simple">Simple</option>
+                              <option value="Compound">Compound</option>
+                            </select>
+                          </div>
+
+                          <div className="control-group">
+                            <label>Textural Factors:</label>
+                            <select
+                              value={types}
+                              onChange={(e) => setTypes(e.target.value)}
+                              className="exercise-select"
+                            >
+                              <option value="None">None</option>
+                              <option value="Drone">Drone</option>
+                              <option value="Ensemble Parts">Ensemble Parts</option>
+                              <option value="Both">Both</option>
+                            </select>
+                          </div>
+
+                          <div className="control-group">
+                            <label className="checkbox-group">
+                              <input
+                                type="checkbox"
+                                checked={transpos}
+                                onChange={(e) => setTranspos(e.target.checked)}
+                                className="checkbox-input"
+                              />
+                              <span className="checkbox-label">Include Transposing Instruments</span>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right side - Exercise Type & Files */}
+                    <div className="workspace-right">
+                      <div className="type-section">
+                        <h4>Exercise Type</h4>
+                        <div className="exercise-tags">
+                          {["Pitch", "Intonation", "Rhythm"].map((tag) => (
+                            <button
+                              key={tag}
+                              type="button"
+                              onClick={() => handleTagChange(tag)}
+                              className={`exercise-tag ${tags.includes(tag) ? "selected" : ""}`}
+                            >
+                              <span className="tag-label">{tag}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="files-section">
+                        <h4>Files</h4>
+                        <div className="file-upload-grid">
+                          <div className="file-upload-item">
+                            <label>MusicXML</label>
+                            <div 
+                              className={`file-drop-zone ${dragOver === 'musicxml' ? 'drag-over' : ''}`}
+                              onDragOver={(e) => handleDragOver(e, 'musicxml')}
+                              onDragLeave={handleDragLeave}
+                              onDrop={(e) => handleDrop(e, 'musicxml')}
+                            >
+                              <input
+                                type="file"
+                                accept=".musicxml,.xml"
+                                onChange={(e) => handleFileSelect(e, 'musicxml')}
+                                className="file-input"
+                              />
+                              <div className="drop-content">
+                                <div className="drop-text">
+                                  {musicXmlFile ? 'Loaded' : 'Drop file'}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="file-upload-item">
+                            <label>Audio</label>
+                            <div 
+                              className={`file-drop-zone ${dragOver === 'audio' ? 'drag-over' : ''}`}
+                              onDragOver={(e) => handleDragOver(e, 'audio')}
+                              onDragLeave={handleDragLeave}
+                              onDrop={(e) => handleDrop(e, 'audio')}
+                            >
+                              <input
+                                type="file"
+                                accept=".mp3,.wav,.m4a"
+                                onChange={(e) => handleFileSelect(e, 'audio')}
+                                className="file-input"
+                              />
+                              <div className="drop-content">
+                                <div className="drop-text">
+                                  {audioFile ? 'Loaded' : 'Drop file'}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="identification-section">
+                        <label className="id-label">ID</label>
+                        <input
+                          type="text"
+                          value={customId}
+                          onChange={(e) => setCustomId(e.target.value)}
+                          placeholder="Custom ID (optional)"
+                          className="exercise-input"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Section - like the exercise controls */}
+              <div className="exercise-controls">
+                <div className="controls-left">
+                  <div className="exercise-type-indicator">
+                    <span className="type-badge">Create Mode</span>
+                  </div>
+                </div>
+                
+                <div className="controls-center">
+                  <div className="media-controls">
+                    <div className="play-button">▶</div>
+                    <div className="time-display">0:00</div>
+                    <div className="progress-bar"></div>
+                  </div>
+                </div>
+                
+                <div className="controls-right">
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="control-btn cancel-btn"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    onClick={handleSubmit}
+                    className="control-btn create-btn"
+                  >
+                    Create Exercise
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <form onSubmit={handleSubmit} className="create-exercise-form">
-        {/* Exercise Properties */}
-        <div className="form-section">
-          <h3>Exercise Properties</h3>
-
-          <div className="form-grid">
-            <div className="form-group">
-              <label className="form-label">Difficulty:</label>
-              <select
-                value={difficulty}
-                onChange={(e) => setDifficulty(Number(e.target.value))}
-                className="form-select"
-              >
-                <option value={1}>1</option>
-                <option value={2}>2</option>
-                <option value={3}>3</option>
-                <option value={4}>4</option>
-                <option value={5}>5</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Voices:</label>
-              <select
-                value={voices}
-                onChange={(e) => setVoices(Number(e.target.value))}
-                className="form-select"
-              >
-                <option value={1}>1</option>
-                <option value={2}>2</option>
-                <option value={3}>3</option>
-                <option value={4}>4</option>
-                <option value={5}>5</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Meter:</label>
-              <select
-                value={meter}
-                onChange={(e) => setMeter(e.target.value)}
-                className="form-select"
-              >
-                <option value="Anything">Anything</option>
-                <option value="Simple">Simple</option>
-                <option value="Compound">Compound</option>
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label className="form-label">Textural Factors:</label>
-              <select
-                value={types}
-                onChange={(e) => setTypes(e.target.value)}
-                className="form-select"
-              >
-                <option value="None">None</option>
-                <option value="Drone">Drone</option>
-                <option value="Ensemble Parts">Ensemble Parts</option>
-                <option value="Both">Drone & Ensemble Parts</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="checkbox-group">
-              <input
-                type="checkbox"
-                checked={transpos}
-                onChange={(e) => setTranspos(e.target.checked)}
-                className="checkbox-input"
-              />
-              <span className="checkbox-label">Transposing Instruments</span>
-            </label>
-          </div>
-        </div>
-
-        {/* Tags */}
-        <div className="form-section">
-          <h3>Exercise Type</h3>
-          <div className="tags-container">
-            {["Pitch", "Intonation", "Rhythm"].map((tag) => (
-              <label
-                key={tag}
-                className={`tag-item ${tags.includes(tag) ? "selected" : ""}`}
-              >
-                <input
-                  type="checkbox"
-                  checked={tags.includes(tag)}
-                  onChange={() => handleTagChange(tag)}
-                  style={{ display: "none" }}
-                />
-                <span className="checkbox-label">{tag}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* File Uploads */}
-        <div className="form-section">
-          <h3>Files</h3>
-          
-          <div className="form-group file-upload-group">
-            <label className="form-label">MusicXML Score (.xml, .musicxml):</label>
-            <div 
-              className={`file-drop-zone ${dragOver === 'musicxml' ? 'drag-over' : ''}`}
-              onDragOver={(e) => handleDragOver(e, 'musicxml')}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, 'musicxml')}
-            >
-              <input
-                type="file"
-                accept=".musicxml,.xml"
-                onChange={(e) => handleFileSelect(e, 'musicxml')}
-                className="file-input"
-              />
-              <div className="file-upload-content">
-                <div className="file-upload-icon">🎼</div>
-                <div className="file-upload-text">
-                  {musicXmlFile ? 'Replace MusicXML File' : 'Drop MusicXML file here or click to browse'}
-                </div>
-                <div className="file-upload-subtext">
-                  Supports .xml, .musicxml files
-                </div>
-              </div>
-            </div>
-            {musicXmlFile && (
-              <div className="file-preview">
-                <div className="file-preview-icon">{getFileIcon(musicXmlFile.name)}</div>
-                <div className="file-preview-info">
-                  <div className="file-preview-name">{musicXmlFile.name}</div>
-                  <div className="file-preview-details">{formatFileSize(musicXmlFile.size)}</div>
-                </div>
-                <button 
-                  className="file-preview-remove"
-                  onClick={() => removeFile('musicxml')}
-                >
-                  Remove
-                </button>
-              </div>
-            )}
-          </div>
-
-          <div className="form-group file-upload-group">
-            <label className="form-label">Audio File (.mp3, .wav, .m4a):</label>
-            <div 
-              className={`file-drop-zone ${dragOver === 'audio' ? 'drag-over' : ''}`}
-              onDragOver={(e) => handleDragOver(e, 'audio')}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, 'audio')}
-            >
-              <input
-                type="file"
-                accept=".mp3,.wav,.m4a"
-                onChange={(e) => handleFileSelect(e, 'audio')}
-                className="file-input"
-              />
-              <div className="file-upload-content">
-                <div className="file-upload-icon">🔊</div>
-                <div className="file-upload-text">
-                  {audioFile ? 'Replace Audio File' : 'Drop audio file here or click to browse'}
-                </div>
-                <div className="file-upload-subtext">
-                  Supports .mp3, .wav, .m4a files
-                </div>
-              </div>
-            </div>
-            {audioFile && (
-              <div className="file-preview">
-                <div className="file-preview-icon">{getFileIcon(audioFile.name)}</div>
-                <div className="file-preview-info">
-                  <div className="file-preview-name">{audioFile.name}</div>
-                  <div className="file-preview-details">{formatFileSize(audioFile.size)}</div>
-                </div>
-                <button 
-                  className="file-preview-remove"
-                  onClick={() => removeFile('audio')}
-                >
-                  Remove
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Identification */}
-        <div className="form-section">
-          <h3>Identification</h3>
-
-          <div className="form-group">
-            <label className="form-label">Custom ID:</label>
-            <input
-              type="text"
-              value={customId}
-              onChange={(e) => setCustomId(e.target.value)}
-              placeholder="Enter custom ID (optional)"
-              className="form-input"
-            />
-          </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="action-buttons">
-          <Button
-            variant="secondary"
-            onClick={handleCancel}
-            className="btn-cancel"
-          >
-            Cancel
-          </Button>
-          <Button variant="primary" type="submit" className="btn-create">
-            Create Exercise
-          </Button>
-        </div>
-      </form>
-    </div>
     
     <ConfirmationModal
       show={showConfirmModal}
