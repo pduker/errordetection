@@ -588,14 +588,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                   </div>
                 </div>
                 
-                <div className="controls-center">
-                  <div className="media-controls">
-                    <div className="play-button">▶</div>
-                    <div className="time-display">0:00</div>
-                    <div className="progress-bar"></div>
-                  </div>
-                </div>
-                
                 <div className="controls-right">
                   <button
                     type="button"
