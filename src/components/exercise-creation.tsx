@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
 import ExerciseData from "../interfaces/exerciseData";
 import { ConfirmationModal } from "./modals/confirmation-modal";
+import { Exercise } from "./exercise";
 import { getDatabase, ref, set, push } from "firebase/database";
 import "../styles/create-exercise.css";
 
@@ -30,6 +31,20 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
   const [confirmAction, setConfirmAction] = useState<"back" | "cancel" | null>(null);
   const [showFileErrorModal, setShowFileErrorModal] = useState<boolean>(false);
   const [fileErrorType, setFileErrorType] = useState<"audio" | "musicxml" | null>(null);
+  const [showValidationErrorModal, setShowValidationErrorModal] = useState<boolean>(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [showPreviewModal, setShowPreviewModal] = useState<boolean>(false);
+  const [fieldErrors, setFieldErrors] = useState<{
+    tags: boolean;
+    musicXml: boolean;
+    audio: boolean;
+    customId: boolean;
+  }>({
+    tags: false,
+    musicXml: false,
+    audio: false,
+    customId: false
+  });
   
   useEffect(() => {
     // Component initialization logic here if needed
@@ -46,6 +61,15 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     setCustomId("");
     setAudioFile(null);
     setMusicXmlFile(null);
+    
+    // Clear validation errors
+    setValidationErrors([]);
+    setFieldErrors({
+      tags: false,
+      musicXml: false,
+      audio: false,
+      customId: false
+    });
   };
 
   const hasUnsavedData = (): boolean => {
@@ -111,6 +135,76 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       return "Please drop a valid MusicXML file!\nValid formats: .xml, .musicxml";
     }
     return "";
+  };
+
+  const validateExercise = (): boolean => {
+    const errors: string[] = [];
+    const newFieldErrors = {
+      tags: false,
+      musicXml: false,
+      audio: false,
+      customId: false
+    };
+
+    // Validate at least one exercise type is selected
+    if (tags.length === 0) {
+      errors.push("Please select at least one exercise type (Pitch, Intonation, or Rhythm)");
+      newFieldErrors.tags = true;
+    }
+
+    // Validate MusicXML file is required
+    if (!musicXmlFile) {
+      errors.push("MusicXML file is required");
+      newFieldErrors.musicXml = true;
+    }
+
+    // Validate Audio file is required
+    if (!audioFile) {
+      errors.push("Audio file is required");
+      newFieldErrors.audio = true;
+    }
+
+    // Validate custom ID format if provided
+    if (customId.trim() !== "") {
+      // Check for valid characters (alphanumeric, hyphens, underscores only)
+      if (!/^[a-zA-Z0-9_-]+$/.test(customId.trim())) {
+        errors.push("Custom ID can only contain letters, numbers, hyphens, and underscores");
+        newFieldErrors.customId = true;
+      }
+      
+      // Check for unique custom ID
+      const isDuplicate = allExData.some(exercise => 
+        exercise && exercise.customId === customId.trim()
+      );
+      if (isDuplicate) {
+        errors.push("This custom ID is already used by another exercise");
+        newFieldErrors.customId = true;
+      }
+    }
+
+    setValidationErrors(errors);
+    setFieldErrors(newFieldErrors);
+    
+    return errors.length === 0;
+  };
+
+  const handleValidationErrorConfirm = () => {
+    setShowValidationErrorModal(false);
+    setValidationErrors([]);
+  };
+
+  const isFormValid = (): boolean => {
+    return tags.length > 0 && musicXmlFile !== null && audioFile !== null && !fieldErrors.customId;
+  };
+
+  const handlePreview = () => {
+    if (isFormValid()) {
+      setShowPreviewModal(true);
+    }
+  };
+
+  const handlePreviewClose = () => {
+    setShowPreviewModal(false);
   };
 
   const handleTagChange = (tag: string) => {
@@ -218,6 +312,12 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate all fields before submission
+    if (!validateExercise()) {
+      setShowValidationErrorModal(true);
+      return;
+    }
 
     try {
       // Generate automatic title based on exercise index
@@ -391,11 +491,14 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                               key={tag}
                               type="button"
                               onClick={() => handleTagChange(tag)}
-                              className={`exercise-tag ${tags.includes(tag) ? "selected" : ""}`}
+                              className={`exercise-tag ${tags.includes(tag) ? "selected" : ""} ${fieldErrors.tags && !tags.includes(tag) ? "error" : ""}`}
                             >
                               <span className="tag-label">{tag}</span>
                             </button>
                           ))}
+                          {fieldErrors.tags && tags.length === 0 && (
+                            <div className="field-error-message">Please select at least one type</div>
+                          )}
                         </div>
                       </div>
 
@@ -405,7 +508,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                           <div className="file-upload-item">
                             <label>MusicXML</label>
                             <div 
-                              className={`file-drop-zone ${dragOver === 'musicxml' ? 'drag-over' : ''}`}
+                              className={`file-drop-zone ${dragOver === 'musicxml' ? 'drag-over' : ''} ${fieldErrors.musicXml && !musicXmlFile ? 'error' : ''}`}
                               onDragOver={(e) => handleDragOver(e, 'musicxml')}
                               onDragLeave={handleDragLeave}
                               onDrop={(e) => handleDrop(e, 'musicxml')}
@@ -422,12 +525,15 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                                 </div>
                               </div>
                             </div>
+                            {fieldErrors.musicXml && !musicXmlFile && (
+                              <div className="field-error-message">MusicXML file required</div>
+                            )}
                           </div>
 
                           <div className="file-upload-item">
                             <label>Audio</label>
                             <div 
-                              className={`file-drop-zone ${dragOver === 'audio' ? 'drag-over' : ''}`}
+                              className={`file-drop-zone ${dragOver === 'audio' ? 'drag-over' : ''} ${fieldErrors.audio && !audioFile ? 'error' : ''}`}
                               onDragOver={(e) => handleDragOver(e, 'audio')}
                               onDragLeave={handleDragLeave}
                               onDrop={(e) => handleDrop(e, 'audio')}
@@ -444,6 +550,9 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                                 </div>
                               </div>
                             </div>
+                            {fieldErrors.audio && !audioFile && (
+                              <div className="field-error-message">Audio file required</div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -456,8 +565,15 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                           value={customId}
                           onChange={(e) => setCustomId(e.target.value)}
                           placeholder="Custom ID (optional)"
-                          className="exercise-input"
+                          className={`exercise-input ${fieldErrors.customId ? 'error' : ''}`}
                         />
+                        {fieldErrors.customId && customId.trim() !== "" && (
+                          <div className="field-error-message">
+                            {!/^[a-zA-Z0-9_-]+$/.test(customId.trim()) 
+                              ? "Invalid characters (use letters, numbers, hyphens, underscores only)"
+                              : "This ID is already in use"}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -487,6 +603,14 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                     className="control-btn cancel-btn"
                   >
                     Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handlePreview}
+                    className={`control-btn preview-btn ${!isFormValid() ? 'disabled' : ''}`}
+                    disabled={!isFormValid()}
+                  >
+                    Preview
                   </button>
                   <button
                     type="submit"
@@ -521,6 +645,81 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       confirmText="OK"
       hideCancelButton={true}
     />
+    
+    <ConfirmationModal
+      show={showValidationErrorModal}
+      onHide={handleValidationErrorConfirm}
+      onConfirm={handleValidationErrorConfirm}
+      title="Validation Errors"
+      message={validationErrors.join('\n\n')}
+      confirmText="Fix Issues"
+      hideCancelButton={true}
+    />
+    
+    {/* Exercise Preview Modal */}
+    <Modal
+      show={showPreviewModal}
+      onHide={handlePreviewClose}
+      centered
+      backdrop="static"
+      keyboard={false}
+      size="xl"
+      className="exercise-preview-modal"
+    >
+      <Modal.Header closeButton>
+        <Modal.Title>Exercise Preview</Modal.Title>
+      </Modal.Header>
+      <Modal.Body style={{ padding: 0 }}>
+        <div className="exercise-viewer" style={{ height: "600px" }}>
+          <div className="exercise-stage">
+            <div className="exercise-content"> 
+              <div className="exercise-content-inner">
+                {(() => {
+                  // Create a mock exercise for preview
+                  const mockExercise = new ExerciseData(
+                    "T: Preview Exercise\nK:C\n|C D E F|G A B c|", // Mock ABC notation
+                    audioFile?.name || "preview-audio.mp3", // Use actual filename or mock
+                    [{"note": "C"}, {"note": "D"}], // Mock correct answers
+                    "Preview exercise", // Mock feedback
+                    allExData.length, // Use next available index
+                    false, // empty
+                    `Exercise ${allExData.length + 1}`, // Auto-generated title
+                    difficulty,
+                    voices,
+                    tags,
+                    types,
+                    meter,
+                    transpos,
+                    true, // isNew
+                    customId
+                  );
+                  
+                  return (
+                    <Exercise 
+                      key={mockExercise.exIndex} 
+                      teacherMode={false} 
+                      ExData={mockExercise} 
+                      allExData={[mockExercise]} 
+                      setAllExData={() => {}} 
+                      exIndex={mockExercise.exIndex} 
+                      handleSelectExercise={undefined} 
+                      isSelected={undefined}
+                      fetch={undefined}
+                      updateProgress={() => {}}
+                    />
+                  );
+                })()}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={handlePreviewClose}>
+          Close Preview
+        </Button>
+      </Modal.Footer>
+    </Modal>
     </>
   );
 }

@@ -4,7 +4,6 @@ import Nav from 'react-bootstrap/Nav';
 import logo from './assets/UD-circle-logo-email.png';
 import './styles/global.css';
 import './styles/app.css';
-import './styles/controls.css';
 import { HomePage } from './components/homepage';
 import { HelpPage } from './components/helppage';
 import { AboutPage } from './components/aboutpage';
