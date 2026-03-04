@@ -137,13 +137,14 @@ export function ExerciseTypeFiles({
                   const file = e.target.files?.[0];
                   if (file) handleFileUpload(file, 'musicxml');
                 }}
-                className="file-input"
+                className={`file-input ${musicXmlFile ? 'file-present' : ''}`}
               />
               <div className="drop-content">
                 {musicXmlFile ? (
                   <>
                     <div className="file-info">
                       <div className="file-details">
+                        <span className="file-icon">🎼</span>
                         <span className="file-name" title={musicXmlFile.name}>
                           {musicXmlFile.name}
                         </span>
@@ -186,13 +187,14 @@ export function ExerciseTypeFiles({
                   const file = e.target.files?.[0];
                   if (file) handleFileUpload(file, 'audio');
                 }}
-                className="file-input"
+                className={`file-input ${audioFile ? 'file-present' : ''}`}
               />
               <div className="drop-content">
                 {audioFile ? (
                   <>
                     <div className="file-info">
                       <div className="file-details">
+                        <span className="file-icon">💿</span>
                         <span className="file-name" title={audioFile.name}>
                           {audioFile.name}
                         </span>

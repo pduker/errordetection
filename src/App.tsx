@@ -4,7 +4,6 @@ import Nav from 'react-bootstrap/Nav';
 import logo from './assets/UD-circle-logo-email.png';
 import './styles/global.css';
 import './styles/app.css';
-import { HomePage } from './components/homepage';
 import { HelpPage } from './components/helppage';
 import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
@@ -192,7 +191,7 @@ function App() {
           display: "block"
         }}>
         <Routes>
-            <Route path="/" element={<HomePage/>}></Route>
+            <Route path="/" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>}></Route>
             <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>}/>
             <Route path="/about" element={<AboutPage/>}/>
             <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>}/>
