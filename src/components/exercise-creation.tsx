@@ -29,6 +29,8 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [musicXmlFile, setMusicXmlFile] = useState<File | null>(null);
   const [abcNotation, setAbcNotation] = useState<string>("");
+  const [feedbackItems, setFeedbackItems] = useState<{id: string, text: string, targetNote?: string, targetMeasure?: string}[]>([]);
+  const [selectedNote, setSelectedNote] = useState<{note: string, measure: string} | null>(null);
   const [dragOver, setDragOver] = useState<string>("");
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<"back" | "cancel" | null>(null);
@@ -103,7 +105,40 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
             minSpacing: 1.0,
             maxSpacing: 2.5,
             preferredMeasuresPerLine: 4
-          }
+          },
+          clickListener: function(abcelem, tuneNumber, classes, analysis, drag) {
+            // Handle note clicks for feedback targeting
+            if (abcelem && abcelem.abselem && abcelem.abselem.elemset && abcelem.abselem.elemset.length > 0) {
+              const noteElems = abcelem.abselem.elemset[0];
+              const staffPos = Number(noteElems.getAttribute("staffPos")) + 1;
+              const measurePos = Number(noteElems.getAttribute("measurePos")) + 1;
+              const noteName = abcelem.pitches && abcelem.pitches.length > 0 
+                ? (typeof abcelem.pitches[0] === 'string' ? abcelem.pitches[0] : abcelem.pitches[0].name || 'note')
+                : 'note';
+              
+              console.log('Note clicked:', noteName, 'Measure:', measurePos, 'Staff:', staffPos);
+              
+              setSelectedNote({
+                note: noteName,
+                measure: measurePos.toString()
+              });
+              
+              // Visual feedback - highlight selected note
+              const svgElement = previewRef.current?.querySelector("svg");
+              if (svgElement) {
+                // Clear previous selections
+                svgElement.querySelectorAll('.selected-for-feedback').forEach(el => {
+                  el.classList.remove('selected-for-feedback');
+                });
+                
+                // Highlight new selection
+                if (noteElems) {
+                  noteElems.classList.add('selected-for-feedback');
+                }
+              }
+            }
+          },
+          selectTypes: ["note"]
         });
       } catch (error) {
         console.error('Error rendering ABC notation:', error);
@@ -123,6 +158,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     setAudioFile(null);
     setMusicXmlFile(null);
     setAbcNotation("");
+    setFeedbackItems([]);
     
     // Clear validation errors
     setValidationErrors([]);
@@ -145,7 +181,8 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       transpos !== false ||
       audioFile !== null ||
       musicXmlFile !== null ||
-      abcNotation !== ""
+      abcNotation !== "" ||
+      feedbackItems.length > 0
     );
   };
 
@@ -420,6 +457,35 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     }
   };
 
+  const addFeedbackItem = () => {
+    const newId = Date.now().toString();
+    const newItem = { 
+      id: newId, 
+      text: "",
+      targetNote: selectedNote?.note,
+      targetMeasure: selectedNote?.measure
+    };
+    setFeedbackItems([...feedbackItems, newItem]);
+    // Clear selection after adding
+    setSelectedNote(null);
+  };
+
+  const updateFeedbackItem = (id: string, text: string) => {
+    setFeedbackItems(feedbackItems.map(item => 
+      item.id === id ? { ...item, text } : item
+    ));
+  };
+
+  const updateFeedbackTarget = (id: string, targetNote?: string, targetMeasure?: string) => {
+    setFeedbackItems(feedbackItems.map(item => 
+      item.id === id ? { ...item, targetNote, targetMeasure } : item
+    ));
+  };
+
+  const removeFeedbackItem = (id: string) => {
+    setFeedbackItems(feedbackItems.filter(item => item.id !== id));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -441,11 +507,12 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       const autoTitle = `Exercise ${newExIndex + 1}`;
 
       // Create new exercise with the generated index and auto title
+      const combinedFeedback = feedbackItems.map(item => item.text).filter(text => text.trim() !== "").join(" | ");
       const newExercise = new ExerciseData(
         "",
         audioFile?.name || "", // Store filename instead of File object
         [],
-        "",
+        combinedFeedback, // Combine all feedback items
         newExIndex,
         false,
         autoTitle, // Use auto-generated title
@@ -498,7 +565,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
   };
 
   return (
-    <>
+    <div className="exercise-creation-container">
       <div className="exercise-viewer">
         <div className="exercise-stage">
           <div className="exercise-content"> 
@@ -619,6 +686,12 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                           </div>
                         </div>
                       </div>
+
+                    </div>
+
+                    {/* Right side - Exercise Type & Files */}
+                    <div className="workspace-right">
+
                       <div className="type-section">
                         <h4>Exercise Type</h4>
                         <div className="exercise-tags">
@@ -637,10 +710,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                           )}
                         </div>
                       </div>
-                    </div>
-
-                    {/* Right side - Exercise Type & Files */}
-                    <div className="workspace-right">
 
                       <div className="identification-section">
                         <label className="id-label">ID</label>
@@ -751,53 +820,148 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                           </div>
                         </div>
                       </div>
-
-                      {/* Music Score Preview Section */}
-                      {(abcNotation || true) && (
-                        <div className="score-preview-section">
-                          <div className="preview-header">
-                            <h4>Score Preview</h4>
-                            {/* <button 
-                              className="preview-clear-btn"
-                              onClick={() => setAbcNotation("")}
-                            >
-                              Clear Preview
-                            </button> */}
-                          </div>
-                          <div className="score-preview-container">
-                            <div className="score-preview-content">
-                              {abcNotation ? (
-                                <div 
-                                  ref={previewRef}
-                                  className="abc-score-display"
-                                />
-                              ) : (
-                                <div style={{ 
-                                  padding: '20px', 
-                                  textAlign: 'center', 
-                                  color: '#666',
-                                  fontStyle: 'italic'
-                                }}>
-                                  Drop a MusicXML file above to see the score preview
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-
                     </div>
+
+                  </div>
+              </div>
+
+            </div>
+
+            {/* Score Preview and Feedback Section - Separate Section */}
+            <div className="inner-score-feedback-section">
+              <div className="score-feedback-header">
+                <h3>Score Preview & Feedback</h3>
+              </div>
+              <div className="score-feedback-content">
+                {/* Music Score Preview Section */}
+                {(abcNotation || true) && (
+                  <div className="score-preview-section">
+                    <div className="preview-header">
+                      <h4>Score Preview</h4>
+                      {/* <button 
+                        className="preview-clear-btn"
+                        onClick={() => setAbcNotation("")}
+                      >
+                        Clear Preview
+                      </button> */}
+                    </div>
+                    <div className="score-preview-container">
+                      <div className="score-preview-content">
+                        {abcNotation ? (
+                          <div 
+                            ref={previewRef}
+                            className="abc-score-display"
+                          />
+                        ) : (
+                          <div style={{ 
+                            padding: '20px', 
+                            textAlign: 'center', 
+                            color: '#666',
+                            fontStyle: 'italic'
+                          }}>
+                            Drop a MusicXML file above to see the score preview
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Feedback Section */}
+                <div className="feedback-section">
+                  <h4>Wrong Answer Feedback</h4>
+                  <div className="feedback-instructions">
+                    <p>Click on notes in the score preview above to target specific feedback, or add general feedback.</p>
+                  </div>
+                  <div className="feedback-controls">
+                    {selectedNote && (
+                      <div className="selected-note-info">
+                        <span className="selected-note-label">Selected:</span>
+                        <span className="selected-note-detail">
+                          {selectedNote.note} in measure {selectedNote.measure}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setSelectedNote(null)}
+                          className="clear-selection-btn"
+                        >
+                          Clear
+                        </button>
+                      </div>
+                    )}
+                    {feedbackItems.length === 0 ? (
+                      <div className="feedback-empty">
+                        <p>No feedback items added. Add feedback for specific notes or general mistakes.</p>
+                        <button
+                          type="button"
+                          onClick={addFeedbackItem}
+                          className="add-feedback-btn"
+                          disabled={!selectedNote}
+                        >
+                          {selectedNote ? "+ Add Feedback for Selected Note" : "+ Add General Feedback"}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="feedback-list">
+                        {feedbackItems.map((item, index) => (
+                          <div key={item.id} className="feedback-item">
+                            <div className="feedback-item-header">
+                              <label>Feedback {index + 1}:</label>
+                              <button
+                                type="button"
+                                onClick={() => removeFeedbackItem(item.id)}
+                                className="remove-feedback-btn"
+                                title="Remove feedback"
+                              >
+                                ✕
+                              </button>
+                            </div>
+                            {item.targetNote && (
+                              <div className="feedback-target-info">
+                                <span className="target-label">Target:</span>
+                                <span className="target-detail">
+                                  {item.targetNote} in measure {item.targetMeasure}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => updateFeedbackTarget(item.id)}
+                                  className="retarget-btn"
+                                  title="Change target"
+                                >
+                                  🎯
+                                </button>
+                              </div>
+                            )}
+                            <textarea
+                              value={item.text}
+                              onChange={(e) => updateFeedbackItem(item.id, e.target.value)}
+                              placeholder={item.targetNote 
+                                ? `Feedback for ${item.targetNote} in measure ${item.targetMeasure}...`
+                                : "Enter general feedback message..."
+                              }
+                              className="feedback-textarea"
+                              rows={2}
+                            />
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={addFeedbackItem}
+                          className="add-feedback-btn"
+                        >
+                          {selectedNote ? "+ Add Feedback for Selected Note" : "+ Add General Feedback"}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-
-
             </div>
+
           </div>
         </div>
       </div>
-    
+
     <ConfirmationModal
       show={showConfirmModal}
       onHide={handleModalCancel}
@@ -892,6 +1056,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
         </Button>
       </Modal.Footer>
     </Modal>
-    </>
+    </div>
+  </div>
   );
 }

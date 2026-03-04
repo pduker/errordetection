@@ -490,9 +490,9 @@
   background: white;
   border-radius: 8px;
   border: 1px solid #e8eaed;
-  padding: 12px;
-  min-height: 150px;
-  max-height: 300px;
+  padding: 16px;
+  min-height: 350px;
+  max-height: 500px;
   overflow: auto;
 }
 
@@ -511,6 +511,341 @@
   max-width: 100%;
   height: auto;
   min-width: 300px;
+}
+
+/* Feedback Section */
+.feedback-section {
+  background: #fafbfc;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e8eaed;
+  margin-top: 16px;
+  transition: all 0.3s ease;
+}
+
+.feedback-section:hover {
+  border-color: #d4d7dc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.feedback-section h4 {
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 1rem;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e8eaed;
+}
+
+.feedback-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.feedback-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 2px solid #e1e4e8;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #2c3e50;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.5;
+}
+
+.feedback-textarea:focus {
+  outline: none;
+  border-color: #114b96;
+  box-shadow: 0 0 0 2px rgba(17, 75, 150, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.feedback-textarea::placeholder {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+/* Multiple Feedback Items */
+.feedback-empty {
+  text-align: center;
+  padding: 20px;
+  color: #6b7280;
+}
+
+.feedback-empty p {
+  margin-bottom: 16px;
+  font-style: italic;
+}
+
+.add-feedback-btn {
+  background: linear-gradient(135deg, #114b96 0%, #1e5ba8 100%);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(17, 75, 150, 0.2);
+}
+
+.add-feedback-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(17, 75, 150, 0.3);
+}
+
+.feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.feedback-item {
+  background: white;
+  border: 1px solid #e8eaed;
+  border-radius: 8px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+.feedback-item:hover {
+  border-color: #d4d7dc;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.feedback-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.feedback-item-header label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 13px;
+}
+
+.remove-feedback-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: bold;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+.remove-feedback-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+  background: #c82333;
+}
+
+/* Feedback Targeting */
+.feedback-instructions {
+  background: #f0f8ff;
+  border: 1px solid #d1e7ff;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 16px;
+}
+
+.feedback-instructions p {
+  margin: 0;
+  color: #1e5ba8;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.selected-note-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #e7f3ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 16px;
+}
+
+.selected-note-label {
+  font-weight: 600;
+  color: #1e5ba8;
+  font-size: 12px;
+}
+
+.selected-note-detail {
+  flex: 1;
+  color: #2c3e50;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.clear-selection-btn {
+  background: #6b7280;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.clear-selection-btn:hover {
+  background: #4b5563;
+}
+
+.feedback-target-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 4px;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+
+.target-label {
+  font-weight: 600;
+  color: #6c757d;
+}
+
+.target-detail {
+  flex: 1;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.retarget-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 10px;
+  transition: all 0.2s ease;
+}
+
+.retarget-btn:hover {
+  background: #218838;
+  transform: scale(1.1);
+}
+
+/* Note selection highlighting */
+.abc-score-display .selected-for-feedback {
+  fill: #ff6b6b !important;
+  stroke: #ff6b6b !important;
+  stroke-width: 2px;
+}
+
+.abc-score-display .selected-for-feedback:hover {
+  fill: #ff5252 !important;
+  stroke: #ff5252 !important;
+}
+
+/* Score Preview and Feedback Section - Inner */
+.inner-score-feedback-section {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.score-feedback-header {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #e8eaed;
+}
+
+.score-feedback-header h3 {
+  color: #1a1a1a;
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.score-feedback-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+}
+
+/* Adjust score preview for inner layout */
+.inner-score-feedback-section .score-preview-section {
+  background: #fafbfc;
+  border-radius: 12px;
+  padding: 20px;
+  border: 2px solid #e8eaed;
+  transition: all 0.3s ease;
+  margin-top: 0;
+  min-height: 400px;
+}
+
+.inner-score-feedback-section .score-preview-section:hover {
+  border-color: #d4d7dc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Adjust feedback section for inner layout */
+.inner-score-feedback-section .feedback-section {
+  background: #fafbfc;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e8eaed;
+  margin-top: 0;
+  transition: all 0.3s ease;
+}
+
+.inner-score-feedback-section .feedback-section:hover {
+  border-color: #d4d7dc;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+/* Responsive design for inner score-feedback section */
+@media (max-width: 1024px) {
+  .inner-score-feedback-section .score-feedback-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .inner-score-feedback-section .score-preview-section {
+    min-height: 300px;
+  }
+  
+  .score-preview-container {
+    min-height: 250px;
+    max-height: 400px;
+  }
 }
 
 /* Exercise Controls - Bottom section matching the image */
