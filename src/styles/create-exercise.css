@@ -4,6 +4,11 @@
 @import './exercises/exercise-viewer.css';
 @import './exercises/layout.css';
 
+/* Section gaps */
+.section-gap {
+  height: 24px;
+}
+
 /* Exercise Header - matches the image layout */
 .exercise-header {
   text-align: left;
@@ -369,11 +374,14 @@
   opacity: 0;
   transform: scale(0.8);
   transition: all 0.2s ease;
-  flex-shrink: 0;
-  margin-left: 4px;
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  pointer-events: auto;
 }
 
-.file-info:hover .clear-file-btn {
+.file-drop-zone:hover .clear-file-btn {
   opacity: 1;
   transform: scale(1);
 }
@@ -511,6 +519,78 @@
   max-width: 100%;
   height: auto;
   min-width: 300px;
+}
+
+/* Selection Box Styles */
+.selection-box {
+  position: absolute;
+  border: 2px dashed #3b82f6;
+  background-color: rgba(59, 130, 246, 0.1);
+  pointer-events: none;
+  z-index: 1000;
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.2);
+}
+
+.score-preview-content.selecting {
+  cursor: crosshair;
+}
+
+.score-preview-content {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  position: relative;
+}
+
+/* Selected Note Styles */
+.selected-note {
+  transition: all 0.2s ease !important;
+}
+
+.selected-note .abcjs-note-head,
+.selected-note .notehead,
+.selected-note circle,
+.selected-note ellipse {
+  fill: #f97316 !important;
+  stroke: #c2410c !important;
+}
+
+.selected-note .abcjs-note-stem,
+.selected-note .stem,
+.selected-note line {
+  stroke: #f97316 !important;
+}
+
+.selected-note path {
+  fill: #f97316 !important;
+  stroke: #c2410c !important;
+}
+
+.selection-indicator {
+  position: absolute;
+  background: rgba(249, 115, 22, 0.1);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  border-radius: 4px;
+  width: calc(100% + 4px);
+  height: calc(100% + 4px);
+  top: -2px;
+  left: -2px;
+  pointer-events: none;
+  z-index: 999;
+  animation: noteGlow 2s infinite;
+}
+
+@keyframes noteGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(249, 115, 22, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(249, 115, 22, 0);
+  }
 }
 
 /* Feedback Section */
