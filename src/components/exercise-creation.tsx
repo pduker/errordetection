@@ -584,10 +584,28 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                                 onChange={(e) => setTranspos(e.target.checked)}
                                 className="checkbox-input"
                               />
-                              <span className="checkbox-label">Include Transposing Instruments</span>
+                              <span className="checkbox-label">Transposing Instruments</span>
                             </label>
                           </div>
                         </div>
+                      </div>
+                      <div className="identification-section">
+                        <label className="id-label">ID</label>
+                        <div className="id-separator"></div>
+                        <input
+                          type="text"
+                          value={customId}
+                          onChange={(e) => setCustomId(e.target.value)}
+                          placeholder="Custom ID (optional)"
+                          className={`exercise-input ${fieldErrors.customId ? 'error' : ''}`}
+                        />
+                        {fieldErrors.customId && customId.trim() !== "" && (
+                          <div className="field-error-message">
+                            {!/^[a-zA-Z0-9_-]+$/.test(customId.trim()) 
+                              ? "Invalid characters (use letters, numbers, hyphens, underscores only)"
+                              : "This ID is already in use"}
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -630,9 +648,27 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                                 className="file-input"
                               />
                               <div className="drop-content">
-                                <div className="drop-text">
-                                  {musicXmlFile ? 'Loaded' : 'Drop file'}
-                                </div>
+                                {musicXmlFile ? (
+                                  <div className="file-info">
+                                    <div className="file-details">
+                                      <span className="file-icon">🎼</span>
+                                      <span className="file-name" title={musicXmlFile.name}>
+                                        {musicXmlFile.name}
+                                      </span>
+                                    </div>
+                                    <button 
+                                      className="clear-file-btn"
+                                      onClick={() => removeFile('musicxml')}
+                                      title="Remove file"
+                                    >
+                                      ✕
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="drop-text">
+                                    Drop file
+                                  </div>
+                                )}
                               </div>
                             </div>
                             {fieldErrors.musicXml && !musicXmlFile && (
@@ -655,9 +691,27 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                                 className="file-input"
                               />
                               <div className="drop-content">
-                                <div className="drop-text">
-                                  {audioFile ? 'Loaded' : 'Drop file'}
-                                </div>
+                                {audioFile ? (
+                                  <div className="file-info">
+                                    <div className="file-details">
+                                      <span className="file-icon">💿</span>
+                                      <span className="file-name" title={audioFile.name}>
+                                        {audioFile.name}
+                                      </span>
+                                    </div>
+                                    <button 
+                                      className="clear-file-btn"
+                                      onClick={() => removeFile('audio')}
+                                      title="Remove file"
+                                    >
+                                      ✕
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="drop-text">
+                                    Drop file
+                                  </div>
+                                )}
                               </div>
                             </div>
                             {fieldErrors.audio && !audioFile && (
@@ -671,13 +725,13 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                       {(abcNotation || true) && (
                         <div className="score-preview-section">
                           <div className="preview-header">
-                            <h4>Score Preview {abcNotation ? '(Loaded)' : '(Waiting for MusicXML...)'}</h4>
-                            <button 
+                            <h4>Score Preview</h4>
+                            {/* <button 
                               className="preview-clear-btn"
                               onClick={() => setAbcNotation("")}
                             >
                               Clear Preview
-                            </button>
+                            </button> */}
                           </div>
                           <div className="score-preview-container">
                             <div className="score-preview-content">
@@ -701,24 +755,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                         </div>
                       )}
 
-                      <div className="identification-section">
-                        <label className="id-label">ID</label>
-                        <div className="id-separator"></div>
-                        <input
-                          type="text"
-                          value={customId}
-                          onChange={(e) => setCustomId(e.target.value)}
-                          placeholder="Custom ID (optional)"
-                          className={`exercise-input ${fieldErrors.customId ? 'error' : ''}`}
-                        />
-                        {fieldErrors.customId && customId.trim() !== "" && (
-                          <div className="field-error-message">
-                            {!/^[a-zA-Z0-9_-]+$/.test(customId.trim()) 
-                              ? "Invalid characters (use letters, numbers, hyphens, underscores only)"
-                              : "This ID is already in use"}
-                          </div>
-                        )}
-                      </div>
+
                     </div>
                   </div>
                 </div>
@@ -740,14 +777,14 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                   >
                     Cancel
                   </button>
-                  <button
+                  {/* <button
                     type="button"
                     onClick={handlePreview}
                     className={`control-btn preview-btn ${!isFormValid() ? 'disabled' : ''}`}
                     disabled={!isFormValid()}
                   >
                     Preview
-                  </button>
+                  </button> */}
                   <button
                     type="submit"
                     onClick={handleSubmit}
