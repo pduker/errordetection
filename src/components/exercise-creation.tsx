@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Modal } from "react-bootstrap";
 import ExerciseData from "../interfaces/exerciseData";
 import { ConfirmationModal } from "./modals/confirmation-modal";
 import { Exercise } from "./exercise";
 import { getDatabase, ref, set, push } from "firebase/database";
+import abcjs from "abcjs";
+import { vertaal } from "xml2abc";
 import "../styles/create-exercise.css";
 
 interface CreateExercisePageProps {
@@ -26,6 +28,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
   const [customId, setCustomId] = useState<string>("");
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [musicXmlFile, setMusicXmlFile] = useState<File | null>(null);
+  const [abcNotation, setAbcNotation] = useState<string>("");
   const [dragOver, setDragOver] = useState<string>("");
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<"back" | "cancel" | null>(null);
@@ -46,9 +49,67 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     customId: false
   });
   
+  const previewRef = useRef<HTMLDivElement>(null);
+
+  const convertMusicXmlToAbc = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.onload = () => {
+        try {
+          const fileContent = fileReader.result as string;
+          console.log('MusicXML file loaded, size:', fileContent.length);
+          
+          const domparser = new DOMParser();
+          const xmldata = domparser.parseFromString(fileContent, 'application/xml');
+          
+          const options = { u:0, b:0, n:0,
+            c:0, v:0, d:0,  
+            m:0, x:0, t:0,  
+            v1:0, noped:0,  
+            stm:0,          
+            p:'f', s:0 };
+          
+          const result = vertaal(xmldata, options);
+          const abcText = result[0];
+          
+          console.log('ABC conversion result length:', abcText.length);
+          console.log('ABC notation preview:', abcText.substring(0, 200) + '...');
+          
+          resolve(abcText);
+        } catch (error) {
+          console.error('Error converting MusicXML to ABC:', error);
+          reject(error);
+        }
+      };
+      fileReader.onerror = () => reject(new Error('Failed to read file'));
+      fileReader.readAsText(file);
+    });
+  };
+
   useEffect(() => {
     // Component initialization logic here if needed
   }, []);
+
+  useEffect(() => {
+    if (abcNotation && previewRef.current) {
+      console.log('Rendering ABC notation:', abcNotation);
+      try {
+        abcjs.renderAbc(previewRef.current, abcNotation, {
+          responsive: "resize",
+          lineThickness: 0.4,
+          add_classes: true,
+          staffwidth: 800,
+          wrap: {
+            minSpacing: 1.0,
+            maxSpacing: 2.5,
+            preferredMeasuresPerLine: 4
+          }
+        });
+      } catch (error) {
+        console.error('Error rendering ABC notation:', error);
+      }
+    }
+  }, [abcNotation]);
 
   const clearAllData = () => {
     // Clear form data (except title which is auto-generated)
@@ -61,6 +122,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     setCustomId("");
     setAudioFile(null);
     setMusicXmlFile(null);
+    setAbcNotation("");
     
     // Clear validation errors
     setValidationErrors([]);
@@ -82,7 +144,8 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       meter !== "Anything" ||
       transpos !== false ||
       audioFile !== null ||
-      musicXmlFile !== null
+      musicXmlFile !== null ||
+      abcNotation !== ""
     );
   };
 
@@ -241,23 +304,29 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
   const handleDragOver = (e: React.DragEvent, type: string) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('Drag over event for:', type);
     setDragOver(type);
   };
 
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('Drag leave event');
     setDragOver('');
   };
 
-  const handleDrop = (e: React.DragEvent, type: string) => {
+  const handleDrop = async (e: React.DragEvent, type: string) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log('Drop event for:', type);
     setDragOver('');
 
     const files = Array.from(e.dataTransfer.files);
+    console.log('Files dropped:', files.length, files.map(f => f.name));
+    
     if (files.length > 0) {
       const file = files[0];
+      console.log('Processing file:', file.name, 'Type:', file.type);
       
       if (type === 'audio') {
         const audioTypes = ['audio/mpeg', 'audio/wav', 'audio/mp4', 'audio/m4a'];
@@ -268,18 +337,38 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
         }
         setAudioFile(file);
       } else if (type === 'musicxml') {
-        const xmlTypes = ['application/xml', 'text/xml'];
-        if (!xmlTypes.includes(file.type) || !file.name.match(/\.(xml|musicxml)$/i)) {
+        console.log('Processing MusicXML file:', file.name);
+        console.log('File type:', file.type);
+        console.log('File extension check:', file.name.match(/\.(xml|musicxml)$/i));
+        
+        // More permissive file type checking
+        const xmlTypes = ['application/xml', 'text/xml', ''];
+        const hasValidExtension = file.name.match(/\.(xml|musicxml)$/i);
+        
+        if (!xmlTypes.includes(file.type) && !hasValidExtension) {
+          console.log('File validation failed - type:', file.type, 'extension:', hasValidExtension);
           setFileErrorType('musicxml');
           setShowFileErrorModal(true);
           return;
         }
+        
+        console.log('File validation passed, setting MusicXML file');
         setMusicXmlFile(file);
+        
+        // Convert MusicXML to ABC for preview
+        console.log('Starting MusicXML to ABC conversion for file:', file.name);
+        try {
+          const abc = await convertMusicXmlToAbc(file);
+          console.log('ABC conversion successful, setting notation');
+          setAbcNotation(abc);
+        } catch (error) {
+          console.error('Error converting MusicXML for preview:', error);
+        }
       }
     }
   };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>, type: string) => {
     const file = e.target.files?.[0];
     if (file) {
       if (type === 'audio') {
@@ -291,13 +380,33 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
         }
         setAudioFile(file);
       } else if (type === 'musicxml') {
-        const xmlTypes = ['application/xml', 'text/xml'];
-        if (!xmlTypes.includes(file.type) || !file.name.match(/\.(xml|musicxml)$/i)) {
+        console.log('Processing MusicXML file via file select:', file.name);
+        console.log('File type:', file.type);
+        console.log('File extension check:', file.name.match(/\.(xml|musicxml)$/i));
+        
+        // More permissive file type checking
+        const xmlTypes = ['application/xml', 'text/xml', ''];
+        const hasValidExtension = file.name.match(/\.(xml|musicxml)$/i);
+        
+        if (!xmlTypes.includes(file.type) && !hasValidExtension) {
+          console.log('File validation failed - type:', file.type, 'extension:', hasValidExtension);
           setFileErrorType('musicxml');
           setShowFileErrorModal(true);
           return;
         }
+        
+        console.log('File validation passed, setting MusicXML file');
         setMusicXmlFile(file);
+        
+        // Convert MusicXML to ABC for preview
+        console.log('Starting MusicXML to ABC conversion for file:', file.name);
+        try {
+          const abc = await convertMusicXmlToAbc(file);
+          console.log('ABC conversion successful, setting notation');
+          setAbcNotation(abc);
+        } catch (error) {
+          console.error('Error converting MusicXML for preview:', error);
+        }
       }
     }
   };
@@ -307,6 +416,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       setAudioFile(null);
     } else if (type === 'musicxml') {
       setMusicXmlFile(null);
+      setAbcNotation("");
     }
   };
 
@@ -556,6 +666,40 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                           </div>
                         </div>
                       </div>
+
+                      {/* Music Score Preview Section */}
+                      {(abcNotation || true) && (
+                        <div className="score-preview-section">
+                          <div className="preview-header">
+                            <h4>Score Preview {abcNotation ? '(Loaded)' : '(Waiting for MusicXML...)'}</h4>
+                            <button 
+                              className="preview-clear-btn"
+                              onClick={() => setAbcNotation("")}
+                            >
+                              Clear Preview
+                            </button>
+                          </div>
+                          <div className="score-preview-container">
+                            <div className="score-preview-content">
+                              {abcNotation ? (
+                                <div 
+                                  ref={previewRef}
+                                  className="abc-score-display"
+                                />
+                              ) : (
+                                <div style={{ 
+                                  padding: '20px', 
+                                  textAlign: 'center', 
+                                  color: '#666',
+                                  fontStyle: 'italic'
+                                }}>
+                                  Drop a MusicXML file above to see the score preview
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
 
                       <div className="identification-section">
                         <label className="id-label">ID</label>
