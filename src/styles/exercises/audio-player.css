@@ -217,9 +217,10 @@
   .audio-controls {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 12px;
     flex-wrap: wrap;
+    max-width: 70%;
   }
 
   .audio-volume {
@@ -232,5 +233,15 @@
     cursor: pointer;
     -webkit-appearance: none;
     appearance: none;
+  }
+
+  .audio-controls {
+    max-width: 60%;
+    max-height: 60%;
+  }
+  .audio-play-btn {
+    max-width: 16px;
+    max-height: 16px;
+    font-size: 9px;
   }
 }

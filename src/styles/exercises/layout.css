@@ -141,4 +141,8 @@
     min-height: 48px;
     font-size: 18px;
   }
+
+  .exercise-content {
+    margin-top: 5%;
+  }
 }
