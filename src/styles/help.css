@@ -126,6 +126,22 @@
   background: #0d3b78;
 }
 
+.help-logout {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #d32f2f;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 12px;
+  font-size: 14px;
+}
+
+.help-logout:hover {
+  background: #b71c1c;
+}
+
 .help-error {
   color: #a80000;
   font-weight: 600;
