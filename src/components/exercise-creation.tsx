@@ -503,11 +503,41 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
         <div className="exercise-stage">
           <div className="exercise-content"> 
             <div className="exercise-content-inner">
-              {/* Exercise Header */}
-              <div className="exercise-header">
-                <h2 className="exercise-title">Create New Exercise</h2>
-              </div>
 
+              {/* Bottom Section - like the exercise controls */}
+              <div className="exercise-controls">
+                <div className="controls-left">
+                  <div className="exercise-type-indicator">
+                    {/* <span className="type-badge">Create Mode</span> */}
+                    <h2 className="exercise-title">Create New Exercise</h2>
+                  </div>
+                </div>
+                
+                <div className="controls-right">
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="control-btn cancel-btn"
+                  >
+                    Cancel
+                  </button>
+                  {/* <button
+                    type="button"
+                    onClick={handlePreview}
+                    className={`control-btn preview-btn ${!isFormValid() ? 'disabled' : ''}`}
+                    disabled={!isFormValid()}
+                  >
+                    Preview
+                  </button> */}
+                  <button
+                    type="submit"
+                    onClick={handleSubmit}
+                    className="control-btn create-btn"
+                  >
+                    Create Exercise
+                  </button>
+                </div>
+              </div>
               {/* Main Exercise Card - where musical notation would be */}
               <div className="exercise-main-card">
                 <div className="creation-workspace">
@@ -589,28 +619,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                           </div>
                         </div>
                       </div>
-                      <div className="identification-section">
-                        <label className="id-label">ID</label>
-                        <div className="id-separator"></div>
-                        <input
-                          type="text"
-                          value={customId}
-                          onChange={(e) => setCustomId(e.target.value)}
-                          placeholder="Custom ID (optional)"
-                          className={`exercise-input ${fieldErrors.customId ? 'error' : ''}`}
-                        />
-                        {fieldErrors.customId && customId.trim() !== "" && (
-                          <div className="field-error-message">
-                            {!/^[a-zA-Z0-9_-]+$/.test(customId.trim()) 
-                              ? "Invalid characters (use letters, numbers, hyphens, underscores only)"
-                              : "This ID is already in use"}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Right side - Exercise Type & Files */}
-                    <div className="workspace-right">
                       <div className="type-section">
                         <h4>Exercise Type</h4>
                         <div className="exercise-tags">
@@ -628,6 +636,29 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                             <div className="field-error-message">Please select at least one type</div>
                           )}
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Right side - Exercise Type & Files */}
+                    <div className="workspace-right">
+
+                      <div className="identification-section">
+                        <label className="id-label">ID</label>
+                        <div className="id-separator"></div>
+                        <input
+                          type="text"
+                          value={customId}
+                          onChange={(e) => setCustomId(e.target.value)}
+                          placeholder="Custom ID (optional)"
+                          className={`exercise-input ${fieldErrors.customId ? 'error' : ''}`}
+                        />
+                        {fieldErrors.customId && customId.trim() !== "" && (
+                          <div className="field-error-message">
+                            {!/^[a-zA-Z0-9_-]+$/.test(customId.trim()) 
+                              ? "Invalid characters (use letters, numbers, hyphens, underscores only)"
+                              : "This ID is already in use"}
+                          </div>
+                        )}
                       </div>
 
                       <div className="files-section">
@@ -761,39 +792,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                 </div>
               </div>
 
-              {/* Bottom Section - like the exercise controls */}
-              <div className="exercise-controls">
-                <div className="controls-left">
-                  <div className="exercise-type-indicator">
-                    <span className="type-badge">Create Mode</span>
-                  </div>
-                </div>
-                
-                <div className="controls-right">
-                  <button
-                    type="button"
-                    onClick={handleCancel}
-                    className="control-btn cancel-btn"
-                  >
-                    Cancel
-                  </button>
-                  {/* <button
-                    type="button"
-                    onClick={handlePreview}
-                    className={`control-btn preview-btn ${!isFormValid() ? 'disabled' : ''}`}
-                    disabled={!isFormValid()}
-                  >
-                    Preview
-                  </button> */}
-                  <button
-                    type="submit"
-                    onClick={handleSubmit}
-                    className="control-btn create-btn"
-                  >
-                    Create Exercise
-                  </button>
-                </div>
-              </div>
+
             </div>
           </div>
         </div>
