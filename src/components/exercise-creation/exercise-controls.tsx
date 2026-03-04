@@ -10,7 +10,7 @@ export function ExerciseControls({ onCreateExercise, onCancel }: ExerciseControl
     <div className="exercise-controls">
       <div className="controls-left">
         <div className="exercise-type-indicator">
-          <h2 className="exercise-title">Create New Exercise</h2>
+          <h2 className="exercise-title">New Exercise</h2>
         </div>
       </div>
       
@@ -29,7 +29,7 @@ export function ExerciseControls({ onCreateExercise, onCancel }: ExerciseControl
           onClick={onCreateExercise}
           className="control-btn create-btn"
         >
-          Create Exercise
+          Create
         </button>
       </div>
     </div>
