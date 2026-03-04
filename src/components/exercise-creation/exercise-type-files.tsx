@@ -144,7 +144,6 @@ export function ExerciseTypeFiles({
                   <>
                     <div className="file-info">
                       <div className="file-details">
-                        <span className="file-icon">🎼</span>
                         <span className="file-name" title={musicXmlFile.name}>
                           {musicXmlFile.name}
                         </span>
@@ -161,7 +160,7 @@ export function ExerciseTypeFiles({
                   </>
                 ) : (
                   <div className="drop-text">
-                    Drop file
+                    Click to browse or drag file
                   </div>
                 )}
               </div>
@@ -194,7 +193,6 @@ export function ExerciseTypeFiles({
                   <>
                     <div className="file-info">
                       <div className="file-details">
-                        <span className="file-icon">💿</span>
                         <span className="file-name" title={audioFile.name}>
                           {audioFile.name}
                         </span>
@@ -211,7 +209,7 @@ export function ExerciseTypeFiles({
                   </>
                 ) : (
                   <div className="drop-text">
-                    Drop file
+                    Click to browse or drag file
                   </div>
                 )}
               </div>
