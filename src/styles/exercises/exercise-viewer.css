@@ -1,6 +1,5 @@
 /* Exercise viewer and navigation components */
 
-
 .exercise-stage {
   display: block;
   overflow: visible;
@@ -50,6 +49,7 @@
   align-items: center;
   gap: 0.75rem;
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .exercise-action-check {
@@ -154,16 +154,37 @@
   right: 16px;
 }
 
-@media only screen and (max-width: 700px) {
+.audio-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  border: 3px solid red;
+}
 
+.audio-controls-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.audio-controls-group textarea {
+  width: 220px;
+}
+
+@media only screen and (max-width: 700px) {
   .exercise-content {
     padding: 0 0px;
   }
-  
+
+  .exercise-content-inner{
+    margin-top: -15%;
+  }
+
   .exercise-viewer {
     max-width: 80%;
   }
-  
+
   .exercise-nav-desktop {
     display: none;
   }
@@ -181,8 +202,24 @@
     position: static;
     transform: none;
   }
-  
+
   .custom-title {
     font-size: 1.15rem;
+  }
+
+  .exercise-action-reset {
+    max-width: 40%;
+    max-height: 40%;
+    font-size: .75rem;
+  }
+
+  .exercise-action-check {
+    max-width: 40%;
+    max-height: 40%;
+    font-size: .75rem;
+  }
+
+  .exercise-action-buttons {
+    gap: 0.0rem;
   }
 }

@@ -74,7 +74,7 @@ export function Exercise({
   var diffInit = 1;
   // Helper function to get filename from File or string
   const getMp3FileName = (mp3: File | string): string => {
-    if (typeof mp3 === 'string') {
+    if (typeof mp3 === "string") {
       return mp3;
     }
     return mp3.name;
@@ -82,7 +82,7 @@ export function Exercise({
 
   // Helper function to convert string to File for audio processing
   const getMp3ForAudio = (mp3: File | string): File | string => {
-    if (typeof mp3 === 'string') {
+    if (typeof mp3 === "string") {
       // For string filenames, we'll need to handle them differently in audio processing
       return mp3;
     }
@@ -134,7 +134,7 @@ export function Exercise({
 
   const [xmlFile, setXmlFile] = useState<File>();
   const [mp3File, setMp3File] = useState<File | string>(mp3);
-  
+
   // Helper to update mp3File with proper type handling
   const handleSetMp3File = (file: File | string) => {
     setMp3File(file);
@@ -403,7 +403,6 @@ export function Exercise({
           } else {
             beatWidth = totalNoteWidth / numBeats - 5;
           }
-
 
           const noteTopPt = toSvgCoords(svgElement, 0, noteBox.top);
           const topLinePt =
@@ -865,7 +864,10 @@ export function Exercise({
         const scoresRef = ref(database, "scores");
         const audioref = storageRef(storage, getMp3FileName(mp3File));
 
-        await uploadBytes(audioref, typeof mp3File === 'string' ? new File([], mp3File) : mp3File);
+        await uploadBytes(
+          audioref,
+          typeof mp3File === "string" ? new File([], mp3File) : mp3File,
+        );
         const dbDataRef = child(scoresRef, exInd.toString());
 
         const snapshot = await get(dbDataRef);
@@ -1340,7 +1342,7 @@ export function Exercise({
         combinedSelections.length < currentCorrectAnswers.length
       ) {
         feedback.push(
-          `Very close! There${plural}${currentCorrectAnswers.length} correct answer(s).`
+          `Very close! There${plural}${currentCorrectAnswers.length} correct answer(s).`,
         );
       }
 
@@ -1406,7 +1408,7 @@ export function Exercise({
 
       if (!allCorrect) {
         feedback.push(
-          `Try again - there${plural}${currentCorrectAnswers.length} correct answer(s).`
+          `Try again - there${plural}${currentCorrectAnswers.length} correct answer(s).`,
         );
       }
 
@@ -1478,7 +1480,7 @@ export function Exercise({
         combinedSelections.length < currentCorrectAnswers.length
       ) {
         feedback.push(
-          `Very close! There${plural}${currentCorrectAnswers.length} correct answer(s).`
+          `Very close! There${plural}${currentCorrectAnswers.length} correct answer(s).`,
         );
       }
 
@@ -1877,7 +1879,10 @@ export function Exercise({
           <button onClick={saveTitle}>Save Title</button>
         </span>
       ) : (
-        <h3 className = "custom-title"onClick={() => setEditingTitle(!editingTitle)}>
+        <h3
+          className="custom-title"
+          onClick={() => setEditingTitle(!editingTitle)}
+        >
           {customTitle}
           {isCompleted && (
             <div
@@ -1900,7 +1905,7 @@ export function Exercise({
         </h3>
       )}
       {teacherMode ? (
-        <span>
+        <div>
           {ExData.isNew && (
             <Button
               variant="danger"
@@ -1910,7 +1915,14 @@ export function Exercise({
               Cancel Exercise Creation
             </Button>
           )}
-          <div id="forms" style={{ display: "inline-flex", padding: "4px", alignItems: "center" }}>
+          <div
+            id="forms"
+            style={{
+              display: "inline-flex",
+              padding: "4px",
+              alignItems: "center",
+            }}
+          >
             <form id="customId">
               Custom ID:
               <br />
@@ -2029,7 +2041,7 @@ export function Exercise({
           </div>
           <div id="mp3Upload" style={{ display: "inline-flex" }}>
             MP3 Upload:{" "}
-            {typeof mp3File === 'string' ? (
+            {typeof mp3File === "string" ? (
               <span>{mp3File}</span>
             ) : (
               <FileUpload
@@ -2051,99 +2063,91 @@ export function Exercise({
           <div style={{ display: "inline-block", width: "75%" }}>
             <div id={"target" + exIndex} style={score}></div>
           </div>
-          <img
-            alt="note-color-key"
-            src={noteKey}
-            width="14%"
-            height="7%"
-            style={{ display: "inline", marginLeft: "1vw" }}
-          />
-          {(abcFile !== undefined && abcFile !== "" && loaded) ||
-          (exerciseData !== undefined && !exerciseData.empty) ? (
-            <div
-              style={{
-                display: "inline-block",
-                marginLeft: "1vw",
-                marginTop: "1vh",
-              }}
-            >
-              <textarea
-                id={"note-feedback-" + exIndex}
-                placeholder={"Note feedback..."}
-                onChange={saveFeedback}
-              ></textarea>
-              <Button
-                variant="danger"
-                onClick={reload}
-                style={{ marginLeft: "1vw", float: "right" }}
-              >
-                Reset Answers
-              </Button>
-            </div>
-          ) : (
-            <></>
-          )}
-          {lastClicked !== undefined &&
-          Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) %
-            4 !==
-            0 ? (
-            <div style={{ marginLeft: "1vw" }}>Note Info: {ana}</div>
-          ) : (
-            <div />
-          )}
-          <br />
-          <Button variant="success" onClick={save}>
-            Save Exercise
-          </Button>
-          {teacherMode && exerciseData?.isNew && (
-            <Button
-              variant="secondary"
-              onClick={() => handleCancelExercise(exInd)}
-              style={{ marginLeft: "10px", marginTop: "10px" }}
-            >
-              Cancel
-            </Button>
-          )}
-          <Button
-            onClick={() => handleExerciseDelete(exIndex)}
-            style={{ marginLeft: "10px", marginTop: "10px" }}
-            variant="danger"
-          >
-            Delete Exercise
-          </Button>
-        </span>
-      ) : (
-        <span>
-          <div style={{ width: "100%", display: "inline-flex" }}>
-            <div id={"target" + exIndex} style={score}></div>
-          </div>
-          <br />
-          {!rhythmOnly && (
+          <div className="audio-row">
             <img
               alt="note-color-key"
               src={noteKey}
               width="14%"
-              height="7%"
-              style={{
-                display: "inline-flex",
-                marginRight: "1vw",
-                marginTop: "-1vh",
-                borderRadius: "1px",
-              }}
+              style={{ marginLeft: "1vw" }}
             />
-          )}
+
+            {(abcFile && loaded) || (exerciseData && !exerciseData.empty) ? (
+              <div className="audio-controls-group">
+                <textarea
+                  id={"note-feedback-" + exIndex}
+                  placeholder="Note feedback..."
+                  onChange={saveFeedback}
+                />
+
+                <Button variant="danger" onClick={reload}>
+                  Reset Answers
+                </Button>
+              </div>
+            ) : null}
+
+            {lastClicked &&
+            Number(
+              lastClicked.abselem.elemset[0].getAttribute("selectedTimes"),
+            ) %
+              4 !==
+              0 ? (
+              <div>Note Info: {ana}</div>
+            ) : null}
+          </div>
+
+          <div className="audio-actions">
+            <Button variant="success" onClick={save}>
+              Save Exercise
+            </Button>
+
+            {teacherMode && exerciseData?.isNew && (
+              <Button
+                variant="secondary"
+                onClick={() => handleCancelExercise(exInd)}
+              >
+                Cancel
+              </Button>
+            )}
+
+            <Button
+              onClick={() => handleExerciseDelete(exIndex)}
+              variant="danger"
+            >
+              Delete Exercise
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <div style={{ width: "100%", display: "flex" }}>
+            <div id={"target" + exIndex} style={score}></div>
+          </div>
+          <br />
 
           <div
             style={{
-              display: "inline-flex",
+              display: "flex",
+              width: "100%",
               marginTop: "-2vh",
               alignItems: "center",
               gap: "1rem",
-              flexWrap: "wrap",
+              flexWrap: "nowrap",
             }}
           >
+            {!rhythmOnly && (
+              <img
+                alt="note-color-key"
+                src={noteKey}
+                style={{
+                  display: "block",
+                  width: "14%",
+                  height: "auto",
+                  borderRadius: "1px",
+                }}
+              />
+            )}
             {mp3 !== undefined ? (
-              <div style={{ marginTop: "1vh" }}>
+              <div style={{ flex: 1 }}>
                 <AudioHandler file={mp3}></AudioHandler>
               </div>
             ) : (
@@ -2163,7 +2167,7 @@ export function Exercise({
                 onClick={exReload}
                 className="exercise-action-reset"
                 style={{
-                  /*SIR: the actual reset answers button*/ position: "relative",
+                  position: "relative",
                   marginBottom: "2vh",
                 }}
               >
@@ -2193,7 +2197,7 @@ export function Exercise({
           ) : (
             <div />
           )}
-        </span>
+        </div>
       )}
       {handleSelectExercise !== undefined ? (
         <div>

@@ -168,8 +168,7 @@
 
 @media only screen and (max-width: 700px) {
   .custom-audio-player {
-    max-width: none;
-    width: 100%;
+    max-width: 100%;
     margin: 8px 0;
   }
 
@@ -236,8 +235,8 @@
   }
 
   .audio-controls {
-    max-width: 60%;
-    max-height: 60%;
+    max-width: 100%;
+    max-height: 100%;
   }
   .audio-play-btn {
     max-width: 16px;
