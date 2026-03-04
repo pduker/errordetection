@@ -519,8 +519,9 @@
   border-radius: 8px;
   border: 1px solid #e8eaed;
   padding: 16px;
-  min-height: 350px;
-  max-height: 500px;
+  min-height: 450px;
+  max-height: 600px;
+  min-width: 500px;
   overflow: auto;
 }
 
@@ -621,6 +622,7 @@
   border: 1px solid #e8eaed;
   margin-top: 16px;
   transition: all 0.3s ease;
+  max-width: 360px;
 }
 
 .feedback-section:hover {
@@ -896,7 +898,7 @@
 
 .score-feedback-content {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: 3fr 1fr;
   gap: 24px;
 }
 
