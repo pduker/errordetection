@@ -144,6 +144,38 @@ export function Exercise({
   // check if an exercise has been completed
   const [isCompleted, setIsCompleted] = useState(false);
 
+  function countExerciseTypes() {
+    const counts ={
+      pitch: 0,
+      intonation: 0,
+      rhythm: 0,
+    };
+    const saved = localStorage.getItem("userProgress");
+    if (!saved) return counts;
+
+    try {
+      const progress = JSON.parse(saved);
+
+      for (const [key, value] of Object.entries(progress)) {
+        if (!(value as any)?.completed) continue;
+
+        const typeSection = key.split(":")[0].toLowerCase();
+
+        if (typeSection.includes("pitch")) counts.pitch++;
+        if (typeSection.includes("intonation")) counts.intonation++;
+        if (typeSection.includes("rhythm")) counts.rhythm++;
+      }
+      console.log("Exercise type counts:", counts);
+    } catch (err) {
+      console.error("Error counting exercise types:", err);
+    }
+     // return counts; at some point if we want to display this info on the frontend or use it to unlock content or something
+  }
+
+useEffect(() => {
+  countExerciseTypes();
+}, []);
+
   // Check localStorage to see if this exercise was previously completed
   useEffect(() => {
     const saved = localStorage.getItem("userProgress");
