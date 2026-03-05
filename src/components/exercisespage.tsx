@@ -123,9 +123,6 @@ function ExerciseQueueComponent({
             setCurrentPage(Math.min(currentPage, totalPages));
         }
     }, [currentPage, setCurrentPage, totalPages]);
-    
-    console.log(pageExercises.length); // check duplication bug
-
 
     return (
         <section className="exercise-queue-panel">
