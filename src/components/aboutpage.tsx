@@ -21,7 +21,7 @@ const contributors = [
     "Trevor Brennan",
     "Aaron Riley",
     "Olivia Bouvier",
-    "Matthew Nadar",
+    "Matt Nadar",
     "Roger Cronin"
 ];
 
