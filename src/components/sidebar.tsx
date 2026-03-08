@@ -1,4 +1,5 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
+import isMobile from "../services/mobiledetection";
 
 interface AppSidebarProps {
   selectedTags: string[];
@@ -97,74 +98,99 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     ],
     []
   );
+  const [filtersOpen, setFiltersOpen] = useState(false); // mobile version of filter sidebar
+  const FiltersContent = () => (
+      <>
+        <Section>
+          <OptionGroup>
+            {tagItems.map((tag) => (
+              <ChipButton key={tag} active={selectedTags.includes(tag)} label={tag} onClick={() => onToggleTag(tag)} />
+            ))}
+          </OptionGroup>
+        </Section>
+
+        <Section>
+          <ToggleRow label="Transposing Instruments" checked={transposing} onChange={onToggleTransposing} />
+        </Section>
+
+        <Section>
+          <div className="filters-subsection">
+            <span className="filters-subsection__label">Difficulty</span>
+            <OptionGroup>
+              {difficultyItems.map((item) => (
+                <OptionButton
+                  key={item}
+                  active={difficulty === item}
+                  label={item}
+                  onClick={() => onSelectDifficulty(item)}
+                />
+              ))}
+            </OptionGroup>
+          </div>
+          <div className="filters-subsection">
+            <span className="filters-subsection__label">Voices</span>
+            <OptionGroup>
+              {voiceItems.map(({ value, label }) => (
+                <OptionButton
+                  key={value}
+                  active={voices === value}
+                  label={label}
+                  onClick={() => onSelectVoices(value)}
+                />
+              ))}
+            </OptionGroup>
+          </div>
+          <div className="filters-subsection">
+            <span className="filters-subsection__label">Meter</span>
+            <OptionGroup>
+              {meterItems.map((item) => (
+                <OptionButton key={item} active={meter === item} label={item} onClick={() => onSelectMeter(item)} />
+              ))}
+            </OptionGroup>
+          </div>
+          <div className="filters-subsection">
+            <span className="filters-subsection__label">Textural Factors</span>
+            <OptionGroup>
+              {texturalItems.map(({ value, label }) => (
+                <OptionButton
+                  key={value}
+                  active={texturalFactor === value}
+                  label={label}
+                  onClick={() => onSelectTexturalFactor(value)}
+                />
+              ))}
+            </OptionGroup>
+          </div>
+        </Section>
+
+        <button type="button" className="filters-reset-btn" onClick={onResetSort} disabled={resetDisabled}>
+          Reset Sort
+        </button>
+      </>
+  );
 
   return (
-    <div className="filters-menu">
-      <Section>
-        <OptionGroup>
-          {tagItems.map((tag) => (
-            <ChipButton key={tag} active={selectedTags.includes(tag)} label={tag} onClick={() => onToggleTag(tag)} />
-          ))}
-        </OptionGroup>
-      </Section>
+    <>
+      <div className="filters-desktop">
+        <div className="filters-panel">
+          <FiltersContent />
+        </div>
+      </div>
 
-      <Section>
-        <ToggleRow label="Transposing Instruments" checked={transposing} onChange={onToggleTransposing} />
-      </Section>
+      <div className="filters-mobile">
 
-      <Section>
-        <div className="filters-subsection">
-          <span className="filters-subsection__label">Difficulty</span>
-          <OptionGroup>
-            {difficultyItems.map((item) => (
-              <OptionButton
-                key={item}
-                active={difficulty === item}
-                label={item}
-                onClick={() => onSelectDifficulty(item)}
-              />
-            ))}
-          </OptionGroup>
-        </div>
-        <div className="filters-subsection">
-          <span className="filters-subsection__label">Voices</span>
-          <OptionGroup>
-            {voiceItems.map(({ value, label }) => (
-              <OptionButton
-                key={value}
-                active={voices === value}
-                label={label}
-                onClick={() => onSelectVoices(value)}
-              />
-            ))}
-          </OptionGroup>
-        </div>
-        <div className="filters-subsection">
-          <span className="filters-subsection__label">Meter</span>
-          <OptionGroup>
-            {meterItems.map((item) => (
-              <OptionButton key={item} active={meter === item} label={item} onClick={() => onSelectMeter(item)} />
-            ))}
-          </OptionGroup>
-        </div>
-        <div className="filters-subsection">
-          <span className="filters-subsection__label">Textural Factors</span>
-          <OptionGroup>
-            {texturalItems.map(({ value, label }) => (
-              <OptionButton
-                key={value}
-                active={texturalFactor === value}
-                label={label}
-                onClick={() => onSelectTexturalFactor(value)}
-              />
-            ))}
-          </OptionGroup>
-        </div>
-      </Section>
+        <button
+          className="mobile-filters-toggle"
+          onClick={() => setFiltersOpen(!filtersOpen)}
+        >
+          Filters
+        </button>
 
-      <button type="button" className="filters-reset-btn" onClick={onResetSort} disabled={resetDisabled}>
-        Reset Sort
-      </button>
-    </div>
+        <div className={`filters-menu-mobile ${filtersOpen ? "filters-open" : ""}`}>
+          <FiltersContent />
+        </div>
+
+      </div>
+    </>
   );
 };
