@@ -113,9 +113,10 @@
 
 .exercise-management-row {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 /* Make forms and lists inside the left column wrap and shrink nicely */

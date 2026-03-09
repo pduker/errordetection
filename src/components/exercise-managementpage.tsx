@@ -469,112 +469,89 @@ export function ExerciseManagementPage({
       </div>
       <div>
         <div className="exercise-management">
-          <div className="exercise-managment-row">
+          <div className="exercise-management-row">
             <h5 style={{ marginTop: "8px", fontStyle: "italic" }}>
             Click the + in the top right to add a new exercise, then edit as needed
             and save. <br /> To edit an existing exercise, click on the pencil icon
             next to the corresponding exercise in the list below.
             </h5>
-            <button
-              onClick={handleLogout}
-              style={{
-                padding: "8px 16px",
-                backgroundColor: "#dc3545",
-                color: "white",
-                border: "none",
-                borderRadius: "4px",
-                cursor: "pointer",
-                fontSize: "14px",
-              }}
-            >
-            Logout
-            </button>
-            {/*creating an exercise*/}
-            <Button
-              style={{ display: "inline", marginRight: "1vw" }}
-              onClick={() => navigate("/exercise-management/create")}
-            >
-            +
-            </Button>
-          </div>
-          <div>
-            <h5>Sort By:</h5>
-            {/*editing an exercise, filling in all paramters*/}
-            <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
-              <form
-                id="tags"
+            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+              <button
+                onClick={handleLogout}
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginRight: "20px",
+                  padding: "8px 16px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "14px",
                 }}
               >
-                <div style={{ fontSize: "16px", marginRight: "8px" }}>Tags:</div>
-                <label
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginRight: "12px",
-                  }}
-                >
+              Logout
+              </button>
+              {/*creating an exercise*/}
+              <Button
+                style={{ display: "inline", marginRight: "1vw" }}
+                onClick={() => navigate("/exercise-management/create")}
+              >
+              +
+              </Button>
+            </div>
+          </div>
+          <div id="exercise-filters-container">
+            <h5>Sort By:</h5>
+            {/*editing an exercise, filling in all paramters*/}
+            <div id="checkboxes-group">
+              <form id="tags">
+                <div>Tags:</div>
+                <label>
                   <input
                     type="checkbox"
                     name="tags"
                     value="Pitch"
                     checked={tags.includes("Pitch")}
                     onChange={tagsChange}
-                    style={{ marginRight: "4px" }}
                   />
                   Pitch
                 </label>
-                <label style={{ display: "flex", alignItems: "center" }}>
+                <label>
                   <input
                     type="checkbox"
                     name="tags"
                     value="Intonation"
                     checked={tags.includes("Intonation")}
                     onChange={tagsChange}
-                    style={{ marginRight: "4px" }}
                   />
                   Intonation
                 </label>
-                <label
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginRight: "12px",
-                  }}
-                >
+                <label>
                   <input
                     type="checkbox"
                     name="tags"
                     value="Rhythm"
                     checked={tags.includes("Rhythm")}
                     onChange={tagsChange}
-                    style={{ marginRight: "4px" }}
                   />
                   Rhythm
                 </label>
               </form>
-              <form id="transpos" style={{ display: "flex", alignItems: "center" }}>
-                <input
-                  type="checkbox"
-                  name="transpos"
-                  value="buh"
-                  checked={transpos}
-                  onChange={transposChange}
-                  style={{ marginRight: "8px" }}
-                />
-                <div style={{ fontSize: "16px" }}>Transposing Instruments</div>
+              <form id="transpos">
+                <label>
+                  <input
+                    type="checkbox"
+                    name="transpos"
+                    value="buh"
+                    checked={transpos}
+                    onChange={transposChange}
+                  />
+                  Transposing Instruments
+                </label>
               </form>
             </div>
-            <br />
-            <div id="dropdowns" style={{ display: "inline-flex", padding: "4px" }}>
+            <div id="dropdowns-group">
               <form id="difficulty">
-                <div style={{ fontSize: "16px", display: "inline" }}>
-                  Difficulty:
-                </div>
-                <br></br>
+                <div>Difficulty:</div>
                 <select name="difficulty" onChange={diffChange}>
                   <option value="All">All</option>
                   <option value="1">1</option>
@@ -585,8 +562,7 @@ export function ExerciseManagementPage({
                 </select>
               </form>
               <form id="voiceCt">
-                Voices:
-                <br></br>
+                <div>Voices:</div>
                 <select name="voices" onChange={voiceChange}>
                   <option value={0}>Any</option>
                   <option value={1}>1</option>
@@ -597,19 +573,15 @@ export function ExerciseManagementPage({
                 </select>
               </form>
               <form id="meterForm">
-                Meter:
-                <br></br>
+                <div>Meter:</div>
                 <select name="meter" defaultValue={types} onChange={meterChange}>
                   <option value="Anything">Anything</option>
                   <option value="Simple">Simple</option>
                   <option value="Compound">Compound</option>
                 </select>
               </form>
-            </div>
-            <div id="secondLine" style={{ display: "inline-flex", padding: "4px" }}>
               <form id="typesForm">
-                Textural Factors:
-                <br></br>
+                <div>Textural Factors:</div>
                 <select name="types" onChange={typesChange}>
                   <option value="None">None</option>
                   <option value="Drone">Drone</option>
@@ -617,9 +589,8 @@ export function ExerciseManagementPage({
                   <option value="Both">Drone & Ensemble Parts</option>
                 </select>
               </form>
-              <form id="customIdForm" style={{ marginLeft: "10px" }}>
-                Custom ID:
-                <br></br>
+              <form id="customIdForm">
+                <div>Custom ID:</div>
                 <input
                   type="text"
                   value={customId}
@@ -627,18 +598,18 @@ export function ExerciseManagementPage({
                   placeholder="Enter custom ID"
                 />
               </form>
-              {/*reset sort*/}
+            </div>
+            {/*reset sort*/}
+            <div style={{ display: "flex", gap: "0.75rem" }}>
               <Button
                 variant="danger"
                 onClick={resetSort}
-                style={{ marginLeft: "10px" }}
               >
                 Reset Sort
               </Button>
               <Button
                 variant="danger"
                 onClick={() => handleMultipleExerciseDelete(selectedIndexes)}
-                style={{ marginLeft: "10px", marginTop: "10px" }}
               >
                 Delete Selected Exercises
               </Button>
@@ -659,21 +630,6 @@ export function ExerciseManagementPage({
                 handleSelectExercise={handleSelectExercise}
               />
             );
-
-            /*
-                            return (
-                                <Exercise
-                                key={exercise.exIndex}
-                                teacherMode={true}
-                                ExData={exercise}
-                                allExData={allExData}
-                                setAllExData={setAllExData}
-                                exIndex={exercise.exIndex}
-                                handleSelectExercise={handleSelectExercise}
-                                isSelected={selectedIndexes.includes(exercise.exIndex)}
-                                fetch={fetch}
-                                />
-                            */
           })}
 
         {exerciseConfig.showNoExercisesMessage && exList.length === 0 ? (
