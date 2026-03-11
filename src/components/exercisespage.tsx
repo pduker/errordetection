@@ -242,6 +242,7 @@ function FiltersComponent({
   resetDisabled: boolean;
 }) {
   const [filtersOpen, setFiltersOpen] = useState<boolean>(true);
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
 
   return (
     <section
