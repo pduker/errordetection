@@ -167,7 +167,7 @@
 /* mobile filter sidebar */
 
 
-@media (max-width: 768px) {
+@media (max-width: 700px) {
 
   .filters-panel {
     position: fixed;
@@ -175,6 +175,9 @@
     bottom: -55vh;   /* hidden */
     width: 100%;
     height: 65vh;
+    margin-bottom: 0px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
 
     display: flex;
     flex-direction: column;
@@ -183,7 +186,6 @@
     z-index: 1000;
   }
 
-  /* THIS is what moves the drawer */
   .filters-panel--open {
     bottom: 0;
   }
@@ -209,6 +211,10 @@
     overflow-y: auto;
 
     box-shadow: 0 -8px 24px rgba(0,0,0,0.2);
+  }
+
+  .filters-panel--no-animation {
+    transition: none;
   }
 
 }

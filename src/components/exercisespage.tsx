@@ -4,6 +4,7 @@ import ExerciseData from "../interfaces/exerciseData";
 import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "react-bootstrap";
 import { AppSidebar } from "./sidebar";
+import { set } from "firebase/database";
 
 const pageSize = 5; //show 5 exercises at a time
 
@@ -241,12 +242,30 @@ function FiltersComponent({
   resetSort: () => void;
   resetDisabled: boolean;
 }) {
-  const [filtersOpen, setFiltersOpen] = useState<boolean>(true);
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState<boolean>(false);
+  const [filtersOpen, setFiltersOpen] = useState(
+    typeof window !== "undefined" ? window.innerWidth > 700 : true
+  );
+  const [noAnimation, setNoAnimation] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setNoAnimation(true);
+      if (window.innerWidth > 700) {
+        setFiltersOpen(true);
+      }
+      else {
+        setFiltersOpen(false);
+      }
+      setTimeout(() => setNoAnimation(false), 50);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <section
-      className={`filters-panel${filtersOpen ? " filters-panel--open" : ""}`}
+      className={`filters-panel${filtersOpen ? " filters-panel--open" : ""} ${noAnimation ? "filters-panel--no-animation" : ""}`}
     >
       <button
         type="button"
