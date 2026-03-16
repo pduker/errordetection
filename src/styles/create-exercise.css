@@ -518,10 +518,10 @@
   background: white;
   border-radius: 8px;
   border: 1px solid #e8eaed;
-  padding: 16px;
+  padding: 20px;
   min-height: 450px;
   max-height: 600px;
-  min-width: 500px;
+  width: 100%;
   overflow: auto;
 }
 
@@ -1081,7 +1081,7 @@
 
 .score-feedback-content {
   display: grid;
-  grid-template-columns: 2.5fr 1fr;
+  grid-template-columns: 1fr;
   gap: 24px;
 }
 
@@ -1124,12 +1124,13 @@
   }
   
   .inner-score-feedback-section .score-preview-section {
-    min-height: 300px;
+    min-height: 350px;
   }
   
   .score-preview-container {
-    min-height: 250px;
-    max-height: 400px;
+    min-height: 300px;
+    max-height: 500px;
+    padding: 16px;
   }
 }
 

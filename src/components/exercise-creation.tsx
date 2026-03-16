@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Modal } from "react-bootstrap";
 import ExerciseData from "../interfaces/exerciseData";
 import { ConfirmationModal } from "./modals/confirmation-modal";
-import { Exercise } from "./exercise";
 import { getDatabase, ref, set, push } from "firebase/database";
 import { vertaal } from "xml2abc";
 import "../styles/create-exercise.css";
@@ -12,9 +10,7 @@ import "../styles/create-exercise.css";
 import { ExerciseForm } from "./exercise-creation/exercise-form";
 import { ExerciseTypeFiles } from "./exercise-creation/exercise-type-files";
 import { ScorePreview } from "./exercise-creation/score-preview";
-import { FeedbackSection } from "./exercise-creation/feedback-section";
 import { ExerciseControls } from "./exercise-creation/exercise-controls";
-import { FeedbackType, MarkedNote, createFeedbackItem, updateNoteMarking, removeNoteMarking } from "../types/feedback-types";
 
 interface CreateExercisePageProps {
   allExData: (ExerciseData | undefined)[];
@@ -36,12 +32,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [musicXmlFile, setMusicXmlFile] = useState<File | null>(null);
   const [abcNotation, setAbcNotation] = useState<string>("");
-  const [feedbackItems, setFeedbackItems] = useState<{id: string, type: FeedbackType, text: string, targetNote?: string, targetMeasure?: string}[]>([]);
-  const [selectedNote, setSelectedNote] = useState<{note: string, measure: string} | null>(null);
-  const [selectedNotes, setSelectedNotes] = useState<{note: string, measure: string}[]>([]);
-  const [rhythmCorrect, setRhythmCorrect] = useState<MarkedNote[]>([]);
-  const [pitchCorrect, setPitchCorrect] = useState<MarkedNote[]>([]);
-  const [dragOver, setDragOver] = useState<string>("");
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<"back" | "cancel" | null>(null);
   const [showFileErrorModal, setShowFileErrorModal] = useState<boolean>(false);
@@ -65,7 +55,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
 
   // Check if score has been edited
   const hasScoreEdits = (): boolean => {
-    return selectedNotes.length > 0 || feedbackItems.length > 0 || rhythmCorrect.length > 0 || pitchCorrect.length > 0;
+    return false; // No score edits possible since we removed note selection
   };
 
   // File removal handlers
@@ -78,11 +68,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       removeFile(type);
       // Clear score-related state when removing MusicXML
       if (type === "musicxml") {
-        setSelectedNotes([]);
-        setFeedbackItems([]);
-        setSelectedNote(null);
-        setRhythmCorrect([]);
-        setPitchCorrect([]);
+        // Nothing to clear since we removed note selection
       }
       setIsRemovingFile(false);
     }
@@ -94,11 +80,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       removeFile(fileToRemoveType);
       // Clear score-related state when removing MusicXML
       if (fileToRemoveType === "musicxml") {
-        setSelectedNotes([]);
-        setFeedbackItems([]);
-        setSelectedNote(null);
-        setRhythmCorrect([]);
-        setPitchCorrect([]);
+        // Nothing to clear since we removed note selection
       }
     }
     setShowFileRemoveModal(false);
@@ -154,7 +136,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       }
       setAudioFile(file);
     }
-    setDragOver("");
   };
 
   const removeFile = (type: "musicxml" | "audio") => {
@@ -225,8 +206,8 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     if (confirmAction === "back") {
       navigate("/exercise-management");
     } else if (confirmAction === "cancel") {
-      // Reset form or navigate away
-      setAllExData([]);
+      // Navigate back to management on cancel
+      navigate("/exercise-management");
     }
     setShowConfirmModal(false);
     setConfirmAction(null);
@@ -258,114 +239,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
 
   
 
-  // Clear selection function
-  const clearSelection = () => {
-    // First clear - remove selected notes from rhythm and pitch lists if they exist there
-    const notesToRemove = selectedNotes.length > 0 ? selectedNotes : (selectedNote ? [selectedNote] : []);
-    
-    setRhythmCorrect(prev => prev.filter(n => 
-      !notesToRemove.some(selected => selected.note === n.note && selected.measure === n.measure)
-    ));
-    
-    setPitchCorrect(prev => prev.filter(n => 
-      !notesToRemove.some(selected => selected.note === n.note && selected.measure === n.measure)
-    ));
-    
-    setSelectedNotes([]);
-    setSelectedNote(null);
-    
-    // Second clear - simulate selecting another note to trigger the full clearing
-    // This mimics the behavior where selecting a note after clearing triggers another clear
-    setTimeout(() => {
-      setResetCounter(prev => prev + 1); // Trigger reset in ScorePreview to clear internal selNotes
-    }, 0);
-  };
-
-  // Clear all notes function
-  const [resetCounter, setResetCounter] = useState(0);
-  const [justMarkedNotes, setJustMarkedNotes] = useState<{note: string, measure: string}[]>([]);
-  const clearAllNotes = () => {
-    // First clear - clear all the state arrays
-    setSelectedNotes([]);
-    setSelectedNote(null);
-    setRhythmCorrect([]);
-    setPitchCorrect([]);
-    
-    // Second clear - simulate selecting another note to trigger the full clearing
-    // This mimics the behavior where selecting a note after clearing triggers another clear
-    setTimeout(() => {
-      setResetCounter(prev => prev + 1); // Increment to trigger reset in child
-    }, 0);
-  };
-
-  // Handle note selection from score preview
-  const handleNoteSelection = (notes: {note: string, measure: string}[]) => {
-    setSelectedNotes(notes);
-    setSelectedNote(null); // Clear single selection when using multi-selection
-  };
-
-  // Handle individual note click
-  const handleNoteClick = (note: string, measure: string) => {
-    setSelectedNote({ note, measure });
-    setSelectedNotes([]); // Clear multi-selection when using single selection
-  };
-
-  // Handle marking selected notes as rhythm correct
-  const markAsRhythmCorrect = () => {
-    const notesToAdd = selectedNotes.length > 0 ? selectedNotes : (selectedNote ? [selectedNote] : []);
-    
-    // Store the notes that are being marked before clearing selection
-    setJustMarkedNotes(notesToAdd);
-    
-    notesToAdd.forEach(note => {
-      setRhythmCorrect(prev => updateNoteMarking(prev, note, { rhythmCorrect: true }));
-      // Remove from pitch correct if it was there (mutually exclusive for now)
-      setPitchCorrect(prev => removeNoteMarking(prev, note));
-    });
-    
-    // Clear the selection but don't remove from rhythm correct
-    setSelectedNotes([]);
-    setSelectedNote(null);
-    
-    // Trigger a special marking event for the score preview
-    setResetCounter(prev => prev + 1);
-    
-    // Clear justMarkedNotes after a short delay to prevent re-triggering
-    setTimeout(() => setJustMarkedNotes([]), 100);
-  };
-
-  // Handle marking selected notes as pitch correct
-  const markAsPitchCorrect = () => {
-    const notesToAdd = selectedNotes.length > 0 ? selectedNotes : (selectedNote ? [selectedNote] : []);
-    
-    // Store the notes that are being marked before clearing selection
-    setJustMarkedNotes(notesToAdd);
-    
-    notesToAdd.forEach(note => {
-      setPitchCorrect(prev => updateNoteMarking(prev, note, { pitchCorrect: true }));
-      // Remove from rhythm correct if it was there (mutually exclusive for now)
-      setRhythmCorrect(prev => removeNoteMarking(prev, note));
-    });
-    
-    // Clear the selection but don't remove from pitch correct
-    setSelectedNotes([]);
-    setSelectedNote(null);
-    
-    // Trigger a special marking event for the score preview
-    setResetCounter(prev => prev + 1);
-    
-    // Clear justMarkedNotes after a short delay to prevent re-triggering
-    setTimeout(() => setJustMarkedNotes([]), 100);
-  };
-
-  // Remove note from rhythm or pitch lists
-  const removeFromRhythm = (noteToRemove: {note: string, measure: string}) => {
-    setRhythmCorrect(prev => removeNoteMarking(prev, noteToRemove));
-  };
-
-  const removeFromPitch = (noteToRemove: {note: string, measure: string}) => {
-    setPitchCorrect(prev => removeNoteMarking(prev, noteToRemove));
-  };
 
   // Submit exercise
   const handleSubmit = async (e: React.FormEvent) => {
@@ -383,13 +256,12 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       
       // Create a new exercise entry
       const newExerciseRef = push(exercisesRef);
-      const newId = newExerciseRef.key;
       
       const newExercise = new ExerciseData(
         abcNotation || "",
         audioFile?.name || "audio.mp3",
-        rhythmCorrect.map(n => ({note: n.note})),
-        feedbackItems.map(item => item.text).join('; ') || "Default feedback for wrong answers",
+        [], // No correct answers needed
+        "Default feedback for wrong answers",
         allExData.length,
         false,
         `Exercise ${allExData.length + 1}`,
@@ -420,7 +292,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
         isNew: newExercise.isNew,
         customId: newExercise.customId,
         // Add pitch correct notes for feedback purposes
-        pitchCorrectNotes: pitchCorrect.map(n => ({note: n.note, measure: n.measure, pitchCorrect: n.pitchCorrect}))
+        pitchCorrectNotes: []
       });
       
       // Refresh the exercises list from database
@@ -449,20 +321,8 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       transpos !== false ||
       audioFile !== null ||
       musicXmlFile !== null ||
-      abcNotation !== "" ||
-      feedbackItems.length > 0 ||
-      rhythmCorrect.length > 0 ||
-      pitchCorrect.length > 0
+      abcNotation !== ""
     );
-  };
-
-  const handleBackToManagement = () => {
-    if (hasUnsavedData()) {
-      setConfirmAction("back");
-      setShowConfirmModal(true);
-    } else {
-      navigate("/exercise-management");
-    }
   };
 
   const handleCancel = () => {
@@ -533,38 +393,22 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                   </div>
                 </div>
 
-                {/* Score Preview and Feedback Section - Separate Section */}
+                {/* Score Preview Section - Separate Section */}
                 <div className="inner-score-feedback-section">
                   <div className="score-feedback-header">
-                    <h3>Score Preview & Feedback</h3>
+                    <h3>Score Preview</h3>
                   </div>
                   <div className="score-feedback-content">
                     <ScorePreview
                       abcNotation={abcNotation}
-                      selectedNotes={selectedNotes}
-                      rhythmCorrect={rhythmCorrect}
-                      pitchCorrect={pitchCorrect}
-                      feedbackNotes={feedbackItems}
-                      onSelectionChange={handleNoteSelection}
-                      onNoteClick={handleNoteClick}
-                      resetSelection={selectedNotes.length === 0 && rhythmCorrect.length === 0 && pitchCorrect.length === 0}
-                      resetCounter={resetCounter}
-                      lastMarkedNotes={justMarkedNotes}
-                    />
-
-                    <FeedbackSection 
-                      feedbackItems={feedbackItems}
-                      setFeedbackItems={setFeedbackItems}
-                      selectedNote={selectedNote}
-                      selectedNotes={selectedNotes}
-                      rhythmCorrect={rhythmCorrect}
-                      pitchCorrect={pitchCorrect}
-                      onMarkAsRhythmCorrect={markAsRhythmCorrect}
-                      onMarkAsPitchCorrect={markAsPitchCorrect}
-                      onRemoveFromRhythm={removeFromRhythm}
-                      onRemoveFromPitch={removeFromPitch}
-                      onClearSelection={clearSelection}
-                      onClearAllNotes={clearAllNotes}
+                      selectedNotes={[]}
+                      rhythmCorrect={[]}
+                      pitchCorrect={[]}
+                      feedbackNotes={[]}
+                      onSelectionChange={() => {}}
+                      onNoteClick={() => {}}
+                      resetSelection={false}
+                      resetCounter={0}
                     />
                   </div>
                 </div>
