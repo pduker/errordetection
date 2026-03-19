@@ -3,14 +3,15 @@ import React from "react";
 interface ExerciseControlsProps {
   onCreateExercise: () => void;
   onCancel?: () => void;
+  isEdit?: boolean;
 }
 
-export function ExerciseControls({ onCreateExercise, onCancel }: ExerciseControlsProps) {
+export function ExerciseControls({ onCreateExercise, onCancel, isEdit = false }: ExerciseControlsProps) {
   return (
     <div className="exercise-controls">
       <div className="controls-left">
         <div className="exercise-type-indicator">
-          <h2 className="exercise-title">New Exercise</h2>
+          <h2 className="exercise-title">{isEdit ? "Edit Exercise" : "New Exercise"}</h2>
         </div>
       </div>
       
@@ -29,7 +30,7 @@ export function ExerciseControls({ onCreateExercise, onCancel }: ExerciseControl
           onClick={onCreateExercise}
           className="control-btn create-btn"
         >
-          Create
+          {isEdit ? "Update" : "Create"}
         </button>
       </div>
     </div>

@@ -15,12 +15,19 @@ function ExerciseManagementListEntry({
   exercise,
   isSelected,
   handleSelectExercise,
+  onEdit,
 }: {
   exercise: ExerciseData | undefined;
   isSelected: boolean;
   handleSelectExercise: (exIndex: number) => void;
+  onEdit: (exerciseId: string) => void;
 }) {
   if (!exercise) return <></>;
+
+  const handleEditClick = () => {
+    const exerciseId = exercise.customId || exercise.exIndex.toString();
+    onEdit(exerciseId);
+  };
 
   return (
     <div
@@ -42,7 +49,7 @@ function ExerciseManagementListEntry({
       </span>
       <div className="actions">
         <Button className="p-0">👁️</Button>
-        <Button className="p-0">✏️</Button>
+        <Button className="p-0" onClick={handleEditClick}>✏️</Button>
       </div>
     </div>
   );
@@ -79,6 +86,10 @@ export function ExerciseManagementPage({
 
   const cancelLogout = () => {
     setShowLogoutModal(false);
+  };
+
+  const handleEdit = (exerciseId: string) => {
+    navigate(`/exercise-management/edit/${exerciseId}`);
   };
 
   //use states for getting and setting specific attributes of exercises and music
@@ -655,6 +666,7 @@ export function ExerciseManagementPage({
                 exercise={exercise}
                 isSelected={selectedIndexes.includes(exercise.exIndex)}
                 handleSelectExercise={handleSelectExercise}
+                onEdit={handleEdit}
               />
             );
 

@@ -9,6 +9,7 @@ import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
 import { CreateExercisePage } from './components/exercise-creation';
+import { EditExercisePage } from './components/exercise-edit';
 import { LoadingScreen, useFirstVisit } from './components/loading-screen';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import ExerciseData from './interfaces/exerciseData';
@@ -199,6 +200,7 @@ function App() {
             <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]} scoresRet={scoresRetrieved}></ExercisesPage>}/>
             <Route path="exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={refreshExercises} authorized={authorized} setAuthorized={updateAuthorized}/>}/>
             <Route path="/exercise-management/create" element={<CreateExercisePage allExData={allExData} setAllExData={setAllExData} refreshExercises={refreshExercises}/>}/>
+            <Route path="/exercise-management/edit/:exerciseId" element={<EditExercisePage allExData={allExData} setAllExData={setAllExData} refreshExercises={refreshExercises}/>}/>
             <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={updateAuthorized}/>}/>
         </Routes>
       </div>
