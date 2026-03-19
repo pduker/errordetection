@@ -143,6 +143,12 @@
   }
 
   .exercise-content {
-    margin-top: 5%;
+    margin-top: 1%;
+    height: auto;
+  }
+
+  .exercise-stage {
+    height: auto;
+    margin-bottom: -10%;
   }
 }

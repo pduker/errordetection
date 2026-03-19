@@ -300,11 +300,16 @@ export function Exercise({
     abcString = abcString.replace("T:Title\n", "");
     var el = document.getElementById("target" + exIndex);
     if (el !== null && abcString !== undefined) {
+      const containerWidth = el.clientWidth;
+      const baseWidth = 800;
+      const scale = Math.min(1, containerWidth / baseWidth);
+
       visualObjs = abcjs.renderAbc(el, abcString, {
         clickListener: rhythmOnly ? undefined : clickListener,
         selectTypes: rhythmOnly ? [] : ["note"],
         lineThickness: 0.4,
         responsive: "resize",
+        scale: scale,
       });
 
       let beatSum: number = 0;
