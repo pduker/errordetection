@@ -42,7 +42,7 @@ function Header({ authorized, resetScrollPosition }: { authorized: boolean; rese
       {/* Centered title */}
       <div style={{ position: 'absolute', right: '50%', transform: 'translateX(50%)', textAlign: 'center', pointerEvents: "none" }}>
         <div style={{display: 'flex', flexDirection:'column', alignItems: 'center', gap:0}}>
-          <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginTop: '6px', lineHeight:1, fontSize: "clamp(1.2rem, 3vw, 2rem)" }}>
+          <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginTop: '12px', lineHeight:1, fontSize: "clamp(1.2rem, 3vw, 2rem)" }}>
           University of Delaware
           </Navbar.Brand>
           <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', fontSize: "clamp(0.8rem, 2vw, 1.2rem)" }}>
