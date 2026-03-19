@@ -252,19 +252,24 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
 
     try {
       const database = getDatabase();
-      const exercisesRef = ref(database, 'exercises');
+      const exercisesRef = ref(database, 'scores');
       
       // Create a new exercise entry
       const newExerciseRef = push(exercisesRef);
+      
+      // Generate a unique exIndex based on existing exercises
+      const existingIndexes = allExData.map(ex => ex?.exIndex || 0).filter(index => index !== undefined);
+      const maxIndex = existingIndexes.length > 0 ? Math.max(...existingIndexes) : 0;
+      const newExIndex = maxIndex + 1;
       
       const newExercise = new ExerciseData(
         abcNotation || "",
         audioFile?.name || "audio.mp3",
         [], // No correct answers needed
         "Default feedback for wrong answers",
-        allExData.length,
+        newExIndex,
         false,
-        `Exercise ${allExData.length + 1}`,
+        `Exercise ${newExIndex}`,
         difficulty,
         voices,
         tags,
