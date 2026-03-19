@@ -264,17 +264,27 @@ function FiltersComponent({
   }, []);
 
   return (
+    <>
+    <button
+        type="button"
+        className="filters-fab"
+        onClick={() => setFiltersOpen((prev) => !prev)}
+        aria-expanded={filtersOpen}
+      >
+        <span>Filters</span>
+      </button>
+    
     <section
       className={`filters-panel${filtersOpen ? " filters-panel--open" : ""} ${noAnimation ? "filters-panel--no-animation" : ""}`}
     >
       <button
         type="button"
-        className="filters-panel__toggle"
+        className="filters-panel__toggle desktop-only"
         onClick={() => setFiltersOpen((prev) => !prev)}
         aria-expanded={filtersOpen}
       >
         <span>Filters</span>
-        <span className="filters-panel__chevron" aria-hidden="true" />
+        <span className="filters-panel__chevron" />
       </button>
       <div
         className={`filters-panel__content${filtersOpen ? " filters-panel__content--open" : ""}`}
@@ -298,6 +308,7 @@ function FiltersComponent({
         />
       </div>
     </section>
+    </>
   );
 }
 

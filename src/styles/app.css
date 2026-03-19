@@ -68,6 +68,7 @@
   background: #ffdb63;
   border-radius: 10px;
   margin-left: 2.5vw;
+  padding-top: 55px;
 }
 
 .pagediv.mobile {
@@ -263,6 +264,7 @@ nav .fas {
 
   .Home-bar, .container {
     padding: 0px;
+    z-index: 10000;
   }
 
   .Home-nav a, .Home-nav-right a {
