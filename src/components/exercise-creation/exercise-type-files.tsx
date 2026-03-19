@@ -20,6 +20,9 @@ interface ExerciseTypeFilesProps {
     customId: boolean;
   };
   allExData: any[];
+  isEdit?: boolean;
+  originalAudioFile?: string;
+  originalMusicXmlFile?: string;
 }
 
 export function ExerciseTypeFiles({
@@ -34,7 +37,10 @@ export function ExerciseTypeFiles({
   handleFileUpload,
   removeFile,
   fieldErrors,
-  allExData
+  allExData,
+  isEdit = false,
+  originalAudioFile = "",
+  originalMusicXmlFile = ""
 }: ExerciseTypeFilesProps) {
   const musicXmlInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
@@ -159,6 +165,25 @@ export function ExerciseTypeFiles({
                       ✕
                     </button>
                   </>
+                ) : isEdit && originalMusicXmlFile ? (
+                  <>
+                    <div className="file-info">
+                      <div className="file-details">
+                        <span className="file-icon">🎼</span>
+                        <span className="file-name" title={originalMusicXmlFile}>
+                          {originalMusicXmlFile}
+                        </span>
+                      </div>
+                    </div>
+                    <button 
+                      type="button"
+                      className="clear-file-btn"
+                      onClick={() => handleClearFile('musicxml')}
+                      title="Replace file"
+                    >
+                      ✕
+                    </button>
+                  </>
                 ) : (
                   <div className="drop-text">
                     Click to browse or drag file
@@ -205,6 +230,25 @@ export function ExerciseTypeFiles({
                       className="clear-file-btn"
                       onClick={() => handleClearFile('audio')}
                       title="Remove file"
+                    >
+                      ✕
+                    </button>
+                  </>
+                ) : isEdit && originalAudioFile ? (
+                  <>
+                    <div className="file-info">
+                      <div className="file-details">
+                        <span className="file-icon">💿</span>
+                        <span className="file-name" title={originalAudioFile}>
+                          {originalAudioFile}
+                        </span>
+                      </div>
+                    </div>
+                    <button 
+                      type="button"
+                      className="clear-file-btn"
+                      onClick={() => handleClearFile('audio')}
+                      title="Replace file"
                     >
                       ✕
                     </button>

@@ -3,14 +3,15 @@ import { useNavigate, useParams } from "react-router-dom";
 import ExerciseData from "../interfaces/exerciseData";
 import { ConfirmationModal } from "./modals/confirmation-modal";
 import { getDatabase, ref, set, get } from "firebase/database";
+import { getStorage, ref as storageRef, getBlob } from "firebase/storage";
 import { vertaal } from "xml2abc";
 import "../styles/create-exercise.css";
 
 // Import the new components
 import { ExerciseForm } from "./exercise-creation/exercise-form";
+import { ExerciseControls } from "./exercise-creation/exercise-controls";
 import { ExerciseTypeFiles } from "./exercise-creation/exercise-type-files";
 import { ScorePreview } from "./exercise-creation/score-preview";
-import { ExerciseControls } from "./exercise-creation/exercise-controls";
 
 interface EditExercisePageProps {
   allExData: (ExerciseData | undefined)[];
@@ -45,6 +46,7 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
   const [originalExercise, setOriginalExercise] = useState<ExerciseData | null>(null);
   const [exerciseKey, setExerciseKey] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [showContent, setShowContent] = useState<boolean>(false);
   const [fieldErrors, setFieldErrors] = useState<{
     tags: boolean;
     musicXml: boolean;
@@ -56,6 +58,8 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
     audio: false,
     customId: false
   });
+  const [originalAudioFile, setOriginalAudioFile] = useState<string>("");
+  const [originalMusicXmlFile, setOriginalMusicXmlFile] = useState<string>("");
 
   // Load exercise data on component mount
   useEffect(() => {
@@ -118,6 +122,28 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
             setTranspos(exercise.transpos || false);
             setCustomId(exercise.customId || "");
             setAbcNotation(exercise.score || "");
+            
+            // Store original audio file name for display
+            if (exercise.sound && typeof exercise.sound === 'string') {
+              setOriginalAudioFile(exercise.sound);
+              
+              // Actually load the audio file from Firebase Storage
+              try {
+                const storage = getStorage();
+                const audioRef = storageRef(storage, exercise.sound);
+                const audioBlob = await getBlob(audioRef);
+                const audioFileObj = new File([audioBlob], exercise.sound, { type: "audio/mpeg" });
+                setAudioFile(audioFileObj);
+              } catch (fileError) {
+                console.error("Error loading audio file:", fileError);
+              }
+            }
+            
+            if (exercise.score) {
+              setOriginalMusicXmlFile("musicxml.xml");
+              // Note: MusicXML files aren't stored separately - they're converted to ABC notation
+              // The ABC notation is already loaded in setAbcNotation above
+            }
           } else {
             alert("Exercise not found");
             navigate("/exercise-management");
@@ -132,6 +158,10 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
         navigate("/exercise-management");
       } finally {
         setIsLoading(false);
+        // Show content after 0.75 seconds
+        setTimeout(() => {
+          setShowContent(true);
+        }, 750);
       }
     };
 
@@ -366,6 +396,10 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
   const hasUnsavedData = (): boolean => {
     if (!originalExercise) return false;
     
+    // Check if audioFile is a newly uploaded file (not the loaded one)
+    const hasNewAudioFile = audioFile && originalAudioFile && audioFile.name !== originalAudioFile;
+    const hasNewMusicXmlFile = musicXmlFile && originalMusicXmlFile && musicXmlFile.name !== originalMusicXmlFile;
+    
     return (
       customId !== (originalExercise.customId || "") ||
       difficulty !== originalExercise.difficulty ||
@@ -374,8 +408,8 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
       types !== (originalExercise.types || "None") ||
       meter !== (originalExercise.meter || "Anything") ||
       transpos !== originalExercise.transpos ||
-      audioFile !== null ||
-      musicXmlFile !== null ||
+      hasNewAudioFile ||
+      hasNewMusicXmlFile ||
       abcNotation !== originalExercise.score
     );
   };
@@ -389,8 +423,17 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
     }
   };
 
-  if (isLoading) {
-    return <div>Loading exercise data...</div>;
+  if (isLoading || !showContent) {
+    return (
+      <div className="loading-indicator">
+        <div className="loading-content-compact">
+          <div className="loading-spinner-compact">
+            <div className="spinner-compact"></div>
+          </div>
+          <p className="loading-text-compact">Loading data...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -447,6 +490,9 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
                           removeFile={handleFileRemoveRequest}
                           fieldErrors={fieldErrors}
                           allExData={allExData}
+                          isEdit={true}
+                          originalAudioFile={originalAudioFile}
+                          originalMusicXmlFile={originalMusicXmlFile}
                         />    
                       </div>
                     </div>
