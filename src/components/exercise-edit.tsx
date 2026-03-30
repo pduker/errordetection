@@ -96,7 +96,7 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
               exercise.types || "None",
               exercise.meter || "Anything",
               exercise.transpos || false,
-              undefined,
+              undefined, // isNew
               exercise.customId
             );
             
@@ -120,7 +120,9 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
             setTypes(exercise.types || "None");
             setMeter(exercise.meter || "Anything");
             setTranspos(exercise.transpos || false);
+            console.log("Loading exercise customId:", exercise.customId);
             setCustomId(exercise.customId || "");
+            console.log("Custom ID set to:", exercise.customId || "");
             setAbcNotation(exercise.score || "");
             
             // Store original audio file name for display
@@ -282,12 +284,12 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
     // For editing, files are optional unless we want to replace them
     // But if we had original files, we should keep them
 
-    if (customId && !/^[a-zA-Z0-9_-]+$/.test(customId.trim())) {
+    if (customId && customId.trim() !== "" && !/^[a-zA-Z0-9_-]+$/.test(customId.trim())) {
       errors.push("Custom ID contains invalid characters");
       newFieldErrors.customId = true;
     }
 
-    if (customId && allExData.some(ex => ex?.customId === customId.trim() && ex !== originalExercise)) {
+    if (customId && customId.trim() !== "" && allExData.some(ex => ex?.customId === customId.trim() && ex !== originalExercise)) {
       errors.push("Custom ID is already in use");
       newFieldErrors.customId = true;
     }
@@ -357,10 +359,19 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
 
     try {
       const database = getDatabase();
+      
+      if (!exerciseKey) {
+        alert("Error: Exercise key not found");
+        return;
+      }
+      
       const exerciseRef = ref(database, `scores/${exerciseKey}`);
       
-      const updatedExercise = {
-        title: originalExercise?.title || `Exercise ${originalExercise?.exIndex}`,
+      const updatedExercise: ExerciseData = {
+        title: (() => {
+          const newTitle = originalExercise?.title === "Title" ? `Exercise ${originalExercise?.exIndex}` : originalExercise?.title || `Exercise ${originalExercise?.exIndex}`;
+          return newTitle;
+        })(),
         score: abcNotation || originalExercise?.score || "",
         sound: audioFile?.name || originalExercise?.sound || "audio.mp3",
         correctAnswers: originalExercise?.correctAnswers || [],
@@ -373,10 +384,13 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
         types: types,
         meter: meter,
         transpos: transpos,
-        isNew: false,
-        customId: customId || undefined,
-        pitchCorrectNotes: originalExercise?.correctAnswers || []
+        isNew: false
       };
+      
+      // Only include customId if it has a value, otherwise omit it completely
+      if (customId && customId.trim() !== "") {
+        updatedExercise.customId = customId;
+      }
       
       await set(exerciseRef, updatedExercise);
       
@@ -401,16 +415,16 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
     const hasNewMusicXmlFile = musicXmlFile && originalMusicXmlFile && musicXmlFile.name !== originalMusicXmlFile;
     
     return (
-      customId !== (originalExercise.customId || "") ||
-      difficulty !== originalExercise.difficulty ||
-      voices !== originalExercise.voices ||
-      JSON.stringify(tags) !== JSON.stringify(originalExercise.tags || []) ||
-      types !== (originalExercise.types || "None") ||
-      meter !== (originalExercise.meter || "Anything") ||
-      transpos !== originalExercise.transpos ||
+      (customId && customId.trim() !== "" && customId !== (originalExercise?.customId || "")) ||
+      difficulty !== originalExercise?.difficulty ||
+      voices !== originalExercise?.voices ||
+      JSON.stringify(tags) !== JSON.stringify(originalExercise?.tags || []) ||
+      types !== originalExercise?.types ||
+      meter !== originalExercise?.meter ||
+      transpos !== originalExercise?.transpos ||
       hasNewAudioFile ||
       hasNewMusicXmlFile ||
-      abcNotation !== originalExercise.score
+      abcNotation !== originalExercise?.score
     );
   };
 

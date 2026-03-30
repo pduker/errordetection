@@ -177,14 +177,19 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       newFieldErrors.audio = true;
     }
 
-    if (customId && !/^[a-zA-Z0-9_-]+$/.test(customId.trim())) {
+    // Clear field errors when validation passes
+    if (customId && customId.trim() !== "" && !/^[a-zA-Z0-9_-]+$/.test(customId.trim())) {
       errors.push("Custom ID contains invalid characters");
       newFieldErrors.customId = true;
+    } else if (!customId || customId.trim() === "") {
+      newFieldErrors.customId = false;
     }
 
-    if (customId && allExData.some(ex => ex?.customId === customId.trim())) {
+    if (customId && customId.trim() !== "" && allExData.some(ex => ex?.customId === customId.trim())) {
       errors.push("Custom ID is already in use");
       newFieldErrors.customId = true;
+    } else if (!customId || customId.trim() === "") {
+      newFieldErrors.customId = false;
     }
 
     setFieldErrors(newFieldErrors);
@@ -277,7 +282,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
         meter,
         transpos,
         true, // isNew
-        customId || undefined
+        customId && customId.trim() !== "" ? customId : undefined
       );
       
       await set(newExerciseRef, {
@@ -317,7 +322,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
 
   const hasUnsavedData = (): boolean => {
     return (
-      customId.trim() !== "" ||
+      (customId && customId.trim() !== "") ||
       difficulty !== 1 ||
       voices !== 1 ||
       tags.length > 0 ||

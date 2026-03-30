@@ -1,4 +1,5 @@
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
+import { getStorage, ref as storageRef, getBlob } from "firebase/storage";
 
 interface ExerciseTypeFilesProps {
   tags: string[];
@@ -45,22 +46,21 @@ export function ExerciseTypeFiles({
   const musicXmlInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
 
-  const handleDragOver = (e: React.DragEvent, type: string) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
-  const handleDrop = (e: React.DragEvent, type: "musicxml" | "audio") => {
-    e.preventDefault();
-    e.stopPropagation();
-    const files = Array.from(e.dataTransfer.files);
-    if (files.length > 0) {
-      handleFileUpload(files[0], type);
+  const loadOriginalFile = async (fileName: string, fileType: "audio" | "musicxml"): Promise<void> => {
+    try {
+      const storage = getStorage();
+      const fileRef = storageRef(storage, fileName);
+      const fileBlob = await getBlob(fileRef);
+      
+      if (fileType === "audio") {
+        const audioFileObj = new File([fileBlob], fileName, { type: "audio/mpeg" });
+        setAudioFile(audioFileObj);
+      } else if (fileType === "musicxml") {
+        const musicXmlFileObj = new File([fileBlob], fileName, { type: "application/xml" });
+        setMusicXmlFile(musicXmlFileObj);
+      }
+    } catch (fileError) {
+      console.error("Error loading original file:", fileError);
     }
   };
 
@@ -73,6 +73,19 @@ export function ExerciseTypeFiles({
       audioInputRef.current.value = "";
     }
   };
+
+  // Load original files when in edit mode OR save files to storage in create mode
+  useEffect(() => {
+    if (isEdit && originalAudioFile && !audioFile) {
+      // Load audio file from Firebase Storage
+      loadOriginalFile(originalAudioFile, "audio");
+    }
+    
+    if (isEdit && originalMusicXmlFile && !musicXmlFile) {
+      // Load MusicXML file from Firebase Storage
+      loadOriginalFile(originalMusicXmlFile, "musicxml");
+    }
+  }, [isEdit, originalAudioFile, originalMusicXmlFile, audioFile, musicXmlFile, setAudioFile, setMusicXmlFile]);
 
   return (
     <div>
@@ -111,8 +124,17 @@ export function ExerciseTypeFiles({
           value={customId}
           onChange={(e) => setCustomId(e.target.value)}
           placeholder="Custom ID (optional)"
-          className={`exercise-input ${fieldErrors.customId ? 'error' : ''}`}
+          className={`exercise-input ${fieldErrors.customId ? "error" : ""}`}
         />
+        <button
+          type="button"
+          onClick={() => setCustomId("")}
+          className="remove-id-btn"
+          title="Remove custom ID"
+          disabled={!customId || customId.trim() === ""}
+        >
+          ✕
+        </button>
         {fieldErrors.customId && customId.trim() !== "" && (
           <div className="field-error-message">
             {!/^[a-zA-Z0-9_-]+$/.test(customId.trim()) 
@@ -125,145 +147,36 @@ export function ExerciseTypeFiles({
       <div className="section-gap"></div>
 
       <div className="files-section">
-        <h4>Files</h4>
-        <div className="file-upload-grid">
-          <div className="file-upload-item">
-            <label>MusicXML</label>
-            <div 
-              className={`file-drop-zone ${fieldErrors.musicXml && !musicXmlFile ? 'error' : ''}`}
-              onDragOver={(e) => handleDragOver(e, 'musicxml')}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, 'musicxml')}
-            >
-              <input
-                ref={musicXmlInputRef}
-                type="file"
-                accept=".musicxml,.xml"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleFileUpload(file, 'musicxml');
-                }}
-                className={`file-input ${musicXmlFile ? 'file-present' : ''}`}
-              />
-              <div className="drop-content">
-                {musicXmlFile ? (
-                  <>
-                    <div className="file-info">
-                      <div className="file-details">
-                        <span className="file-icon">🎼</span>
-                        <span className="file-name" title={musicXmlFile.name}>
-                          {musicXmlFile.name}
-                        </span>
-                      </div>
-                    </div>
-                    <button 
-                      type="button"
-                      className="clear-file-btn"
-                      onClick={() => handleClearFile('musicxml')}
-                      title="Remove file"
-                    >
-                      ✕
-                    </button>
-                  </>
-                ) : isEdit && originalMusicXmlFile ? (
-                  <>
-                    <div className="file-info">
-                      <div className="file-details">
-                        <span className="file-icon">🎼</span>
-                        <span className="file-name" title={originalMusicXmlFile}>
-                          {originalMusicXmlFile}
-                        </span>
-                      </div>
-                    </div>
-                    <button 
-                      type="button"
-                      className="clear-file-btn"
-                      onClick={() => handleClearFile('musicxml')}
-                      title="Replace file"
-                    >
-                      ✕
-                    </button>
-                  </>
-                ) : (
-                  <div className="drop-text">
-                    Click to browse or drag file
-                  </div>
-                )}
-              </div>
-            </div>
-            {fieldErrors.musicXml && !musicXmlFile && (
-              <div className="field-error-message">MusicXML file required</div>
-            )}
-          </div>
-
-          <div className="file-upload-item">
-            <label>Audio</label>
-            <div 
-              className={`file-drop-zone ${fieldErrors.audio && !audioFile ? 'error' : ''}`}
-              onDragOver={(e) => handleDragOver(e, 'audio')}
-              onDragLeave={handleDragLeave}
-              onDrop={(e) => handleDrop(e, 'audio')}
-            >
-              <input
-                ref={audioInputRef}
-                type="file"
-                accept=".mp3,.wav,.m4a"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleFileUpload(file, 'audio');
-                }}
-                className={`file-input ${audioFile ? 'file-present' : ''}`}
-              />
-              <div className="drop-content">
-                {audioFile ? (
-                  <>
-                    <div className="file-info">
-                      <div className="file-details">
-                        <span className="file-icon">💿</span>
-                        <span className="file-name" title={audioFile.name}>
-                          {audioFile.name}
-                        </span>
-                      </div>
-                    </div>
-                    <button 
-                      type="button"
-                      className="clear-file-btn"
-                      onClick={() => handleClearFile('audio')}
-                      title="Remove file"
-                    >
-                      ✕
-                    </button>
-                  </>
-                ) : isEdit && originalAudioFile ? (
-                  <>
-                    <div className="file-info">
-                      <div className="file-details">
-                        <span className="file-icon">💿</span>
-                        <span className="file-name" title={originalAudioFile}>
-                          {originalAudioFile}
-                        </span>
-                      </div>
-                    </div>
-                    <button 
-                      type="button"
-                      className="clear-file-btn"
-                      onClick={() => handleClearFile('audio')}
-                      title="Replace file"
-                    >
-                      ✕
-                    </button>
-                  </>
-                ) : (
-                  <div className="drop-text">
-                    Click to browse or drag file
-                  </div>
-                )}
-              </div>
-            </div>
-            {fieldErrors.audio && !audioFile && (
-              <div className="field-error-message">Audio file required</div>
-            )}
-          </div>
+        <div className="file-upload-item">
+          <label>Score</label>
+          <input
+            type="file"
+            accept=".xml,.musicxml"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFileUpload(file, "musicxml");
+            }}
+            className={`file-input ${musicXmlFile ? "file-present" : ""}`}
+          />
+          {fieldErrors.musicXml && !musicXmlFile && (!isEdit || !originalMusicXmlFile) && (
+          <div className="field-error-message">MusicXML file required</div>
+          )}
+        </div>
+        
+        <div className="file-upload-item">
+          <label>Audio</label>
+          <input
+            type="file"
+            accept=".mp3,.wav,.m4a"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFileUpload(file, "audio");
+            }}
+            className={`file-input ${audioFile ? "file-present" : ""}`}
+          />
+          {fieldErrors.audio && !audioFile && (!isEdit || !originalAudioFile) && (
+          <div className="field-error-message">Audio file required</div>
+          )}
         </div>
       </div>
     </div>
