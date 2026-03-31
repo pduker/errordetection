@@ -449,24 +449,6 @@ export function ExerciseManagementPage({
 
   return (
     <div style={{ width: "90vw" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <div>
-          {/*page header*/}
-          <h2 style={{ display: "inline" }}>
-            Welcome to the Exercise Management Page!
-          </h2>
-        </div>
-
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          
-        </div>
-      </div>
       <div>
         <div className="exercise-management">
           <div className="exercise-management-row">
