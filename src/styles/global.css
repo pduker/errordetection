@@ -37,6 +37,9 @@ a:hover {
   }
 }
 
+/* Import controls styles for button styling */
+@import './controls.css';
+
 * {
   margin: 0;
   padding: 0;
