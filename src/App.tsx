@@ -59,7 +59,7 @@ function Header({ authorized, resetScrollPosition }: { authorized: boolean; rese
 
     <Nav className='Home-nav-right'>
     <Link to="/about" style={{ marginLeft: '-225px' }} onClick={() => handleNavClick("/about")}>About</Link>
-    <Link to="/help" style={{ marginLeft: '10px' }} onClick={() => handleNavClick("/help")}>Help</Link>
+    <Link to="/help" style={{ marginLeft: '10px', paddingRight: '1vw' }} onClick={() => handleNavClick("/help")}>Help</Link>
     </Nav>
     </Navbar>
 
