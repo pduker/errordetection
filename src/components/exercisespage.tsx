@@ -276,6 +276,14 @@ function FiltersComponent({
     <section
       className={`filters-panel${filtersOpen ? " filters-panel--open" : ""} ${noAnimation ? "filters-panel--no-animation" : ""}`}
     >
+      <div className="filters-mobile-close">
+      <button
+        onClick={() => setFiltersOpen(false)}
+        aria-label="Close filters"
+      >
+        ﹀
+      </button>
+    </div>
       <button
         type="button"
         className="filters-panel__toggle desktop-only"
