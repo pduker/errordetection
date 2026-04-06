@@ -141,6 +141,8 @@ function ExerciseQueueComponent({
     setCurrentPage(Math.max(1, currentPage - 1));
   }, [currentPage, setCurrentPage]);
 
+  const [isOpen, setIsOpen] = useState(false);
+
   useEffect(() => {
     if (totalPages === 0) {
       setCurrentPage(1);
@@ -150,61 +152,81 @@ function ExerciseQueueComponent({
   }, [currentPage, setCurrentPage, totalPages]);
 
   return (
-    <section className="exercise-queue-panel">
-      <div className="exercise-queue-header">
-        <div className="exercise-queue-nav">
+    <section
+      className={`exercise-queue-panel${
+        isOpen ? " exercise-queue-panel--open" : ""
+      }`}
+    >
+      <button
+        type="button"
+        className="exercise-queue-panel__toggle"
+        onClick={() => setIsOpen((prev) => !prev)}
+        aria-expanded={isOpen}
+      >
+        <span>Exercises</span>
+        <span className="exercise-queue__chevron" aria-hidden="true" />
+      </button>
+      <div
+        className={`exercise-queue-panel__content${
+          isOpen ? " exercise-queue-panel__content--open" : ""
+        }`}
+        aria-hidden={!isOpen}
+      >
+        <div className="exercise-queue-header">
+          <div className="exercise-queue-nav">
+            <Button
+              onClick={prevPage}
+              disabled={currentPage === 1}
+              className="exercise-queue-nav-btn"
+              aria-label="Previous page of exercises"
+            >
+              ←
+            </Button>
+            <span className="exercise-queue-status">{paginationStatus}</span>
+            <Button
+              onClick={nextPage}
+              disabled={totalPages === 0 || currentPage >= totalPages}
+              className="exercise-queue-nav-btn"
+              aria-label="Next page of exercises"
+            >
+              →
+            </Button>
+          </div>
           <Button
-            onClick={prevPage}
-            disabled={currentPage === 1}
-            className="exercise-queue-nav-btn"
-            aria-label="Previous page of exercises"
+            onClick={clearSelection}
+            variant="outline-secondary"
+            disabled={!selExercise}
+            className="exercise-queue-clear"
           >
-            ←
-          </Button>
-          <span className="exercise-queue-status">{paginationStatus}</span>
-          <Button
-            onClick={nextPage}
-            disabled={totalPages === 0 || currentPage >= totalPages}
-            className="exercise-queue-nav-btn"
-            aria-label="Next page of exercises"
-          >
-            →
+            Clear selection
           </Button>
         </div>
-        <Button
-          onClick={clearSelection}
-          variant="outline-secondary"
-          disabled={!selExercise}
-          className="exercise-queue-clear"
-        >
-          Clear selection
-        </Button>
-      </div>
-      <div className="exercise-queue-list">
-        {filteredExercises.length === 0 ? (
-          scoresRet ? (
-            <div className="exercise-list-item exercise-list-item--empty">
-              <strong>No exercises with those criteria found!</strong>
-            </div>
-          ) : null
-        ) : (
-          pageExercises.map(function (exercise: ExerciseData, idx: number) {
-            const isActive = selExercise?.exIndex === exercise.exIndex;
-            const globalIndex = startIndex + idx;
-            return (
-              <div
-                key={exercise.exIndex}
-                id={exercise.title}
-                onClick={() => selectExerciseAtIndex(globalIndex)}
-                role="button"
-                aria-pressed={isActive}
-                className={`exercise-list-item${isActive ? " active" : ""}`}
-              >
-                {exercise.title}
+        <div className="exercise-queue-list">
+          {filteredExercises.length === 0 ? (
+            scoresRet ? (
+              <div className="exercise-list-item exercise-list-item--empty">
+                <strong>No exercises with those criteria found!</strong>
               </div>
-            );
-          })
-        )}
+            ) : null
+          ) : (
+            pageExercises.map(function (exercise: ExerciseData, idx: number) {
+              const isActive = selExercise?.exIndex === exercise.exIndex;
+              const globalIndex = startIndex + idx;
+              return (
+                <div
+                  key={exercise.title}
+                  id={exercise.title}
+                  onClick={() => selectExerciseAtIndex(globalIndex)}
+                  role="button"
+                  aria-pressed={isActive}
+                  className={`exercise-list-item${isActive ? " active" : ""}`}
+                >
+                  {exercise.title}
+                </div>
+              );
+            })
+          )}
+        </div>
       </div>
     </section>
   );
