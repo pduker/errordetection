@@ -159,7 +159,7 @@ nav {
   position: fixed;
 
   padding: 7px;
-  width: 100vw;
+  width: 100%; /* fix nav bar width issue */
   text-align: left;
 }
 nav ul li {
@@ -287,5 +287,12 @@ nav .fas {
   .pagediv {
     background-color: transparent;
     box-shadow: inset 0 0 5px transparent;
+  }
+  .Home-bar {
+    display: none;
+  }
+
+  .pagediv {
+    padding-top: 0;
   }
 }
