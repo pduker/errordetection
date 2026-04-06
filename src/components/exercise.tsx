@@ -38,6 +38,8 @@ export function Exercise({
   handleSelectExercise,
   isSelected,
   fetch,
+  filtersOpen,
+  setFiltersOpen,
 }: {
   exIndex: number;
   teacherMode: boolean;
@@ -51,6 +53,8 @@ export function Exercise({
   handleSelectExercise: ((exIndex: number) => void) | undefined;
   isSelected: boolean | undefined;
   fetch: ((val: boolean) => void) | undefined;
+  filtersOpen: boolean;
+  setFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   // for score styling
   const score = {
@@ -2178,7 +2182,17 @@ export function Exercise({
               >
                 Reset Answers
               </Button>
+              </div>
             </div>
+            <div className="filters-button-row">
+                <div style={{ marginTop: "0" }}>
+                  <button
+                    className="filters-fab"
+                    onClick={() => setFiltersOpen((prev: boolean) => !prev)}
+                  >
+                    Filters
+                  </button>
+                </div>
           </div>
           {canCheckAnswers ? (
             <div>
