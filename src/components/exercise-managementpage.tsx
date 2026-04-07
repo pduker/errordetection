@@ -1,5 +1,6 @@
 import "../styles/exercises/index.css";
 import "../styles/logout-modal.css";
+import "../styles/exercises/pagination.css";
 import { Button } from "react-bootstrap";
 import ExerciseData from "../interfaces/exerciseData";
 import { LogoutModal } from "./modals/LogoutModal";
@@ -106,6 +107,10 @@ export function ExerciseManagementPage({
   const [exList, setExList] = useState<(ExerciseData | undefined)[]>([]);
 
   const [customId, setCustomId] = useState<string>("");
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [exercisesPerPage] = useState<number>(10);
 
   //sort function for the exercises - optimized with useCallback
   const exSortFunc = useCallback(function (
@@ -441,6 +446,22 @@ export function ExerciseManagementPage({
     }
   };
 
+  // Get current exercises for pagination
+  const indexOfLastExercise = currentPage * exercisesPerPage;
+  const indexOfFirstExercise = indexOfLastExercise - exercisesPerPage;
+  const currentExercises = exList.slice(indexOfFirstExercise, indexOfLastExercise);
+  const totalPages = Math.ceil(exList.length / exercisesPerPage);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [exList.length]);
+
+  // Pagination controls
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  const goToPreviousPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
+  const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+
   //html for the page
   console.log(
     "ExerciseManagementPage rendering. authorized:",
@@ -609,9 +630,55 @@ export function ExerciseManagementPage({
           </div>
         </div>
 
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="pagination-container">
+            {/* Exercise count info */}
+            <div className="exercise-count-display">
+              Showing {indexOfFirstExercise + 1}-{Math.min(indexOfLastExercise, exList.length)} of {exList.length} exercises
+            </div>
+
+            <div className="pagination-controls-row">
+              <Button 
+                onClick={goToPreviousPage} 
+                disabled={currentPage === 1}
+                variant="outline-primary"
+                size="sm"
+                className="pagination-nav-button"
+              >
+                ← Previous
+              </Button>
+              
+              <div className="pagination-page-numbers">
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                  <Button
+                    key={pageNumber}
+                    onClick={() => paginate(pageNumber)}
+                    variant="outline-secondary"
+                    size="sm"
+                    className={`pagination-page-button ${currentPage === pageNumber ? 'active' : ''}`}
+                  >
+                    {pageNumber}
+                  </Button>
+                ))}
+              </div>
+              
+              <Button 
+                onClick={goToNextPage} 
+                disabled={currentPage === totalPages}
+                variant="outline-primary"
+                size="sm"
+                className="pagination-nav-button"
+              >
+                Next →
+              </Button>
+            </div>
+          </div>
+        )}
+
         {/*returning exercise data */}
         {exerciseConfig.showExercises &&
-          exList.map((exercise) => {
+          currentExercises.map((exercise) => {
             if (!exercise) return <div key={Math.random()} />;
 
             return (
