@@ -11,7 +11,7 @@ import { AboutPage } from './components/aboutpage';
 import { ExercisesPage } from './components/exercisespage';
 import { ExerciseManagementPage} from './components/exercise-managementpage';
 import { CreateExercisePage } from './components/exercise-creation';
-import { Routes, Route, Link, useLocation } from 'react-router-dom';
+import { Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import ExerciseData from './interfaces/exerciseData';
 import { getDatabase } from 'firebase/database';
 import { ref, get, query, DataSnapshot, orderByKey } from 'firebase/database';
@@ -187,9 +187,9 @@ function App() {
             <Route path="/" element={<HomePage/>}></Route>
             <Route path="/exercises" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={[]} scoresRet={scoresRetrieved}/>}/>
             <Route path="/about" element={<AboutPage/>}/>
-            <Route path="/exercises/intonation" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Intonation"]} scoresRet={scoresRetrieved}/>}/>
-            <Route path="/exercises/pitch" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Pitch"]} scoresRet={scoresRetrieved}/>}/>
-            <Route path="/exercises/rhythm" element={<ExercisesPage allExData = {allExData} setAllExData = {setAllExData} defaultTags={["Rhythm"]} scoresRet={scoresRetrieved}></ExercisesPage>}/>
+            <Route path="/exercises/intonation" element={<Navigate replace to="/exercises?tags=Intonation"/>}/>
+            <Route path="/exercises/pitch" element={<Navigate replace to="/exercises?tags=Pitch"/>}/>
+            <Route path="/exercises/rhythm" element={<Navigate replace to="/exercises?tags=Rhythm"/>}/>
             <Route path="exercise-management" element={<ExerciseManagementPage allExData = {allExData} setAllExData = {setAllExData} fetch={refreshExercises} authorized={authorized} setAuthorized={updateAuthorized}/>}/>
             <Route path="/exercise-management/create" element={<CreateExercisePage allExData={allExData} setAllExData={setAllExData} refreshExercises={refreshExercises}/>}/>
             <Route path="/help" element={<HelpPage authorized={authorized} setAuthorized={updateAuthorized}/>}/>
