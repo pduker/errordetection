@@ -288,8 +288,60 @@ nav .fas {
     background-color: transparent;
     box-shadow: inset 0 0 5px transparent;
   }
+  /* Mobile version of how the home bar opens */ 
   .Home-bar {
-    display: none;
+    background: transparent;
+    box-shadow: none;
+    height: 0;
+    padding: 0;
+  }
+
+  /* Hide logo and title */
+  .Home-bar .navbar-brand {
+    display: none !important;
+  }
+
+  /* Show ONLY the hamburger */
+  .Home-bar .navbar-toggler {
+    display: block !important;
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 9999;
+    background-color: #ffdb63;
+    border-radius: 8px;
+    padding: 6px 10px;
+  }
+  .Home-bar .navbar-collapse {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    right: -260px;  
+    width: 200px;
+    height: 100vh;
+    background: #fff7c9;
+    padding-top: 70px;
+    transition: right 0.35s ease-in-out;
+    z-index: 9998;
+    border-radius: 5px;
+    box-shadow: -2px 0 12px rgba(0,0,0,0.15);
+  }
+
+  .Home-bar .navbar-collapse.show {
+    right: 0;
+  }
+
+  /* Stack links vertically */
+  .Home-bar .navbar-collapse a {
+    display: block;
+    padding: 14px 20px;
+    text-decoration: none;
+    color: #114b96;
+    font-weight: 500;
+  }
+
+  .Home-bar .navbar-collapse a:hover {
+    background: rgba(17,75,150,0.08);
   }
 
   .pagediv {

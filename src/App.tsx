@@ -184,7 +184,7 @@ function App() {
         ref={contentRef}
         style={{
           overflowY: isLanding ? "hidden" : "scroll",
-          margin: isLanding ? "0" : "10px",
+          //margin: isLanding ? "0" : "10px", To give more space?
           height: "100%",
           width: "100%",
           display: isLanding ? "flex" : "block",
