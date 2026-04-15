@@ -237,11 +237,18 @@
   }
 
   .filters-button-row {
-  width: 100%;
+  position: absolute;
   display: flex;
-  justify-content: center; /* or flex-start if you want left-aligned */
-  margin-top: 12px;
-  }
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.filters-fab {
+  min-width: 120px;
+  height: 48px;
+  border-radius: 14px;
+}
 
   .filters-mobile-close {
     width: 100%;
