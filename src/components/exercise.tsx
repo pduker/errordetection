@@ -2069,6 +2069,18 @@ export function Exercise({
             <div id={"target" + exIndex} style={score}></div>
           </div>
           <div className="audio-row">
+            {
+              <button
+                className="exercise-nav-inline exercise-nav-inline--prev mobile-only"
+                onClick={() => {
+                  const btn = document.querySelector('.exercise-nav-desktop.exercise-nav-inline--prev') as HTMLElement | null;
+                  if (btn) btn.click();
+                }}
+                aria-label="Previous exercise"
+              >
+                ←
+              </button>
+            }
             <img
               alt="note-color-key"
               src={noteKey}
@@ -2139,12 +2151,25 @@ export function Exercise({
               flexWrap: "nowrap",
             }}
           >
+            {
+              <button
+                className="exercise-nav-inline exercise-nav-inline--prev mobile-only"
+                onClick={() => {
+                  const btn = document.querySelector('.exercise-nav-desktop.exercise-nav-inline--prev') as HTMLElement | null;
+                  if (btn) btn.click();
+                }}
+                aria-label="Previous exercise"
+              >
+                ←
+              </button>
+            }
+
             {!rhythmOnly && (
               <img
                 alt="note-color-key"
                 src={noteKey}
                 style={{
-                  display: "block",
+                  display: "inline-flex",
                   width: "14%",
                   height: "auto",
                   borderRadius: "1px",
@@ -2179,6 +2204,18 @@ export function Exercise({
                 Reset Answers
               </Button>
             </div>
+            {
+              <button
+                className="exercise-nav-inline exercise-nav-inline--next mobile-only"
+                onClick={() => {
+                  const btn = document.querySelector('.exercise-nav-desktop.exercise-nav-inline--next') as HTMLElement | null;
+                  if (btn) btn.click();
+                }}
+                aria-label="Next exercise"
+              >
+                →
+              </button>
+            }
           </div>
           {canCheckAnswers ? (
             <div>

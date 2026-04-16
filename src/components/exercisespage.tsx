@@ -32,6 +32,7 @@ function ExerciseViewerComponent({
     <div className="exercise-viewer">
       <div className="exercise-stage">
         <div className="exercise-content">
+
           {navButtonsVisible && (
             <button
               className="exercise-nav-inline exercise-nav-desktop exercise-nav-inline--prev"
@@ -74,28 +75,6 @@ function ExerciseViewerComponent({
             >
               →
             </button>
-          )}
-
-          {/* Mobile buttons */}
-          {navButtonsVisible && (
-            <div className="exercise-nav-mobile">
-              <button
-                className="exercise-nav-inline"
-                onClick={prevEx}
-                disabled={disablePrevNav}
-                aria-label="Previous exercise"
-              >
-                ←
-              </button>
-              <button
-                className="exercise-nav-inline"
-                onClick={nextEx}
-                disabled={disableNextNav}
-                aria-label="Next exercise"
-              >
-                →
-              </button>
-            </div>
           )}
         </div>
       </div>

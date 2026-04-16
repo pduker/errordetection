@@ -92,6 +92,7 @@
 }
 
 .exercise-nav-inline--prev {
+  order: 0;
   left: 16px;
 }
 
@@ -139,6 +140,11 @@
   display: none;
 }
 
+/* Utility: hide elements by default unless explicitly shown on mobile */
+.mobile-only {
+  display: none;
+}
+
 .exercise-nav-desktop {
   position: absolute;
   top: 50%;
@@ -160,6 +166,7 @@
   gap: 1rem;
   width: 100%;
   border: 3px solid red;
+  position: relative;
 }
 
 .audio-controls-group {
@@ -174,20 +181,20 @@
 
 @media only screen and (max-width: 700px) {
   .exercise-content-inner > div {
-    width: 120%;
+    width: 100%;
     max-width: none;
     display: block;
-    margin-left: -10%;
+    margin-left: 0;
   }
 
   .exercise-content-inner {
-    margin-top: -15%;
+    margin-top: 0;
     width: 100%;
   }
 
-  .exercise-viewer {
+  /* .exercise-viewer {
     max-width: 95%;
-  }
+  } */
 
   .exercise-box {
     width: 100%;
@@ -196,7 +203,8 @@
   }
 
   .exercise-nav-desktop {
-    display: none;
+    /* hide desktop nav on mobile; use mobile-only buttons inside exercise rows */
+    display: none !important;
   }
 
   .exercise-nav-mobile {
@@ -205,12 +213,138 @@
     justify-content: flex-end;
     gap: 8px;
     margin-top: 12px;
-    margin-right: -1%;
+    margin-right: 0;
+    width: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    align-items: center;
+    order: 999; /* ensure it sits after other content in flex containers */
   }
 
   .exercise-nav-mobile .exercise-nav-inline {
     position: static;
     transform: none;
+    width: auto;
+    min-width: 44px;
+    flex: 0 0 auto;
+  }
+
+  /* show mobile-only elements and style mobile inline navs */
+  .mobile-only {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .exercise-nav-inline.mobile-only {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    margin: 0 0.5rem;
+    border-radius: 8px;
+    background: #1659c1;
+    color: #fff;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.12);
+  }
+
+  /* Ensure mobile nav buttons align vertically with audio/action row */
+  .exercise-nav-inline.mobile-only {
+    position: static !important;
+    transform: none !important;
+    align-self: center !important;
+    display: inline-flex !important;
+    justify-content: center;
+    align-items: center;
+    /* slight downward nudge if the audio player is larger */
+    margin-top: 6px;
+  }
+
+  /* push prev to left edge and next to right edge inside the flex row */
+  .exercise-nav-inline.mobile-only.exercise-nav-inline--prev {
+    margin-right: auto !important;
+    margin-left: 0 !important;
+  }
+
+  .exercise-nav-inline.mobile-only.exercise-nav-inline--next {
+    order: 3;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+
+  /* Ensure mobile inline navs anchor to the audio row edges when present */
+  .audio-row > .exercise-nav-inline.mobile-only.exercise-nav-inline--prev {
+    margin-right: auto !important;
+    margin-left: 0 !important;
+    align-self: center !important;
+  }
+
+  .audio-row > .exercise-nav-inline.mobile-only.exercise-nav-inline--next {
+    order: 99 !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    align-self: center !important;
+  }
+
+  /* Absolute-anchor the mobile inline navs to audio-row edges to guarantee placement */
+  .audio-row > .exercise-nav-inline.mobile-only.exercise-nav-inline--prev {
+    position: absolute !important;
+    left: 8px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 10 !important;
+  }
+
+  .audio-row > .exercise-nav-inline.mobile-only.exercise-nav-inline--next {
+    position: absolute !important;
+    right: 8px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    z-index: 10 !important;
+  }
+
+  /* Stronger flex-based fallback: ensure buttons are static in audio-row and spaced by flex */
+  .exercise-box .audio-row > .exercise-nav-inline.mobile-only {
+    position: static !important;
+    transform: none !important;
+    align-self: center !important;
+    z-index: 10 !important;
+  }
+
+  .exercise-box .audio-row > .exercise-nav-inline.mobile-only.exercise-nav-inline--prev {
+    margin-right: auto !important;
+    margin-left: 0 !important;
+  }
+
+  .exercise-box .audio-row > .exercise-nav-inline.mobile-only.exercise-nav-inline--next {
+    order: 2 !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+
+  /* ensure the action row doesn't clip children */
+  .exercise-box,
+  .exercise-content,
+  .exercise-content > div {
+    overflow: visible !important;
+  }
+
+  /* Make the inline nav buttons participate in the .exercise-content flex row */
+  .exercise-content > .exercise-nav-inline {
+    position: static !important;
+    transform: none !important;
+    flex: 0 0 auto;
+    order: 1;
+    margin: 0 0.5rem;
+    align-self: center;
+  }
+
+  .exercise-content-inner {
+    order: 2;
+    flex: 1 1 auto;
+  }
+
+  .exercise-content > .exercise-nav-inline.exercise-nav-inline--next {
+    order: 3;
   }
 
   .custom-title {
@@ -231,5 +365,14 @@
 
   .exercise-action-buttons {
     gap: 0rem;
+  }
+
+  /* center wrapper for audio + controls row */
+  .exercise-center-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    flex: 1 1 auto;
   }
 }
