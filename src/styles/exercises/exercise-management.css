@@ -7,6 +7,7 @@
     justify-content: space-between;
     align-items: center;
     cursor: default;
+    transition: margin-bottom 0s 0.325s;
 
     span.custom-id {
         font-size: 0.8em;
@@ -15,7 +16,8 @@
 }
 
 .exercise-management-entry-wrapper:has(.exercise-score-preview.expanded) .exercise-management-list-entry {
-    margin: 0 !important;
+    margin-bottom: 0 !important;
+    transition: none;
 }
 
 .exercise-score-preview {
