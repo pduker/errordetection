@@ -37,7 +37,7 @@ export function LogoutModal({ show, onConfirm, onCancel, setAuthorized, navigate
           <h3>Confirm Logout</h3>
         </div>
         <div className="modal-body">
-          <p>Are you sure you want to logout of admin mode?</p>
+          <p>Are you sure you want to logout?</p>
         </div>
         <div className="modal-footer">
           <button onClick={onCancel} className="modal-btn modal-btn-cancel">

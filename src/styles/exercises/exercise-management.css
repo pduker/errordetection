@@ -1,13 +1,41 @@
+.exercise-management-entry-wrapper {
+    margin-bottom: 0;
+}
+
 .exercise-management-list-entry {
     display: flex;
     justify-content: space-between;
     align-items: center;
     cursor: default;
+    transition: margin-bottom 0s 0.325s;
 
     span.custom-id {
         font-size: 0.8em;
         color: #666;
     }
+}
+
+.exercise-management-entry-wrapper:has(.exercise-score-preview.expanded) .exercise-management-list-entry {
+    margin-bottom: 0 !important;
+    transition: none;
+}
+
+.exercise-score-preview {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 0 1rem;
+    margin-top: -1px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .25s ease-out, padding .25s ease-out;
+}
+
+.exercise-score-preview.expanded {
+    max-height: 500px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .exercise-management-list-entry.active {
@@ -37,6 +65,41 @@
     margin: 0;
     color: #1f0545;
     font-weight: 600;
+}
+
+/* Simple grouping for Tags section */
+#tags {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(31, 5, 69, 0.1);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+}
+
+#tags label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-right: 0.75rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #1f0545;
+}
+
+/* Simple grouping for Transpose Instruments section */
+#transpos {
+    background: rgba(255, 255, 255, 0.5);
+    border: 1px solid rgba(31, 5, 69, 0.1);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+}
+
+#transpos label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: #1f0545;
 }
 
 #exercise-filters-container > div {
