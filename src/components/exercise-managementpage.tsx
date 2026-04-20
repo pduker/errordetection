@@ -4,23 +4,79 @@ import "../styles/exercises/pagination.css";
 import { Button } from "react-bootstrap";
 import ExerciseData from "../interfaces/exerciseData";
 import { LogoutModal } from "./modals/LogoutModal";
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { get, getDatabase, ref, remove } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import { exerciseConfig } from "../config/exercise-config";
+import abcjs from "abcjs";
 
 import "../styles/exercises/exercise-management.css";
+
+function ScorePreview({ abcNotation }: { abcNotation: string }) {
+  const previewRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (abcNotation && previewRef.current) {
+      try {
+        abcjs.renderAbc(previewRef.current, abcNotation, {
+          responsive: "resize",
+          lineThickness: 0.4,
+          add_classes: true,
+          staffwidth: 800,
+          wrap: {
+            minSpacing: 1.0,
+            maxSpacing: 2.5,
+            preferredMeasuresPerLine: 4
+          }
+        });
+      } catch (error) {
+        console.error('Error rendering ABC notation:', error);
+      }
+    }
+  }, [abcNotation]);
+
+  return (
+    <div className="score-preview-section">
+      <div className="score-preview-container">
+        <div 
+          className="score-preview-content"
+          style={{ position: 'relative', userSelect: 'none' }}
+        >
+          {abcNotation ? (
+            <div 
+              ref={previewRef}
+              className="abc-score-display"
+            />
+          ) : (
+            <div style={{ 
+              padding: '20px', 
+              textAlign: 'center', 
+              color: '#666',
+              fontStyle: 'italic'
+            }}>
+              No score available
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function ExerciseManagementListEntry({
   exercise,
   isSelected,
   handleSelectExercise,
   onEdit,
+  isExpanded,
+  onToggleExpand,
 }: {
   exercise: ExerciseData | undefined;
   isSelected: boolean;
   handleSelectExercise: (exIndex: number) => void;
   onEdit: (exerciseId: string) => void;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
 }) {
   if (!exercise) return <></>;
 
@@ -30,27 +86,34 @@ function ExerciseManagementListEntry({
   };
 
   return (
-    <div
-      className={`exercise-list-item no-hover exercise-management-list-entry ${isSelected ? "active" : ""}`}
-    >
-      <div>
-        <input
-          type="checkbox"
-          checked={isSelected}
-          onChange={() => handleSelectExercise(exercise.exIndex)}
-        ></input>
-        &nbsp;
-      </div>
-      <span>
-        {exercise.title}{" "}
-        <span className="custom-id">
-          {exercise.customId ? `(ID: ${exercise.customId})` : ""}
+    <div className="exercise-management-entry-wrapper">
+      <div
+        className={`exercise-list-item no-hover exercise-management-list-entry ${isSelected ? "active" : ""}`}
+      >
+        <div>
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => handleSelectExercise(exercise.exIndex)}
+          ></input>
+          &nbsp;
+        </div>
+        <span>
+          {exercise.title}{" "}
+          <span className="custom-id">
+            {exercise.customId ? `(ID: ${exercise.customId})` : ""}
+          </span>
         </span>
-      </span>
-      <div className="actions">
-        <Button className="p-0">👁️</Button>
-        <Button className="p-0" onClick={handleEditClick}>✏️</Button>
+        <div className="actions">
+          <Button className="p-0" onClick={onToggleExpand}>👁️</Button>
+          <Button className="p-0" onClick={handleEditClick}>✏️</Button>
+        </div>
       </div>
+      {exercise.score && (
+        <div className={`exercise-score-preview ${isExpanded ? 'expanded' : ''}`}>
+          <ScorePreview abcNotation={exercise.score} />
+        </div>
+      )}
     </div>
   );
 }
@@ -94,6 +157,7 @@ export function ExerciseManagementPage({
 
   //use states for getting and setting specific attributes of exercises and music
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
+  const [expandedExerciseId, setExpandedExerciseId] = useState<number | null>(null);
 
   /* const [mode, setMode] = useState<boolean>(false); */
 
@@ -688,6 +752,10 @@ export function ExerciseManagementPage({
                 isSelected={selectedIndexes.includes(exercise.exIndex)}
                 handleSelectExercise={handleSelectExercise}
                 onEdit={handleEdit}
+                isExpanded={expandedExerciseId === exercise.exIndex}
+                onToggleExpand={() => setExpandedExerciseId(
+                  expandedExerciseId === exercise.exIndex ? null : exercise.exIndex
+                )}
               />
             );
           })}
