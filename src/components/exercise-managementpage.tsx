@@ -18,7 +18,9 @@ function ScorePreview({ abcNotation }: { abcNotation: string }) {
   useEffect(() => {
     if (abcNotation && previewRef.current) {
       try {
-        abcjs.renderAbc(previewRef.current, abcNotation, {
+        // Remove title line from ABC notation to hide it in the preview
+        const abcWithoutTitle = abcNotation.split('\n').filter(line => !line.startsWith('T:')).join('\n');
+        abcjs.renderAbc(previewRef.current, abcWithoutTitle, {
           responsive: "resize",
           lineThickness: 0.4,
           add_classes: true,
@@ -152,6 +154,7 @@ export function ExerciseManagementPage({
   };
 
   const handleEdit = (exerciseId: string) => {
+    sessionStorage.setItem('managementPage', currentPage.toString());
     navigate(`/exercise-management/edit/${exerciseId}`);
   };
 
@@ -176,7 +179,17 @@ export function ExerciseManagementPage({
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [exercisesPerPage] = useState<number>(10);
 
-  //sort function for the exercises - optimized with useCallback
+  // Set currentPage from sessionStorage on mount
+  useEffect(() => {
+    const savedPage = sessionStorage.getItem('managementPage');
+    if (savedPage) {
+      const pageNum = parseInt(savedPage, 10);
+      if (!isNaN(pageNum) && pageNum > 0) {
+        setCurrentPage(pageNum);
+        sessionStorage.removeItem('managementPage');
+      }
+    }
+  }, []);
   const exSortFunc = useCallback(function (
     e1: ExerciseData | undefined,
     e2: ExerciseData | undefined,
@@ -515,11 +528,6 @@ export function ExerciseManagementPage({
   const indexOfFirstExercise = indexOfLastExercise - exercisesPerPage;
   const currentExercises = exList.slice(indexOfFirstExercise, indexOfLastExercise);
   const totalPages = Math.ceil(exList.length / exercisesPerPage);
-
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [exList.length]);
 
   // Pagination controls
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
