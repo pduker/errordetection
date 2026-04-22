@@ -395,9 +395,9 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
       await set(exerciseRef, updatedExercise);
       
       await refreshExercises();
-      
+
       alert("Exercise updated successfully!");
-      
+
       setTimeout(() => {
         navigate("/exercise-management");
       }, 100);

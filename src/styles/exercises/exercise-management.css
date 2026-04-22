@@ -33,7 +33,7 @@
 }
 
 .exercise-score-preview.expanded {
-    max-height: 500px;
+    max-height: 1000px;
     padding: 1rem;
     margin-bottom: 0.5rem;
 }
