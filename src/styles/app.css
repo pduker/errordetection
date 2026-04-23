@@ -235,3 +235,9 @@ nav .fas {
     cursor: pointer;
   }
 }
+
+@media (max-width: 768px) {
+  .titlecard {
+    display: none;
+  }
+}
