@@ -112,7 +112,6 @@
 
 
 @media only screen and (max-width: 700px) {
-
   .ex-right{
     padding-right: 0;
     margin-left: 0;
@@ -138,7 +137,8 @@
   .exercise-content {
     margin-top: 1%;
     height: auto;
-    padding: 0 1rem; /* reduce horizontal padding on small screens */
+    padding: 0 1rem;
+    min-width: 100%;
   }
 
   .exercise-stage {
@@ -186,5 +186,7 @@
   /* add space below the exercise content to avoid overlap */
   .exercise-content {
     padding-bottom: 64px;
+    padding-left: 0;
+    padding-right: 0;
   }
 }
