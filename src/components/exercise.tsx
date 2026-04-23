@@ -180,7 +180,9 @@ export function Exercise({
     const progress = JSON.parse(saved);
     const title = ExData.title;
 
-    if (!progress[title]) return;
+    if (!progress[title]) {
+      progress[title] = {};
+    }
 
     if (!progress[title].checkClicks) {
       progress[title].checkClicks = 0;
