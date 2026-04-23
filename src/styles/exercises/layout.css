@@ -37,7 +37,7 @@
 }
 
 .ex-right {
-  flex: 1; /* grow to fill remaining space, can shrink */
+  flex: 1;
   padding-right: 10px;
   margin-left: 0.5vw;
   display: flex;
@@ -105,25 +105,18 @@
 
 @media only screen and (max-width: 700px) {
   .exercise-viewer {
-    max-width: 50%;
-
+    max-width: 100%;
+    width: 100%;
   }
   }
 
-/* Mobile fixed right-side nav for prev/next buttons (mobile only) */
+
 @media only screen and (max-width: 700px) {
-  .exercise-nav-mobile {
-    position: fixed !important;
-    right: 12px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0.5rem !important;
-    z-index: 9999 !important;
-    pointer-events: auto !important;
-  }
 
+  .ex-right{
+    padding-right: 0;
+    margin-left: 0;
+  }
   .exercise-nav-mobile .exercise-nav-inline {
     background: #ffffffcc;
     border: 1px solid rgba(0,0,0,0.08);
@@ -145,10 +138,53 @@
   .exercise-content {
     margin-top: 1%;
     height: auto;
+    padding: 0 1rem; /* reduce horizontal padding on small screens */
   }
 
   .exercise-stage {
     height: auto;
     margin-bottom: -10%;
+  }
+
+  .exercise-nav-mobile {
+    position: static !important;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    gap: 0.5rem;
+    margin-top: 12px;
+    z-index: 1;
+  }
+
+  .exercise-nav-mobile .exercise-nav-inline {
+    flex: 0 0 auto;
+    position: static !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+  }
+
+  /* Ensure the action buttons sit between the prev/next buttons and are centered */
+  .exercise-action-buttons {
+    order: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
+    gap: 0.75rem;
+    padding: 0 0.5rem;
+  }
+
+  .exercise-nav-inline--prev { order: 1; }
+  .exercise-nav-inline--next { order: 3; }
+  
+  /* add space below the exercise content to avoid overlap */
+  .exercise-content {
+    padding-bottom: 64px;
   }
 }
