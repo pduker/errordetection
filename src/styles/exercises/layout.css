@@ -185,7 +185,7 @@
   
   /* add space below the exercise content to avoid overlap */
   .exercise-content {
-    padding-bottom: 64px;
+    padding-bottom: auto;
     padding-left: 0;
     padding-right: 0;
   }
