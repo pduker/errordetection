@@ -143,3 +143,66 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.9);
   letter-spacing: 0.2px;
 }
+
+/* Responsive Pagination */
+@media (max-width: 768px) {
+  .pagination-container {
+    padding: 12px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+  }
+
+  .pagination-nav-button {
+    min-width: 70px;
+    height: 38px;
+    font-size: 12px;
+  }
+
+  .pagination-page-button {
+    min-width: 40px;
+    max-width: 60px;
+    height: 38px;
+    font-size: 12px;
+  }
+
+  .pagination-page-numbers {
+    gap: 6px;
+  }
+
+  .exercise-count-display {
+    font-size: 11px;
+    padding: 6px 12px;
+    min-width: 150px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pagination-container {
+    padding: 8px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  .pagination-nav-button {
+    min-width: 55px;
+    height: 34px;
+    font-size: 11px;
+  }
+
+  .pagination-page-button {
+    min-width: 32px;
+    max-width: 48px;
+    height: 34px;
+    font-size: 11px;
+  }
+
+  .pagination-page-numbers {
+    gap: 4px;
+  }
+
+  .exercise-count-display {
+    font-size: 10px;
+    padding: 4px 10px;
+    min-width: 120px;
+  }
+}

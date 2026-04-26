@@ -78,7 +78,7 @@ function ExerciseManagementListEntry({
   handleSelectExercise: (exIndex: number) => void;
   onEdit: (exerciseId: string) => void;
   isExpanded: boolean;
-  onToggleExpand: () => void;
+  onToggleExpand: (exIndex: number) => void;
 }) {
   if (!exercise) return <></>;
 
@@ -107,7 +107,7 @@ function ExerciseManagementListEntry({
           </span>
         </span>
         <div className="actions">
-          <Button className="p-0" onClick={onToggleExpand}>👁️</Button>
+          <Button className="p-0" onClick={() => onToggleExpand(exercise.exIndex)}>👁️</Button>
           <Button className="p-0" onClick={handleEditClick}>✏️</Button>
         </div>
       </div>
@@ -160,7 +160,7 @@ export function ExerciseManagementPage({
 
   //use states for getting and setting specific attributes of exercises and music
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
-  const [expandedExerciseId, setExpandedExerciseId] = useState<number | null>(null);
+  const [expandedExerciseIds, setExpandedExerciseIds] = useState<number[]>([]);
 
   /* const [mode, setMode] = useState<boolean>(false); */
 
@@ -711,8 +711,8 @@ export function ExerciseManagementPage({
             </div>
 
             <div className="pagination-controls-row">
-              <Button 
-                onClick={goToPreviousPage} 
+              <Button
+                onClick={goToPreviousPage}
                 disabled={currentPage === 1}
                 variant="outline-primary"
                 size="sm"
@@ -720,7 +720,7 @@ export function ExerciseManagementPage({
               >
                 ← Previous
               </Button>
-              
+
               <div className="pagination-page-numbers">
                 {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
                   <Button
@@ -734,9 +734,9 @@ export function ExerciseManagementPage({
                   </Button>
                 ))}
               </div>
-              
-              <Button 
-                onClick={goToNextPage} 
+
+              <Button
+                onClick={goToNextPage}
                 disabled={currentPage === totalPages}
                 variant="outline-primary"
                 size="sm"
@@ -747,6 +747,29 @@ export function ExerciseManagementPage({
             </div>
           </div>
         )}
+
+        {/* Preview All and Collapse All Buttons */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '4px', marginTop: '0', marginBottom: '0.5rem' }}>
+          <Button
+            onClick={() => {
+              const currentExerciseIds = currentExercises.map(ex => ex?.exIndex).filter((id): id is number => id !== undefined);
+              setExpandedExerciseIds(currentExerciseIds);
+            }}
+            variant="primary"
+            className="preview-all-btn"
+          >
+            Preview All
+          </Button>
+          <Button
+            onClick={() => {
+              setExpandedExerciseIds([]);
+            }}
+            variant="primary"
+            className="collapse-all-btn"
+          >
+            Collapse All
+          </Button>
+        </div>
 
         {/*returning exercise data */}
         {exerciseConfig.showExercises &&
@@ -760,10 +783,14 @@ export function ExerciseManagementPage({
                 isSelected={selectedIndexes.includes(exercise.exIndex)}
                 handleSelectExercise={handleSelectExercise}
                 onEdit={handleEdit}
-                isExpanded={expandedExerciseId === exercise.exIndex}
-                onToggleExpand={() => setExpandedExerciseId(
-                  expandedExerciseId === exercise.exIndex ? null : exercise.exIndex
-                )}
+                isExpanded={expandedExerciseIds.includes(exercise.exIndex)}
+                onToggleExpand={(exIndex) => {
+                  if (expandedExerciseIds.includes(exIndex)) {
+                    setExpandedExerciseIds(expandedExerciseIds.filter(id => id !== exIndex));
+                  } else {
+                    setExpandedExerciseIds([...expandedExerciseIds, exIndex]);
+                  }
+                }}
               />
             );
           })}
