@@ -33,9 +33,19 @@
 }
 
 .exercise-score-preview.expanded {
-    max-height: 1000px;
+    max-height: none;
     padding: 1rem;
     margin-bottom: 0.5rem;
+    height: auto;
+}
+
+.exercise-score-preview .score-preview-container {
+    min-height: auto !important;
+    max-height: none !important;
+}
+
+.exercise-score-preview .abc-score-display {
+    min-height: auto !important;
 }
 
 .exercise-management-list-entry.active {
