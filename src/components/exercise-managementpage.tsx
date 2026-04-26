@@ -1,7 +1,7 @@
 import "../styles/exercises/index.css";
 import "../styles/logout-modal.css";
 import "../styles/exercises/pagination.css";
-import { Button } from "react-bootstrap";
+import { Button, SplitButton, Dropdown } from "react-bootstrap";
 import ExerciseData from "../interfaces/exerciseData";
 import { LogoutModal } from "./modals/LogoutModal";
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
@@ -749,7 +749,7 @@ export function ExerciseManagementPage({
         )}
 
         {/* Preview All and Collapse All Buttons */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '4px', marginTop: '0', marginBottom: '0.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '4px', marginBottom: '0.5rem' }}>
           <Button
             onClick={() => {
               const currentExerciseIds = currentExercises.map(ex => ex?.exIndex).filter((id): id is number => id !== undefined);
@@ -766,6 +766,7 @@ export function ExerciseManagementPage({
             }}
             variant="primary"
             className="collapse-all-btn"
+            disabled={expandedExerciseIds.length === 0}
           >
             Collapse All
           </Button>

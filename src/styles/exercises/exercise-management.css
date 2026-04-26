@@ -4,15 +4,17 @@
 
 .exercise-management-list-entry {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     cursor: default;
     transition: margin-bottom 0s 0.325s;
+    gap: 8px;
+}
 
-    span.custom-id {
-        font-size: 0.8em;
-        color: #666;
-    }
+.exercise-management-list-entry .actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
 }
 
 .exercise-management-entry-wrapper:has(.exercise-score-preview.expanded) .exercise-management-list-entry {
@@ -23,9 +25,6 @@
 .exercise-score-preview {
     background: #fff;
     border: 1px solid #ddd;
-    border-top: none;
-    border-radius: 0 0 8px 8px;
-    padding: 0 1rem;
     margin-top: -1px;
     max-height: 0;
     overflow: hidden;
@@ -33,9 +32,19 @@
 }
 
 .exercise-score-preview.expanded {
-    max-height: 1000px;
+    max-height: none;
     padding: 1rem;
     margin-bottom: 0.5rem;
+    height: auto;
+}
+
+.exercise-score-preview .score-preview-container {
+    min-height: auto !important;
+    max-height: none !important;
+}
+
+.exercise-score-preview .abc-score-display {
+    min-height: auto !important;
 }
 
 .exercise-management-list-entry.active {
@@ -43,11 +52,6 @@
     border-color: #fd0d0d;
     box-shadow: 0 0 0 2px rgba(253, 13, 13, 0.15);
     font-weight: 600;
-}
-
-.exercise-management-list-entry .actions {
-    display: flex;
-    gap: 8px;
 }
 
 .exercise-management-list-entry .actions .btn {
@@ -99,9 +103,58 @@
     background: #4e81b3;
 }
 
+.collapse-all-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
 .preview-all-btn,
 .collapse-all-btn {
     margin: 0 !important;
+}
+
+/* Collapse All button styles */
+.collapse-all-btn {
+    background: #1659c1;
+    border: none;
+    padding: 10px 24px;
+    font-weight: 600;
+    border-radius: 8px;
+    color: white;
+}
+
+.collapse-all-btn:hover {
+    background: #4e81b3;
+}
+
+.collapse-all-btn:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+.dropdown-menu {
+    background: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 160px;
+}
+
+.dropdown-item {
+    color: #2c3e50;
+    font-weight: 500;
+    padding: 8px 16px;
+    transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+    background: #1659c1;
+    color: white;
+}
+
+.dropdown-item:active {
+    background: #4e81b3;
+    color: white;
 }
 
 /* Styled filters container for management page */
