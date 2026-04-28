@@ -24,6 +24,14 @@ function Header({ authorized, resetScrollPosition }: { authorized: boolean; rese
     }
   }, [resetScrollPosition]);
 
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
   <header className="App-header">
         
@@ -46,8 +54,9 @@ function Header({ authorized, resetScrollPosition }: { authorized: boolean; rese
     : <></>}
     </Nav>
 
+    {!(windowWidth < 1600 && !isMobile) && (
     <div style={{ position: 'absolute', right: '50%', transform: 'translateX(50%)', textAlign: 'center' }}>
-      <div style={{display: 'flex', flexDirection:'column', alignItems: 'center', gap:0}}>
+      <div className='titlecard' style={{display: 'flex', flexDirection:'column', alignItems: 'center', gap:0}}>
         <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginBottom: '6px', lineHeight:1, fontSize: '30px'}}>
         University of Delaware
         </Navbar.Brand>
@@ -56,6 +65,7 @@ function Header({ authorized, resetScrollPosition }: { authorized: boolean; rese
         </Navbar.Brand>
       </div>
     </div>
+    )}
 
     <Nav className='Home-nav-right'>
     <Link to="/about" style={{ marginLeft: '-225px' }} onClick={() => handleNavClick("/about")}>About</Link>
