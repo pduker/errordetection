@@ -4,6 +4,7 @@ import "../styles/exercises/pagination.css";
 import { Button, SplitButton, Dropdown } from "react-bootstrap";
 import ExerciseData from "../interfaces/exerciseData";
 import { LogoutModal } from "./modals/LogoutModal";
+import { DeleteConfirmationModal } from "./modals/DeleteConfirmationModal";
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { get, getDatabase, ref, remove } from "firebase/database";
 import { useNavigate } from "react-router-dom";
@@ -140,6 +141,9 @@ export function ExerciseManagementPage({
   // Modal state for logout confirmation
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
 
+  // Modal state for delete confirmation
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+
   // Logout function to end admin mode
   const handleLogout = () => {
     setShowLogoutModal(true);
@@ -151,6 +155,19 @@ export function ExerciseManagementPage({
 
   const cancelLogout = () => {
     setShowLogoutModal(false);
+  };
+
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    setShowDeleteModal(false);
+    handleMultipleExerciseDelete(selectedIndexes);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
   };
 
   const handleEdit = (exerciseId: string) => {
@@ -689,12 +706,14 @@ export function ExerciseManagementPage({
               <Button
                 variant="danger"
                 onClick={resetSort}
+                disabled={tags.length === 0 && diff === "All" && voices === 0 && !transpos && types === "None" && meter === "Anything" && customId === ""}
               >
                 Reset Sort
               </Button>
               <Button
                 variant="danger"
-                onClick={() => handleMultipleExerciseDelete(selectedIndexes)}
+                onClick={handleDeleteClick}
+                disabled={selectedIndexes.length === 0}
               >
                 Delete Selected Exercises
               </Button>
@@ -773,28 +792,30 @@ export function ExerciseManagementPage({
         </div>
 
         {/*returning exercise data */}
-        {exerciseConfig.showExercises &&
-          currentExercises.map((exercise) => {
-            if (!exercise) return <div key={Math.random()} />;
+        <div className="exercise-list-scroll-area">
+          {exerciseConfig.showExercises &&
+            currentExercises.map((exercise) => {
+              if (!exercise) return <div key={Math.random()} />;
 
-            return (
-              <ExerciseManagementListEntry
-                key={exercise.exIndex}
-                exercise={exercise}
-                isSelected={selectedIndexes.includes(exercise.exIndex)}
-                handleSelectExercise={handleSelectExercise}
-                onEdit={handleEdit}
-                isExpanded={expandedExerciseIds.includes(exercise.exIndex)}
-                onToggleExpand={(exIndex) => {
-                  if (expandedExerciseIds.includes(exIndex)) {
-                    setExpandedExerciseIds(expandedExerciseIds.filter(id => id !== exIndex));
-                  } else {
-                    setExpandedExerciseIds([...expandedExerciseIds, exIndex]);
-                  }
-                }}
-              />
-            );
-          })}
+              return (
+                <ExerciseManagementListEntry
+                  key={exercise.exIndex}
+                  exercise={exercise}
+                  isSelected={selectedIndexes.includes(exercise.exIndex)}
+                  handleSelectExercise={handleSelectExercise}
+                  onEdit={handleEdit}
+                  isExpanded={expandedExerciseIds.includes(exercise.exIndex)}
+                  onToggleExpand={(exIndex) => {
+                    if (expandedExerciseIds.includes(exIndex)) {
+                      setExpandedExerciseIds(expandedExerciseIds.filter(id => id !== exIndex));
+                    } else {
+                      setExpandedExerciseIds([...expandedExerciseIds, exIndex]);
+                    }
+                  }}
+                />
+              );
+            })}
+        </div>
 
         {exerciseConfig.showNoExercisesMessage && exList.length === 0 ? (
           <div>No exercises found! Maybe try adding one?</div>
@@ -809,6 +830,14 @@ export function ExerciseManagementPage({
           onCancel={cancelLogout}
           setAuthorized={setAuthorized}
           navigateTo="/exercises"
+        />
+
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmationModal
+          show={showDeleteModal}
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+          exerciseCount={selectedIndexes.length}
         />
       </div>
     </div>

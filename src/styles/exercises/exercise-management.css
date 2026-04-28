@@ -9,6 +9,11 @@
     cursor: default;
     transition: margin-bottom 0s 0.325s;
     gap: 8px;
+    border-radius: 8px;
+}
+
+.exercise-management-list-entry > div:first-child {
+    margin-right: 12px;
 }
 
 .exercise-management-list-entry .actions {
@@ -22,9 +27,21 @@
     transition: none;
 }
 
+.exercise-list-scroll-area {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+button:disabled,
+.btn:disabled,
+.btn[disabled] {
+    cursor: not-allowed !important;
+}
+
 .exercise-score-preview {
     background: #fff;
-    border: 1px solid #ddd;
+    border: none;
     margin-top: -1px;
     max-height: 0;
     overflow: hidden;
@@ -36,6 +53,7 @@
     padding: 1rem;
     margin-bottom: 0.5rem;
     height: auto;
+    border: 1px solid #ddd;
 }
 
 .exercise-score-preview .score-preview-container {

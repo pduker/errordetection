@@ -89,10 +89,10 @@
 /* Compact loading indicator for rerenders */
 .loading-indicator {
   position: fixed;
-  top: 76px; /* Adjusted to better align with navbar */
+  top: 0;
   left: 0;
   width: 100%;
-  height: calc(100vh - 76px); /* Adjusted to better align with navbar */
+  height: 100vh;
   z-index: 998; /* Below navbar but above content */
 }
 
