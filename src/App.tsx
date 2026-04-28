@@ -54,22 +54,10 @@ function Header({ authorized, resetScrollPosition }: { authorized: boolean; rese
     : <></>}
     </Nav>
 
-    {!(windowWidth < 1600 && !isMobile) && (
-    <div style={{ position: 'absolute', right: '50%', transform: 'translateX(50%)', textAlign: 'center' }}>
-      <div className='titlecard' style={{display: 'flex', flexDirection:'column', alignItems: 'center', gap:0}}>
-        <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block', marginBottom: '6px', lineHeight:1, fontSize: '30px'}}>
-        University of Delaware
-        </Navbar.Brand>
-        <Navbar.Brand className='Home-title' style={{ color: '#114b96', display: 'block' }}>
-        Aural Skills Error Detection Practice Site
-        </Navbar.Brand>
-      </div>
-    </div>
-    )}
 
     <Nav className='Home-nav-right'>
-    <Link to="/about" style={{ marginLeft: '-225px' }} onClick={() => handleNavClick("/about")}>About</Link>
-    <Link to="/help" style={{ marginLeft: '10px', paddingRight: '1vw' }} onClick={() => handleNavClick("/help")}>Help</Link>
+    <Link to="/about" style={{ marginLeft: '0' }} onClick={() => handleNavClick("/about")}>About</Link>
+    <Link to="/help" style={{ marginLeft: '10px', paddingRight: '1vw', marginRight: '30px' }} onClick={() => handleNavClick("/help")}>Help</Link>
     </Nav>
     </Navbar>
 
@@ -92,6 +80,7 @@ function App() {
 
   // get data from the database
   const fetchScoresFromDatabase = useCallback(async () => {
+    // TODO: Remove this console log in production
     console.log("Retrieving scores...");
 
     try {
@@ -104,6 +93,7 @@ function App() {
       const scores = await get(query(ref(database, 'scores'), orderByKey()));
       
       if (!scores.exists()) {
+        // TODO: Remove this console log in production
         console.log("No scores found in database");
         setScoresRetrieved(true);
         return;
@@ -135,6 +125,7 @@ function App() {
       setAllExData(exerciseList); // once we've fetched and filled out our list, commit it to React state
       setScoresRetrieved(true); // all done!
     } catch (error) {
+      // TODO: Remove this console log in production
       console.error('Error fetching scores:', error);
       setScoresRetrieved(true); // Set to true to prevent infinite loading
     }
