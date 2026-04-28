@@ -172,6 +172,35 @@ export function Exercise({
      // return counts; at some point if we want to display this info on the frontend or use it to unlock content or something
   }
 
+  function trackCheckClicks() {
+  const saved = localStorage.getItem("userProgress");
+  if (!saved) return;
+
+  try {
+    const progress = JSON.parse(saved);
+    const title = ExData.title;
+
+    if (!progress[title]) {
+      progress[title] = {};
+    }
+
+    if (!progress[title].checkClicks) {
+      progress[title].checkClicks = 0;
+    }
+
+    progress[title].checkClicks += 1;
+
+    localStorage.setItem("userProgress", JSON.stringify(progress));
+
+    console.log(
+      `${title} clicks:`,
+      progress[title].checkClicks
+    );
+  } catch (err) {
+    console.error("Error updating clicks:", err);
+  }
+}
+
 useEffect(() => {
   countExerciseTypes();
 }, []);
@@ -2184,7 +2213,10 @@ useEffect(() => {
               {canCheckAnswers && (
                 <button
                   className="btnback exercise-action-check"
-                  onClick={checkAnswers}
+                  onClick={() => {
+                      checkAnswers();
+                      trackCheckClicks();
+                    }}
                 >
                   Check Answer
                 </button>
