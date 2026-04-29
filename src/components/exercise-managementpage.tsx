@@ -1,7 +1,7 @@
 import "../styles/exercises/index.css";
 import "../styles/logout-modal.css";
 import "../styles/exercises/pagination.css";
-import { Button, SplitButton, Dropdown } from "react-bootstrap";
+import { Button } from "react-bootstrap";
 import ExerciseData from "../interfaces/exerciseData";
 import { LogoutModal } from "./modals/LogoutModal";
 import { DeleteConfirmationModal } from "./modals/DeleteConfirmationModal";
