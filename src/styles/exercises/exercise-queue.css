@@ -174,14 +174,13 @@
   cursor: pointer;
 }
 
-.exercise-queue__chevron {
+.exercise-queue__chevron { /* exercises container */
   width: 1.2rem;
   height: 1.2rem;
   border-radius: 50%;
   border: 2px solid rgba(31, 5, 69, 0.3);
   position: relative;
   transition: transform 0.25s ease;
-  margin: 10px;
 }
 
 .exercise-queue__chevron::after {
