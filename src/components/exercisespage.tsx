@@ -200,7 +200,7 @@ function ExerciseQueueComponent({
               const globalIndex = startIndex + idx;
               return (
                 <div
-                  key={exercise.title}
+                  key={exercise.exIndex}
                   id={exercise.title}
                   onClick={() => selectExerciseAtIndex(globalIndex)}
                   role="button"
