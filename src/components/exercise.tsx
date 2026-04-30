@@ -169,7 +169,7 @@ export function Exercise({
 
   //for disabling ui elements
   const rhythmOnly = tags.length === 1 && tags.includes("Rhythm");
-  const canCheckAnswers = abcFile !== undefined && abcFile !== "" && loaded;
+  const canCheckAnswers = abcFile !== undefined && abcFile !== "";
 
   // try to load score when there's either exerciseData or an abc file to pull from
   useEffect(() => {
@@ -2188,14 +2188,13 @@ export function Exercise({
               <></>
             )}
             <div className="exercise-action-buttons">
-              {canCheckAnswers && (
-                <button
-                  className="btnback exercise-action-check"
-                  onClick={checkAnswers}
-                >
-                  Check Answer
-                </button>
-              )}
+              <button
+                className="btnback exercise-action-check" // fixed button resizing
+                onClick={checkAnswers}
+                style={{ visibility: canCheckAnswers ? "visible" : "hidden" }}
+              >
+                Check Answer
+              </button>
               <Button
                 variant="danger"
                 onClick={exReload}
