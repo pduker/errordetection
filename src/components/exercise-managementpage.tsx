@@ -144,12 +144,26 @@ export function ExerciseManagementPage({
   // Modal state for logout confirmation
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
 
-  // Modal state for success message
-  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
+  // Success banner state
+  const [showSuccessBanner, setShowSuccessBanner] = useState<boolean>(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
 
   // Modal state for delete confirmation
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+
+  // Check for login success flag on mount
+  useEffect(() => {
+    const showLoginSuccess = localStorage.getItem('showLoginSuccess');
+    if (showLoginSuccess === 'true') {
+      setSuccessMessage("Successfully logged in");
+      setShowSuccessBanner(true);
+      localStorage.removeItem('showLoginSuccess');
+    }
+  }, []);
+
+  const closeSuccessBanner = () => {
+    setShowSuccessBanner(false);
+  };
 
   // Logout function to end admin mode
   const handleLogout = () => {
@@ -172,10 +186,6 @@ export function ExerciseManagementPage({
 
   const cancelLogout = () => {
     setShowLogoutModal(false);
-  };
-
-  const closeSuccessModal = () => {
-    setShowSuccessModal(false);
   };
 
   const handleDeleteClick = () => {
@@ -861,9 +871,9 @@ export function ExerciseManagementPage({
 
         {/* Success Banner */}
         <SuccessBanner
-          show={showSuccessModal}
+          show={showSuccessBanner}
           message={successMessage}
-          onClose={closeSuccessModal}
+          onClose={closeSuccessBanner}
         />
       </div>
     </div>
