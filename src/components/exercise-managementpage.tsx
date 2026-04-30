@@ -5,11 +5,14 @@ import { Button } from "react-bootstrap";
 import ExerciseData from "../interfaces/exerciseData";
 import { LogoutModal } from "./modals/LogoutModal";
 import { DeleteConfirmationModal } from "./modals/DeleteConfirmationModal";
+import { SuccessBanner } from "./modals/SuccessBanner";
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { get, getDatabase, ref, remove } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import { exerciseConfig } from "../config/exercise-config";
 import abcjs from "abcjs";
+import { signOut } from 'firebase/auth';
+import { auth } from '../services/database';
 
 import "../styles/exercises/exercise-management.css";
 
@@ -141,16 +144,44 @@ export function ExerciseManagementPage({
   // Modal state for logout confirmation
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
 
+  // Success banner state
+  const [showSuccessBanner, setShowSuccessBanner] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
+
   // Modal state for delete confirmation
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+
+  // Check for login success flag on mount
+  useEffect(() => {
+    const showLoginSuccess = localStorage.getItem('showLoginSuccess');
+    if (showLoginSuccess === 'true') {
+      setSuccessMessage("Successfully logged in");
+      setShowSuccessBanner(true);
+      localStorage.removeItem('showLoginSuccess');
+    }
+  }, []);
+
+  const closeSuccessBanner = () => {
+    setShowSuccessBanner(false);
+  };
 
   // Logout function to end admin mode
   const handleLogout = () => {
     setShowLogoutModal(true);
   };
 
-  const confirmLogout = () => {
-    setShowLogoutModal(false);
+  const confirmLogout = async () => {
+    try {
+      await signOut(auth);
+      setAuthorized(false);
+      localStorage.removeItem('adminAuthorized');
+      localStorage.setItem('showLogoutSuccess', 'true');
+      console.log("Logged out successfully");
+      setShowLogoutModal(false);
+      navigate("/exercises");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   const cancelLogout = () => {
@@ -828,8 +859,6 @@ export function ExerciseManagementPage({
           show={showLogoutModal}
           onConfirm={confirmLogout}
           onCancel={cancelLogout}
-          setAuthorized={setAuthorized}
-          navigateTo="/exercises"
         />
 
         {/* Delete Confirmation Modal */}
@@ -838,6 +867,13 @@ export function ExerciseManagementPage({
           onConfirm={confirmDelete}
           onCancel={cancelDelete}
           exerciseCount={selectedIndexes.length}
+        />
+
+        {/* Success Banner */}
+        <SuccessBanner
+          show={showSuccessBanner}
+          message={successMessage}
+          onClose={closeSuccessBanner}
         />
       </div>
     </div>

@@ -8,13 +8,14 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import noteKey from "../assets/note-color-key.png"
 import exExample from "../assets/excersie-example.png"
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "../services/database"
 import execPage from "../assets/exc-page.png";
 import filterSec from "../assets/filterPage.png";
 import click from "../assets/noteClick.png";
 import check from "../assets/check-answer.png";
 import { LogoutModal } from "./modals/LogoutModal";
+import { SuccessBanner } from "./modals/SuccessBanner";
 
 //function for creating the help page, for authorized users
 export function HelpPage({
@@ -37,16 +38,17 @@ export function HelpPage({
           console.log("Attempting login with email:", email);
           const userCredential = await signInWithEmailAndPassword(auth, email, password);
           console.log("Login successful! Logged in as:", userCredential.user.email);
-          
+
           // Set admin privileges based on login - useEffect will handle navigation
           setAuthorized(true);
           setJustLoggedIn(true);
+          localStorage.setItem('showLoginSuccess', 'true');
           setError("");
-          
+
         } catch (error: any) {
           console.error("Login failed:", error);
           let errorMessage = "Login failed. Please check your credentials.";
-          
+
           if (error.code === 'auth/user-not-found') {
             errorMessage = "User not found. Please check the email address.";
           } else if (error.code === 'auth/wrong-password') {
@@ -58,7 +60,7 @@ export function HelpPage({
           } else if (error.code === 'auth/too-many-requests') {
             errorMessage = "Too many failed attempts. Please try again later.";
           }
-          
+
           setError(errorMessage);
         }
     };
@@ -67,8 +69,17 @@ export function HelpPage({
         setShowLogoutModal(true);
     };
 
-    const confirmLogout = () => {
-        setShowLogoutModal(false);
+    const confirmLogout = async () => {
+        try {
+            await signOut(auth);
+            setAuthorized(false);
+            localStorage.removeItem('adminAuthorized');
+            console.log("Logged out successfully");
+            setShowLogoutModal(false);
+            navigate("/exercises");
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
     };
 
     const cancelLogout = () => {
@@ -281,11 +292,10 @@ export function HelpPage({
         </div>
 
         {/* Logout Confirmation Modal */}
-        <LogoutModal 
+        <LogoutModal
             show={showLogoutModal}
             onConfirm={confirmLogout}
             onCancel={cancelLogout}
-            setAuthorized={setAuthorized}
         />
         </>
     );
