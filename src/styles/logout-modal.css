@@ -95,3 +95,56 @@
 .modal-btn-confirm:hover {
   background: #c82333;
 }
+
+/* Success Banner Styles */
+.success-banner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 2000;
+  animation: slideDown 0.3s ease-out;
+}
+
+.success-banner-overlay.exiting {
+  animation: slideUp 0.3s ease-out forwards;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+.success-banner {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  padding: 16px 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.success-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.success-message {
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+}

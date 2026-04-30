@@ -4,6 +4,7 @@ import ExerciseData from '../interfaces/exerciseData';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Button } from 'react-bootstrap';
 import { AppSidebar } from './sidebar';
+import { SuccessBanner } from './modals/SuccessBanner';
 
 const pageSize = 5; //show 5 exercises at a time
 
@@ -310,6 +311,24 @@ export function ExercisesPage({
 
     const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
 
+    // Success banner state
+    const [showSuccessBanner, setShowSuccessBanner] = useState<boolean>(false);
+    const [successMessage, setSuccessMessage] = useState<string>("");
+
+    // Check for logout success flag on mount
+    useEffect(() => {
+        const showLogoutSuccess = localStorage.getItem('showLogoutSuccess');
+        if (showLogoutSuccess === 'true') {
+            setSuccessMessage("Successfully logged out");
+            setShowSuccessBanner(true);
+            localStorage.removeItem('showLogoutSuccess');
+        }
+    }, []);
+
+    const closeSuccessBanner = () => {
+        setShowSuccessBanner(false);
+    };
+
     const filteredExercises = React.useMemo(() => {
         const baseList = allExData.filter((exercise): exercise is ExerciseData => exercise !== undefined);
         const filtered = baseList.filter((exercise) => {
@@ -478,9 +497,14 @@ export function ExercisesPage({
     //html to render page
     return (
         <div className="fullpage">
-            <div className="ex-page-container"> 
+            <SuccessBanner
+                show={showSuccessBanner}
+                message={successMessage}
+                onClose={closeSuccessBanner}
+            />
+            <div className="ex-page-container">
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
-                    <div className = "two-column-wrapper"> 
+                    <div className = "two-column-wrapper">
                         <div className="ex-left">
                             <FiltersComponent
                                 tags={tags}

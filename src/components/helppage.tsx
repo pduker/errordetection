@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import noteKey from "../assets/note-color-key.png"
 import exExample from "../assets/excersie-example.png"
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth } from "../services/database"
 import execPage from "../assets/exc-page.png";
 import filterSec from "../assets/filterPage.png";
@@ -67,8 +67,17 @@ export function HelpPage({
         setShowLogoutModal(true);
     };
 
-    const confirmLogout = () => {
-        setShowLogoutModal(false);
+    const confirmLogout = async () => {
+        try {
+            await signOut(auth);
+            setAuthorized(false);
+            localStorage.removeItem('adminAuthorized');
+            console.log("Logged out successfully");
+            setShowLogoutModal(false);
+            navigate("/exercises");
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
     };
 
     const cancelLogout = () => {
@@ -281,11 +290,10 @@ export function HelpPage({
         </div>
 
         {/* Logout Confirmation Modal */}
-        <LogoutModal 
+        <LogoutModal
             show={showLogoutModal}
             onConfirm={confirmLogout}
             onCancel={cancelLogout}
-            setAuthorized={setAuthorized}
         />
         </>
     );
