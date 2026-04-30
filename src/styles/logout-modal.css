@@ -36,6 +36,10 @@
 .modal-header {
   padding: 20px 24px 16px;
   border-bottom: 1px solid #e9ecef;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .modal-header h3 {
@@ -47,6 +51,7 @@
 
 .modal-body {
   padding: 20px 24px;
+  text-align: center;
 }
 
 .modal-body p {
@@ -60,7 +65,7 @@
   border-top: 1px solid #e9ecef;
   display: flex;
   gap: 12px;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .modal-btn {
