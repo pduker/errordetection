@@ -151,6 +151,10 @@ export function ExerciseManagementPage({
   // Modal state for delete confirmation
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
 
+  // Modal state for info overlay
+  const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
+  const infoButtonRef = useRef<HTMLButtonElement>(null);
+
   // Check for login success flag on mount
   useEffect(() => {
     const showLoginSuccess = localStorage.getItem('showLoginSuccess');
@@ -603,11 +607,30 @@ export function ExerciseManagementPage({
       <div>
         <div className="exercise-management">
           <div className="exercise-management-row">
-            <h5 style={{ marginTop: "8px", fontStyle: "italic" }}>
-            Click the + in the top right to add a new exercise, then edit as needed
-            and save. <br /> To edit an existing exercise, click on the pencil icon
-            next to the corresponding exercise in the list below.
-            </h5>
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", position: "relative" }}>
+              <button
+                ref={infoButtonRef}
+                onClick={() => setShowInfoModal(true)}
+                style={{
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "50%",
+                  border: "2px solid #114b96",
+                  backgroundColor: "white",
+                  color: "#114b96",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                }}
+                title="Information"
+              >
+                i
+              </button>
+            </div>
             <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
               <button
                 onClick={handleLogout}
@@ -860,6 +883,39 @@ export function ExerciseManagementPage({
           onConfirm={confirmLogout}
           onCancel={cancelLogout}
         />
+
+        {/* Info Dropdown */}
+        {showInfoModal && (
+          <>
+            <div
+              className="info-dropdown-backdrop"
+              onClick={() => setShowInfoModal(false)}
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 999,
+              }}
+            />
+            <div
+              className="info-dropdown"
+              style={{
+                position: "absolute",
+                top: infoButtonRef.current?.getBoundingClientRect().top ?? 0,
+                left: (infoButtonRef.current?.getBoundingClientRect().right ?? 0) + 12,
+              }}
+            >
+              <p>
+                <span className="label-add">Add:</span> Click the <strong>+</strong> in the top right to <span className="label-add">add a new exercise</span>, then edit as needed and <span className="label-save">save</span>.
+              </p>
+              <p>
+                <span className="label-edit">Edit:</span> Click the <strong>pencil icon</strong> next to any exercise in the list below to <span className="label-edit">edit existing exercises</span>.
+              </p>
+            </div>
+          </>
+        )}
 
         {/* Delete Confirmation Modal */}
         <DeleteConfirmationModal
