@@ -37,7 +37,7 @@ To manage or upload new exercises:
    Open the main dashboard and select the `Help` tab in the top navigation menu.
 
 2. **Log In as Admin**  
-   A login form will be displayed. Use the admin credentials to sign in.
+   Scroll to the bottom of the page. A login form will be displayed. Use the admin credentials to sign in.
 
 3. **Credentials**  
    Admin emails and passwords are stored securely in Firebase. Contact Professor Duker for access.
