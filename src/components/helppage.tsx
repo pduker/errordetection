@@ -74,6 +74,7 @@ export function HelpPage({
             await signOut(auth);
             setAuthorized(false);
             localStorage.removeItem('adminAuthorized');
+            localStorage.setItem('showLogoutSuccess', 'true');
             console.log("Logged out successfully");
             setShowLogoutModal(false);
             navigate("/exercises");
