@@ -843,7 +843,7 @@ export function ExerciseManagementPage({
           </div>
         )}
 
-        {/* Select All, Preview All, and Collapse All Buttons */}
+        {/* Select All, Preview All/Collapse All Button */}
         <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '4px', marginBottom: '0.5rem' }}>
           <Button
             onClick={handleSelectAll}
@@ -854,24 +854,19 @@ export function ExerciseManagementPage({
           </Button>
           <Button
             onClick={() => {
-              const allExerciseIds = exList.map((ex, index) => indexOfFirstExercise + index);
-              setExpandedExerciseIds(allExerciseIds);
+              if (expandedExerciseIds.length === exList.length) {
+                // All are expanded, so collapse all
+                setExpandedExerciseIds([]);
+              } else {
+                // Not all are expanded, so expand all
+                const allExerciseIds = exList.map((ex, index) => indexOfFirstExercise + index);
+                setExpandedExerciseIds(allExerciseIds);
+              }
             }}
             variant="primary"
             className="collapse-all-btn"
-            disabled={expandedExerciseIds.length === exList.length}
           >
-            Preview All
-          </Button>
-          <Button
-            onClick={() => {
-              setExpandedExerciseIds([]);
-            }}
-            variant="primary"
-            className="collapse-all-btn"
-            disabled={expandedExerciseIds.length === 0}
-          >
-            Collapse All
+            {expandedExerciseIds.length === exList.length ? 'Collapse All' : 'Preview All'}
           </Button>
         </div>
 
@@ -938,10 +933,10 @@ export function ExerciseManagementPage({
               }}
             >
               <p>
-                <span className="label-add">Add:</span> Click the <strong>+</strong> in the top right to <span className="label-add">add a new exercise</span>, then edit as needed and <span className="label-save">save</span>.
+                <span className="label-add">Add:</span> Click the <strong>[+] (plus icon)</strong> in top right to add a new exercise, then edit as needed and save.
               </p>
               <p>
-                <span className="label-edit">Edit:</span> Click the <strong>pencil icon</strong> next to any exercise in the list below to <span className="label-edit">edit existing exercises</span>.
+                <span className="label-edit">Edit:</span> Click the <strong>✏️ (pencil icon)</strong> next to any exercise in the list below to edit existing exercises.
               </p>
             </div>
           </>

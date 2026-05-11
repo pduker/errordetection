@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ExerciseData from "../interfaces/exerciseData";
 import { ConfirmationModal } from "./modals/confirmation-modal";
+import { ExerciseSuccessModal } from "./modals/ExerciseSuccessModal";
 import { getDatabase, ref, set, push } from "firebase/database";
 import { vertaal } from "xml2abc";
 import "../styles/create-exercise.css";
@@ -40,6 +41,8 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [showFileRemoveModal, setShowFileRemoveModal] = useState<boolean>(false);
   const [fileToRemoveType, setFileToRemoveType] = useState<"musicxml" | "audio" | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
   const [isRemovingFile, setIsRemovingFile] = useState<boolean>(false);
   const [fieldErrors, setFieldErrors] = useState<{
     tags: boolean;
@@ -308,16 +311,20 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       // Refresh the exercises list from database
       await refreshExercises();
       
-      alert("Exercise created successfully!");
-      
-      // Add a small delay to ensure the state is updated before navigation
-      setTimeout(() => {
-        navigate("/exercise-management");
-      }, 100);
+      setSuccessMessage("Exercise created successfully!");
+      setShowSuccessModal(true);
     } catch (error) {
       console.error("Error saving exercise:", error);
       alert("Error saving exercise. Please try again.");
     }
+  };
+
+  const handleSuccessModalOk = () => {
+    setShowSuccessModal(false);
+    // Add a small delay to ensure the state is updated before navigation
+    setTimeout(() => {
+      navigate("/exercise-management");
+    }, 100);
   };
 
   const hasUnsavedData = (): boolean => {
@@ -441,13 +448,19 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       />
       
       <ConfirmationModal
-        show={showFileErrorModal}
-        onHide={handleFileErrorConfirm}
-        onConfirm={handleFileErrorConfirm}
-        title="Invalid File Type"
-        message={getFileErrorMessage()}
-        confirmText="OK"
-        hideCancelButton={true}
+        show={showFileRemoveModal}
+        onHide={handleFileRemoveCancel}
+        onConfirm={handleFileRemoveConfirm}
+        title="Confirm File Removal"
+        message={`Are you sure you want to remove the ${fileToRemoveType} file?`}
+        confirmText="Remove"
+        cancelText="Cancel"
+      />
+      
+      <ExerciseSuccessModal
+        show={showSuccessModal}
+        onOk={handleSuccessModalOk}
+        message={successMessage}
       />
       
       <ConfirmationModal

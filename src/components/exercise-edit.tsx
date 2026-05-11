@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ExerciseData from "../interfaces/exerciseData";
 import { ConfirmationModal } from "./modals/confirmation-modal";
+import { ExerciseSuccessModal } from "./modals/ExerciseSuccessModal";
 import { getDatabase, ref, set, get } from "firebase/database";
 import { getStorage, ref as storageRef, getBlob } from "firebase/storage";
 import { vertaal } from "xml2abc";
@@ -42,6 +43,8 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [showFileRemoveModal, setShowFileRemoveModal] = useState<boolean>(false);
   const [fileToRemoveType, setFileToRemoveType] = useState<"musicxml" | "audio" | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
   const [isRemovingFile, setIsRemovingFile] = useState<boolean>(false);
   const [originalExercise, setOriginalExercise] = useState<ExerciseData | null>(null);
   const [exerciseKey, setExerciseKey] = useState<string>("");
@@ -396,15 +399,20 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
       
       await refreshExercises();
 
-      alert("Exercise updated successfully!");
-
-      setTimeout(() => {
-        navigate("/exercise-management");
-      }, 100);
+      setSuccessMessage("Exercise updated successfully!");
+      setShowSuccessModal(true);
     } catch (error) {
       console.error("Error updating exercise:", error);
       alert("Error updating exercise. Please try again.");
     }
+  };
+
+  const handleSuccessModalOk = () => {
+    setShowSuccessModal(false);
+    // Add a small delay to ensure the state is updated before navigation
+    setTimeout(() => {
+      navigate("/exercise-management");
+    }, 100);
   };
 
   const hasUnsavedData = (): boolean => {
@@ -551,16 +559,6 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
       />
       
       <ConfirmationModal
-        show={showFileErrorModal}
-        onHide={handleFileErrorConfirm}
-        onConfirm={handleFileErrorConfirm}
-        title="Invalid File Type"
-        message={getFileErrorMessage()}
-        confirmText="OK"
-        hideCancelButton={true}
-      />
-      
-      <ConfirmationModal
         show={showValidationErrorModal}
         onHide={handleValidationErrorConfirm}
         onConfirm={handleValidationErrorConfirm}
@@ -578,6 +576,12 @@ export function EditExercisePage({ allExData, setAllExData, refreshExercises }: 
         message="You have made edits to the score (selected notes or feedback items). Removing the MusicXML file will discard all these edits. Are you sure you want to continue?"
         confirmText="Yes, Remove File"
         cancelText="No, Keep File"
+      />
+      
+      <ExerciseSuccessModal
+        show={showSuccessModal}
+        onOk={handleSuccessModalOk}
+        message={successMessage}
       />
     </div>
   );
