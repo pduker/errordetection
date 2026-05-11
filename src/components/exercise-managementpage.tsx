@@ -155,6 +155,9 @@ export function ExerciseManagementPage({
   const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
   const infoButtonRef = useRef<HTMLButtonElement>(null);
 
+  // State to track if all items are selected
+  const [allSelected, setAllSelected] = useState<boolean>(false);
+
   // Check for login success flag on mount
   useEffect(() => {
     const showLoginSuccess = localStorage.getItem('showLoginSuccess');
@@ -167,6 +170,25 @@ export function ExerciseManagementPage({
 
   const closeSuccessBanner = () => {
     setShowSuccessBanner(false);
+  };
+
+  const handleSelectAll = () => {
+    // Filter out undefined exercises
+    const validExercises = exList.filter((ex): ex is ExerciseData => ex !== undefined);
+    
+    // Check if all current exercises are selected
+    const allCurrentSelected = validExercises.length > 0 && validExercises.every(ex => selectedIndexes.includes(ex.exIndex));
+    
+    if (allCurrentSelected) {
+      // Deselect all
+      setSelectedIndexes([]);
+      setAllSelected(false);
+    } else {
+      // Select all
+      const allIndexes = validExercises.map(ex => ex.exIndex);
+      setSelectedIndexes(allIndexes);
+      setAllSelected(true);
+    }
   };
 
   // Logout function to end admin mode
@@ -821,15 +843,23 @@ export function ExerciseManagementPage({
           </div>
         )}
 
-        {/* Preview All and Collapse All Buttons */}
+        {/* Select All, Preview All, and Collapse All Buttons */}
         <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '4px', marginBottom: '0.5rem' }}>
           <Button
+            onClick={handleSelectAll}
+            variant="primary"
+            className="collapse-all-btn"
+          >
+            {allSelected ? 'Deselect All' : 'Select All'}
+          </Button>
+          <Button
             onClick={() => {
-              const currentExerciseIds = currentExercises.map(ex => ex?.exIndex).filter((id): id is number => id !== undefined);
-              setExpandedExerciseIds(currentExerciseIds);
+              const allExerciseIds = exList.map((ex, index) => indexOfFirstExercise + index);
+              setExpandedExerciseIds(allExerciseIds);
             }}
             variant="primary"
-            className="preview-all-btn"
+            className="collapse-all-btn"
+            disabled={expandedExerciseIds.length === exList.length}
           >
             Preview All
           </Button>
