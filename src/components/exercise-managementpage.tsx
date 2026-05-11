@@ -933,10 +933,10 @@ export function ExerciseManagementPage({
               }}
             >
               <p>
-                <span className="label-add">Add:</span> Click the <strong>+</strong> in the top right to <span className="label-add">add a new exercise</span>, then edit as needed and <span className="label-save">save</span>.
+                <span className="label-add">Add:</span> Click the <strong>[+] (plus icon)</strong> in top right to add a new exercise, then edit as needed and save.
               </p>
               <p>
-                <span className="label-edit">Edit:</span> Click the <strong>pencil icon</strong> next to any exercise in the list below to <span className="label-edit">edit existing exercises</span>.
+                <span className="label-edit">Edit:</span> Click the <strong>✏️ (pencil icon)</strong> next to any exercise in the list below to edit existing exercises.
               </p>
             </div>
           </>
