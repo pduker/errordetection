@@ -843,7 +843,7 @@ export function ExerciseManagementPage({
           </div>
         )}
 
-        {/* Select All, Preview All, and Collapse All Buttons */}
+        {/* Select All, Preview All/Collapse All Button */}
         <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '4px', marginBottom: '0.5rem' }}>
           <Button
             onClick={handleSelectAll}
@@ -854,24 +854,19 @@ export function ExerciseManagementPage({
           </Button>
           <Button
             onClick={() => {
-              const allExerciseIds = exList.map((ex, index) => indexOfFirstExercise + index);
-              setExpandedExerciseIds(allExerciseIds);
+              if (expandedExerciseIds.length === exList.length) {
+                // All are expanded, so collapse all
+                setExpandedExerciseIds([]);
+              } else {
+                // Not all are expanded, so expand all
+                const allExerciseIds = exList.map((ex, index) => indexOfFirstExercise + index);
+                setExpandedExerciseIds(allExerciseIds);
+              }
             }}
             variant="primary"
             className="collapse-all-btn"
-            disabled={expandedExerciseIds.length === exList.length}
           >
-            Preview All
-          </Button>
-          <Button
-            onClick={() => {
-              setExpandedExerciseIds([]);
-            }}
-            variant="primary"
-            className="collapse-all-btn"
-            disabled={expandedExerciseIds.length === 0}
-          >
-            Collapse All
+            {expandedExerciseIds.length === exList.length ? 'Collapse All' : 'Preview All'}
           </Button>
         </div>
 
