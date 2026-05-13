@@ -35,7 +35,7 @@ function Header({ authorized, resetScrollPosition }: { authorized: boolean; rese
   return (
   <header className="App-header">
         
-    <Navbar className={`Home-bar ${isMobile ? "mobile" : ""}`} fixed={isMobile ? undefined : "top"}>
+  <Navbar expand="lg" className="Home-bar" fixed="top">
 
     <Navbar.Brand>
       <img
@@ -46,19 +46,25 @@ function Header({ authorized, resetScrollPosition }: { authorized: boolean; rese
       className="d-inline-block align-top"
     />
     </Navbar.Brand>
+     
+    {/* Hamburger button for mobile view */}
+    <Navbar.Toggle aria-controls="main-navbar" />
 
-    <Nav className='Home-nav'>
-    <Link to="/exercises" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercises")}>Exercises</Link>
-    {authorized ?
-    <Link to="exercise-management" style={{ marginRight: '10px' }} onClick={() => handleNavClick("exercise-management")}>Exercise Management</Link>
-    : <></>}
-    </Nav>
+    <Navbar.Collapse id="main-navbar">
 
+    {/* Left-aligned nav links */}
+      <Nav className='Home-nav'>
+      <Link to="/exercises" style={{ marginRight: '10px' }} onClick={() => handleNavClick("/exercises")}>Exercises</Link>
+      {authorized ?
+      <Link to="exercise-management" style={{ marginRight: '10px' }} onClick={() => handleNavClick("exercise-management")}>Exercise Management</Link>
+      : <></>}
+      </Nav>
 
-    <Nav className='Home-nav-right'>
-    <Link to="/about" style={{ marginLeft: '0' }} onClick={() => handleNavClick("/about")}>About</Link>
-    <Link to="/help" style={{ marginLeft: '10px', paddingRight: '1vw', marginRight: '30px' }} onClick={() => handleNavClick("/help")}>Help</Link>
-    </Nav>
+      <Nav className='Home-nav-right'>
+      <Link to="/about" onClick={() => handleNavClick("/about")}>About</Link>
+      <Link to="/help" onClick={() => handleNavClick("/help")}>Help</Link>
+      </Nav>
+    </Navbar.Collapse>
     </Navbar>
 
     </header>

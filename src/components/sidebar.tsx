@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 interface AppSidebarProps {
   selectedTags: string[];
@@ -97,7 +97,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
     ],
     []
   );
-
+ 
   return (
     <div className="filters-menu">
       <Section>

@@ -58,6 +58,7 @@ body {
   background-repeat: no-repeat;
   background-position: center;
   overflow-y: auto;
+  overflow: hidden; /* fix scrollbar issue */
 }
 
 ::-webkit-scrollbar {
@@ -101,4 +102,19 @@ h5 {
   color: #51b752;
   margin-top: -40px;
   display: block;
+}
+
+/*Mobile styles*/
+@media only screen and (max-width: 700px) {
+  ::-webkit-scrollbar-thumb {
+    display: none;
+  }
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    display: none;
+  }
 }
