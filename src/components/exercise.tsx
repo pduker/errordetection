@@ -1870,15 +1870,13 @@ export function Exercise({
 
   return (
     <div
-      className="exercise-box" // SIR added exercise box
+      className="exercise-box"
       style={{
-        //exercise example box
         padding: "10px",
         backgroundColor: "#fcfcd2",
         borderRadius: "10px",
-        display: "flex", // SIR: added flex to box
-        flexDirection: "column", // SIR
-        alignItems: "stretch", // SIR
+        display: "flex",
+        flexDirection: "column",
         boxSizing: "border-box",
       }}
     >
@@ -2077,7 +2075,9 @@ export function Exercise({
               <button
                 className="exercise-nav-inline exercise-nav-inline--prev mobile-only"
                 onClick={() => {
-                  const btn = document.querySelector('.exercise-nav-desktop.exercise-nav-inline--prev') as HTMLElement | null;
+                  const btn = document.querySelector(
+                    ".exercise-nav-desktop.exercise-nav-inline--prev",
+                  ) as HTMLElement | null;
                   if (btn) btn.click();
                 }}
                 aria-label="Previous exercise"
@@ -2159,7 +2159,9 @@ export function Exercise({
               <button
                 className="exercise-nav-inline exercise-nav-inline--prev mobile-only"
                 onClick={() => {
-                  const btn = document.querySelector('.exercise-nav-desktop.exercise-nav-inline--prev') as HTMLElement | null;
+                  const btn = document.querySelector(
+                    ".exercise-nav-desktop.exercise-nav-inline--prev",
+                  ) as HTMLElement | null;
                   if (btn) btn.click();
                 }}
                 aria-label="Previous exercise"
@@ -2211,7 +2213,9 @@ export function Exercise({
               <button
                 className="exercise-nav-inline exercise-nav-inline--next mobile-only"
                 onClick={() => {
-                  const btn = document.querySelector('.exercise-nav-desktop.exercise-nav-inline--next') as HTMLElement | null;
+                  const btn = document.querySelector(
+                    ".exercise-nav-desktop.exercise-nav-inline--next",
+                  ) as HTMLElement | null;
                   if (btn) btn.click();
                 }}
                 aria-label="Next exercise"
@@ -2219,16 +2223,16 @@ export function Exercise({
                 →
               </button>
             }
+          </div>
+          <div className="filters-button-row">
+            <div style={{ marginTop: "0" }}>
+              <button
+                className="filters-fab"
+                onClick={() => setFiltersOpen((prev: boolean) => !prev)}
+              >
+                Filters
+              </button>
             </div>
-            <div className="filters-button-row">
-                <div style={{ marginTop: "0" }}>
-                  <button
-                    className="filters-fab"
-                    onClick={() => setFiltersOpen((prev: boolean) => !prev)}
-                  >
-                    Filters
-                  </button>
-                </div>
           </div>
           {canCheckAnswers ? (
             <div>

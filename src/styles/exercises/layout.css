@@ -37,8 +37,8 @@
 }
 
 .ex-right {
-  flex: 1;
-  padding-right: 10px;
+  flex: 1; /* grow to fill remaining space, can shrink */
+  padding-right: 5px;
   margin-left: 0.5vw;
   display: flex;
   flex-direction: column;
@@ -54,7 +54,7 @@
   margin: 0;
   box-sizing: border-box;
   min-height: 360px;
-  margin-bottom: 55px;
+  margin-bottom: 15px;
 }
 
 .exercise-stage {
@@ -76,7 +76,7 @@
   margin: 0;
   display: flex;
   align-items: stretch;
-  min-height: 450px;
+  min-height: 465px;
   border-radius: 24px;
   background: #fff7c9;
   position: relative;
@@ -124,90 +124,4 @@
 .ex-left #boxes,
 .ex-left #dropdowns {
   width: 100%;
-}
-
-@media only screen and (max-width: 700px) {
-  .exercise-viewer {
-    max-width: 100%;
-    width: 100%;
-  }
-  }
-
-
-@media only screen and (max-width: 700px) {
-
-  .ex-right{
-    padding-right: 0;
-    margin-left: 0;
-  }
-  .exercise-nav-mobile .exercise-nav-inline {
-    background: #ffffffcc;
-    border: 1px solid rgba(0,0,0,0.08);
-    border-radius: 8px;
-    padding: 8px 10px;
-    min-width: 44px;
-    min-height: 44px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-  }
-
-  /* Slightly larger hit target on small mobile */
-  .exercise-nav-mobile .exercise-nav-inline {
-    padding: 10px 12px;
-    min-width: 48px;
-    min-height: 48px;
-    font-size: 18px;
-  }
-
-  .exercise-content {
-    margin-top: 1%;
-    height: auto;
-    padding: 0 1rem; /* reduce horizontal padding on small screens */
-  }
-
-  .exercise-stage {
-    height: auto;
-    margin-bottom: -10%;
-  }
-
-  .exercise-nav-mobile {
-    position: static !important;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0 1rem;
-    box-sizing: border-box;
-    gap: 0.5rem;
-    margin-top: 12px;
-    z-index: 1;
-  }
-
-  .exercise-nav-mobile .exercise-nav-inline {
-    flex: 0 0 auto;
-    position: static !important;
-    top: auto !important;
-    left: auto !important;
-    right: auto !important;
-    transform: none !important;
-  }
-
-  /* Ensure the action buttons sit between the prev/next buttons and are centered */
-  .exercise-action-buttons {
-    order: 2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1 1 auto;
-    gap: 0.75rem;
-    padding: 0 0.5rem;
-  }
-
-  .exercise-nav-inline--prev { order: 1; }
-  .exercise-nav-inline--next { order: 3; }
-  
-  /* add space below the exercise content to avoid overlap */
-  .exercise-content {
-    padding-bottom: 64px;
-  }
 }
