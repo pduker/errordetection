@@ -4,7 +4,7 @@ import ExerciseData from "../interfaces/exerciseData";
 import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "react-bootstrap";
 import { AppSidebar } from "./sidebar";
-import { set } from "firebase/database";
+import { SuccessBanner } from './modals/SuccessBanner';
 
 const pageSize = 5; //show 5 exercises at a time
 
