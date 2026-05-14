@@ -4,7 +4,7 @@
 }
 
 .App-header {
-  min-height: 11vh;
+  min-height: 1vh;
   display: inline-block;
   flex-direction: row;
   justify-content: flex-start;
@@ -37,6 +37,9 @@ a:hover {
   }
 }
 
+/* Import controls styles for button styling */
+@import './controls.css';
+
 * {
   margin: 0;
   padding: 0;
@@ -58,7 +61,7 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 20px;
+  width: 18px;
 }
 
 .names {
@@ -98,4 +101,17 @@ h5 {
   color: #51b752;
   margin-top: -40px;
   display: block;
+}
+
+/*Mobile styles*/
+.is-mobile ::-webkit-scrollbar-thumb {
+  display: none;
+}
+
+.is-mobile ::-webkit-scrollbar {
+  display: none;
+}
+
+.is-mobile ::-webkit-scrollbar-thumb:hover {
+  display: none;
 }

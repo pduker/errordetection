@@ -1,49 +1,125 @@
 import "../styles/exercises/index.css";
 import "../styles/logout-modal.css";
+import "../styles/exercises/pagination.css";
 import { Button } from "react-bootstrap";
 import ExerciseData from "../interfaces/exerciseData";
-import { Exercise } from "./exercise";
 import { LogoutModal } from "./modals/LogoutModal";
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { DeleteConfirmationModal } from "./modals/DeleteConfirmationModal";
+import { SuccessBanner } from "./modals/SuccessBanner";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { get, getDatabase, ref, remove } from "firebase/database";
 import { useNavigate } from "react-router-dom";
 import { exerciseConfig } from "../config/exercise-config";
+import abcjs from "abcjs";
+import { signOut } from 'firebase/auth';
+import { auth } from '../services/database';
 
 import "../styles/exercises/exercise-management.css";
+
+function ScorePreview({ abcNotation }: { abcNotation: string }) {
+  const previewRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (abcNotation && previewRef.current) {
+      try {
+        // Remove title line from ABC notation to hide it in the preview
+        const abcWithoutTitle = abcNotation.split('\n').filter(line => !line.startsWith('T:')).join('\n');
+        abcjs.renderAbc(previewRef.current, abcWithoutTitle, {
+          responsive: "resize",
+          lineThickness: 0.4,
+          add_classes: true,
+          staffwidth: 800,
+          wrap: {
+            minSpacing: 1.0,
+            maxSpacing: 2.5,
+            preferredMeasuresPerLine: 4
+          }
+        });
+      } catch (error) {
+        console.error('Error rendering ABC notation:', error);
+      }
+    }
+  }, [abcNotation]);
+
+  return (
+    <div className="score-preview-section">
+      <div className="score-preview-container">
+        <div 
+          className="score-preview-content"
+          style={{ position: 'relative', userSelect: 'none' }}
+        >
+          {abcNotation ? (
+            <div 
+              ref={previewRef}
+              className="abc-score-display"
+            />
+          ) : (
+            <div style={{ 
+              padding: '20px', 
+              textAlign: 'center', 
+              color: '#666',
+              fontStyle: 'italic'
+            }}>
+              No score available
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function ExerciseManagementListEntry({
   exercise,
   isSelected,
   handleSelectExercise,
+  onEdit,
+  isExpanded,
+  onToggleExpand,
 }: {
   exercise: ExerciseData | undefined;
   isSelected: boolean;
   handleSelectExercise: (exIndex: number) => void;
+  onEdit: (exerciseId: string) => void;
+  isExpanded: boolean;
+  onToggleExpand: (exIndex: number) => void;
 }) {
   if (!exercise) return <></>;
 
+  const handleEditClick = () => {
+    const exerciseId = exercise.customId || exercise.exIndex.toString();
+    onEdit(exerciseId);
+  };
+
   return (
-    <div
-      className={`exercise-list-item no-hover exercise-management-list-entry ${isSelected ? "active" : ""}`}
-    >
-      <div>
-        <input
-          type="checkbox"
-          checked={isSelected}
-          onChange={() => handleSelectExercise(exercise.exIndex)}
-        ></input>
-        &nbsp;
-      </div>
-      <span>
-        {exercise.title}{" "}
-        <span className="custom-id">
-          {exercise.customId ? `(ID: ${exercise.customId})` : ""}
+    <div className="exercise-management-entry-wrapper">
+      <div
+        className={`exercise-list-item no-hover exercise-management-list-entry ${isSelected ? "active" : ""}`}
+      >
+        <div>
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => handleSelectExercise(exercise.exIndex)}
+          ></input>
+          &nbsp;
+        </div>
+        <span>
+          {exercise.title}{" "}
+          <span className="custom-id">
+            {exercise.customId ? `(ID: ${exercise.customId})` : ""}
+          </span>
         </span>
-      </span>
-      <div className="actions">
-        <Button className="p-0">👁️</Button>
-        <Button className="p-0">✏️</Button>
+        <div className="actions">
+          <Button className="p-0" onClick={() => onToggleExpand(exercise.exIndex)}>👁️</Button>
+          <Button className="p-0" onClick={handleEditClick}>✏️</Button>
+        </div>
       </div>
+      {exercise.score && (
+        <div className={`exercise-score-preview ${isExpanded ? 'expanded' : ''}`}>
+          <ScorePreview abcNotation={exercise.score} />
+        </div>
+      )}
     </div>
   );
 }
@@ -68,21 +144,97 @@ export function ExerciseManagementPage({
   // Modal state for logout confirmation
   const [showLogoutModal, setShowLogoutModal] = useState<boolean>(false);
 
+  // Success banner state
+  const [showSuccessBanner, setShowSuccessBanner] = useState<boolean>(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
+
+  // Modal state for delete confirmation
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+
+  // Modal state for info overlay
+  const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
+  const infoButtonRef = useRef<HTMLButtonElement>(null);
+
+  // State to track if all items are selected
+  const [allSelected, setAllSelected] = useState<boolean>(false);
+
+  // Check for login success flag on mount
+  useEffect(() => {
+    const showLoginSuccess = localStorage.getItem('showLoginSuccess');
+    if (showLoginSuccess === 'true') {
+      setSuccessMessage("Successfully logged in");
+      setShowSuccessBanner(true);
+      localStorage.removeItem('showLoginSuccess');
+    }
+  }, []);
+
+  const closeSuccessBanner = () => {
+    setShowSuccessBanner(false);
+  };
+
+  const handleSelectAll = () => {
+    // Filter out undefined exercises
+    const validExercises = exList.filter((ex): ex is ExerciseData => ex !== undefined);
+    
+    // Check if all current exercises are selected
+    const allCurrentSelected = validExercises.length > 0 && validExercises.every(ex => selectedIndexes.includes(ex.exIndex));
+    
+    if (allCurrentSelected) {
+      // Deselect all
+      setSelectedIndexes([]);
+      setAllSelected(false);
+    } else {
+      // Select all
+      const allIndexes = validExercises.map(ex => ex.exIndex);
+      setSelectedIndexes(allIndexes);
+      setAllSelected(true);
+    }
+  };
+
   // Logout function to end admin mode
   const handleLogout = () => {
     setShowLogoutModal(true);
   };
 
-  const confirmLogout = () => {
-    setShowLogoutModal(false);
+  const confirmLogout = async () => {
+    try {
+      await signOut(auth);
+      setAuthorized(false);
+      localStorage.removeItem('adminAuthorized');
+      localStorage.setItem('showLogoutSuccess', 'true');
+      console.log("Logged out successfully");
+      setShowLogoutModal(false);
+      navigate("/exercises");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
   };
 
   const cancelLogout = () => {
     setShowLogoutModal(false);
   };
 
+  const handleDeleteClick = () => {
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = () => {
+    setShowDeleteModal(false);
+    handleMultipleExerciseDelete(selectedIndexes);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+  };
+
+  const handleEdit = (exerciseId: string) => {
+    sessionStorage.setItem('managementPage', currentPage.toString());
+    navigate(`/exercise-management/edit/${exerciseId}`);
+  };
+
   //use states for getting and setting specific attributes of exercises and music
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
+  const [expandedExerciseIds, setExpandedExerciseIds] = useState<number[]>([]);
 
   /* const [mode, setMode] = useState<boolean>(false); */
 
@@ -97,7 +249,21 @@ export function ExerciseManagementPage({
 
   const [customId, setCustomId] = useState<string>("");
 
-  //sort function for the exercises - optimized with useCallback
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [exercisesPerPage] = useState<number>(10);
+
+  // Set currentPage from sessionStorage on mount
+  useEffect(() => {
+    const savedPage = sessionStorage.getItem('managementPage');
+    if (savedPage) {
+      const pageNum = parseInt(savedPage, 10);
+      if (!isNaN(pageNum) && pageNum > 0) {
+        setCurrentPage(pageNum);
+        sessionStorage.removeItem('managementPage');
+      }
+    }
+  }, []);
   const exSortFunc = useCallback(function (
     e1: ExerciseData | undefined,
     e2: ExerciseData | undefined,
@@ -431,6 +597,17 @@ export function ExerciseManagementPage({
     }
   };
 
+  // Get current exercises for pagination
+  const indexOfLastExercise = currentPage * exercisesPerPage;
+  const indexOfFirstExercise = indexOfLastExercise - exercisesPerPage;
+  const currentExercises = exList.slice(indexOfFirstExercise, indexOfLastExercise);
+  const totalPages = Math.ceil(exList.length / exercisesPerPage);
+
+  // Pagination controls
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
+  const goToPreviousPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
+  const goToNextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
+
   //html for the page
   console.log(
     "ExerciseManagementPage rendering. authorized:",
@@ -449,230 +626,275 @@ export function ExerciseManagementPage({
 
   return (
     <div style={{ width: "90vw" }}>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
-        <div>
-          {/*page header*/}
-          <h2 style={{ display: "inline" }}>
-            Welcome to the Exercise Management Page!
-          </h2>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <button
-            onClick={handleLogout}
-            style={{
-              padding: "8px 16px",
-              backgroundColor: "#dc3545",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontSize: "14px",
-            }}
-          >
-            Logout
-          </button>
-          {/*creating an exercise*/}
-          <Button
-            style={{ display: "inline", marginRight: "1vw" }}
-            onClick={() => navigate("/exercise-management/create")}
-          >
-            +
-          </Button>
-        </div>
-      </div>
-      <h5 style={{ marginTop: "8px", fontStyle: "italic" }}>
-        Click the + in the top right to add a new exercise, then edit as needed
-        and save. <br /> To edit an existing exercise, click on the pencil icon
-        next to the corresponding exercise in the list below.
-      </h5>
-
       <div>
-        <br />
-        <h5 style={{ marginLeft: "4px", marginBottom: "-20px" }}>Sort By:</h5>
-        <br />
-
-        {/*editing an exercise, filling in all paramters*/}
-        <div id="boxes" style={{ display: "inline-flex", padding: "4px" }}>
-          <form
-            id="tags"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              marginRight: "20px",
-            }}
-          >
-            <div style={{ fontSize: "16px", marginRight: "8px" }}>Tags:</div>
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginRight: "12px",
-              }}
-            >
-              <input
-                type="checkbox"
-                name="tags"
-                value="Pitch"
-                checked={tags.includes("Pitch")}
-                onChange={tagsChange}
-                style={{ marginRight: "4px" }}
-              />
-              Pitch
-            </label>
-            <label style={{ display: "flex", alignItems: "center" }}>
-              <input
-                type="checkbox"
-                name="tags"
-                value="Intonation"
-                checked={tags.includes("Intonation")}
-                onChange={tagsChange}
-                style={{ marginRight: "4px" }}
-              />
-              Intonation
-            </label>
-            <label
-              style={{
-                display: "flex",
-                alignItems: "center",
-                marginRight: "12px",
-              }}
-            >
-              <input
-                type="checkbox"
-                name="tags"
-                value="Rhythm"
-                checked={tags.includes("Rhythm")}
-                onChange={tagsChange}
-                style={{ marginRight: "4px" }}
-              />
-              Rhythm
-            </label>
-          </form>
-          <form id="transpos" style={{ display: "flex", alignItems: "center" }}>
-            <input
-              type="checkbox"
-              name="transpos"
-              value="buh"
-              checked={transpos}
-              onChange={transposChange}
-              style={{ marginRight: "8px" }}
-            />
-            <div style={{ fontSize: "16px" }}>Transposing Instruments</div>
-          </form>
-        </div>
-
-        <br />
-        <div id="dropdowns" style={{ display: "inline-flex", padding: "4px" }}>
-          <form id="difficulty">
-            <div style={{ fontSize: "16px", display: "inline" }}>
-              Difficulty:
+        <div className="exercise-management">
+          <div className="exercise-management-row">
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", position: "relative" }}>
+              <button
+                ref={infoButtonRef}
+                onClick={() => setShowInfoModal(true)}
+                style={{
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "50%",
+                  border: "2px solid #114b96",
+                  backgroundColor: "white",
+                  color: "#114b96",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                }}
+                title="Information"
+              >
+                i
+              </button>
             </div>
-            <br></br>
-            <select name="difficulty" onChange={diffChange}>
-              <option value="All">All</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-            </select>
-          </form>
-          <form id="voiceCt">
-            Voices:
-            <br></br>
-            <select name="voices" onChange={voiceChange}>
-              <option value={0}>Any</option>
-              <option value={1}>1</option>
-              <option value={2}>2</option>
-              <option value={3}>3</option>
-              <option value={4}>4</option>
-              <option value={5}>5</option>
-            </select>
-          </form>
-          <form id="meterForm">
-            Meter:
-            <br></br>
-            <select name="meter" defaultValue={types} onChange={meterChange}>
-              <option value="Anything">Anything</option>
-              <option value="Simple">Simple</option>
-              <option value="Compound">Compound</option>
-            </select>
-          </form>
+            <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+              <button
+                onClick={handleLogout}
+                style={{
+                  padding: "8px 16px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                  fontSize: "14px",
+                }}
+              >
+              Logout
+              </button>
+              {/*creating an exercise*/}
+              <Button
+                style={{ display: "inline", marginRight: "1vw" }}
+                onClick={() => navigate("/exercise-management/create")}
+              >
+              +
+              </Button>
+            </div>
+          </div>
+          <div id="exercise-filters-container">
+            <h5>Sort By:</h5>
+            {/*editing an exercise, filling in all paramters*/}
+            <div id="checkboxes-group">
+              <form id="tags">
+                <div>Tags:</div>
+                <label>
+                  <input
+                    type="checkbox"
+                    name="tags"
+                    value="Pitch"
+                    checked={tags.includes("Pitch")}
+                    onChange={tagsChange}
+                  />
+                  Pitch
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    name="tags"
+                    value="Intonation"
+                    checked={tags.includes("Intonation")}
+                    onChange={tagsChange}
+                  />
+                  Intonation
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
+                    name="tags"
+                    value="Rhythm"
+                    checked={tags.includes("Rhythm")}
+                    onChange={tagsChange}
+                  />
+                  Rhythm
+                </label>
+              </form>
+              <form id="transpos">
+                <label>
+                  <input
+                    type="checkbox"
+                    name="transpos"
+                    value="buh"
+                    checked={transpos}
+                    onChange={transposChange}
+                  />
+                  Transposing Instruments
+                </label>
+              </form>
+            </div>
+            <div id="dropdowns-group">
+              <form id="difficulty">
+                <div>Difficulty:</div>
+                <select name="difficulty" onChange={diffChange}>
+                  <option value="All">All</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+              </form>
+              <form id="voiceCt">
+                <div>Voices:</div>
+                <select name="voices" onChange={voiceChange}>
+                  <option value={0}>Any</option>
+                  <option value={1}>1</option>
+                  <option value={2}>2</option>
+                  <option value={3}>3</option>
+                  <option value={4}>4</option>
+                  <option value={5}>5</option>
+                </select>
+              </form>
+              <form id="meterForm">
+                <div>Meter:</div>
+                <select name="meter" defaultValue={types} onChange={meterChange}>
+                  <option value="Anything">Anything</option>
+                  <option value="Simple">Simple</option>
+                  <option value="Compound">Compound</option>
+                </select>
+              </form>
+              <form id="typesForm">
+                <div>Textural Factors:</div>
+                <select name="types" onChange={typesChange}>
+                  <option value="None">None</option>
+                  <option value="Drone">Drone</option>
+                  <option value="Ensemble Parts">Ensemble Parts</option>
+                  <option value="Both">Drone & Ensemble Parts</option>
+                </select>
+              </form>
+              <form id="customIdForm">
+                <div>Custom ID:</div>
+                <input
+                  type="text"
+                  value={customId}
+                  onChange={(e) => setCustomId(e.target.value)}
+                  placeholder="Enter custom ID"
+                />
+              </form>
+            </div>
+            {/*reset sort*/}
+            <div style={{ display: "flex", gap: "0.75rem" }}>
+              <Button
+                variant="danger"
+                onClick={resetSort}
+                disabled={tags.length === 0 && diff === "All" && voices === 0 && !transpos && types === "None" && meter === "Anything" && customId === ""}
+              >
+                Reset Sort
+              </Button>
+              <Button
+                variant="danger"
+                onClick={handleDeleteClick}
+                disabled={selectedIndexes.length === 0}
+              >
+                Delete Selected Exercises
+              </Button>
+            </div>
+          </div>
         </div>
 
-        <div id="secondLine" style={{ display: "inline-flex", padding: "4px" }}>
-          <form id="typesForm">
-            Textural Factors:
-            <br></br>
-            <select name="types" onChange={typesChange}>
-              <option value="None">None</option>
-              <option value="Drone">Drone</option>
-              <option value="Ensemble Parts">Ensemble Parts</option>
-              <option value="Both">Drone & Ensemble Parts</option>
-            </select>
-          </form>
-          <form id="customIdForm" style={{ marginLeft: "10px" }}>
-            Custom ID:
-            <br></br>
-            <input
-              type="text"
-              value={customId}
-              onChange={(e) => setCustomId(e.target.value)}
-              placeholder="Enter custom ID"
-            />
-          </form>
-          {/*reset sort*/}
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="pagination-container">
+            {/* Exercise count info */}
+            <div className="exercise-count-display">
+              Showing {indexOfFirstExercise + 1}-{Math.min(indexOfLastExercise, exList.length)} of {exList.length} exercises
+            </div>
+
+            <div className="pagination-controls-row">
+              <Button
+                onClick={goToPreviousPage}
+                disabled={currentPage === 1}
+                variant="outline-primary"
+                size="sm"
+                className="pagination-nav-button"
+              >
+                ← Previous
+              </Button>
+
+              <div className="pagination-page-numbers">
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                  <Button
+                    key={pageNumber}
+                    onClick={() => paginate(pageNumber)}
+                    variant="outline-secondary"
+                    size="sm"
+                    className={`pagination-page-button ${currentPage === pageNumber ? 'active' : ''}`}
+                  >
+                    {pageNumber}
+                  </Button>
+                ))}
+              </div>
+
+              <Button
+                onClick={goToNextPage}
+                disabled={currentPage === totalPages}
+                variant="outline-primary"
+                size="sm"
+                className="pagination-nav-button"
+              >
+                Next →
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Select All, Preview All/Collapse All Button */}
+        <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '4px', marginBottom: '0.5rem' }}>
           <Button
-            variant="danger"
-            onClick={resetSort}
-            style={{ marginLeft: "10px" }}
+            onClick={handleSelectAll}
+            variant="primary"
+            className="collapse-all-btn"
           >
-            Reset Sort
+            {allSelected ? 'Deselect All' : 'Select All'}
           </Button>
           <Button
-            variant="danger"
-            onClick={() => handleMultipleExerciseDelete(selectedIndexes)}
-            style={{ marginLeft: "10px", marginTop: "10px" }}
+            onClick={() => {
+              if (expandedExerciseIds.length === exList.length) {
+                // All are expanded, so collapse all
+                setExpandedExerciseIds([]);
+              } else {
+                // Not all are expanded, so expand all
+                const allExerciseIds = exList.map((ex, index) => indexOfFirstExercise + index);
+                setExpandedExerciseIds(allExerciseIds);
+              }
+            }}
+            variant="primary"
+            className="collapse-all-btn"
           >
-            Delete Selected Exercises
+            {expandedExerciseIds.length === exList.length ? 'Collapse All' : 'Preview All'}
           </Button>
         </div>
 
         {/*returning exercise data */}
-        {exerciseConfig.showExercises &&
-          exList.map((exercise) => {
-            if (!exercise) return <div key={Math.random()} />;
+        <div className="exercise-list-scroll-area">
+          {exerciseConfig.showExercises &&
+            currentExercises.map((exercise) => {
+              if (!exercise) return <div key={Math.random()} />;
 
-            return (
-              <ExerciseManagementListEntry
-                key={exercise.exIndex}
-                exercise={exercise}
-                isSelected={selectedIndexes.includes(exercise.exIndex)}
-                handleSelectExercise={handleSelectExercise}
-              />
-            );
-
-            /*
-                            return (
-                                <Exercise
-                                key={exercise.exIndex}
-                                teacherMode={true}
-                                ExData={exercise}
-                                allExData={allExData}
-                                setAllExData={setAllExData}
-                                exIndex={exercise.exIndex}
-                                handleSelectExercise={handleSelectExercise}
-                                isSelected={selectedIndexes.includes(exercise.exIndex)}
-                                fetch={fetch}
-                                />
-                            */
-          })}
+              return (
+                <ExerciseManagementListEntry
+                  key={exercise.exIndex}
+                  exercise={exercise}
+                  isSelected={selectedIndexes.includes(exercise.exIndex)}
+                  handleSelectExercise={handleSelectExercise}
+                  onEdit={handleEdit}
+                  isExpanded={expandedExerciseIds.includes(exercise.exIndex)}
+                  onToggleExpand={(exIndex) => {
+                    if (expandedExerciseIds.includes(exIndex)) {
+                      setExpandedExerciseIds(expandedExerciseIds.filter(id => id !== exIndex));
+                    } else {
+                      setExpandedExerciseIds([...expandedExerciseIds, exIndex]);
+                    }
+                  }}
+                />
+              );
+            })}
+        </div>
 
         {exerciseConfig.showNoExercisesMessage && exList.length === 0 ? (
           <div>No exercises found! Maybe try adding one?</div>
@@ -685,8 +907,54 @@ export function ExerciseManagementPage({
           show={showLogoutModal}
           onConfirm={confirmLogout}
           onCancel={cancelLogout}
-          setAuthorized={setAuthorized}
-          navigateTo="/exercises"
+        />
+
+        {/* Info Dropdown */}
+        {showInfoModal && (
+          <>
+            <div
+              className="info-dropdown-backdrop"
+              onClick={() => setShowInfoModal(false)}
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 999,
+              }}
+            />
+            <div
+              className="info-dropdown"
+              style={{
+                position: "absolute",
+                top: (infoButtonRef.current?.getBoundingClientRect().top ?? 0) + 80,
+                left: (infoButtonRef.current?.getBoundingClientRect().right ?? 0) + 12,
+              }}
+            >
+              <p>
+                <span className="label-add">Add:</span> Click the <strong>[+] (plus icon)</strong> in top right to add a new exercise, then edit as needed and save.
+              </p>
+              <p>
+                <span className="label-edit">Edit:</span> Click the <strong>✏️ (pencil icon)</strong> next to any exercise in the list below to edit existing exercises.
+              </p>
+            </div>
+          </>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmationModal
+          show={showDeleteModal}
+          onConfirm={confirmDelete}
+          onCancel={cancelDelete}
+          exerciseCount={selectedIndexes.length}
+        />
+
+        {/* Success Banner */}
+        <SuccessBanner
+          show={showSuccessBanner}
+          message={successMessage}
+          onClose={closeSuccessBanner}
         />
       </div>
     </div>

@@ -28,33 +28,29 @@
   }
 }
 
-@media (max-width: 768px) {
-  .exercise-viewer {
-    padding: 0;
-  }
-  /*
-  .exercise-nav-row {
-    flex-direction: column;
-  }*/
-  .exercise-nav-button {
-    width: 50%;
-    min-height: 35px;
-    letter-spacing: 3px;
-    max-width: none;
-  }
+.is-mobile .exercise-viewer {
+  padding: 0;
+}
+/*
+.is-mobile .exercise-nav-row {
+  flex-direction: column;
+}*/
+.is-mobile .exercise-nav-button {
+  width: 50%;
+  min-height: 35px;
+  letter-spacing: 3px;
+  max-width: none;
 }
 
 /* Small tweaks for very small screens */
-@media (max-width: 480px) {
-  .ex-left {
-    padding-right: 0.5rem;
-  }
-  .ex-right {
-    padding-left: 0.5rem;
-  }
-  .ex-left form {
-    font-size: 0.95rem;
-  }
+.is-mobile .ex-left {
+  padding-right: 0.5rem;
+}
+.is-mobile .ex-right {
+  padding-left: 0.5rem;
+}
+.is-mobile .ex-left form {
+  font-size: 0.95rem;
 }
 
 /* Responsive design for mobile audio player */
@@ -63,33 +59,33 @@
     /*edit button so that it shrinks*/
     height: 50px;
   }
-  
+
   .custom-audio-player {
-    max-width: 150px;
+    max-width: 280px;
   }
-  
+
   .audio-controls {
     flex-direction: column;
     gap: 8px;
     padding: 8px;
   }
-  
+
   .audio-play-btn {
     width: 32px;
     height: 32px;
     font-size: 14px;
   }
-  
+
   .audio-time-display {
     font-size: 10px;
     min-width: 60px;
   }
-  
+
   .audio-volume-section {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .audio-volume {
     width: 40px;
   }
