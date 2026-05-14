@@ -1,6 +1,5 @@
 /* Custom Audio Player Styling */
 .custom-audio-player {
-  width: 100%;
   max-width: 400px;
   margin: 10px 0;
 }
@@ -278,6 +277,7 @@
 
 .is-mobile .custom-audio-player .audio-volume {
   width: 100%;
+  flex: 1 1 auto;
 }
 .is-mobile .custom-audio-player .audio-time-display {
   min-width: 56px;

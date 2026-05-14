@@ -2245,9 +2245,7 @@ useEffect(() => {
               />
             )}
             {mp3 !== undefined ? (
-              <div style={{ flex: 1 }}>
-                <AudioHandler file={mp3}></AudioHandler>
-              </div>
+              <AudioHandler file={mp3}></AudioHandler>
             ) : (
               <></>
             )}
