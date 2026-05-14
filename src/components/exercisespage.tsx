@@ -262,23 +262,7 @@ function FiltersComponent({
   resetDisabled: boolean;
 }) {
 
-  const [noAnimation, setNoAnimation] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setNoAnimation(true);
-      if (window.innerWidth > 700) {
-        setFiltersOpen(true);
-      }
-      else {
-        setFiltersOpen(false);
-      }
-      setTimeout(() => setNoAnimation(false), 50);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const [noAnimation] = useState(false);
 
   return (
     <>
