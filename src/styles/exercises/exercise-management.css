@@ -484,3 +484,14 @@ button:disabled,
     color: #dc3545;
     font-weight: 600;
 }
+
+div.audio-row.teachermode-bottom-row {
+    margin-top: 1rem;
+    border: none;
+    justify-content: center;
+}
+
+div.audio-row.teachermode-bottom-row button.btn-danger {
+    margin-left: 0;
+    margin-right: 0;
+}

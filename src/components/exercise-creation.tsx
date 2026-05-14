@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import ExerciseData from "../interfaces/exerciseData";
 import { ConfirmationModal } from "./modals/confirmation-modal";
@@ -12,6 +12,7 @@ import { ExerciseForm } from "./exercise-creation/exercise-form";
 import { ExerciseTypeFiles } from "./exercise-creation/exercise-type-files";
 import { ScorePreview } from "./exercise-creation/score-preview";
 import { ExerciseControls } from "./exercise-creation/exercise-controls";
+import { Exercise } from "./exercise";
 
 interface CreateExercisePageProps {
   allExData: (ExerciseData | undefined)[];
@@ -22,17 +23,30 @@ interface CreateExercisePageProps {
 export function CreateExercisePage({ allExData, setAllExData, refreshExercises }: CreateExercisePageProps) {
   const navigate = useNavigate();
 
-  // State management
-  const [difficulty, setDifficulty] = useState<number>(1);
-  const [voices, setVoices] = useState<number>(1);
-  const [tags, setTags] = useState<string[]>([]);
-  const [types, setTypes] = useState<string>("None");
-  const [meter, setMeter] = useState<string>("Anything");
-  const [transpos, setTranspos] = useState<boolean>(false);
-  const [customId, setCustomId] = useState<string>("");
+  const [exIndex, setExIndex] = useState<number>(-1);
+  const [exerciseData, setExerciseData] = useState<ExerciseData>(
+    new ExerciseData(
+      "", // score / abc
+      undefined, // sound
+      [], // correctAnswers
+      "", // feedback
+      -1, // exIndex
+      true, // empty
+      "", // title
+      1, // difficulty
+      1, // voices
+      [], // tags
+      "None", // types
+      "Anything", // meter
+      false, // transpos
+      true, // isNew
+      "" // customId
+    )
+  );
+
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [musicXmlFile, setMusicXmlFile] = useState<File | null>(null);
-  const [abcNotation, setAbcNotation] = useState<string>("");
+
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<"back" | "cancel" | null>(null);
   const [showFileErrorModal, setShowFileErrorModal] = useState<boolean>(false);
@@ -42,8 +56,10 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
   const [showFileRemoveModal, setShowFileRemoveModal] = useState<boolean>(false);
   const [fileToRemoveType, setFileToRemoveType] = useState<"musicxml" | "audio" | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState<boolean>(false);
+
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [isRemovingFile, setIsRemovingFile] = useState<boolean>(false);
+
   const [fieldErrors, setFieldErrors] = useState<{
     tags: boolean;
     musicXml: boolean;
@@ -55,6 +71,16 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     audio: false,
     customId: false
   });
+
+  const exerciseComponentRef = useRef();
+
+  const setDifficulty = (difficulty: number) => { exerciseData.difficulty = difficulty; setExerciseData(exerciseData); }
+  const setVoices = (voices: number) => { exerciseData.voices = voices; setExerciseData(exerciseData); }
+  const setTags = (tags: string[]) => { exerciseData.tags = tags; setExerciseData(exerciseData); }
+  const setTypes = (types: string) => { exerciseData.types = types; setExerciseData(exerciseData); }
+  const setMeter = (meter: string) => { exerciseData.meter = meter; setExerciseData(exerciseData); }
+  const setTranspos = (transpos: boolean) => { exerciseData.transpos = transpos; setExerciseData(exerciseData); }
+  const setCustomId = (customId: string) => { exerciseData.customId = customId; setExerciseData(exerciseData); }
 
   // Check if score has been edited
   const hasScoreEdits = (): boolean => {
@@ -96,7 +122,29 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     setFileToRemoveType(null);
   };
 
+  const handleFileUpload = (file: File, type: "musicxml" | "audio") => {
+    if (type === "musicxml") {
+      if (!file.name.match(/\.(xml|musicxml)$/i)) {
+        setFileErrorType("musicxml");
+        setShowFileErrorModal(true);
+        return;
+      }
+      (exerciseComponentRef.current as any).setMusicXmlFile(file);
+      setMusicXmlFile(file);
+    } else if (type === "audio") {
+      if (!file.name.match(/\.mp3$/i)) {
+        setFileErrorType("audio");
+        setShowFileErrorModal(true);
+        return;
+      }
+      (exerciseComponentRef.current as any).setAudioXmlFile(file);
+      setAudioFile(file);
+    }
+  }
+
+  // TODO remake handleFileUpload
   // File handling functions
+  /*
   const handleFileUpload = (file: File, type: "musicxml" | "audio") => {
     if (type === "musicxml") {
       if (!file.name.match(/\.(xml|musicxml)$/i)) {
@@ -140,11 +188,11 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       setAudioFile(file);
     }
   };
+  */
 
   const removeFile = (type: "musicxml" | "audio") => {
     if (type === "musicxml") {
       setMusicXmlFile(null);
-      setAbcNotation("");
     } else {
       setAudioFile(null);
     }
@@ -165,7 +213,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       customId: false
     };
 
-    if (tags.length === 0) {
+    if (exerciseData.tags.length === 0) {
       errors.push("Please select at least one exercise type");
       newFieldErrors.tags = true;
     }
@@ -181,17 +229,17 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     }
 
     // Clear field errors when validation passes
-    if (customId && customId.trim() !== "" && !/^[a-zA-Z0-9_-]+$/.test(customId.trim())) {
+    if (exerciseData.customId && exerciseData.customId.trim() !== "" && !/^[a-zA-Z0-9_-]+$/.test(exerciseData.customId.trim())) {
       errors.push("Custom ID contains invalid characters");
       newFieldErrors.customId = true;
-    } else if (!customId || customId.trim() === "") {
+    } else if (!exerciseData.customId || exerciseData.customId.trim() === "") {
       newFieldErrors.customId = false;
     }
 
-    if (customId && customId.trim() !== "" && allExData.some(ex => ex?.customId === customId.trim())) {
+    if (exerciseData.customId && exerciseData.customId.trim() !== "" && allExData.some(ex => ex?.customId === exerciseData?.customId?.trim())) {
       errors.push("Custom ID is already in use");
       newFieldErrors.customId = true;
-    } else if (!customId || customId.trim() === "") {
+    } else if (!exerciseData.customId || exerciseData.customId.trim() === "") {
       newFieldErrors.customId = false;
     }
 
@@ -245,9 +293,27 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     setValidationErrors([]);
   };
 
-  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
+    if (!validateExercise()) { // check to see if data is valid
+      setShowValidationErrorModal(true);
+      return;
+    }
 
+    // if so, proceed with exercise creation!
+    try {
+      // copied from old exercise.tsx save function
+      var data;
+      
+    } catch (error) {
+      console.error("Error saving exercise: ", error);
+      alert("Error saving exercise. Please try again.");
+    }
+  }
+
+  // TODO remake handleSubmit
+  /*
   // Submit exercise
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -318,6 +384,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       alert("Error saving exercise. Please try again.");
     }
   };
+  */
 
   const handleSuccessModalOk = () => {
     setShowSuccessModal(false);
@@ -329,16 +396,15 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
 
   const hasUnsavedData = (): boolean => {
     return (
-      (customId && customId.trim() !== "") ||
-      difficulty !== 1 ||
-      voices !== 1 ||
-      tags.length > 0 ||
-      types !== "None" ||
-      meter !== "Anything" ||
-      transpos !== false ||
+      (exerciseData.customId && exerciseData.customId.trim() !== "") ||
+      exerciseData.difficulty !== 1 ||
+      exerciseData.voices !== 1 ||
+      exerciseData.tags.length > 0 ||
+      exerciseData.types !== "None" ||
+      exerciseData.meter !== "Anything" ||
+      exerciseData.transpos !== false ||
       audioFile !== null ||
-      musicXmlFile !== null ||
-      abcNotation !== ""
+      musicXmlFile !== null
     );
   };
 
@@ -369,19 +435,19 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                       {/* Left side - Exercise Properties */}
                       <div className="workspace-left">
                         <ExerciseForm
-                          difficulty={difficulty}
+                          difficulty={exerciseData.difficulty}
                           setDifficulty={setDifficulty}
-                          voices={voices}
+                          voices={exerciseData.voices}
                           setVoices={setVoices}
-                          tags={tags}
+                          tags={exerciseData.tags}
                           setTags={setTags}
-                          types={types}
+                          types={exerciseData.types}
                           setTypes={setTypes}
-                          meter={meter}
+                          meter={exerciseData.meter}
                           setMeter={setMeter}
-                          transpos={transpos}
+                          transpos={exerciseData.transpos}
                           setTranspos={setTranspos}
-                          customId={customId}
+                          customId={exerciseData.customId || ""}
                           setCustomId={setCustomId}
                           fieldErrors={fieldErrors}
                         />
@@ -390,11 +456,11 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                       {/* Right side - Exercise Type & Files */}
                       <div className="workspace-right">
                         <ExerciseTypeFiles
-                          tags={tags}
+                          tags={exerciseData.tags}
                           setTags={setTags}
-                          types={types}
+                          types={exerciseData.types}
                           setTypes={setTypes}
-                          customId={customId}
+                          customId={exerciseData.customId || ""}
                           setCustomId={setCustomId}
                           musicXmlFile={musicXmlFile}
                           setMusicXmlFile={setMusicXmlFile}
@@ -416,16 +482,19 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                     <h3>Score Preview</h3>
                   </div>
                   <div className="score-feedback-content">
-                    <ScorePreview
-                      abcNotation={abcNotation}
-                      selectedNotes={[]}
-                      rhythmCorrect={[]}
-                      pitchCorrect={[]}
-                      feedbackNotes={[]}
-                      onSelectionChange={() => {}}
-                      onNoteClick={() => {}}
-                      resetSelection={false}
-                      resetCounter={0}
+                    <Exercise
+                      exIndex={exIndex}
+                      teacherMode={true}
+                      ExData={exerciseData}
+                      allExData={[]}
+                      updateProgress={() => {}}
+                      setAllExData={() => {}}
+                      handleSelectExercise={undefined}
+                      isSelected={undefined}
+                      fetch={undefined}
+                      filtersOpen={false}
+                      setFiltersOpen={() => {}}
+                      teacherModeRef={exerciseComponentRef}
                     />
                   </div>
                 </div>

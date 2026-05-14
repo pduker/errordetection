@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useImperativeHandle } from "react";
 import { ref, get, remove, child, set } from "firebase/database";
 import abcjs from "abcjs";
 import FileUpload from "./fileupload";
@@ -40,6 +40,7 @@ export function Exercise({
   fetch,
   filtersOpen,
   setFiltersOpen,
+  teacherModeRef = undefined
 }: {
   exIndex: number;
   teacherMode: boolean;
@@ -55,6 +56,7 @@ export function Exercise({
   fetch: ((val: boolean) => void) | undefined;
   filtersOpen: boolean;
   setFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  teacherModeRef?: React.Ref<any> | undefined;
 }) {
   // for score styling
   const score = {
@@ -147,6 +149,9 @@ export function Exercise({
 
   // check if an exercise has been completed
   const [isCompleted, setIsCompleted] = useState(false);
+
+  const xmlFileUploadRef = useRef();
+  const audioFileUploadRef = useRef();
 
   function countExerciseTypes() {
     const counts ={
@@ -1929,6 +1934,15 @@ useEffect(() => {
     setAllExData(updatedExercises);
   };
 
+  useImperativeHandle(teacherModeRef, () => ({
+    setMusicXmlFile(file: File) {
+      (xmlFileUploadRef.current as any).setFileUsingRef(file);
+    },
+    setAudioXmlFile(file: File) {
+      (audioFileUploadRef.current as any).setFileUsingRef(file);
+    }
+  }));
+  
   return (
     <div
       className="exercise-box"
@@ -1974,128 +1988,6 @@ useEffect(() => {
       )}
       {teacherMode ? (
         <div>
-          {ExData.isNew && (
-            <Button
-              variant="danger"
-              onClick={() => handleCancelExercise(exIndex)}
-              style={{ marginBottom: "10px" }}
-            >
-              Cancel Exercise Creation
-            </Button>
-          )}
-          <div
-            id="forms"
-            style={{
-              display: "inline-flex",
-              padding: "4px",
-              alignItems: "center",
-            }}
-          >
-            <form id="customId">
-              Custom ID:
-              <br />
-              <input
-                type="text"
-                value={customId}
-                onChange={(e) => setCustomId(e.target.value)}
-                placeholder="Enter custom ID"
-                style={{ margin: "4px" }}
-              />
-            </form>
-            <form id="tags">
-              Tags:
-              <br />
-              <input
-                type="checkbox"
-                name="tags"
-                value="Pitch"
-                checked={tags.includes("Pitch")}
-                onChange={tagsChange}
-                style={{ margin: "4px" }}
-              />
-              Pitch
-              <input
-                type="checkbox"
-                name="tags"
-                value="Intonation"
-                checked={tags.includes("Intonation")}
-                onChange={tagsChange}
-                style={{ marginLeft: "12px" }}
-              />{" "}
-              Intonation
-              <label>
-                <input
-                  type="checkbox"
-                  name="tags"
-                  value="Rhythm"
-                  checked={tags.includes("Rhythm")}
-                  onChange={tagsChange}
-                />
-                Rhythm
-              </label>
-            </form>
-            <form id="voiceCt">
-              Voices:
-              <br />
-              <select
-                name="voices"
-                defaultValue={voices}
-                onChange={voiceChange}
-              >
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-              </select>
-            </form>
-            <form id="difficulty">
-              Difficulty:
-              <br />
-              <select
-                name="difficulty"
-                defaultValue={diff}
-                onChange={diffChange}
-              >
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-              </select>
-            </form>
-            <form id="meter">
-              Meter:
-              <br />
-              <select name="meter" defaultValue={types} onChange={meterChange}>
-                <option value="Anything">Anything</option>
-                <option value="Simple">Simple</option>
-                <option value="Compound">Compound</option>
-              </select>
-            </form>
-            <form id="types">
-              Textural Factors:
-              <br />
-              <select name="types" defaultValue={types} onChange={typesChange}>
-                <option value="None">None</option>
-                <option value="Drone">Drone</option>
-                <option value="Ensemble Parts">Ensemble Parts</option>
-                <option value="Both">Drone & Ensemble Parts</option>
-              </select>
-            </form>
-            <form id="transpos">
-              Transposing Instruments:
-              <br />
-              <input
-                type="checkbox"
-                name="transpos"
-                value="true"
-                checked={transpos}
-                onChange={transposChange}
-                style={{ marginLeft: "5.3vw" }}
-              />
-            </form>
-          </div>
           <div />
           <div id="xmlUpload" style={{ display: "inline-flex" }}>
             XML Upload:{" "}
@@ -2105,6 +1997,7 @@ useEffect(() => {
               setAbcFile={setAbcFile}
               type="xml"
               setLoaded={setLoaded}
+              exerciseRef={xmlFileUploadRef}
             ></FileUpload>
           </div>
           <div id="mp3Upload" style={{ display: "inline-flex" }}>
@@ -2118,6 +2011,7 @@ useEffect(() => {
                 setAbcFile={setAbcFile}
                 type="mp3"
                 setLoaded={setLoaded}
+                exerciseRef={audioFileUploadRef}
               ></FileUpload>
             )}
           </div>
@@ -2131,7 +2025,7 @@ useEffect(() => {
           <div style={{ display: "inline-block", width: "75%" }}>
             <div id={"target" + exIndex} style={score}></div>
           </div>
-          <div className="audio-row">
+          <div className="audio-row teachermode-bottom-row">
             {
               <button
                 className="exercise-nav-inline exercise-nav-inline--prev mobile-only"
@@ -2150,52 +2044,30 @@ useEffect(() => {
               alt="note-color-key"
               src={noteKey}
               width="14%"
-              style={{ marginLeft: "1vw" }}
             />
 
-            {(abcFile && loaded) || (exerciseData && !exerciseData.empty) ? (
+            <div>
+              {
+                (
+                  lastClicked &&
+                  Number(
+                    lastClicked.abselem.elemset[0].getAttribute("selectedTimes"),
+                  ) % 4 !== 0
+                ) ? (
+                  <div>Note info: {ana}</div>
+                ) : <div>No note selected</div>
+              }
               <div className="audio-controls-group">
                 <textarea
                   id={"note-feedback-" + exIndex}
                   placeholder="Note feedback..."
                   onChange={saveFeedback}
                 />
-
-                <Button variant="danger" onClick={reload}>
-                  Reset Answers
-                </Button>
               </div>
-            ) : null}
+            </div>
 
-            {lastClicked &&
-            Number(
-              lastClicked.abselem.elemset[0].getAttribute("selectedTimes"),
-            ) %
-              4 !==
-              0 ? (
-              <div>Note Info: {ana}</div>
-            ) : null}
-          </div>
-
-          <div className="audio-actions">
-            <Button variant="success" onClick={save}>
-              Save Exercise
-            </Button>
-
-            {teacherMode && exerciseData?.isNew && (
-              <Button
-                variant="secondary"
-                onClick={() => handleCancelExercise(exInd)}
-              >
-                Cancel
-              </Button>
-            )}
-
-            <Button
-              onClick={() => handleExerciseDelete(exIndex)}
-              variant="danger"
-            >
-              Delete Exercise
+            <Button variant="danger" onClick={reload}>
+              Reset Answers
             </Button>
           </div>
         </div>
