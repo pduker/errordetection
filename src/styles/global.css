@@ -4,7 +4,7 @@
 }
 
 .App-header {
-  min-height: 11vh;
+  min-height: 1vh;
   display: inline-block;
   flex-direction: row;
   justify-content: flex-start;
@@ -58,11 +58,10 @@ body {
   background-repeat: no-repeat;
   background-position: center;
   overflow-y: auto;
-  overflow: hidden;
 }
 
 ::-webkit-scrollbar {
-  width: 20px;
+  width: 18px;
 }
 
 .names {
