@@ -2212,6 +2212,7 @@ useEffect(() => {
               width: "100%",
               marginTop: "-2vh",
               alignItems: "center",
+              justifyContent: "center",
               gap: "1rem",
               flexWrap: "nowrap",
             }}

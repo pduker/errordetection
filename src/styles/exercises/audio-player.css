@@ -278,7 +278,6 @@
 
 .is-mobile .custom-audio-player .audio-volume {
   width: 100%;
-  flex: 1 1 auto;
 }
 .is-mobile .custom-audio-player .audio-time-display {
   min-width: 56px;
