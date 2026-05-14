@@ -1029,21 +1029,19 @@
 }
 
 /* Responsive design for marked notes section */
-@media (max-width: 768px) {
-  .marked-notes-section {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-  
-  .selection-actions {
-    flex-wrap: wrap;
-  }
-  
-  .mark-correct-btn,
-  .mark-wrong-btn {
-    flex: 1;
-    min-width: 80px;
-  }
+.is-mobile .marked-notes-section {
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.is-mobile .selection-actions {
+  flex-wrap: wrap;
+}
+
+.is-mobile .mark-correct-btn,
+.is-mobile .mark-wrong-btn {
+  flex: 1;
+  min-width: 80px;
 }
 
 /* Score Preview and Feedback Section - Inner */
@@ -1352,22 +1350,20 @@
 }
 
 /* Responsive Design */
-@media (max-width: 768px) {
-  .workspace-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
+.is-mobile .workspace-grid {
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
 
-  .file-upload-grid {
-    grid-template-columns: 1fr;
-  }
+.is-mobile .file-upload-grid {
+  grid-template-columns: 1fr;
+}
 
-  .exercise-controls {
-    flex-direction: column;
-    gap: 16px;
-  }
+.is-mobile .exercise-controls {
+  flex-direction: column;
+  gap: 16px;
+}
 
-  .media-controls {
-    order: -1;
-  }
+.is-mobile .media-controls {
+  order: -1;
 }

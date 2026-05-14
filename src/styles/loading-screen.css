@@ -97,12 +97,10 @@
 }
 
 /* Mobile adjustment - navbar is at bottom on mobile */
-@media (max-width: 768px) {
-  .loading-indicator {
-    top: 0;
-    height: 100vh;
-    z-index: 999; /* Above everything on mobile since navbar is at bottom */
-  }
+.is-mobile .loading-indicator {
+  top: 0;
+  height: 100vh;
+  z-index: 999; /* Above everything on mobile since navbar is at bottom */
 }
 
 .loading-content-compact {
@@ -143,46 +141,42 @@
 }
 
 /* Mobile responsiveness */
-@media (max-width: 768px) {
-  .loading-content-compact {
-    padding: 1rem 1.5rem;
-  }
-  
-  .spinner-compact {
-    width: 50px;
-    height: 50px;
-    border-width: 3px;
-  }
-  
-  .loading-text-compact {
-    font-size: 1.5rem;
-  }
+.is-mobile .loading-content-compact {
+  padding: 1rem 1.5rem;
 }
-@media (max-width: 768px) {
-  .loading-content {
-    padding: 1rem;
-  }
-  
-  .loading-logo {
-    width: 60px;
-    height: 60px;
-  }
-  
-  .loading-title {
-    font-size: 2rem;
-  }
-  
-  .loading-subtitle {
-    font-size: 1.2rem;
-  }
-  
-  .spinner {
-    width: 40px;
-    height: 40px;
-    border-width: 3px;
-  }
-  
-  .loading-text {
-    font-size: 1rem;
-  }
+
+.is-mobile .spinner-compact {
+  width: 50px;
+  height: 50px;
+  border-width: 3px;
+}
+
+.is-mobile .loading-text-compact {
+  font-size: 1.5rem;
+}
+.is-mobile .loading-content {
+  padding: 1rem;
+}
+
+.is-mobile .loading-logo {
+  width: 60px;
+  height: 60px;
+}
+
+.is-mobile .loading-title {
+  font-size: 2rem;
+}
+
+.is-mobile .loading-subtitle {
+  font-size: 1.2rem;
+}
+
+.is-mobile .spinner {
+  width: 40px;
+  height: 40px;
+  border-width: 3px;
+}
+
+.is-mobile .loading-text {
+  font-size: 1rem;
 }

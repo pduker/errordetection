@@ -187,7 +187,7 @@ function App() {
   }, [isMobile, contentRef]);
 
   return (
-    <div>
+    <div className={isMobile ? "is-mobile" : ""}>
       {showLoading && <LoadingScreen />}
       {
         isMobile ? "" : <Header authorized={authorized} resetScrollPosition={resetScrollPosition}/>
@@ -197,8 +197,8 @@ function App() {
         ref={contentRef}
         style={{
           overflowY: "scroll",
-          margin: "10px",
-          height: "100%",
+          margin: isMobile ? "10px" : "30px",
+          height: isMobile ? "calc(100% - 20px)" : "calc(100% - 60px)",
           width: "100%",
           display: "block"
         }}>
