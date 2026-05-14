@@ -39,6 +39,7 @@ export default function AudioHandler({ file }: { file: string | File }): JSX.Ele
   const [isLoaded, setIsLoaded] = useState(false);
   const [showVolumeOverlay, setShowVolumeOverlay] = useState(false);
   const volumeSliderRef = useRef<HTMLInputElement>(null);
+  const volumeOverlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if(audioRef.current?.src) URL.revokeObjectURL(audioRef.current.src);
@@ -155,6 +156,25 @@ export default function AudioHandler({ file }: { file: string | File }): JSX.Ele
     };
   }, [showVolumeOverlay]);
 
+  // Close volume overlay when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      // Close if click is outside overlay and not on the volume button
+      if (volumeOverlayRef.current && !volumeOverlayRef.current.contains(target)) {
+        const volumeButton = document.querySelector('.audio-volume-btn');
+        if (volumeButton && !volumeButton.contains(target)) {
+          setShowVolumeOverlay(false);
+        }
+      }
+    };
+
+    if (showVolumeOverlay) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [showVolumeOverlay]);
+
   const toggleVolumeOverlay = () => {
     setShowVolumeOverlay(!showVolumeOverlay);
   };
@@ -224,7 +244,7 @@ export default function AudioHandler({ file }: { file: string | File }): JSX.Ele
 
         {/* Mobile vertical volume overlay */}
         {isMobile && showVolumeOverlay && (
-          <div className="audio-volume-overlay">
+          <div ref={volumeOverlayRef} className="audio-volume-overlay">
             <input
               ref={volumeSliderRef}
               type="range"

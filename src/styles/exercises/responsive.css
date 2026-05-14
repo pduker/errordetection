@@ -23,9 +23,6 @@
     order: 2;
     padding-right: 0;
   }
-  .exercise-queue-panel {
-    margin-top: 1rem;
-  }
 }
 
 .is-mobile .exercise-viewer {

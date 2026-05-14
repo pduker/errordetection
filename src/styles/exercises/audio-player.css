@@ -182,7 +182,7 @@
 .audio-volume-overlay {
   position: absolute;
   bottom: 45px;
-  left: 55px;
+  left: 110px;
   width: 24px;
   height: 80px;
   background: linear-gradient(135deg, #4e81b3 0%, #1659c1 100%);
