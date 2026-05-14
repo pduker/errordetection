@@ -182,6 +182,10 @@ function App() {
     resetScrollPosition("auto");
   }, [location.pathname, resetScrollPosition]);
 
+  useEffect(() => {
+    console.log('isMobile:', isMobile, 'contentRef:', contentRef.current);
+  }, [isMobile, contentRef]);
+
   return (
     <div>
       {showLoading && <LoadingScreen />}
