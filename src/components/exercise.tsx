@@ -2212,6 +2212,7 @@ useEffect(() => {
               width: "100%",
               marginTop: "-2vh",
               alignItems: "center",
+              justifyContent: "center",
               gap: "1rem",
               flexWrap: "nowrap",
             }}
@@ -2244,9 +2245,7 @@ useEffect(() => {
               />
             )}
             {mp3 !== undefined ? (
-              <div style={{ flex: 1 }}>
-                <AudioHandler file={mp3}></AudioHandler>
-              </div>
+              <AudioHandler file={mp3}></AudioHandler>
             ) : (
               <></>
             )}
