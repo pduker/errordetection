@@ -127,7 +127,15 @@ function ExerciseQueueComponent({
     setCurrentPage(Math.max(1, currentPage - 1));
   }, [currentPage, setCurrentPage]);
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(() => {
+    const saved = localStorage.getItem('exerciseQueueOpen');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  // Save isOpen state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('exerciseQueueOpen', JSON.stringify(isOpen));
+  }, [isOpen]);
 
   useEffect(() => {
     if (totalPages === 0) {
@@ -146,7 +154,7 @@ function ExerciseQueueComponent({
       <button
         type="button"
         className="exercise-queue-panel__toggle"
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={() => setIsOpen((prev: boolean) => !prev)}
         aria-expanded={isOpen}
       >
         <span>Exercises</span>
@@ -393,7 +401,15 @@ export function ExercisesPage({
   const [tags, setTags] = useState<string[]>(defaultTags);
   const [transpos, setTranspos] = useState<boolean>(false);
 
-  const [filtersOpen, setFiltersOpen] = useState(false); // for filters component
+  const [filtersOpen, setFiltersOpen] = useState(() => {
+    const saved = localStorage.getItem('filtersOpen');
+    return saved ? JSON.parse(saved) : false;
+  }); // for filters component
+
+  // Save filtersOpen state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('filtersOpen', JSON.stringify(filtersOpen));
+  }, [filtersOpen]);
   const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
 
   // Success banner state
