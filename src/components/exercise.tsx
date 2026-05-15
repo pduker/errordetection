@@ -1415,8 +1415,8 @@ useEffect(() => {
       const isCorrect = allCorrect && combinedSelections.length > 0;
       const scoreValue = isCorrect ? 1 : 0;
 
-      updateProgress?.(ExData.title, { completed: true, score: scoreValue });
-      setIsCompleted(true);
+      updateProgress?.(ExData.title, { completed: isCorrect, score: scoreValue });
+      setIsCompleted(isCorrect);
       console.log(`Progress saved for ${ExData.title}: correct=${isCorrect}`);
       return;
     }
@@ -1553,8 +1553,8 @@ useEffect(() => {
       const isCorrect = allCorrect && combinedSelections.length > 0;
       const scoreValue = isCorrect ? 1 : 0;
 
-      updateProgress?.(ExData.title, { completed: true, score: scoreValue });
-      setIsCompleted(true);
+      updateProgress?.(ExData.title, { completed: isCorrect, score: scoreValue });
+      setIsCompleted(isCorrect);
       console.log(`Progress saved for ${ExData.title}: correct=${isCorrect}`);
       return;
     }
@@ -1668,8 +1668,8 @@ useEffect(() => {
     );
     const scoreValue = isCorrect ? 1 : 0;
 
-    updateProgress?.(ExData.title, { completed: true, score: scoreValue });
-    setIsCompleted(true);
+    updateProgress?.(ExData.title, { completed: isCorrect, score: scoreValue });
+    setIsCompleted(isCorrect);
     console.log(`Progress saved YES for ${ExData.title}: correct=${isCorrect}`);
   };
 

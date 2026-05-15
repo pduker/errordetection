@@ -474,8 +474,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                       handleSelectExercise={undefined}
                       isSelected={undefined}
                       fetch={undefined}
-                      filtersOpen={false}
-                      setFiltersOpen={() => {}}
                       teacherModeRef={exerciseComponentRef}
                     />
                   </div>
