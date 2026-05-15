@@ -2,6 +2,7 @@ import "../styles/exercises/index.css";
 import { Exercise } from "./exercise";
 import ExerciseData from "../interfaces/exerciseData";
 import React, { useState, useEffect, useCallback } from "react";
+import { useSearchParams } from 'react-router-dom';
 import { Button } from "react-bootstrap";
 import { AppSidebar } from "./sidebar";
 import { SuccessBanner } from './modals/SuccessBanner';
@@ -451,6 +452,33 @@ export function ExercisesPage({
     );
     if (!stillExists) setSelExercise(undefined);
   }, [allExData, selExercise]);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  useEffect(() => { // set searchParams on load
+      setTags(searchParams.get("tags")?.split(",") || tags);
+      setTranspos((searchParams.get("transpos") === "true") || transpos);
+      setDiff(searchParams.get("diff") || diff);
+      setVoices(Number(searchParams.get("voices")) || voices);
+      setMeter(searchParams.get("meter") || meter);
+      setTypes(searchParams.get("types") || types);
+
+      // we want this to only run on component mount, this gets rid of the eslint warning
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => { // update searchParams on filter change
+      const newSearchParams = new URLSearchParams();
+
+      newSearchParams.set("tags", tags.filter(t => !!t).toString());
+      newSearchParams.set("transpos", transpos.toString());
+      newSearchParams.set("diff", diff.toString());
+      newSearchParams.set("voices", voices.toString());
+      newSearchParams.set("meter", meter.toString());
+      newSearchParams.set("types", types.toString());
+
+      setSearchParams(newSearchParams);
+  }, [tags, transpos, diff, voices, meter, types, setSearchParams]);
 
   const navButtonsVisible =
     filteredExercises.length > 0 && selExercise !== undefined;
