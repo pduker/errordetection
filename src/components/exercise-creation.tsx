@@ -1,4 +1,4 @@
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ExerciseData from "../interfaces/exerciseData";
 import { ConfirmationModal } from "./modals/confirmation-modal";
@@ -46,6 +46,26 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     )
   );
 
+  const [difficulty, setDifficulty] = useState<number>(exerciseData.difficulty);
+  const [voices, setVoices] = useState<number>(exerciseData.voices);
+  const [tags, setTags] = useState<string[]>(exerciseData.tags);
+  const [types, setTypes] = useState<string>(exerciseData.types);
+  const [meter, setMeter] = useState<string>(exerciseData.meter);
+  const [transpos, setTranspos] = useState<boolean>(exerciseData.transpos);
+  const [customId, setCustomId] = useState<string>(exerciseData.customId || "");
+
+  useEffect(() => {
+    exerciseData.difficulty = difficulty;
+    exerciseData.voices = voices;
+    exerciseData.tags = tags;
+    exerciseData.types = types;
+    exerciseData.meter = meter;
+    exerciseData.transpos = transpos;
+    exerciseData.customId = customId;
+
+    setExerciseData(exerciseData);
+  }, [difficulty, voices, tags, types, meter, transpos, customId]);
+
   const isEditing = !exerciseData.isNew;
 
   const [audioFile, setAudioFile] = useState<File | null>(null);
@@ -78,13 +98,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
 
   const exerciseComponentRef = useRef();
 
-  const setDifficulty = (difficulty: number) => { exerciseData.difficulty = difficulty; setExerciseData(exerciseData); }
-  const setVoices = (voices: number) => { exerciseData.voices = voices; setExerciseData(exerciseData); }
-  const setTags = (tags: string[]) => { exerciseData.tags = tags; setExerciseData(exerciseData); }
-  const setTypes = (types: string) => { exerciseData.types = types; setExerciseData(exerciseData); }
-  const setMeter = (meter: string) => { exerciseData.meter = meter; setExerciseData(exerciseData); }
-  const setTranspos = (transpos: boolean) => { exerciseData.transpos = transpos; setExerciseData(exerciseData); }
-  const setCustomId = (customId: string) => { exerciseData.customId = customId; setExerciseData(exerciseData); }
+  console.log(exerciseData);
 
   // Check if score has been edited
   const hasScoreEdits = (): boolean => {
@@ -445,19 +459,19 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                       {/* Left side - Exercise Properties */}
                       <div className="workspace-left">
                         <ExerciseForm
-                          difficulty={exerciseData.difficulty}
+                          difficulty={difficulty}
                           setDifficulty={setDifficulty}
-                          voices={exerciseData.voices}
+                          voices={voices}
                           setVoices={setVoices}
-                          tags={exerciseData.tags}
+                          tags={tags}
                           setTags={setTags}
-                          types={exerciseData.types}
+                          types={types}
                           setTypes={setTypes}
-                          meter={exerciseData.meter}
+                          meter={meter}
                           setMeter={setMeter}
-                          transpos={exerciseData.transpos}
+                          transpos={transpos}
                           setTranspos={setTranspos}
-                          customId={exerciseData.customId || ""}
+                          customId={customId}
                           setCustomId={setCustomId}
                           fieldErrors={fieldErrors}
                         />
@@ -466,11 +480,11 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                       {/* Right side - Exercise Type & Files */}
                       <div className="workspace-right">
                         <ExerciseTypeFiles
-                          tags={exerciseData.tags || []}
+                          tags={tags || []}
                           setTags={setTags}
-                          types={exerciseData.types}
+                          types={types}
                           setTypes={setTypes}
-                          customId={exerciseData.customId || ""}
+                          customId={customId}
                           setCustomId={setCustomId}
                           musicXmlFile={musicXmlFile}
                           setMusicXmlFile={setMusicXmlFile}
