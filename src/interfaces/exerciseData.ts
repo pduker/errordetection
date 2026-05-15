@@ -4,7 +4,7 @@ class ExerciseData {
     score: string
     sound: File | string | undefined
     correctAnswers: {[label: string]: (number | string)}[]
-    feedback: string
+    feedback: string // unused?
     exIndex: number
     empty: boolean
     title: string

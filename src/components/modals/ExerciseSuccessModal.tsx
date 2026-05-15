@@ -19,7 +19,7 @@ export function ExerciseSuccessModal({ show, onOk, message }: ExerciseSuccessMod
           <p>{message}</p>
         </div>
         <div className="modal-footer">
-          <button onClick={onOk} className="modal-btn modal-btn-confirm">
+          <button onClick={onOk} className="modal-btn btn-primary">
             OK
           </button>
         </div>

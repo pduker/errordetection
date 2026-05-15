@@ -185,7 +185,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
 
     if (exerciseData.correctAnswers.length === 0) {
       errors.push("Please select at least one correct answer");
-      newFieldErrors.tags = true; // TODO make this a custom error type
     }
 
     if (exerciseData.tags.length === 0) {
@@ -268,8 +267,19 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     setValidationErrors([]);
   };
 
+  const syncExerciseComponentAndData = () => {
+    // sync score and correctAnswers from exerciseComponentRef
+    const componentData = (exerciseComponentRef.current as any).getDataToSync();
+
+    exerciseData.score = componentData.score;
+    exerciseData.correctAnswers = componentData.correctAnswers;
+    setExerciseData(exerciseData);
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    syncExerciseComponentAndData();
 
     if (!validateExercise()) { // check to see if data is valid
       setShowValidationErrorModal(true);
@@ -503,7 +513,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                           removeFile={handleFileRemoveRequest}
                           fieldErrors={fieldErrors}
                           allExData={allExData}
-                          sound={exerciseData.sound}
+                          sound={exerciseData.sound || audioFile || undefined}
                           isEditing={isEditing}
                         />
                       </div>

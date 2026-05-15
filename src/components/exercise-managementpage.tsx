@@ -577,7 +577,6 @@ export function ExerciseManagementPage({
         return !selectedIndexes.includes(exercise?.exIndex || -1);
       });
       setAllExData(updatedExercises);
-      alert("selected exercises deleted!");
       // reload the page without changing the url
       window.location.reload();
     } catch (error) {

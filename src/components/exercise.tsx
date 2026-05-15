@@ -1936,6 +1936,12 @@ useEffect(() => {
     },
     getCustomTitle() {
       return customTitle;
+    },
+    getDataToSync() {
+      return {
+        score: abcFile,
+        correctAnswers: correctAnswers
+      };
     }
   }));
   
