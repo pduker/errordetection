@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import ExerciseData from "../interfaces/exerciseData";
 import { ConfirmationModal } from "./modals/confirmation-modal";
 import { ExerciseSuccessModal } from "./modals/ExerciseSuccessModal";
-import { getDatabase, ref, set, push } from "firebase/database";
+import { getDatabase, ref, get, remove, child, set } from "firebase/database";
+import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 
 import "../styles/create-exercise.css";
 
@@ -11,6 +12,7 @@ import { ExerciseForm } from "./exercise-creation/exercise-form";
 import { ExerciseTypeFiles } from "./exercise-creation/exercise-type-files";
 import { ExerciseControls } from "./exercise-creation/exercise-controls";
 import { Exercise } from "./exercise";
+import DBData from "../interfaces/DBData";
 
 interface CreateExercisePageProps {
   allExData: (ExerciseData | undefined)[];
@@ -98,8 +100,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
 
   const exerciseComponentRef = useRef();
 
-  console.log(exerciseData);
-
   // Check if score has been edited
   const hasScoreEdits = (): boolean => {
     return false; // No score edits possible since we removed note selection
@@ -160,54 +160,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     }
   }
 
-  // TODO remake handleFileUpload
-  // File handling functions
-  /*
-  const handleFileUpload = (file: File, type: "musicxml" | "audio") => {
-    if (type === "musicxml") {
-      if (!file.name.match(/\.(xml|musicxml)$/i)) {
-        setFileErrorType("musicxml");
-        setShowFileErrorModal(true);
-        return;
-      }
-      setMusicXmlFile(file);
-      
-      // Convert MusicXML to ABC notation
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const xmlContent = e.target?.result as string;
-        try {
-          const domparser = new DOMParser();
-          const xmldata = domparser.parseFromString(xmlContent, 'application/xml');
-          
-          const options = { u:0, b:0, n:0,
-            c:0, v:0, d:0,  
-            m:0, x:0, t:0,  
-            v1:0, noped:0,  
-            stm:0,          
-            p:'f', s:0 };
-          
-          const result = vertaal(xmldata, options);
-          const abcText = result[0];
-          
-          setAbcNotation(abcText);
-        } catch (error) {
-          console.error("Error converting MusicXML to ABC:", error);
-          setAbcNotation("");
-        }
-      };
-      reader.readAsText(file);
-    } else if (type === "audio") {
-      if (!file.name.match(/\.(mp3|wav|ogg|m4a|aac)$/i)) {
-        setFileErrorType("audio");
-        setShowFileErrorModal(true);
-        return;
-      }
-      setAudioFile(file);
-    }
-  };
-  */
-
   const removeFile = (type: "musicxml" | "audio") => {
     if (type === "musicxml") {
       setMusicXmlFile(null);
@@ -231,17 +183,22 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       customId: false
     };
 
+    if (exerciseData.correctAnswers.length === 0) {
+      errors.push("Please select at least one correct answer");
+      newFieldErrors.tags = true; // TODO make this a custom error type
+    }
+
     if (exerciseData.tags.length === 0) {
       errors.push("Please select at least one exercise type");
       newFieldErrors.tags = true;
     }
 
-    if (!musicXmlFile) {
+    if (!musicXmlFile && !exerciseData.score) {
       errors.push("Please upload a MusicXML file");
       newFieldErrors.musicXml = true;
     }
 
-    if (!audioFile) {
+    if (!audioFile && !exerciseData.sound) {
       errors.push("Please upload an audio file");
       newFieldErrors.audio = true;
     }
@@ -254,7 +211,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       newFieldErrors.customId = false;
     }
 
-    if (exerciseData.customId && exerciseData.customId.trim() !== "" && allExData.some(ex => ex?.customId === exerciseData?.customId?.trim())) {
+    if (!isEditing && exerciseData.customId && exerciseData.customId.trim() !== "" && allExData.some(ex => ex?.customId === exerciseData?.customId?.trim())) {
       errors.push("Custom ID is already in use");
       newFieldErrors.customId = true;
     } else if (!exerciseData.customId || exerciseData.customId.trim() === "") {
@@ -322,8 +279,60 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     // if so, proceed with exercise creation!
     try {
       // copied from old exercise.tsx save function
-      var data;
-      
+      exerciseData.correctAnswers.sort((i1, i2) => {
+        if ((i1.index as number) > (i2.index as number)) return 1;
+        if ((i1.index as number) < (i2.index as number)) return -1;
+        return 0;
+      });
+      const data = new ExerciseData(
+        exerciseData.score,
+        exerciseData.sound,
+        exerciseData.correctAnswers,
+        "",
+        exerciseData.exIndex,
+        false,
+        (exerciseComponentRef.current as any).getCustomTitle() || exerciseData.title,
+        exerciseData.difficulty,
+        exerciseData.voices,
+        exerciseData.tags,
+        exerciseData.types,
+        exerciseData.meter,
+        exerciseData.transpos,
+        false,
+        exerciseData.customId
+      );
+
+      if (audioFile === null) throw new Error("Audio file is null");
+
+      const database = getDatabase();
+      const storage = getStorage();
+
+      const scoresRef = ref(database, "scores");
+      const audioRef = storageRef(storage, audioFile.name);
+
+      await uploadBytes(audioRef, audioFile);
+      const dbDataRef = child(scoresRef, exerciseData.exIndex.toString());
+
+      const snapshot = await get(dbDataRef);
+      if (snapshot.exists()) {
+        // update existing exercise
+        const updatedData = new DBData(data, audioFile.name);
+        await set(dbDataRef, updatedData);
+        console.log("Exercise data was updated!");
+
+        await refreshExercises();
+        setSuccessMessage("Exercise updated successfully!");
+        setShowSuccessModal(true);
+      } else {
+        // create new exercise
+        const newData = new DBData(data, audioFile.name);
+        await set(dbDataRef, newData);
+        console.log("New exercise added!");
+
+        await refreshExercises();
+        setSuccessMessage("Exercise created successfully!");
+        setShowSuccessModal(true);
+      }
     } catch (error) {
       console.error("Error saving exercise: ", error);
       alert("Error saving exercise. Please try again.");

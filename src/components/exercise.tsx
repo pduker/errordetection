@@ -1934,8 +1934,8 @@ useEffect(() => {
     setAudioFile(file: File) {
       (audioFileUploadRef.current as any).setFileUsingRef(file);
     },
-    submitSave() {
-      save();
+    getCustomTitle() {
+      return customTitle;
     }
   }));
   
