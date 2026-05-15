@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/errordetection/static/css/main.e508b413.css",
-    "main.js": "/errordetection/static/js/main.27000b65.js",
+    "main.css": "/errordetection/static/css/main.16a58dc5.css",
+    "main.js": "/errordetection/static/js/main.debacb36.js",
     "static/js/453.3e63ad05.chunk.js": "/errordetection/static/js/453.3e63ad05.chunk.js",
     "static/media/excersie-example.png": "/errordetection/static/media/excersie-example.4e8ebf0a4840c2997302.png",
     "static/media/background-1.jpg": "/errordetection/static/media/background-1.a164f648d84dd4ee6ac5.jpg",
@@ -11,12 +11,12 @@
     "static/media/noteClick.png": "/errordetection/static/media/noteClick.f0fe78aebdccd9f9d5b7.png",
     "static/media/note-color-key.png": "/errordetection/static/media/note-color-key.ac2ee696deb3cc7f1940.png",
     "index.html": "/errordetection/index.html",
-    "main.e508b413.css.map": "/errordetection/static/css/main.e508b413.css.map",
-    "main.27000b65.js.map": "/errordetection/static/js/main.27000b65.js.map",
+    "main.16a58dc5.css.map": "/errordetection/static/css/main.16a58dc5.css.map",
+    "main.debacb36.js.map": "/errordetection/static/js/main.debacb36.js.map",
     "453.3e63ad05.chunk.js.map": "/errordetection/static/js/453.3e63ad05.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e508b413.css",
-    "static/js/main.27000b65.js"
+    "static/css/main.16a58dc5.css",
+    "static/js/main.debacb36.js"
   ]
 }
