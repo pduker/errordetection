@@ -18,8 +18,6 @@ function ExerciseViewerComponent({
   allExData,
   setAllExData,
   updateProgress,
-  filtersOpen,
-  setFiltersOpen,
 }: {
   navButtonsVisible: boolean;
   disablePrevNav: boolean;
@@ -30,8 +28,6 @@ function ExerciseViewerComponent({
   allExData: (ExerciseData | undefined)[];
   setAllExData: (newData: (ExerciseData | undefined)[]) => void;
   updateProgress: (title: string | number, data: any) => void;
-  filtersOpen: boolean;
-  setFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
     <div className="exercise-viewer">
@@ -62,8 +58,6 @@ function ExerciseViewerComponent({
                 isSelected={undefined}
                 fetch={undefined}
                 updateProgress={updateProgress}
-                filtersOpen={filtersOpen}
-                setFiltersOpen={setFiltersOpen}
               />
             ) : (
               <div className="exercise-placeholder">
@@ -227,8 +221,6 @@ function ExerciseQueueComponent({
 }
 
 function FiltersComponent({
-  filtersOpen,
-  setFiltersOpen,
   tags,
   handleTagToggle,
   transpos,
@@ -244,8 +236,6 @@ function FiltersComponent({
   resetSort,
   resetDisabled,
 }: {
-  filtersOpen: boolean;
-  setFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
   tags: string[];
   handleTagToggle: (tag: string) => void;
   transpos: boolean;
@@ -261,30 +251,20 @@ function FiltersComponent({
   resetSort: () => void;
   resetDisabled: boolean;
 }) {
-
-  const [noAnimation] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState<boolean>(true);
 
   return (
-    <>
     <section
-      className={`filters-panel${filtersOpen ? " filters-panel--open" : ""} ${noAnimation ? "filters-panel--no-animation" : ""}`}
+      className={`filters-panel${filtersOpen ? " filters-panel--open" : ""}`}
     >
-      <div className="filters-mobile-close">
-      <button
-        onClick={() => setFiltersOpen(false)}
-        aria-label="Close filters"
-      >
-        ﹀
-      </button>
-    </div>
       <button
         type="button"
-        className="filters-panel__toggle desktop-only"
+        className="filters-panel__toggle"
         onClick={() => setFiltersOpen((prev) => !prev)}
         aria-expanded={filtersOpen}
       >
         <span>Filters</span>
-        <span className="filters-panel__chevron" />
+        <span className="filters-panel__chevron" aria-hidden="true" />
       </button>
       <div
         className={`filters-panel__content${filtersOpen ? " filters-panel__content--open" : ""}`}
@@ -308,7 +288,6 @@ function FiltersComponent({
         />
       </div>
     </section>
-    </>
   );
 }
 
@@ -638,8 +617,6 @@ export function ExercisesPage({
                 allExData={allExData}
                 setAllExData={setAllExData}
                 updateProgress={updateProgress}
-                filtersOpen={filtersOpen}
-                setFiltersOpen={setFiltersOpen}
               />
               {!scoresRet ? (
                 <div className="exercise-queue-loading">

@@ -2284,16 +2284,6 @@ useEffect(() => {
               </button>
             }
           </div>
-          <div className="filters-button-row">
-            <div style={{ marginTop: "0" }}>
-              <button
-                className="filters-fab"
-                onClick={() => setFiltersOpen((prev: boolean) => !prev)}
-              >
-                Filters
-              </button>
-            </div>
-          </div>
           {canCheckAnswers ? (
             <div>
               <div>
