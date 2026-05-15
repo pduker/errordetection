@@ -1,16 +1,14 @@
-import React, { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useRef, useMemo } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import ExerciseData from "../interfaces/exerciseData";
 import { ConfirmationModal } from "./modals/confirmation-modal";
 import { ExerciseSuccessModal } from "./modals/ExerciseSuccessModal";
 import { getDatabase, ref, set, push } from "firebase/database";
-import { vertaal } from "xml2abc";
+
 import "../styles/create-exercise.css";
 
-// Import the new components
 import { ExerciseForm } from "./exercise-creation/exercise-form";
 import { ExerciseTypeFiles } from "./exercise-creation/exercise-type-files";
-import { ScorePreview } from "./exercise-creation/score-preview";
 import { ExerciseControls } from "./exercise-creation/exercise-controls";
 import { Exercise } from "./exercise";
 
@@ -22,17 +20,21 @@ interface CreateExercisePageProps {
 
 export function CreateExercisePage({ allExData, setAllExData, refreshExercises }: CreateExercisePageProps) {
   const navigate = useNavigate();
+  const params = useParams();
 
-  const [exIndex, setExIndex] = useState<number>(-1);
+  const exerciseIdParam = params.exerciseId;
+  const exIndex = parseInt(typeof exerciseIdParam === "string" ? exerciseIdParam : "error");
+
   const [exerciseData, setExerciseData] = useState<ExerciseData>(
+    allExData.find(ex => ex?.exIndex === exIndex) ||
     new ExerciseData(
       "", // score / abc
       undefined, // sound
       [], // correctAnswers
       "", // feedback
-      -1, // exIndex
+      exIndex, // exIndex
       true, // empty
-      "", // title
+      `Exercise ${exIndex}`, // title
       1, // difficulty
       1, // voices
       [], // tags
@@ -43,6 +45,8 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
       "" // customId
     )
   );
+
+  const isEditing = !exerciseData.isNew;
 
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [musicXmlFile, setMusicXmlFile] = useState<File | null>(null);
@@ -137,7 +141,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
         setShowFileErrorModal(true);
         return;
       }
-      (exerciseComponentRef.current as any).setAudioXmlFile(file);
+      (exerciseComponentRef.current as any).setAudioFile(file);
       setAudioFile(file);
     }
   }
@@ -417,9 +421,14 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     }
   };
 
+  if (Number.isNaN(exIndex)) {
+    alert(`Couldn't find an exercise with ID ${exerciseIdParam}!`);
+    navigate("/exercise-management");
+  }
+
   return (
     <div className="exercise-creation-container">
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={(e) => { e.preventDefault(); }}>
         <div className="exercise-viewer">
           <div className="exercise-stage">
             <div className="exercise-content"> 
@@ -427,6 +436,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                 <ExerciseControls 
                   onCreateExercise={() => handleSubmit(new Event('submit') as any)}
                   onCancel={handleCancel}
+                  isEdit={isEditing}
                 />
 
                 <div className="exercise-main-card">
@@ -456,7 +466,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                       {/* Right side - Exercise Type & Files */}
                       <div className="workspace-right">
                         <ExerciseTypeFiles
-                          tags={exerciseData.tags}
+                          tags={exerciseData.tags || []}
                           setTags={setTags}
                           types={exerciseData.types}
                           setTypes={setTypes}
@@ -470,7 +480,9 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                           removeFile={handleFileRemoveRequest}
                           fieldErrors={fieldErrors}
                           allExData={allExData}
-                        />    
+                          sound={exerciseData.sound}
+                          isEditing={isEditing}
+                        />
                       </div>
                     </div>
                   </div>
@@ -505,7 +517,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
         </div>
       </form>
 
-      {/* Modals */}
       <ConfirmationModal
         show={showConfirmModal}
         onHide={handleModalCancel}

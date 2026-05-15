@@ -1,11 +1,3 @@
-import "../styles/exercises/index.css";
-import "../styles/logout-modal.css";
-import "../styles/exercises/pagination.css";
-import { Button } from "react-bootstrap";
-import ExerciseData from "../interfaces/exerciseData";
-import { LogoutModal } from "./modals/LogoutModal";
-import { DeleteConfirmationModal } from "./modals/DeleteConfirmationModal";
-import { SuccessBanner } from "./modals/SuccessBanner";
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { get, getDatabase, ref, remove } from "firebase/database";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +6,15 @@ import abcjs from "abcjs";
 import { signOut } from 'firebase/auth';
 import { auth } from '../services/database';
 
+import { Button } from "react-bootstrap";
+import ExerciseData from "../interfaces/exerciseData";
+import { LogoutModal } from "./modals/LogoutModal";
+import { DeleteConfirmationModal } from "./modals/DeleteConfirmationModal";
+import { SuccessBanner } from "./modals/SuccessBanner";
+
+import "../styles/exercises/index.css";
+import "../styles/logout-modal.css";
+import "../styles/exercises/pagination.css";
 import "../styles/exercises/exercise-management.css";
 
 function ScorePreview({ abcNotation }: { abcNotation: string }) {
@@ -87,7 +88,7 @@ function ExerciseManagementListEntry({
   if (!exercise) return <></>;
 
   const handleEditClick = () => {
-    const exerciseId = exercise.customId || exercise.exIndex.toString();
+    const exerciseId = exercise.exIndex.toString();
     onEdit(exerciseId);
   };
 
@@ -158,6 +159,15 @@ export function ExerciseManagementPage({
   // State to track if all items are selected
   const [allSelected, setAllSelected] = useState<boolean>(false);
 
+  const nextAvailableExIndex = useMemo(() => {
+    let largestExIndex = -1;
+    for (const exercise of allExData) {
+      const exIndex = exercise?.exIndex || -1;
+      if (largestExIndex < exIndex) largestExIndex = exIndex;
+    }
+    return largestExIndex + 1;
+  }, [allExData]);
+
   // Check for login success flag on mount
   useEffect(() => {
     const showLoginSuccess = localStorage.getItem('showLoginSuccess');
@@ -170,25 +180,6 @@ export function ExerciseManagementPage({
 
   const closeSuccessBanner = () => {
     setShowSuccessBanner(false);
-  };
-
-  const handleSelectAll = () => {
-    // Filter out undefined exercises
-    const validExercises = exList.filter((ex): ex is ExerciseData => ex !== undefined);
-    
-    // Check if all current exercises are selected
-    const allCurrentSelected = validExercises.length > 0 && validExercises.every(ex => selectedIndexes.includes(ex.exIndex));
-    
-    if (allCurrentSelected) {
-      // Deselect all
-      setSelectedIndexes([]);
-      setAllSelected(false);
-    } else {
-      // Select all
-      const allIndexes = validExercises.map(ex => ex.exIndex);
-      setSelectedIndexes(allIndexes);
-      setAllSelected(true);
-    }
   };
 
   // Logout function to end admin mode
@@ -235,8 +226,6 @@ export function ExerciseManagementPage({
   //use states for getting and setting specific attributes of exercises and music
   const [selectedIndexes, setSelectedIndexes] = useState<number[]>([]);
   const [expandedExerciseIds, setExpandedExerciseIds] = useState<number[]>([]);
-
-  /* const [mode, setMode] = useState<boolean>(false); */
 
   const [diff, setDiff] = useState<string>("All");
   const [types, setTypes] = useState<string>("None");
@@ -671,7 +660,7 @@ export function ExerciseManagementPage({
               {/*creating an exercise*/}
               <Button
                 style={{ display: "inline", marginRight: "1vw" }}
-                onClick={() => navigate("/exercise-management/create")}
+                onClick={() => navigate(`/exercise-management/create/${nextAvailableExIndex}`)}
               >
               +
               </Button>
@@ -845,13 +834,6 @@ export function ExerciseManagementPage({
 
         {/* Select All, Preview All/Collapse All Button */}
         <div style={{ display: 'flex', justifyContent: 'flex-start', gap: '4px', marginBottom: '0.5rem' }}>
-          <Button
-            onClick={handleSelectAll}
-            variant="primary"
-            className="collapse-all-btn"
-          >
-            {allSelected ? 'Deselect All' : 'Select All'}
-          </Button>
           <Button
             onClick={() => {
               if (expandedExerciseIds.length === exList.length) {

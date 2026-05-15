@@ -86,15 +86,6 @@ export function Exercise({
     return mp3.name;
   };
 
-  // Helper function to convert string to File for audio processing
-  const getMp3ForAudio = (mp3: File | string): File | string => {
-    if (typeof mp3 === "string") {
-      // For string filenames, we'll need to handle them differently in audio processing
-      return mp3;
-    }
-    return mp3;
-  };
-
   var voicesInit = 1;
   var mp3: File | string = new File([], "");
   var typesInit = "None";
@@ -899,6 +890,11 @@ useEffect(() => {
   };
 
   const save = async function () {
+    if (typeof mp3File === "string") {
+      alert("Something went wrong when saving!");
+      return;
+    }
+
     try {
       var data;
       if (correctAnswers.length > 0) {
@@ -911,7 +907,7 @@ useEffect(() => {
       if (
         abcFile !== undefined &&
         abcFile !== "" &&
-        getMp3FileName(mp3File) !== "" &&
+        mp3File.name !== "" &&
         correctAnswers.length > 0
       ) {
         data = new ExerciseData(
@@ -937,12 +933,9 @@ useEffect(() => {
         const storage = getStorage();
 
         const scoresRef = ref(database, "scores");
-        const audioref = storageRef(storage, getMp3FileName(mp3File));
+        const audioref = storageRef(storage, mp3File.name);
 
-        await uploadBytes(
-          audioref,
-          typeof mp3File === "string" ? new File([], mp3File) : mp3File,
-        );
+        await uploadBytes(audioref, mp3File); // TODO inspect uploadbytes
         const dbDataRef = child(scoresRef, exInd.toString());
 
         const snapshot = await get(dbDataRef);
@@ -958,7 +951,7 @@ useEffect(() => {
           alert("exercise data was updated!");
         } else {
           // Create new exercise
-          const newData = new DBData(data, getMp3FileName(mp3File));
+          const newData = new DBData(data, mp3File.name);
           newData.customId = customId; // Ensure customId is included in new data
           await set(dbDataRef, newData);
           console.log("New exercise added!");
@@ -1938,8 +1931,11 @@ useEffect(() => {
     setMusicXmlFile(file: File) {
       (xmlFileUploadRef.current as any).setFileUsingRef(file);
     },
-    setAudioXmlFile(file: File) {
+    setAudioFile(file: File) {
       (audioFileUploadRef.current as any).setFileUsingRef(file);
+    },
+    submitSave() {
+      save();
     }
   }));
   
@@ -1989,7 +1985,7 @@ useEffect(() => {
       {teacherMode ? (
         <div>
           <div />
-          <div id="xmlUpload" style={{ display: "inline-flex" }}>
+          <div id="xmlUpload" style={{ display: "none" }}>
             XML Upload:{" "}
             <FileUpload
               setFile={setXmlFile}
@@ -2000,7 +1996,7 @@ useEffect(() => {
               exerciseRef={xmlFileUploadRef}
             ></FileUpload>
           </div>
-          <div id="mp3Upload" style={{ display: "inline-flex" }}>
+          <div id="mp3Upload" style={{ display: "none" }}>
             MP3 Upload:{" "}
             {typeof mp3File === "string" ? (
               <span>{mp3File}</span>

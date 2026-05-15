@@ -25,7 +25,8 @@ const useIsMobile = () => {
 };
 
 // Custom audio player with full controls and styling
-export default function AudioHandler({ file }: { file: string | File }): JSX.Element {
+export default function AudioHandler(
+  { file, exerciseManagement = false }: { file: string | File, exerciseManagement?: boolean }): JSX.Element {
   const [msgContent] = useState<string>("");
   const audioRef = useRef<HTMLAudioElement>(null);
   const storage = getStorage();
@@ -39,6 +40,9 @@ export default function AudioHandler({ file }: { file: string | File }): JSX.Ele
   const [isLoaded, setIsLoaded] = useState(false);
   const [showVolumeOverlay, setShowVolumeOverlay] = useState(false);
   const volumeSliderRef = useRef<HTMLInputElement>(null);
+
+  const showVolume = true;
+  const noMargins = exerciseManagement;
 
   useEffect(() => {
     if(audioRef.current?.src) URL.revokeObjectURL(audioRef.current.src);
@@ -167,7 +171,7 @@ export default function AudioHandler({ file }: { file: string | File }): JSX.Ele
   };
 
   return (
-    <div className="custom-audio-player">
+    <div className="custom-audio-player" style={noMargins ? { margin: 0, maxWidth: "none" } : {}}>
       <audio ref={audioRef} preload="metadata" />
 
       <div className="audio-controls">
@@ -185,7 +189,7 @@ export default function AudioHandler({ file }: { file: string | File }): JSX.Ele
           </div>
 
           {/* Mobile volume button */}
-          {isMobile && (
+          {isMobile && showVolume && (
             <button
               className="audio-volume-btn"
               onClick={toggleVolumeOverlay}
@@ -207,7 +211,7 @@ export default function AudioHandler({ file }: { file: string | File }): JSX.Ele
         />
 
         {/* Desktop horizontal volume slider */}
-        {!isMobile && (
+        {!isMobile && showVolume && (
           <div className="audio-volume-section">
             <span className="volume-icon">🔊</span>
             <input
@@ -223,7 +227,7 @@ export default function AudioHandler({ file }: { file: string | File }): JSX.Ele
         )}
 
         {/* Mobile vertical volume overlay */}
-        {isMobile && showVolumeOverlay && (
+        {isMobile && showVolume && showVolumeOverlay && (
           <div className="audio-volume-overlay">
             <input
               ref={volumeSliderRef}

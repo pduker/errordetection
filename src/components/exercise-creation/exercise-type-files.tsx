@@ -1,6 +1,8 @@
 import React, { useRef, useEffect } from "react";
 import { getStorage, ref as storageRef, getBlob } from "firebase/storage";
 
+import AudioHandler from "../audiohandler";
+
 interface ExerciseTypeFilesProps {
   tags: string[];
   setTags: (value: string[]) => void;
@@ -21,9 +23,8 @@ interface ExerciseTypeFilesProps {
     customId: boolean;
   };
   allExData: any[];
-  isEdit?: boolean;
-  originalAudioFile?: string;
-  originalMusicXmlFile?: string;
+  sound: File | string | undefined;
+  isEditing: boolean;
 }
 
 export function ExerciseTypeFiles({
@@ -39,53 +40,34 @@ export function ExerciseTypeFiles({
   removeFile,
   fieldErrors,
   allExData,
-  isEdit = false,
-  originalAudioFile = "",
-  originalMusicXmlFile = ""
+  sound,
+  isEditing
 }: ExerciseTypeFilesProps) {
   const musicXmlInputRef = useRef<HTMLInputElement>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
 
-  const loadOriginalFile = async (fileName: string, fileType: "audio" | "musicxml"): Promise<void> => {
+  const loadOriginalFile = async (): Promise<void> => {
     try {
-      const storage = getStorage();
-      const fileRef = storageRef(storage, fileName);
-      const fileBlob = await getBlob(fileRef);
-      
-      if (fileType === "audio") {
-        const audioFileObj = new File([fileBlob], fileName, { type: "audio/mpeg" });
+      if (typeof sound === "string") {
+        const storage = getStorage();
+        const fileRef = storageRef(storage, sound);
+        const fileBlob = await getBlob(fileRef);
+        
+        const audioFileObj = new File([fileBlob], sound, { type: "audio/mpeg" });
         setAudioFile(audioFileObj);
-      } else if (fileType === "musicxml") {
-        const musicXmlFileObj = new File([fileBlob], fileName, { type: "application/xml" });
-        setMusicXmlFile(musicXmlFileObj);
       }
     } catch (fileError) {
       console.error("Error loading original file:", fileError);
     }
   };
 
-  const handleClearFile = (type: "musicxml" | "audio") => {
-    removeFile(type);
-    // Reset the file input value
-    if (type === "musicxml" && musicXmlInputRef.current) {
-      musicXmlInputRef.current.value = "";
-    } else if (type === "audio" && audioInputRef.current) {
-      audioInputRef.current.value = "";
-    }
-  };
-
   // Load original files when in edit mode OR save files to storage in create mode
   useEffect(() => {
-    if (isEdit && originalAudioFile && !audioFile) {
+    if (isEditing && !audioFile && (typeof sound === "string")) {
       // Load audio file from Firebase Storage
-      loadOriginalFile(originalAudioFile, "audio");
+      loadOriginalFile();
     }
-    
-    if (isEdit && originalMusicXmlFile && !musicXmlFile) {
-      // Load MusicXML file from Firebase Storage
-      loadOriginalFile(originalMusicXmlFile, "musicxml");
-    }
-  }, [isEdit, originalAudioFile, originalMusicXmlFile, audioFile, musicXmlFile, setAudioFile, setMusicXmlFile]);
+  }, []);
 
   return (
     <div>
@@ -158,23 +140,33 @@ export function ExerciseTypeFiles({
             }}
             className={`file-input ${musicXmlFile ? "file-present" : ""}`}
           />
-          {fieldErrors.musicXml && !musicXmlFile && (!isEdit || !originalMusicXmlFile) && (
+          {fieldErrors.musicXml && !musicXmlFile && !isEditing && (
           <div className="field-error-message">MusicXML file required</div>
           )}
         </div>
         
         <div className="file-upload-item">
           <label>Audio</label>
-          <input
-            type="file"
-            accept=".mp3,.wav,.m4a"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) handleFileUpload(file, "audio");
-            }}
-            className={`file-input ${audioFile ? "file-present" : ""}`}
-          />
-          {fieldErrors.audio && !audioFile && (!isEdit || !originalAudioFile) && (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem" }}>
+            <input
+              type="file"
+              accept=".mp3,.wav,.m4a"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFileUpload(file, "audio");
+              }}
+              className={`file-input ${audioFile ? "file-present" : ""}`}
+            />
+            {
+              sound !== undefined ? (
+                <AudioHandler file={sound} exerciseManagement={true}></AudioHandler>
+              ) : (
+                <></>
+              )
+            }
+          </div>
+          
+          {fieldErrors.audio && !audioFile && !isEditing && (
           <div className="field-error-message">Audio file required</div>
           )}
         </div>
