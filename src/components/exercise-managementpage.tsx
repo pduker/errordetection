@@ -928,7 +928,7 @@ export function ExerciseManagementPage({
               className="info-dropdown"
               style={{
                 position: "absolute",
-                top: (infoButtonRef.current?.getBoundingClientRect().top ?? 0) + 80,
+                top: (infoButtonRef.current?.getBoundingClientRect().top ?? 0),
                 left: (infoButtonRef.current?.getBoundingClientRect().right ?? 0) + 12,
               }}
             >

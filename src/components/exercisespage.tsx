@@ -235,6 +235,8 @@ function FiltersComponent({
   handleTexturalFactorSelect,
   resetSort,
   resetDisabled,
+  filtersOpen,
+  setFiltersOpen,
 }: {
   tags: string[];
   handleTagToggle: (tag: string) => void;
@@ -250,8 +252,9 @@ function FiltersComponent({
   handleTexturalFactorSelect: (value: string) => void;
   resetSort: () => void;
   resetDisabled: boolean;
+  filtersOpen: boolean;
+  setFiltersOpen: (value: boolean) => void;
 }) {
-  const [filtersOpen, setFiltersOpen] = useState<boolean>(true);
 
   return (
     <section
@@ -260,7 +263,7 @@ function FiltersComponent({
       <button
         type="button"
         className="filters-panel__toggle"
-        onClick={() => setFiltersOpen((prev) => !prev)}
+        onClick={() => setFiltersOpen(!filtersOpen)}
         aria-expanded={filtersOpen}
       >
         <span>Filters</span>

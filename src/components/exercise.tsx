@@ -38,8 +38,6 @@ export function Exercise({
   handleSelectExercise,
   isSelected,
   fetch,
-  filtersOpen,
-  setFiltersOpen,
 }: {
   exIndex: number;
   teacherMode: boolean;
@@ -53,8 +51,6 @@ export function Exercise({
   handleSelectExercise: ((exIndex: number) => void) | undefined;
   isSelected: boolean | undefined;
   fetch: ((val: boolean) => void) | undefined;
-  filtersOpen: boolean;
-  setFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   // for score styling
   const score = {
