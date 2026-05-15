@@ -1,6 +1,7 @@
 import '../styles/about.css';
 import { Link } from "react-router-dom";
 
+// TODO: Make sure to add your name to this list
 const contributors = [
     "Alex Daley",
     "Weldin Dunn",

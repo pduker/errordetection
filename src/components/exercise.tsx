@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useImperativeHandle } from "react";
 import { ref, get, remove, child, set } from "firebase/database";
 import abcjs from "abcjs";
 import FileUpload from "./fileupload";
@@ -38,6 +38,9 @@ export function Exercise({
   handleSelectExercise,
   isSelected,
   fetch,
+  filtersOpen,
+  setFiltersOpen,
+  teacherModeRef = undefined
 }: {
   exIndex: number;
   teacherMode: boolean;
@@ -51,6 +54,9 @@ export function Exercise({
   handleSelectExercise: ((exIndex: number) => void) | undefined;
   isSelected: boolean | undefined;
   fetch: ((val: boolean) => void) | undefined;
+  filtersOpen: boolean;
+  setFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  teacherModeRef?: React.Ref<any> | undefined;
 }) {
   // for score styling
   const score = {
@@ -74,19 +80,10 @@ export function Exercise({
   var diffInit = 1;
   // Helper function to get filename from File or string
   const getMp3FileName = (mp3: File | string): string => {
-    if (typeof mp3 === 'string') {
+    if (typeof mp3 === "string") {
       return mp3;
     }
     return mp3.name;
-  };
-
-  // Helper function to convert string to File for audio processing
-  const getMp3ForAudio = (mp3: File | string): File | string => {
-    if (typeof mp3 === 'string') {
-      // For string filenames, we'll need to handle them differently in audio processing
-      return mp3;
-    }
-    return mp3;
   };
 
   var voicesInit = 1;
@@ -134,7 +131,7 @@ export function Exercise({
 
   const [xmlFile, setXmlFile] = useState<File>();
   const [mp3File, setMp3File] = useState<File | string>(mp3);
-  
+
   // Helper to update mp3File with proper type handling
   const handleSetMp3File = (file: File | string) => {
     setMp3File(file);
@@ -143,6 +140,9 @@ export function Exercise({
 
   // check if an exercise has been completed
   const [isCompleted, setIsCompleted] = useState(false);
+
+  const xmlFileUploadRef = useRef();
+  const audioFileUploadRef = useRef();
 
   function countExerciseTypes() {
     const counts ={
@@ -226,7 +226,7 @@ useEffect(() => {
 
   //for disabling ui elements
   const rhythmOnly = tags.length === 1 && tags.includes("Rhythm");
-  const canCheckAnswers = abcFile !== undefined && abcFile !== "" && loaded;
+  const canCheckAnswers = abcFile !== undefined && abcFile !== "";
 
   // try to load score when there's either exerciseData or an abc file to pull from
   useEffect(() => {
@@ -361,11 +361,16 @@ useEffect(() => {
     abcString = abcString.replace("T:Title\n", "");
     var el = document.getElementById("target" + exIndex);
     if (el !== null && abcString !== undefined) {
+      const containerWidth = el.clientWidth;
+      const baseWidth = 800;
+      const scale = Math.min(1, containerWidth / baseWidth);
+
       visualObjs = abcjs.renderAbc(el, abcString, {
         clickListener: rhythmOnly ? undefined : clickListener,
         selectTypes: rhythmOnly ? [] : ["note"],
         lineThickness: 0.4,
         responsive: "resize",
+        scale: scale,
       });
 
       let beatSum: number = 0;
@@ -464,7 +469,6 @@ useEffect(() => {
           } else {
             beatWidth = totalNoteWidth / numBeats - 5;
           }
-
 
           const noteTopPt = toSvgCoords(svgElement, 0, noteBox.top);
           const topLinePt =
@@ -886,6 +890,11 @@ useEffect(() => {
   };
 
   const save = async function () {
+    if (typeof mp3File === "string") {
+      alert("Something went wrong when saving!");
+      return;
+    }
+
     try {
       var data;
       if (correctAnswers.length > 0) {
@@ -898,7 +907,7 @@ useEffect(() => {
       if (
         abcFile !== undefined &&
         abcFile !== "" &&
-        getMp3FileName(mp3File) !== "" &&
+        mp3File.name !== "" &&
         correctAnswers.length > 0
       ) {
         data = new ExerciseData(
@@ -924,9 +933,9 @@ useEffect(() => {
         const storage = getStorage();
 
         const scoresRef = ref(database, "scores");
-        const audioref = storageRef(storage, getMp3FileName(mp3File));
+        const audioref = storageRef(storage, mp3File.name);
 
-        await uploadBytes(audioref, typeof mp3File === 'string' ? new File([], mp3File) : mp3File);
+        await uploadBytes(audioref, mp3File); // TODO inspect uploadbytes
         const dbDataRef = child(scoresRef, exInd.toString());
 
         const snapshot = await get(dbDataRef);
@@ -942,7 +951,7 @@ useEffect(() => {
           alert("exercise data was updated!");
         } else {
           // Create new exercise
-          const newData = new DBData(data, getMp3FileName(mp3File));
+          const newData = new DBData(data, mp3File.name);
           newData.customId = customId; // Ensure customId is included in new data
           await set(dbDataRef, newData);
           console.log("New exercise added!");
@@ -1148,13 +1157,15 @@ useEffect(() => {
     }
 
     // Find which selected notes are correct
-    const correctNoteIndices = new Set(
-      correctAnswers.map((ans) => String(ans.index)),
+    const correctNoteKeys = new Set(
+      correctAnswers.map((ans) => `${ans.index}-${ans.selectedTimes ?? 0}`),
     );
 
     selectedNotes.forEach((noteElem) => {
       const noteIndex = noteElem.getAttribute("index");
-      if (noteIndex != null && correctNoteIndices.has(noteIndex)) {
+      const selTimes = noteElem.getAttribute("selectedTimes") ?? "0";
+      const noteKey = `${noteIndex}-${selTimes}`;
+      if (noteIndex != null && correctNoteKeys.has(noteKey)) {
         // Correct selection: highlight beat green
         highlightBeatOfNote(noteElem, "rgba(61, 245, 39, 0.6)");
       } else {
@@ -1258,10 +1269,6 @@ useEffect(() => {
       let allCorrect = true;
       const plural = currentCorrectAnswers.length === 1 ? " is " : " are ";
 
-      feedback.push(
-        `You selected ${combinedSelections.length} answer(s). There${plural}${currentCorrectAnswers.length} correct answer(s).`,
-      );
-
       highlightBeat(
         selectedBeatElements as unknown as Element[],
         currentCorrectAnswers,
@@ -1296,7 +1303,9 @@ useEffect(() => {
             (s) =>
               s.type === "note" &&
               Number(s.measurePos) === Number(corr.measurePos) &&
-              Number(s.index) === Number(corr.index),
+              Number(s.index) === Number(corr.index) &&
+              // ensure the number of times selected matches expected
+              Number((s as any).selectedTimes) === Number(corr.selectedTimes),
           );
 
           if (!found) {
@@ -1367,9 +1376,10 @@ useEffect(() => {
           // Check if this note is correct
           found = currentCorrectAnswers.some(
             (c) =>
-              // c.type === "note" &&
               Number(c.measurePos) === Number(sel.measurePos) &&
-              Number(c.index) === Number(sel.index),
+              Number(c.index) === Number(sel.index) &&
+              // ensure the selectedTimes also match
+              Number(c.selectedTimes) === Number((sel as any).selectedTimes),
           );
 
           if (!found) {
@@ -1400,7 +1410,7 @@ useEffect(() => {
         combinedSelections.length < currentCorrectAnswers.length
       ) {
         feedback.push(
-          `Very close! There${plural}${currentCorrectAnswers.length} correct answer(s).`
+          `Very close! There${plural}${currentCorrectAnswers.length} correct answer(s).`,
         );
       }
 
@@ -1466,7 +1476,7 @@ useEffect(() => {
 
       if (!allCorrect) {
         feedback.push(
-          `Try again - there${plural}${currentCorrectAnswers.length} correct answer(s).`
+          `Try again - there${plural}${currentCorrectAnswers.length} correct answer(s).`,
         );
       }
 
@@ -1538,7 +1548,7 @@ useEffect(() => {
         combinedSelections.length < currentCorrectAnswers.length
       ) {
         feedback.push(
-          `Very close! There${plural}${currentCorrectAnswers.length} correct answer(s).`
+          `Very close! There${plural}${currentCorrectAnswers.length} correct answer(s).`,
         );
       }
 
@@ -1917,17 +1927,33 @@ useEffect(() => {
     setAllExData(updatedExercises);
   };
 
+  useImperativeHandle(teacherModeRef, () => ({
+    setMusicXmlFile(file: File) {
+      (xmlFileUploadRef.current as any).setFileUsingRef(file);
+    },
+    setAudioFile(file: File) {
+      (audioFileUploadRef.current as any).setFileUsingRef(file);
+    },
+    getCustomTitle() {
+      return customTitle;
+    },
+    getDataToSync() {
+      return {
+        score: abcFile,
+        correctAnswers: correctAnswers
+      };
+    }
+  }));
+  
   return (
     <div
-      className="exercise-box" // SIR added exercise box
+      className="exercise-box"
       style={{
-        //exercise example box
         padding: "10px",
         backgroundColor: "#fcfcd2",
         borderRadius: "10px",
-        display: "flex", // SIR: added flex to box
-        flexDirection: "column", // SIR
-        alignItems: "stretch", // SIR
+        display: "flex",
+        flexDirection: "column",
         boxSizing: "border-box",
       }}
     >
@@ -1937,7 +1963,10 @@ useEffect(() => {
           <button onClick={saveTitle}>Save Title</button>
         </span>
       ) : (
-        <h3 onClick={() => setEditingTitle(!editingTitle)}>
+        <h3
+          className="custom-title"
+          onClick={() => setEditingTitle(!editingTitle)}
+        >
           {customTitle}
           {isCompleted && (
             <div
@@ -1960,124 +1989,9 @@ useEffect(() => {
         </h3>
       )}
       {teacherMode ? (
-        <span>
-          {ExData.isNew && (
-            <Button
-              variant="danger"
-              onClick={() => handleCancelExercise(exIndex)}
-              style={{ marginBottom: "10px" }}
-            >
-              Cancel Exercise Creation
-            </Button>
-          )}
-          <div id="forms" style={{ display: "inline-flex", padding: "4px", alignItems: "center" }}>
-            <form id="customId">
-              Custom ID:
-              <br />
-              <input
-                type="text"
-                value={customId}
-                onChange={(e) => setCustomId(e.target.value)}
-                placeholder="Enter custom ID"
-                style={{ margin: "4px" }}
-              />
-            </form>
-            <form id="tags">
-              Tags:
-              <br />
-              <input
-                type="checkbox"
-                name="tags"
-                value="Pitch"
-                checked={tags.includes("Pitch")}
-                onChange={tagsChange}
-                style={{ margin: "4px" }}
-              />
-              Pitch
-              <input
-                type="checkbox"
-                name="tags"
-                value="Intonation"
-                checked={tags.includes("Intonation")}
-                onChange={tagsChange}
-                style={{ marginLeft: "12px" }}
-              />{" "}
-              Intonation
-              <label>
-                <input
-                  type="checkbox"
-                  name="tags"
-                  value="Rhythm"
-                  checked={tags.includes("Rhythm")}
-                  onChange={tagsChange}
-                />
-                Rhythm
-              </label>
-            </form>
-            <form id="voiceCt">
-              Voices:
-              <br />
-              <select
-                name="voices"
-                defaultValue={voices}
-                onChange={voiceChange}
-              >
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-              </select>
-            </form>
-            <form id="difficulty">
-              Difficulty:
-              <br />
-              <select
-                name="difficulty"
-                defaultValue={diff}
-                onChange={diffChange}
-              >
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-              </select>
-            </form>
-            <form id="meter">
-              Meter:
-              <br />
-              <select name="meter" defaultValue={types} onChange={meterChange}>
-                <option value="Anything">Anything</option>
-                <option value="Simple">Simple</option>
-                <option value="Compound">Compound</option>
-              </select>
-            </form>
-            <form id="types">
-              Textural Factors:
-              <br />
-              <select name="types" defaultValue={types} onChange={typesChange}>
-                <option value="None">None</option>
-                <option value="Drone">Drone</option>
-                <option value="Ensemble Parts">Ensemble Parts</option>
-                <option value="Both">Drone & Ensemble Parts</option>
-              </select>
-            </form>
-            <form id="transpos">
-              Transposing Instruments:
-              <br />
-              <input
-                type="checkbox"
-                name="transpos"
-                value="true"
-                checked={transpos}
-                onChange={transposChange}
-                style={{ marginLeft: "5.3vw" }}
-              />
-            </form>
-          </div>
+        <div>
           <div />
-          <div id="xmlUpload" style={{ display: "inline-flex" }}>
+          <div id="xmlUpload" style={{ display: "none" }}>
             XML Upload:{" "}
             <FileUpload
               setFile={setXmlFile}
@@ -2085,11 +1999,12 @@ useEffect(() => {
               setAbcFile={setAbcFile}
               type="xml"
               setLoaded={setLoaded}
+              exerciseRef={xmlFileUploadRef}
             ></FileUpload>
           </div>
-          <div id="mp3Upload" style={{ display: "inline-flex" }}>
+          <div id="mp3Upload" style={{ display: "none" }}>
             MP3 Upload:{" "}
-            {typeof mp3File === 'string' ? (
+            {typeof mp3File === "string" ? (
               <span>{mp3File}</span>
             ) : (
               <FileUpload
@@ -2098,6 +2013,7 @@ useEffect(() => {
                 setAbcFile={setAbcFile}
                 type="mp3"
                 setLoaded={setLoaded}
+                exerciseRef={audioFileUploadRef}
               ></FileUpload>
             )}
           </div>
@@ -2111,127 +2027,146 @@ useEffect(() => {
           <div style={{ display: "inline-block", width: "75%" }}>
             <div id={"target" + exIndex} style={score}></div>
           </div>
-          <img
-            alt="note-color-key"
-            src={noteKey}
-            width="14%"
-            height="7%"
-            style={{ display: "inline", marginLeft: "1vw" }}
-          />
-          {(abcFile !== undefined && abcFile !== "" && loaded) ||
-          (exerciseData !== undefined && !exerciseData.empty) ? (
-            <div
-              style={{
-                display: "inline-block",
-                marginLeft: "1vw",
-                marginTop: "1vh",
-              }}
-            >
-              <textarea
-                id={"note-feedback-" + exIndex}
-                placeholder={"Note feedback..."}
-                onChange={saveFeedback}
-              ></textarea>
-              <Button
-                variant="danger"
-                onClick={reload}
-                style={{ marginLeft: "1vw", float: "right" }}
+          <div className="audio-row teachermode-bottom-row">
+            {
+              <button
+                className="exercise-nav-inline exercise-nav-inline--prev mobile-only"
+                onClick={() => {
+                  const btn = document.querySelector(
+                    ".exercise-nav-desktop.exercise-nav-inline--prev",
+                  ) as HTMLElement | null;
+                  if (btn) btn.click();
+                }}
+                aria-label="Previous exercise"
               >
-                Reset Answers
-              </Button>
-            </div>
-          ) : (
-            <></>
-          )}
-          {lastClicked !== undefined &&
-          Number(lastClicked.abselem.elemset[0].getAttribute("selectedTimes")) %
-            4 !==
-            0 ? (
-            <div style={{ marginLeft: "1vw" }}>Note Info: {ana}</div>
-          ) : (
-            <div />
-          )}
-          <br />
-          <Button variant="success" onClick={save}>
-            Save Exercise
-          </Button>
-          {teacherMode && exerciseData?.isNew && (
-            <Button
-              variant="secondary"
-              onClick={() => handleCancelExercise(exInd)}
-              style={{ marginLeft: "10px", marginTop: "10px" }}
-            >
-              Cancel
-            </Button>
-          )}
-          <Button
-            onClick={() => handleExerciseDelete(exIndex)}
-            style={{ marginLeft: "10px", marginTop: "10px" }}
-            variant="danger"
-          >
-            Delete Exercise
-          </Button>
-        </span>
-      ) : (
-        <span>
-          <div style={{ width: "100%", display: "inline-flex" }}>
-            <div id={"target" + exIndex} style={score}></div>
-          </div>
-          <br />
-          {!rhythmOnly && (
+                ←
+              </button>
+            }
             <img
               alt="note-color-key"
               src={noteKey}
               width="14%"
-              height="7%"
-              style={{
-                display: "inline-flex",
-                marginRight: "1vw",
-                marginTop: "-1vh",
-                borderRadius: "1px",
-              }}
             />
-          )}
+
+            <div>
+              {
+                (
+                  lastClicked &&
+                  Number(
+                    lastClicked.abselem.elemset[0].getAttribute("selectedTimes"),
+                  ) % 4 !== 0
+                ) ? (
+                  <div>Note info: {ana}</div>
+                ) : <div>No note selected</div>
+              }
+              <div className="audio-controls-group">
+                <textarea
+                  id={"note-feedback-" + exIndex}
+                  placeholder="Note feedback..."
+                  onChange={saveFeedback}
+                />
+              </div>
+            </div>
+
+            <Button variant="danger" onClick={reload}>
+              Reset Answers
+            </Button>
+          </div>
+        </div>
+      ) : (
+        <div>
+          <div style={{ width: "100%", display: "flex" }}>
+            <div id={"target" + exIndex} style={score}></div>
+          </div>
+          <br />
 
           <div
             style={{
-              display: "inline-flex",
+              display: "flex",
+              width: "100%",
               marginTop: "-2vh",
               alignItems: "center",
               gap: "1rem",
-              flexWrap: "wrap",
+              flexWrap: "nowrap",
             }}
           >
+            {
+              <button
+                className="exercise-nav-inline exercise-nav-inline--prev mobile-only"
+                onClick={() => {
+                  const btn = document.querySelector(
+                    ".exercise-nav-desktop.exercise-nav-inline--prev",
+                  ) as HTMLElement | null;
+                  if (btn) btn.click();
+                }}
+                aria-label="Previous exercise"
+              >
+                ←
+              </button>
+            }
+
+            {!rhythmOnly && (
+              <img
+                alt="note-color-key"
+                src={noteKey}
+                style={{
+                  display: "inline-flex",
+                  width: "14%",
+                  height: "auto",
+                  borderRadius: "1px",
+                }}
+              />
+            )}
             {mp3 !== undefined ? (
-              <div style={{ marginTop: "1vh" }}>
+              <div style={{ flex: 1 }}>
                 <AudioHandler file={mp3}></AudioHandler>
               </div>
             ) : (
               <></>
             )}
             <div className="exercise-action-buttons">
-              {canCheckAnswers && (
-                <button
-                  className="btnback exercise-action-check"
-                  onClick={() => {
-                      checkAnswers();
-                      trackCheckClicks();
-                    }}
-                >
-                  Check Answer
-                </button>
-              )}
+              <button
+                className="btnback exercise-action-check" // fixed button resizing
+                onClick={checkAnswers}
+                style={{ visibility: canCheckAnswers ? "visible" : "hidden" }}
+              >
+                Check Answer
+              </button>
               <Button
                 variant="danger"
                 onClick={exReload}
                 className="exercise-action-reset"
                 style={{
-                  /*SIR: the actual reset answers button*/ position: "relative",
+                  position: "relative",
                   marginBottom: "2vh",
                 }}
               >
                 Reset Answers
               </Button>
+            </div>
+            {
+              <button
+                className="exercise-nav-inline exercise-nav-inline--next mobile-only"
+                onClick={() => {
+                  const btn = document.querySelector(
+                    ".exercise-nav-desktop.exercise-nav-inline--next",
+                  ) as HTMLElement | null;
+                  if (btn) btn.click();
+                }}
+                aria-label="Next exercise"
+              >
+                →
+              </button>
+            }
+          </div>
+          <div className="filters-button-row">
+            <div style={{ marginTop: "0" }}>
+              <button
+                className="filters-fab"
+                onClick={() => setFiltersOpen((prev: boolean) => !prev)}
+              >
+                Filters
+              </button>
             </div>
           </div>
           {canCheckAnswers ? (
@@ -2256,7 +2191,7 @@ useEffect(() => {
           ) : (
             <div />
           )}
-        </span>
+        </div>
       )}
       {handleSelectExercise !== undefined ? (
         <div>

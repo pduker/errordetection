@@ -1,5 +1,5 @@
 //imports
-import { useState } from 'react';
+import { useState, useImperativeHandle } from 'react';
 import { vertaal } from 'xml2abc';
 import AudioHandler from './audiohandler';
 
@@ -9,13 +9,15 @@ export default function FileUpload ({
   setAbcFile,
   file,
   type,
-  setLoaded
+  setLoaded,
+  exerciseRef = undefined
 }:{
   file:File | undefined;
   setFile: ((newFile: File) => void);
   setAbcFile: ((newFile: string) => void) | null;
   type:string;
   setLoaded: ((newVal: boolean) => void);
+  exerciseRef?: any;
 }):JSX.Element{
 
     //state declarations, can be used to access file in the future
@@ -45,6 +47,7 @@ export default function FileUpload ({
     //function to update state whenever uploaded file is changed
     const fileChange = function (e: React.ChangeEvent<HTMLInputElement>) {
       const selectedFiles = e.target.files;
+      console.log(selectedFiles);
       if (!selectedFiles || selectedFiles.length === 0) {
         //setMsgContent("No file selected.");
         return;
@@ -77,6 +80,17 @@ export default function FileUpload ({
           }
         }
       };
+
+  useImperativeHandle(exerciseRef, () => ({
+    setFileUsingRef(file: File) {
+      console.log("calling set file using ref");
+      fileChange({
+        target: {
+          files: [file]
+        }
+      } as any);
+    }
+  }));
 
   //render musical file 
   return (
