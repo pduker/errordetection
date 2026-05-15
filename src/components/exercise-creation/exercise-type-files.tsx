@@ -72,7 +72,7 @@ export function ExerciseTypeFiles({
   return (
     <div>
       <div className="type-section">
-        <h4>Exercise Type</h4>
+        <h4>Exercise Tags</h4>
         <div className="exercise-tags">
           {["Pitch", "Intonation", "Rhythm"].map((tag) => (
             <button

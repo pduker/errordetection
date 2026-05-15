@@ -1942,6 +1942,22 @@ useEffect(() => {
         score: abcFile,
         correctAnswers: correctAnswers
       };
+    },
+    updateDataFromExerciseCreation(
+      difficulty: number,
+      tags: string[],
+      types: string,
+      meter: string,
+      transpos: boolean,
+      voices: number
+    ) {
+      setDiff(difficulty);
+      setTags(tags);
+      setTypes(types);
+      setMeter(meter);
+      setTranspos(transpos);
+      setVoices(voices);
+      customTitleChange(tags, difficulty, voices, types, meter, transpos)
     }
   }));
   

@@ -380,6 +380,17 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     }
   };
 
+  useEffect(() => {
+    (exerciseComponentRef.current as any).updateDataFromExerciseCreation(
+      difficulty,
+      tags,
+      types,
+      meter,
+      transpos,
+      voices
+    );
+  }, [difficulty, tags, types, meter, transpos, voices]);
+
   if (Number.isNaN(exIndex)) {
     alert(`Couldn't find an exercise with ID ${exerciseIdParam}!`);
     navigate("/exercise-management");
@@ -425,7 +436,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                       {/* Right side - Exercise Type & Files */}
                       <div className="workspace-right">
                         <ExerciseTypeFiles
-                          tags={tags || []}
+                          tags={tags}
                           setTags={setTags}
                           types={types}
                           setTypes={setTypes}
