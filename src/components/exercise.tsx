@@ -38,6 +38,8 @@ export function Exercise({
   handleSelectExercise,
   isSelected,
   fetch,
+  filtersOpen,
+  setFiltersOpen,
 }: {
   exIndex: number;
   teacherMode: boolean;
@@ -51,6 +53,8 @@ export function Exercise({
   handleSelectExercise: ((exIndex: number) => void) | undefined;
   isSelected: boolean | undefined;
   fetch: ((val: boolean) => void) | undefined;
+  filtersOpen: boolean;
+  setFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   // for score styling
   const score = {
@@ -144,6 +148,67 @@ export function Exercise({
   // check if an exercise has been completed
   const [isCompleted, setIsCompleted] = useState(false);
 
+  function countExerciseTypes() {
+    const counts ={
+      pitch: 0,
+      intonation: 0,
+      rhythm: 0,
+    };
+    const saved = localStorage.getItem("userProgress");
+    if (!saved) return counts;
+
+    try {
+      const progress = JSON.parse(saved);
+
+      for (const [key, value] of Object.entries(progress)) {
+        if (!(value as any)?.completed) continue;
+
+        const typeSection = key.split(":")[0].toLowerCase();
+
+        if (typeSection.includes("pitch")) counts.pitch++;
+        if (typeSection.includes("intonation")) counts.intonation++;
+        if (typeSection.includes("rhythm")) counts.rhythm++;
+      }
+      console.log("Exercise type counts:", counts);
+    } catch (err) {
+      console.error("Error counting exercise types:", err);
+    }
+     // return counts; at some point if we want to display this info on the frontend or use it to unlock content or something
+  }
+
+  function trackCheckClicks() {
+  const saved = localStorage.getItem("userProgress");
+  if (!saved) return;
+
+  try {
+    const progress = JSON.parse(saved);
+    const title = ExData.title;
+
+    if (!progress[title]) {
+      progress[title] = {};
+    }
+
+    if (!progress[title].checkClicks) {
+      progress[title].checkClicks = 0;
+    }
+
+    progress[title].checkClicks += 1;
+
+    localStorage.setItem("userProgress", JSON.stringify(progress));
+
+    console.log(
+      `${title} clicks:`,
+      progress[title].checkClicks
+    );
+  } catch (err) {
+    console.error("Error updating clicks:", err);
+  }
+}
+
+useEffect(() => {
+  countExerciseTypes();
+}, []);
+
   // Check localStorage to see if this exercise was previously completed
   useEffect(() => {
     const saved = localStorage.getItem("userProgress");
@@ -165,7 +230,7 @@ export function Exercise({
 
   //for disabling ui elements
   const rhythmOnly = tags.length === 1 && tags.includes("Rhythm");
-  const canCheckAnswers = abcFile !== undefined && abcFile !== "" && loaded;
+  const canCheckAnswers = abcFile !== undefined && abcFile !== "";
 
   // try to load score when there's either exerciseData or an abc file to pull from
   useEffect(() => {
@@ -1866,15 +1931,13 @@ export function Exercise({
 
   return (
     <div
-      className="exercise-box" // SIR added exercise box
+      className="exercise-box"
       style={{
-        //exercise example box
         padding: "10px",
         backgroundColor: "#fcfcd2",
         borderRadius: "10px",
-        display: "flex", // SIR: added flex to box
-        flexDirection: "column", // SIR
-        alignItems: "stretch", // SIR
+        display: "flex",
+        flexDirection: "column",
         boxSizing: "border-box",
       }}
     >
@@ -2073,7 +2136,9 @@ export function Exercise({
               <button
                 className="exercise-nav-inline exercise-nav-inline--prev mobile-only"
                 onClick={() => {
-                  const btn = document.querySelector('.exercise-nav-desktop.exercise-nav-inline--prev') as HTMLElement | null;
+                  const btn = document.querySelector(
+                    ".exercise-nav-desktop.exercise-nav-inline--prev",
+                  ) as HTMLElement | null;
                   if (btn) btn.click();
                 }}
                 aria-label="Previous exercise"
@@ -2147,6 +2212,7 @@ export function Exercise({
               width: "100%",
               marginTop: "-2vh",
               alignItems: "center",
+              justifyContent: "center",
               gap: "1rem",
               flexWrap: "nowrap",
             }}
@@ -2155,7 +2221,9 @@ export function Exercise({
               <button
                 className="exercise-nav-inline exercise-nav-inline--prev mobile-only"
                 onClick={() => {
-                  const btn = document.querySelector('.exercise-nav-desktop.exercise-nav-inline--prev') as HTMLElement | null;
+                  const btn = document.querySelector(
+                    ".exercise-nav-desktop.exercise-nav-inline--prev",
+                  ) as HTMLElement | null;
                   if (btn) btn.click();
                 }}
                 aria-label="Previous exercise"
@@ -2177,21 +2245,18 @@ export function Exercise({
               />
             )}
             {mp3 !== undefined ? (
-              <div style={{ flex: 1 }}>
-                <AudioHandler file={mp3}></AudioHandler>
-              </div>
+              <AudioHandler file={mp3}></AudioHandler>
             ) : (
               <></>
             )}
             <div className="exercise-action-buttons">
-              {canCheckAnswers && (
-                <button
-                  className="btnback exercise-action-check"
-                  onClick={checkAnswers}
-                >
-                  Check Answer
-                </button>
-              )}
+              <button
+                className="btnback exercise-action-check" // fixed button resizing
+                onClick={checkAnswers}
+                style={{ visibility: canCheckAnswers ? "visible" : "hidden" }}
+              >
+                Check Answer
+              </button>
               <Button
                 variant="danger"
                 onClick={exReload}
@@ -2208,7 +2273,9 @@ export function Exercise({
               <button
                 className="exercise-nav-inline exercise-nav-inline--next mobile-only"
                 onClick={() => {
-                  const btn = document.querySelector('.exercise-nav-desktop.exercise-nav-inline--next') as HTMLElement | null;
+                  const btn = document.querySelector(
+                    ".exercise-nav-desktop.exercise-nav-inline--next",
+                  ) as HTMLElement | null;
                   if (btn) btn.click();
                 }}
                 aria-label="Next exercise"

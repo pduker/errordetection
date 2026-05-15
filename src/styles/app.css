@@ -14,15 +14,52 @@
   color: #114b96;
   display: block;
 }
+.Home-title-1 {
+  margin: 0;
+  padding: 0;
+  color: #114b96;
+  display: block;
+  margin-bottom: 6px;
+  line-height: 1;
+  font-size: 30px;
+}
+
+.Home-title-2 {
+  margin: 0;
+  padding: 0;
+  color: #114b96;
+  display: block;
+}
+
+.Home-bar img {
+  border: 1px solid white;
+  border-radius: 50%;
+}
 
 .Home-bar {
   display: flex;
   padding-left: 1vw;
   padding-top: 1vh;
-  background-color: #ffdb63;
+  background-color: #114b96;
   height: 70px;
   justify-content: space-between;
   align-items: center;
+  padding-top: 0px;
+  box-shadow: none;
+}
+
+.Home-bar .navbar-toggler {
+  color: white;
+  border-color: white;
+}
+
+.Home-bar .navbar-toggler:focus {
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+  border-color: white;
+}
+
+.Home-bar .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 .Home-bar.mobile {
@@ -31,11 +68,35 @@
 
 .Home-nav {
   align-items: center;
-  display: inline;
+  display: flex;
+}
+
+.Home-nav a {
+  font-size: 1.3rem;
+  padding: 0.5rem;
+  color: white;
+  text-decoration: none;
+}
+
+.Home-nav a:hover {
+  color: #ffdb63;
 }
 
 .Home-nav-right {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+
+.Home-nav-right a {
+  font-size: 1.3rem;
+  padding: 0.5rem;
+  color: white;
+  text-decoration: none;
+}
+
+.Home-nav-right a:hover {
+  color: #ffdb63;
 }
 
 #navbar {
@@ -54,7 +115,7 @@
   /* 600px 1000px; */
 }
 .pagediv {
-  height: 86.5vh;
+  height: 96.5vh;
   width: 95vw;
   display: flex;
   box-shadow: inset 0 0 5px grey;
@@ -62,12 +123,14 @@
   align-items: center; /*SIR: removed justifyContent: center*/
   text-align: center;
   padding: 1vh 1vw 1vh 1vw;
-  margin-top: 0px;
+  margin-top: 20px;
   background: #ffdb63;
   border-radius: 10px;
   margin-left: 2.5vw;
+  padding-top: 20px;
 }
 
+/* CHECK IF NEEDED
 .pagediv.mobile {
   height: 100vh;
   width: 100vw;
@@ -75,7 +138,7 @@
   border-radius: 0;
   padding: 0;
 }
-
+*/ 
 .pagediv-landing {
   width: min(92vw, 1100px);
   height: calc(100vh - 140px);
@@ -157,7 +220,7 @@ nav {
   position: fixed;
 
   padding: 7px;
-  width: 100vw;
+  width: 100%; /* fix nav bar width issue */
   text-align: left;
 }
 nav ul li {
@@ -183,6 +246,11 @@ nav ul li a::after {
   bottom: -6px;
   transition: 0.5s;
 }
+
+#main-navbar { /* check if needed */
+  padding-right: 10px;
+  padding-left: 10px;
+}
 /* cool transition css stuff */
 nav ul li a:hover::after {
   width: 100%;
@@ -204,7 +272,7 @@ nav .fas {
   display: none;
 }
 
-@media only screen and (max-width: 1100px) {
+@media only screen and (max-width: 991px) {
   #header {
     background-image: url(../assets/musicbg1.jpg);
   }
@@ -247,6 +315,108 @@ nav .fas {
     left: 25px;
     cursor: pointer;
   }
+/* Hamburger menu reactive CSS */
+  .Home-bar .navbar-collapse  { 
+    background-color: #fff7c9; 
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+  }
+
+  .Home-bar, .container {
+    padding: 0px;
+    z-index: 10000;
+  }
+
+  .Home-nav a, .Home-nav-right a {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    text-decoration: none;
+    color: #877b5d;
+    }
+
+  
+}
+
+
+/* Mobile-specific styles */
+.is-mobile .Home-title-1 {
+  display: none;
+}
+.is-mobile .Home-title-2 {
+  display: none;
+}
+.is-mobile .pagediv {
+  background-color: transparent;
+  box-shadow: inset 0 0 5px transparent;
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  border-radius: 0;
+  padding-top: 0;
+}
+/* Mobile version of how the home bar opens */
+.is-mobile .Home-bar {
+  background: transparent;
+  box-shadow: none;
+  height: 0;
+  padding: 0;
+}
+
+/* Hide logo and title */
+.is-mobile .Home-bar .navbar-brand {
+  display: none !important;
+}
+
+/* Show ONLY the hamburger */
+.is-mobile .Home-bar .navbar-toggler {
+  display: block !important;
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  z-index: 9999;
+  background: #FFDB63;
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: black;
+  border-color: black;
+}
+
+.is-mobile .Home-bar .navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='black' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+.is-mobile .Home-bar .navbar-collapse {
+  display: block !important;
+  position: fixed;
+  top: 0;
+  right: -260px;
+  width: 200px;
+  height: 100vh;
+  background: #fff7c9;
+  padding-top: 70px;
+  transition: right 0.35s ease-in-out;
+  z-index: 9998;
+  border-radius: 5px;
+  box-shadow: -2px 0 12px rgba(0,0,0,0.15);
+}
+
+.is-mobile .Home-bar .navbar-collapse.show {
+  right: 0;
+}
+
+/* Stack links vertically */
+.is-mobile .Home-bar .navbar-collapse a {
+  display: block;
+  padding: 14px 20px;
+  text-decoration: none;
+  color: #114b96;
+  font-weight: 500;
+}
+
+.is-mobile .Home-bar .navbar-collapse a:hover {
+  background: rgba(17,75,150,0.08);
 }
 
 

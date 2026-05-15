@@ -54,7 +54,7 @@
   margin: 0;
   box-sizing: border-box;
   min-height: 360px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
 }
 
 .exercise-stage {
@@ -80,8 +80,8 @@
   border-radius: 24px;
   background: #fff7c9;
   position: relative;
-  overflow: hidden;
-  padding: 0 64px;
+  overflow: visible;
+  padding: 0 32px;
 }
 
 .exercise-content-inner {
@@ -94,6 +94,29 @@
   height: 100%;
   min-height: 360px;
   justify-content: center;
+}
+
+/* Layout styles for the exercise management page */
+.exercise-management {
+  width: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 360px;
+  border-radius: 24px;
+  background: #fff7c9;
+  position: relative;
+  overflow: hidden;
+  padding: 0 64px;
+}
+
+.exercise-management-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
 }
 
 /* Make forms and lists inside the left column wrap and shrink nicely */

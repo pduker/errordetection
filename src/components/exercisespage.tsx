@@ -4,6 +4,7 @@ import ExerciseData from "../interfaces/exerciseData";
 import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "react-bootstrap";
 import { AppSidebar } from "./sidebar";
+import { SuccessBanner } from './modals/SuccessBanner';
 
 const pageSize = 5; //show 5 exercises at a time
 
@@ -120,7 +121,15 @@ function ExerciseQueueComponent({
     setCurrentPage(Math.max(1, currentPage - 1));
   }, [currentPage, setCurrentPage]);
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(() => {
+    const saved = localStorage.getItem('exerciseQueueOpen');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  // Save isOpen state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('exerciseQueueOpen', JSON.stringify(isOpen));
+  }, [isOpen]);
 
   useEffect(() => {
     if (totalPages === 0) {
@@ -139,7 +148,7 @@ function ExerciseQueueComponent({
       <button
         type="button"
         className="exercise-queue-panel__toggle"
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={() => setIsOpen((prev: boolean) => !prev)}
         aria-expanded={isOpen}
       >
         <span>Exercises</span>
@@ -193,7 +202,7 @@ function ExerciseQueueComponent({
               const globalIndex = startIndex + idx;
               return (
                 <div
-                  key={exercise.title}
+                  key={exercise.exIndex}
                   id={exercise.title}
                   onClick={() => selectExerciseAtIndex(globalIndex)}
                   role="button"
@@ -355,9 +364,34 @@ export function ExercisesPage({
   const [tags, setTags] = useState<string[]>(defaultTags);
   const [transpos, setTranspos] = useState<boolean>(false);
 
-  const [selExercise, setSelExercise] = useState<ExerciseData | undefined>(
-    undefined,
-  );
+  const [filtersOpen, setFiltersOpen] = useState(() => {
+    const saved = localStorage.getItem('filtersOpen');
+    return saved ? JSON.parse(saved) : false;
+  }); // for filters component
+
+  // Save filtersOpen state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('filtersOpen', JSON.stringify(filtersOpen));
+  }, [filtersOpen]);
+  const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
+
+  // Success banner state
+    const [showSuccessBanner, setShowSuccessBanner] = useState<boolean>(false);
+    const [successMessage, setSuccessMessage] = useState<string>("");
+
+    // Check for logout success flag on mount
+    useEffect(() => {
+        const showLogoutSuccess = localStorage.getItem('showLogoutSuccess');
+        if (showLogoutSuccess === 'true') {
+            setSuccessMessage("Successfully logged out");
+            setShowSuccessBanner(true);
+            localStorage.removeItem('showLogoutSuccess');
+        }
+    }, []);
+
+    const closeSuccessBanner = () => {
+        setShowSuccessBanner(false);
+    };
 
   const filteredExercises = React.useMemo(() => {
     const baseList = allExData.filter(
@@ -540,37 +574,37 @@ export function ExercisesPage({
     );
   }, [tags, diff, voices, types, meter, transpos]);
 
-  //html to render page
-  return (
-    <div className="fullpage">
-      <div className="ex-page-container">
-        <div
-          style={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            width: "100%",
-          }}
-        >
-          <div className="two-column-wrapper">
-            <div className="ex-left">
-              <FiltersComponent
-                tags={tags}
-                handleTagToggle={handleTagToggle}
-                transpos={transpos}
-                handleTransposToggle={handleTransposToggle}
-                diff={diff}
-                handleDifficultySelect={handleDifficultySelect}
-                voices={voices}
-                handleVoicesSelect={handleVoicesSelect}
-                meter={meter}
-                handleMeterSelect={handleMeterSelect}
-                types={types}
-                handleTexturalFactorSelect={handleTexturalFactorSelect}
-                resetSort={resetSort}
-                resetDisabled={resetDisabled}
-              />
-            </div>
+    //html to render page
+    return (
+        <div className="fullpage">
+          <SuccessBanner
+                show={showSuccessBanner}
+                message={successMessage}
+                onClose={closeSuccessBanner}
+            />
+            <div className="ex-page-container"> 
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
+                    <div className = "two-column-wrapper"> 
+                        <div className="ex-left">
+                            <FiltersComponent
+                                tags={tags}
+                                handleTagToggle={handleTagToggle}
+                                transpos={transpos}
+                                handleTransposToggle={handleTransposToggle}
+                                diff={diff}
+                                handleDifficultySelect={handleDifficultySelect}
+                                voices={voices}
+                                handleVoicesSelect={handleVoicesSelect}
+                            meter={meter}
+                            handleMeterSelect={handleMeterSelect}
+                            types={types}
+                            handleTexturalFactorSelect={handleTexturalFactorSelect}
+                            resetSort={resetSort}
+                            resetDisabled={resetDisabled}
+                            filtersOpen={filtersOpen}
+                            setFiltersOpen={setFiltersOpen}
+                        />
+                    </div>
 
             <div className="ex-right">
               <ExerciseViewerComponent
