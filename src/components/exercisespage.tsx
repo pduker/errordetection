@@ -4,7 +4,6 @@ import ExerciseData from "../interfaces/exerciseData";
 import React, { useState, useEffect, useCallback } from "react";
 import { Button } from "react-bootstrap";
 import { AppSidebar } from "./sidebar";
-import { set } from "firebase/database";
 
 const pageSize = 5; //show 5 exercises at a time
 
@@ -18,8 +17,6 @@ function ExerciseViewerComponent({
   allExData,
   setAllExData,
   updateProgress,
-  filtersOpen,
-  setFiltersOpen,
 }: {
   navButtonsVisible: boolean;
   disablePrevNav: boolean;
@@ -30,8 +27,6 @@ function ExerciseViewerComponent({
   allExData: (ExerciseData | undefined)[];
   setAllExData: (newData: (ExerciseData | undefined)[]) => void;
   updateProgress: (title: string | number, data: any) => void;
-  filtersOpen: boolean;
-  setFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
     <div className="exercise-viewer">
@@ -62,8 +57,6 @@ function ExerciseViewerComponent({
                 isSelected={undefined}
                 fetch={undefined}
                 updateProgress={updateProgress}
-                filtersOpen={filtersOpen}
-                setFiltersOpen={setFiltersOpen}
               />
             ) : (
               <div className="exercise-placeholder">
@@ -200,7 +193,7 @@ function ExerciseQueueComponent({
               const globalIndex = startIndex + idx;
               return (
                 <div
-                  key={exercise.exIndex}
+                  key={exercise.title}
                   id={exercise.title}
                   onClick={() => selectExerciseAtIndex(globalIndex)}
                   role="button"
@@ -219,8 +212,6 @@ function ExerciseQueueComponent({
 }
 
 function FiltersComponent({
-  filtersOpen,
-  setFiltersOpen,
   tags,
   handleTagToggle,
   transpos,
@@ -236,8 +227,6 @@ function FiltersComponent({
   resetSort,
   resetDisabled,
 }: {
-  filtersOpen: boolean;
-  setFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
   tags: string[];
   handleTagToggle: (tag: string) => void;
   transpos: boolean;
@@ -253,46 +242,20 @@ function FiltersComponent({
   resetSort: () => void;
   resetDisabled: boolean;
 }) {
-
-  const [noAnimation, setNoAnimation] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setNoAnimation(true);
-      if (window.innerWidth > 700) {
-        setFiltersOpen(true);
-      }
-      else {
-        setFiltersOpen(false);
-      }
-      setTimeout(() => setNoAnimation(false), 50);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  const [filtersOpen, setFiltersOpen] = useState<boolean>(true);
 
   return (
-    <>
     <section
-      className={`filters-panel${filtersOpen ? " filters-panel--open" : ""} ${noAnimation ? "filters-panel--no-animation" : ""}`}
+      className={`filters-panel${filtersOpen ? " filters-panel--open" : ""}`}
     >
-      <div className="filters-mobile-close">
-      <button
-        onClick={() => setFiltersOpen(false)}
-        aria-label="Close filters"
-      >
-        ﹀
-      </button>
-    </div>
       <button
         type="button"
-        className="filters-panel__toggle desktop-only"
+        className="filters-panel__toggle"
         onClick={() => setFiltersOpen((prev) => !prev)}
         aria-expanded={filtersOpen}
       >
         <span>Filters</span>
-        <span className="filters-panel__chevron" />
+        <span className="filters-panel__chevron" aria-hidden="true" />
       </button>
       <div
         className={`filters-panel__content${filtersOpen ? " filters-panel__content--open" : ""}`}
@@ -316,7 +279,6 @@ function FiltersComponent({
         />
       </div>
     </section>
-    </>
   );
 }
 
@@ -393,7 +355,6 @@ export function ExercisesPage({
   const [tags, setTags] = useState<string[]>(defaultTags);
   const [transpos, setTranspos] = useState<boolean>(false);
 
-  const [filtersOpen, setFiltersOpen] = useState(false); // for filters component
   const [selExercise, setSelExercise] = useState<ExerciseData | undefined>(
     undefined,
   );
@@ -608,8 +569,6 @@ export function ExercisesPage({
                 handleTexturalFactorSelect={handleTexturalFactorSelect}
                 resetSort={resetSort}
                 resetDisabled={resetDisabled}
-                filtersOpen={filtersOpen}
-                setFiltersOpen={setFiltersOpen}
               />
             </div>
 
@@ -624,8 +583,6 @@ export function ExercisesPage({
                 allExData={allExData}
                 setAllExData={setAllExData}
                 updateProgress={updateProgress}
-                filtersOpen={filtersOpen}
-                setFiltersOpen={setFiltersOpen}
               />
               {!scoresRet ? (
                 <div className="exercise-queue-loading">

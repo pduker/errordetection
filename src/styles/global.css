@@ -55,7 +55,6 @@ body {
   background-repeat: no-repeat;
   background-position: center;
   overflow-y: auto;
-  overflow: hidden; /* fix scrollbar issue */
 }
 
 ::-webkit-scrollbar {

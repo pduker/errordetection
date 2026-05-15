@@ -38,8 +38,6 @@ export function Exercise({
   handleSelectExercise,
   isSelected,
   fetch,
-  filtersOpen,
-  setFiltersOpen,
 }: {
   exIndex: number;
   teacherMode: boolean;
@@ -53,8 +51,6 @@ export function Exercise({
   handleSelectExercise: ((exIndex: number) => void) | undefined;
   isSelected: boolean | undefined;
   fetch: ((val: boolean) => void) | undefined;
-  filtersOpen: boolean;
-  setFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   // for score styling
   const score = {
@@ -169,7 +165,7 @@ export function Exercise({
 
   //for disabling ui elements
   const rhythmOnly = tags.length === 1 && tags.includes("Rhythm");
-  const canCheckAnswers = abcFile !== undefined && abcFile !== "";
+  const canCheckAnswers = abcFile !== undefined && abcFile !== "" && loaded;
 
   // try to load score when there's either exerciseData or an abc file to pull from
   useEffect(() => {
@@ -2188,13 +2184,14 @@ export function Exercise({
               <></>
             )}
             <div className="exercise-action-buttons">
-              <button
-                className="btnback exercise-action-check" // fixed button resizing
-                onClick={checkAnswers}
-                style={{ visibility: canCheckAnswers ? "visible" : "hidden" }}
-              >
-                Check Answer
-              </button>
+              {canCheckAnswers && (
+                <button
+                  className="btnback exercise-action-check"
+                  onClick={checkAnswers}
+                >
+                  Check Answer
+                </button>
+              )}
               <Button
                 variant="danger"
                 onClick={exReload}
@@ -2219,16 +2216,6 @@ export function Exercise({
                 →
               </button>
             }
-            </div>
-            <div className="filters-button-row">
-                <div style={{ marginTop: "0" }}>
-                  <button
-                    className="filters-fab"
-                    onClick={() => setFiltersOpen((prev: boolean) => !prev)}
-                  >
-                    Filters
-                  </button>
-                </div>
           </div>
           {canCheckAnswers ? (
             <div>
