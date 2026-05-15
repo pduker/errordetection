@@ -1,6 +1,18 @@
-.Home-title {
+.Home-title-1 {
   margin: 0;
   padding: 0;
+  color: #114b96;
+  display: block;
+  margin-bottom: 6px;
+  line-height: 1;
+  font-size: 30px;
+}
+
+.Home-title-2 {
+  margin: 0;
+  padding: 0;
+  color: #114b96;
+  display: block;
 }
 .Home-title-1 {
   margin: 0;
@@ -124,6 +136,7 @@
   width: 100vw;
   margin: 0;
   border-radius: 0;
+  padding: 0;
 }
 */ 
 .pagediv-landing {
@@ -404,4 +417,23 @@ nav .fas {
 
 .is-mobile .Home-bar .navbar-collapse a:hover {
   background: rgba(17,75,150,0.08);
+}
+
+
+/* Mobile-specific styles */
+@media only screen and (max-width: 700px) {
+  .Home-title-1 {
+    display: none;
+  }
+  .Home-title-2 {
+    display: none;
+  }
+  .pagediv {
+    background-color: transparent;
+    box-shadow: inset 0 0 5px transparent;
+    padding: 0;
+    width: 100%;
+    margin-left: 0;
+
+  }
 }

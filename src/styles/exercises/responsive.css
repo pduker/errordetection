@@ -18,10 +18,11 @@
   }
   .ex-right {
     order: 1;
+    padding-right: 10px;
   }
   .ex-left {
     order: 2;
-    padding-right: 0;
+    padding-right: 10px;
   }
 }
 
