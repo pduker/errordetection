@@ -38,8 +38,6 @@ export function Exercise({
   handleSelectExercise,
   isSelected,
   fetch,
-  filtersOpen,
-  setFiltersOpen,
   teacherModeRef = undefined
 }: {
   exIndex: number;
@@ -54,8 +52,6 @@ export function Exercise({
   handleSelectExercise: ((exIndex: number) => void) | undefined;
   isSelected: boolean | undefined;
   fetch: ((val: boolean) => void) | undefined;
-  filtersOpen: boolean;
-  setFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
   teacherModeRef?: React.Ref<any> | undefined;
 }) {
   // for score styling
@@ -2102,6 +2098,7 @@ useEffect(() => {
               width: "100%",
               marginTop: "-2vh",
               alignItems: "center",
+              justifyContent: "center",
               gap: "1rem",
               flexWrap: "nowrap",
             }}
@@ -2134,9 +2131,7 @@ useEffect(() => {
               />
             )}
             {mp3 !== undefined ? (
-              <div style={{ flex: 1 }}>
-                <AudioHandler file={mp3}></AudioHandler>
-              </div>
+              <AudioHandler file={mp3}></AudioHandler>
             ) : (
               <></>
             )}
@@ -2174,16 +2169,6 @@ useEffect(() => {
                 →
               </button>
             }
-          </div>
-          <div className="filters-button-row">
-            <div style={{ marginTop: "0" }}>
-              <button
-                className="filters-fab"
-                onClick={() => setFiltersOpen((prev: boolean) => !prev)}
-              >
-                Filters
-              </button>
-            </div>
           </div>
           {canCheckAnswers ? (
             <div>

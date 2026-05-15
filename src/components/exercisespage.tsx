@@ -19,8 +19,6 @@ function ExerciseViewerComponent({
   allExData,
   setAllExData,
   updateProgress,
-  filtersOpen,
-  setFiltersOpen,
 }: {
   navButtonsVisible: boolean;
   disablePrevNav: boolean;
@@ -31,8 +29,6 @@ function ExerciseViewerComponent({
   allExData: (ExerciseData | undefined)[];
   setAllExData: (newData: (ExerciseData | undefined)[]) => void;
   updateProgress: (title: string | number, data: any) => void;
-  filtersOpen: boolean;
-  setFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
     <div className="exercise-viewer">
@@ -63,8 +59,6 @@ function ExerciseViewerComponent({
                 isSelected={undefined}
                 fetch={undefined}
                 updateProgress={updateProgress}
-                filtersOpen={filtersOpen}
-                setFiltersOpen={setFiltersOpen}
               />
             ) : (
               <div className="exercise-placeholder">
@@ -128,7 +122,15 @@ function ExerciseQueueComponent({
     setCurrentPage(Math.max(1, currentPage - 1));
   }, [currentPage, setCurrentPage]);
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(() => {
+    const saved = localStorage.getItem('exerciseQueueOpen');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  // Save isOpen state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('exerciseQueueOpen', JSON.stringify(isOpen));
+  }, [isOpen]);
 
   useEffect(() => {
     if (totalPages === 0) {
@@ -147,7 +149,7 @@ function ExerciseQueueComponent({
       <button
         type="button"
         className="exercise-queue-panel__toggle"
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={() => setIsOpen((prev: boolean) => !prev)}
         aria-expanded={isOpen}
       >
         <span>Exercises</span>
@@ -220,8 +222,6 @@ function ExerciseQueueComponent({
 }
 
 function FiltersComponent({
-  filtersOpen,
-  setFiltersOpen,
   tags,
   handleTagToggle,
   transpos,
@@ -236,9 +236,9 @@ function FiltersComponent({
   handleTexturalFactorSelect,
   resetSort,
   resetDisabled,
+  filtersOpen,
+  setFiltersOpen,
 }: {
-  filtersOpen: boolean;
-  setFiltersOpen: React.Dispatch<React.SetStateAction<boolean>>;
   tags: string[];
   handleTagToggle: (tag: string) => void;
   transpos: boolean;
@@ -253,47 +253,22 @@ function FiltersComponent({
   handleTexturalFactorSelect: (value: string) => void;
   resetSort: () => void;
   resetDisabled: boolean;
+  filtersOpen: boolean;
+  setFiltersOpen: (value: boolean) => void;
 }) {
 
-  const [noAnimation, setNoAnimation] = useState(false);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setNoAnimation(true);
-      if (window.innerWidth > 700) {
-        setFiltersOpen(true);
-      }
-      else {
-        setFiltersOpen(false);
-      }
-      setTimeout(() => setNoAnimation(false), 50);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
   return (
-    <>
     <section
-      className={`filters-panel${filtersOpen ? " filters-panel--open" : ""} ${noAnimation ? "filters-panel--no-animation" : ""}`}
+      className={`filters-panel${filtersOpen ? " filters-panel--open" : ""}`}
     >
-      <div className="filters-mobile-close">
-      <button
-        onClick={() => setFiltersOpen(false)}
-        aria-label="Close filters"
-      >
-        ﹀
-      </button>
-    </div>
       <button
         type="button"
-        className="filters-panel__toggle desktop-only"
-        onClick={() => setFiltersOpen((prev) => !prev)}
+        className="filters-panel__toggle"
+        onClick={() => setFiltersOpen(!filtersOpen)}
         aria-expanded={filtersOpen}
       >
         <span>Filters</span>
-        <span className="filters-panel__chevron" />
+        <span className="filters-panel__chevron" aria-hidden="true" />
       </button>
       <div
         className={`filters-panel__content${filtersOpen ? " filters-panel__content--open" : ""}`}
@@ -317,7 +292,6 @@ function FiltersComponent({
         />
       </div>
     </section>
-    </>
   );
 }
 
@@ -394,7 +368,15 @@ export function ExercisesPage({
   const [tags, setTags] = useState<string[]>(defaultTags);
   const [transpos, setTranspos] = useState<boolean>(false);
 
-  const [filtersOpen, setFiltersOpen] = useState(false); // for filters component
+  const [filtersOpen, setFiltersOpen] = useState(() => {
+    const saved = localStorage.getItem('filtersOpen');
+    return saved ? JSON.parse(saved) : false;
+  }); // for filters component
+
+  // Save filtersOpen state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('filtersOpen', JSON.stringify(filtersOpen));
+  }, [filtersOpen]);
   const [selExercise, setSelExercise] = useState<ExerciseData |  undefined>(undefined);
 
   // Success banner state
@@ -666,8 +648,6 @@ export function ExercisesPage({
                 allExData={allExData}
                 setAllExData={setAllExData}
                 updateProgress={updateProgress}
-                filtersOpen={filtersOpen}
-                setFiltersOpen={setFiltersOpen}
               />
               {!scoresRet ? (
                 <div className="exercise-queue-loading">
