@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useImperativeHandle } from "react";
-import { ref, get, remove, child, set } from "firebase/database";
+import { ref, get, child, set } from "firebase/database";
 import abcjs from "abcjs";
 import FileUpload from "./fileupload";
 import ExerciseData from "../interfaces/exerciseData";
@@ -168,34 +168,35 @@ export function Exercise({
      // return counts; at some point if we want to display this info on the frontend or use it to unlock content or something
   }
 
-  function trackCheckClicks() {
-  const saved = localStorage.getItem("userProgress");
-  if (!saved) return;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  function trackCheckClicks() { // unused right now but could be in the future
+    const saved = localStorage.getItem("userProgress");
+    if (!saved) return;
 
-  try {
-    const progress = JSON.parse(saved);
-    const title = ExData.title;
+    try {
+      const progress = JSON.parse(saved);
+      const title = ExData.title;
 
-    if (!progress[title]) {
-      progress[title] = {};
+      if (!progress[title]) {
+        progress[title] = {};
+      }
+
+      if (!progress[title].checkClicks) {
+        progress[title].checkClicks = 0;
+      }
+
+      progress[title].checkClicks += 1;
+
+      localStorage.setItem("userProgress", JSON.stringify(progress));
+
+      console.log(
+        `${title} clicks:`,
+        progress[title].checkClicks
+      );
+    } catch (err) {
+      console.error("Error updating clicks:", err);
     }
-
-    if (!progress[title].checkClicks) {
-      progress[title].checkClicks = 0;
-    }
-
-    progress[title].checkClicks += 1;
-
-    localStorage.setItem("userProgress", JSON.stringify(progress));
-
-    console.log(
-      `${title} clicks:`,
-      progress[title].checkClicks
-    );
-  } catch (err) {
-    console.error("Error updating clicks:", err);
   }
-}
 
 useEffect(() => {
   countExerciseTypes();
@@ -216,9 +217,7 @@ useEffect(() => {
     }
   }, [ExData.title]);
 
-  const [customId, setCustomId] = useState<string>(
-    exerciseData?.customId || "",
-  );
+  const [customId, setCustomId] = useState<string>(exerciseData?.customId || "");
 
   //for disabling ui elements
   const rhythmOnly = tags.length === 1 && tags.includes("Rhythm");
@@ -885,7 +884,8 @@ useEffect(() => {
     loadScore();
   };
 
-  const save = async function () {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const save = async function () { // old exercise saving function
     if (typeof mp3File === "string") {
       alert("Something went wrong when saving!");
       return;
@@ -1821,49 +1821,6 @@ useEffect(() => {
     }
   };
 
-  const diffChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
-    setDiff(Number(e.target.value));
-    customTitleChange(
-      tags,
-      Number(e.target.value),
-      voices,
-      types,
-      meter,
-      transpos,
-    );
-  };
-
-  const tagsChange = function (e: React.ChangeEvent<HTMLInputElement>) {
-    let val = e.target.value;
-    if (tags.includes(val)) {
-      tags.splice(tags.indexOf(val), 1);
-      setTags([...tags]);
-      customTitleChange([...tags], diff, voices, types, meter, transpos);
-    } else {
-      setTags([...tags, val]);
-      customTitleChange([...tags, val], diff, voices, types, meter, transpos);
-    }
-  };
-
-  const voiceChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
-    setVoices(Number(e.target.value));
-  };
-
-  const typesChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
-    setTypes(e.target.value);
-    customTitleChange(tags, diff, voices, e.target.value, meter, transpos);
-  };
-
-  const meterChange = function (e: React.ChangeEvent<HTMLSelectElement>) {
-    setMeter(e.target.value);
-    customTitleChange(tags, diff, voices, types, e.target.value, transpos);
-  };
-
-  const transposChange = function (e: React.ChangeEvent<HTMLInputElement>) {
-    setTranspos(!transpos);
-    customTitleChange(tags, diff, voices, types, meter, !transpos);
-  };
-
   const findNum = function (
     tags: string[],
     difficulty: number,
@@ -1892,37 +1849,6 @@ useEffect(() => {
     return count.length + 1;
   };
 
-  const handleExerciseDelete = async (exIndex: number) => {
-    try {
-      const database = getDatabase();
-      const exerciseRef = ref(database, `scores/${exIndex}`);
-      const snapshot = await get(exerciseRef);
-      if (snapshot.exists()) {
-        var exTitle = title;
-        await remove(exerciseRef);
-        console.log("exercise deleted from the database!");
-        const updatedExercises = allExData.filter((exercise) => {
-          return exercise && exercise.exIndex !== exIndex;
-        });
-        setAllExData(updatedExercises);
-        alert("exercise " + exTitle + " deleted!");
-      } else {
-        console.log("exercise with" + exIndex + " not found!");
-        alert("exercise not found.");
-      }
-    } catch (error) {
-      console.error("Error deleting exercise:", error);
-      alert("error deleting exercise.");
-    }
-  };
-
-  const handleCancelExercise = (exIndex: number) => {
-    const updatedExercises = allExData.filter(
-      (exercise) => exercise && exercise.exIndex !== exIndex,
-    );
-    setAllExData(updatedExercises);
-  };
-
   useImperativeHandle(teacherModeRef, () => ({
     setMusicXmlFile(file: File) {
       (xmlFileUploadRef.current as any).setFileUsingRef(file);
@@ -1945,7 +1871,8 @@ useEffect(() => {
       types: string,
       meter: string,
       transpos: boolean,
-      voices: number
+      voices: number,
+      newCustomId: string
     ) {
       setDiff(difficulty);
       setTags(tags);
@@ -1953,7 +1880,8 @@ useEffect(() => {
       setMeter(meter);
       setTranspos(transpos);
       setVoices(voices);
-      customTitleChange(tags, difficulty, voices, types, meter, transpos)
+      customTitleChange(tags, difficulty, voices, types, meter, transpos);
+      setCustomId(newCustomId);
     }
   }));
   
