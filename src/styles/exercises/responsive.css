@@ -11,20 +11,18 @@
   .ex-left,
   .ex-right,
   .exercise-placeholder {
-    flex: 1 1 auto;
+    flex: 1;
     width: 100%;
     max-width: 100%;
     margin-left: 0;
   }
   .ex-right {
     order: 1;
+    padding-right: 10px;
   }
   .ex-left {
     order: 2;
-    padding-right: 0;
-  }
-  .exercise-queue-panel {
-    margin-top: 1rem;
+    padding-right: 10px;
   }
 }
 

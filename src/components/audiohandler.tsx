@@ -40,6 +40,7 @@ export default function AudioHandler(
   const [isLoaded, setIsLoaded] = useState(false);
   const [showVolumeOverlay, setShowVolumeOverlay] = useState(false);
   const volumeSliderRef = useRef<HTMLInputElement>(null);
+  const volumeOverlayRef = useRef<HTMLDivElement>(null);
 
   const showVolume = true;
   const noMargins = exerciseManagement;
@@ -157,6 +158,25 @@ export default function AudioHandler(
       slider.removeEventListener('touchstart', handleTouchStart);
       slider.removeEventListener('touchmove', handleTouchMove);
     };
+  }, [showVolumeOverlay]);
+
+  // Close volume overlay when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      // Close if click is outside overlay and not on the volume button
+      if (volumeOverlayRef.current && !volumeOverlayRef.current.contains(target)) {
+        const volumeButton = document.querySelector('.audio-volume-btn');
+        if (volumeButton && !volumeButton.contains(target)) {
+          setShowVolumeOverlay(false);
+        }
+      }
+    };
+
+    if (showVolumeOverlay) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
   }, [showVolumeOverlay]);
 
   const toggleVolumeOverlay = () => {

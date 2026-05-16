@@ -1,9 +1,9 @@
-import React, { useState, useRef, useMemo, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import ExerciseData from "../interfaces/exerciseData";
 import { ConfirmationModal } from "./modals/confirmation-modal";
 import { ExerciseSuccessModal } from "./modals/ExerciseSuccessModal";
-import { getDatabase, ref, get, remove, child, set } from "firebase/database";
+import { getDatabase, ref, get, child, set } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 
 import "../styles/create-exercise.css";
@@ -66,7 +66,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     exerciseData.customId = customId;
 
     setExerciseData(exerciseData);
-  }, [difficulty, voices, tags, types, meter, transpos, customId]);
+  }, [difficulty, voices, tags, types, meter, transpos, customId, exerciseData]);
 
   const isEditing = !exerciseData.isNew;
 
@@ -75,8 +75,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
 
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false);
   const [confirmAction, setConfirmAction] = useState<"back" | "cancel" | null>(null);
-  const [showFileErrorModal, setShowFileErrorModal] = useState<boolean>(false);
-  const [fileErrorType, setFileErrorType] = useState<"audio" | "musicxml" | null>(null);
   const [showValidationErrorModal, setShowValidationErrorModal] = useState<boolean>(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [showFileRemoveModal, setShowFileRemoveModal] = useState<boolean>(false);
@@ -142,19 +140,9 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
 
   const handleFileUpload = (file: File, type: "musicxml" | "audio") => {
     if (type === "musicxml") {
-      if (!file.name.match(/\.(xml|musicxml)$/i)) {
-        setFileErrorType("musicxml");
-        setShowFileErrorModal(true);
-        return;
-      }
       (exerciseComponentRef.current as any).setMusicXmlFile(file);
       setMusicXmlFile(file);
     } else if (type === "audio") {
-      if (!file.name.match(/\.mp3$/i)) {
-        setFileErrorType("audio");
-        setShowFileErrorModal(true);
-        return;
-      }
       (exerciseComponentRef.current as any).setAudioFile(file);
       setAudioFile(file);
     }
@@ -246,20 +234,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
   const handleModalCancel = () => {
     setShowConfirmModal(false);
     setConfirmAction(null);
-  };
-
-  const getFileErrorMessage = () => {
-    if (fileErrorType === "audio") {
-      return "Please upload a valid audio file (MP3, WAV, OGG, M4A, or AAC).";
-    } else if (fileErrorType === "musicxml") {
-      return "Please upload a valid MusicXML file (.xml or .musicxml).";
-    }
-    return "";
-  };
-
-  const handleFileErrorConfirm = () => {
-    setShowFileErrorModal(false);
-    setFileErrorType(null);
   };
 
   const handleValidationErrorConfirm = () => {
@@ -380,6 +354,18 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
     }
   };
 
+  useEffect(() => {
+    (exerciseComponentRef.current as any).updateDataFromExerciseCreation(
+      difficulty,
+      tags,
+      types,
+      meter,
+      transpos,
+      voices,
+      customId
+    );
+  }, [difficulty, tags, types, meter, transpos, voices, customId]);
+
   if (Number.isNaN(exIndex)) {
     alert(`Couldn't find an exercise with ID ${exerciseIdParam}!`);
     navigate("/exercise-management");
@@ -425,7 +411,7 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                       {/* Right side - Exercise Type & Files */}
                       <div className="workspace-right">
                         <ExerciseTypeFiles
-                          tags={tags || []}
+                          tags={tags}
                           setTags={setTags}
                           types={types}
                           setTypes={setTypes}
@@ -463,8 +449,6 @@ export function CreateExercisePage({ allExData, setAllExData, refreshExercises }
                       handleSelectExercise={undefined}
                       isSelected={undefined}
                       fetch={undefined}
-                      filtersOpen={false}
-                      setFiltersOpen={() => {}}
                       teacherModeRef={exerciseComponentRef}
                     />
                   </div>
