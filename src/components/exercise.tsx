@@ -381,6 +381,11 @@ useEffect(() => {
       if (!svgElement) return;
       const boundingBox: DOMRect = svgElement?.getBoundingClientRect();
 
+      if (!visualObjs[0] || !visualObjs[0].lines || !visualObjs[0].lines[0]) {
+        console.error("Invalid visualObjs structure from abcjs.renderAbc");
+        return;
+      }
+
       var staffArray = visualObjs[0].lines[0].staff;
 
       for (

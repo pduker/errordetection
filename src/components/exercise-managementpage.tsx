@@ -156,9 +156,6 @@ export function ExerciseManagementPage({
   const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
   const infoButtonRef = useRef<HTMLButtonElement>(null);
 
-  // State to track if all items are selected
-  const [allSelected, setAllSelected] = useState<boolean>(false);
-
   const nextAvailableExIndex = useMemo(() => {
     let largestExIndex = -1;
     for (const exercise of allExData) {
@@ -848,6 +845,28 @@ export function ExerciseManagementPage({
             className="collapse-all-btn"
           >
             {expandedExerciseIds.length === exList.length ? 'Collapse All' : 'Preview All'}
+          </Button>
+          <Button
+            onClick={() => {
+              const allExerciseIds = exList.map((ex) => ex?.exIndex).filter((id): id is number => id !== undefined);
+              const allSelected = allExerciseIds.every(id => selectedIndexes.includes(id));
+              
+              if (allSelected) {
+                // All exercises are selected, so deselect all
+                setSelectedIndexes([]);
+              } else {
+                // Not all are selected, so select all exercises
+                setSelectedIndexes(allExerciseIds);
+              }
+            }}
+            variant="primary"
+            className="collapse-all-btn"
+          >
+            {(() => {
+              const allExerciseIds = exList.map((ex) => ex?.exIndex).filter((id): id is number => id !== undefined);
+              const allSelected = allExerciseIds.every(id => selectedIndexes.includes(id));
+              return allSelected ? 'Deselect All' : 'Select All';
+            })()}
           </Button>
         </div>
 
