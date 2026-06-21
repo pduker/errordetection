@@ -1,0 +1,50 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+        # CRA (react-scripts) treats ESLint warnings as errors when CI=true,
+        # which GitHub Actions sets by default. This repo has warnings (unused
+        # imports, hook-dependency nags), so we opt out to keep deploys from
+        # breaking on non-fatal lint issues. Locally this isn't set, which is
+        # why `npm run build` already succeeds on your machine.
+        env:
+          CI: false
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          # CRA outputs to build/ (Clef_Defender used dist/ because it is Vite).
+          path: build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@v4
+        id: deployment
