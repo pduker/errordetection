@@ -1706,124 +1706,36 @@ useEffect(() => {
     meter: string,
     transpos: boolean,
   ) {
-    let exNum = findNum(tags, diff, voices, types, meter, transpos);
-    if (meter === "Anything") {
-      if (types === "None") {
-        setCustomTitle(
-          tags.sort().join(" & ") + ": Level " + diff + ", Exercise: " + exNum,
-        );
-        if (transpos)
-          setCustomTitle(
-            tags.sort().join(" & ") +
-              ": Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum,
-          );
-      } else if (types === "Both") {
-        setCustomTitle(
-          tags.sort().join(" & ") +
-            ": Drone/Ens Parts  - Level " +
-            diff +
-            ", Exercise: " +
-            exNum,
-        );
-        if (transpos)
-          setCustomTitle(
-            tags.sort().join(" & ") +
-              ": Drone/Ens Parts w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum,
-          );
-      } else {
-        setCustomTitle(
-          tags.sort().join(" & ") +
-            ": " +
-            types +
-            " - Level " +
-            diff +
-            ", Exercise: " +
-            exNum,
-        );
-        if (transpos)
-          setCustomTitle(
-            tags.sort().join(" & ") +
-              ": " +
-              types +
-              " w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum,
-          );
-      }
-    } else {
-      if (types === "None") {
-        setCustomTitle(
-          tags.sort().join(" & ") +
-            ": " +
-            meter +
-            " - Level " +
-            diff +
-            ", Exercise: " +
-            exNum,
-        );
-        if (transpos)
-          setCustomTitle(
-            tags.sort().join(" & ") +
-              ": " +
-              meter +
-              "  w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum,
-          );
-      } else if (types === "Both") {
-        setCustomTitle(
-          tags.sort().join(" & ") +
-            ": Drone/Ens Parts: " +
-            meter +
-            " - Level " +
-            diff +
-            ", Exercise: " +
-            exNum,
-        );
-        if (transpos)
-          setCustomTitle(
-            tags.sort().join(" & ") +
-              ": Drone/Ens Parts: " +
-              meter +
-              " w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum,
-          );
-      } else {
-        setCustomTitle(
-          tags.sort().join(" & ") +
-            ": " +
-            types +
-            ": " +
-            meter +
-            " - Level " +
-            diff +
-            ", Exercise: " +
-            exNum,
-        );
-        if (transpos)
-          setCustomTitle(
-            tags.sort().join(" & ") +
-              ": " +
-              types +
-              ": " +
-              meter +
-              " w/ Transpose Insts - Level " +
-              diff +
-              ", Exercise: " +
-              exNum,
-          );
-      }
+    const exNum = findNum(tags, diff, voices, types, meter, transpos);
+
+    // The title is "<tags>: <middle>, Exercise: <exNum>", where <middle> is a
+    // handful of optional pieces joined by " - ". Each input below decides
+    // which pieces appear, so we build the pieces and then drop the empty ones.
+
+    // Descriptor labels (either may be empty / absent)
+    const typeLabel =
+      types === "None" ? "" : types === "Both" ? "Drone/Ens Parts" : types;
+    const meterLabel = meter === "Anything" ? "" : meter;
+
+    // Type + meter join with ": " when both are present (e.g. "Drone/Ens Parts: simple")
+    let descriptor = [typeLabel, meterLabel].filter(Boolean).join(": ");
+    if (transpos) {
+      descriptor = descriptor
+        ? `${descriptor} w/ Transpose Insts`
+        : "Transpose Insts";
     }
+
+    // Voice count, only shown when there's more than one voice
+    const voiceLabel = voices > 1 ? `${voices} Voices` : "";
+
+    // Assemble the middle section, dropping any empty pieces
+    const middle = [voiceLabel, descriptor, `Level ${diff}`]
+      .filter(Boolean)
+      .join(" - ");
+
+    setCustomTitle(
+      `${tags.sort().join(" & ")}: ${middle}, Exercise: ${exNum}`,
+    );
   };
 
   const findNum = function (
